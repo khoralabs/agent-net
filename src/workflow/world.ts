@@ -1,0 +1,23 @@
+import { getWorld } from "workflow/runtime";
+
+import { resolveHarnessDataDir, workflowDbPath } from "./paths.ts";
+
+const startedForDataDir = new Set<string>();
+
+export function configureTursoWorldEnv(opts?: { dataDir?: string }): string {
+  const dataDir = resolveHarnessDataDir(opts?.dataDir);
+  process.env.WORKFLOW_TARGET_WORLD ??= "@workflow-worlds/turso";
+  process.env.WORKFLOW_TURSO_DATABASE_URL ??= `file:${workflowDbPath(dataDir)}`;
+  process.env.WORKFLOW_SERVICE_URL ??= `http://localhost:${process.env.PORT ?? "3000"}`;
+  return dataDir;
+}
+
+export async function startTursoWorldWorker(opts?: { dataDir?: string }): Promise<void> {
+  const dataDir = configureTursoWorldEnv(opts);
+  if (startedForDataDir.has(dataDir)) return;
+  const world = getWorld();
+  if (typeof world.start === "function") {
+    await world.start();
+  }
+  startedForDataDir.add(dataDir);
+}

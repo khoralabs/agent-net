@@ -1,0 +1,31 @@
+import path from "node:path";
+
+import { loadIdentity } from "@khoralabs/did-key-identity";
+import { KhoraClient } from "@khoralabs/khora-client";
+import { AgentStore } from "../../../../agents";
+
+export function resolveKhoraServerBaseUrl(): string | undefined {
+  const value =
+    process.env.KHORA_SERVER_URL?.trim() ||
+    process.env.HARNESS_KHORA_BASE_URL?.trim() ||
+    process.env.KHORA_BASE_URL?.trim();
+  return value !== undefined && value.length > 0 ? value : undefined;
+}
+
+export function resolveAgentsDataDir(): string {
+  const configured = process.env.HARNESS_AGENTS_DATA_DIR?.trim();
+  if (configured !== undefined && configured.length > 0) return configured;
+  return path.join(process.cwd(), ".harness-data", "agents");
+}
+
+export async function createHarnessKhoraClientForAgent(opts: {
+  baseUrl: string;
+  agentDid: string;
+  agentsDataDir?: string;
+}): Promise<KhoraClient | undefined> {
+  const dataDir = opts.agentsDataDir ?? resolveAgentsDataDir();
+  const keyPath = AgentStore.keyPath(dataDir, opts.agentDid);
+  const signer = await loadIdentity(keyPath);
+  if (signer === undefined) return undefined;
+  return new KhoraClient({ baseUrl: opts.baseUrl, signer });
+}
