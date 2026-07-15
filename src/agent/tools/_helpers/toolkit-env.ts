@@ -3,6 +3,7 @@ import type { EmbeddingModel } from "@khoralabs/memories-core/helpers";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service-client";
 
 import type { AgentChatClient } from "../../../chat";
+import { resolveMemoriesBaseUrlFromEnv } from "../../../lib/memories-base-url.ts";
 import {
   agentMemoriesDatabase,
   createHarnessMemoriesClient,
@@ -67,12 +68,10 @@ export async function createHarnessMemoriesClientForAgent(opts: {
   });
 }
 
-export function resolveMemoriesServiceBaseUrl(): string | undefined {
-  const value =
-    process.env.MEMORIES_SERVICE_URL?.trim() ||
-    process.env.HARNESS_MEMORIES_BASE_URL?.trim() ||
-    process.env.MEMORIES_BASE_URL?.trim();
-  return value !== undefined && value.length > 0 ? value : undefined;
+export function resolveMemoriesServiceBaseUrl(
+  env: NodeJS.ProcessEnv = process.env,
+): string | undefined {
+  return resolveMemoriesBaseUrlFromEnv(env);
 }
 
 export type HarnessAgentWorkflowDeps = Pick<

@@ -2,26 +2,33 @@
 
 Budgeted multi-agent orchestration on top of `@khoralabs/agent-net`.
 
-The CLI creates a `NetworkHarnessHandle` (remote Khora + remote relay + local memories), then `setupSwarm({ harness, config })` spawns agents and runs durable workflow loops until the shared token budget is exhausted.
+The CLI creates a `NetworkHarnessHandle` (remote Khora + relay + memories), then `setupSwarm({ harness, config })` spawns agents and runs durable workflow loops until the shared token budget is exhausted.
 
 ```bash
 # from the agent-net repo root
 bun run swarm -- \
   --khora-url http://127.0.0.1:8788 \
   --relay-url http://127.0.0.1:8790 \
+  --memories-url http://127.0.0.1:8791 \
   --agents 2
 
 bun run --filter @khoralabs/agent-net-swarm test
 ```
 
 ```ts
-import { startNetworkHarness, requireKhoraBaseUrl, requireRelayBaseUrl } from "@khoralabs/agent-net";
-import { provideHarnessForSession, setupSwarm, swarmOrchestrator } from "@khoralabs/agent-net-swarm";
+import {
+  requireKhoraBaseUrl,
+  requireMemoriesBaseUrl,
+  requireRelayBaseUrl,
+  startNetworkHarness,
+} from "@khoralabs/agent-net";
+import { provideHarnessForSession, setupSwarm } from "@khoralabs/agent-net-swarm";
 
 const harness = await startNetworkHarness({
   dataDir,
   khoraBaseUrl: requireKhoraBaseUrl(undefined),
   relayBaseUrl: requireRelayBaseUrl(undefined),
+  memoriesBaseUrl: requireMemoriesBaseUrl(undefined),
 });
 provideHarnessForSession(config.sessionId, harness);
 await setupSwarm({ harness, config });

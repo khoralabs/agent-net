@@ -40,6 +40,10 @@ export {
   resolveKhoraBaseUrlFromEnv,
 } from "./lib/khora-base-url.ts";
 export {
+  requireMemoriesBaseUrl,
+  resolveMemoriesBaseUrlFromEnv,
+} from "./lib/memories-base-url.ts";
+export {
   requireRelayBaseUrl,
   resolveRelayBaseUrlFromEnv,
 } from "./lib/relay-base-url.ts";

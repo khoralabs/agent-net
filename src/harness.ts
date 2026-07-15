@@ -1,5 +1,3 @@
-import path from "node:path";
-
 import { loadIdentity } from "@khoralabs/did-key-identity";
 import { createNoAuthProvider, MemoriesServiceClient } from "@khoralabs/memories-service-client";
 import { AgentStore, ManagedAgentPool } from "./agents";
@@ -10,7 +8,6 @@ import {
   type NetworkHarnessAgentApi,
   type NetworkHarnessCore,
 } from "./harness-agents.ts";
-import { startMemoriesService } from "./memories";
 import {
   emitNetworkEvent,
   getNetworkLogContext,
@@ -34,9 +31,8 @@ export type NetworkHarnessOptions = {
   khoraBaseUrl: string;
   /** Base URL of a running relay server (e.g. http://127.0.0.1:8790). */
   relayBaseUrl: string;
-  /** Override the port the memories service binds to. Defaults to a random free port. */
-  memoriesPort?: number;
-  sqlCipherKey?: string;
+  /** Base URL of a running memories service (e.g. http://127.0.0.1:8791). */
+  memoriesBaseUrl: string;
 };
 
 export type NetworkHarnessHandle = NetworkHarnessCore & NetworkHarnessAgentApi;
@@ -54,19 +50,15 @@ export async function startNetworkHarness(
     throw new Error("startNetworkHarness: relayBaseUrl is required");
   }
 
-  const memoriesDataDir = path.join(opts.dataDir, "memories");
+  const memoriesBaseUrl = opts.memoriesBaseUrl.trim().replace(/\/$/, "");
+  if (memoriesBaseUrl.length === 0) {
+    throw new Error("startNetworkHarness: memoriesBaseUrl is required");
+  }
+
   const agentsDataDir = harnessAgentsDataDir(opts.dataDir);
 
-  // Memories must start first — it calls Database.setCustomSQLite which must
-  // run before any bun:sqlite Database is opened (e.g. signed chat).
-  const memories = startMemoriesService({
-    dataDir: memoriesDataDir,
-    sqlCipherKey: opts.sqlCipherKey ?? "harness-memories-key",
-    port: opts.memoriesPort,
-  });
-
   const memoriesClient = new MemoriesServiceClient({
-    baseUrl: memories.baseUrl,
+    baseUrl: memoriesBaseUrl,
     auth: createNoAuthProvider(),
   });
 
@@ -100,7 +92,7 @@ export async function startNetworkHarness(
       payload: {
         serverBaseUrl: khoraBaseUrl,
         relayBaseUrl,
-        memoriesBaseUrl: memories.baseUrl,
+        memoriesBaseUrl,
       },
     });
   }
@@ -108,7 +100,7 @@ export async function startNetworkHarness(
   const core: NetworkHarnessCore = {
     serverBaseUrl: khoraBaseUrl,
     relayBaseUrl,
-    memoriesBaseUrl: memories.baseUrl,
+    memoriesBaseUrl,
     get agentDids() {
       return pool.list();
     },
@@ -132,7 +124,6 @@ export async function startNetworkHarness(
           message: "Network harness stopped",
         });
       }
-      memories.stop();
     },
   };
 

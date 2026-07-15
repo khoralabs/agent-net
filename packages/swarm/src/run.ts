@@ -6,6 +6,7 @@ import {
   createNetworkLogger,
   initNetworkLog,
   requireKhoraBaseUrl,
+  requireMemoriesBaseUrl,
   requireRelayBaseUrl,
   resolveHarnessDataDir,
   startNetworkHarness,
@@ -21,6 +22,7 @@ function parseArgs(argv: string[]): {
   config: SwarmConfig;
   khoraBaseUrl?: string;
   relayBaseUrl?: string;
+  memoriesBaseUrl?: string;
 } {
   const args = new Map<string, string>();
   for (let i = 0; i < argv.length; i++) {
@@ -45,6 +47,7 @@ function parseArgs(argv: string[]): {
   const sessionId = args.get("session-id")?.trim() || crypto.randomUUID();
   const khoraBaseUrl = args.get("khora-url")?.trim();
   const relayBaseUrl = args.get("relay-url")?.trim();
+  const memoriesBaseUrl = args.get("memories-url")?.trim();
 
   return {
     config: {
@@ -62,11 +65,12 @@ function parseArgs(argv: string[]): {
     },
     ...(khoraBaseUrl !== undefined && khoraBaseUrl.length > 0 ? { khoraBaseUrl } : {}),
     ...(relayBaseUrl !== undefined && relayBaseUrl.length > 0 ? { relayBaseUrl } : {}),
+    ...(memoriesBaseUrl !== undefined && memoriesBaseUrl.length > 0 ? { memoriesBaseUrl } : {}),
   };
 }
 
 async function main(): Promise<void> {
-  const { config, khoraBaseUrl, relayBaseUrl } = parseArgs(process.argv.slice(2));
+  const { config, khoraBaseUrl, relayBaseUrl, memoriesBaseUrl } = parseArgs(process.argv.slice(2));
   configureTursoWorldEnv({ dataDir: config.dataDir });
   await startTursoWorldWorker({ dataDir: config.dataDir });
 
@@ -74,6 +78,7 @@ async function main(): Promise<void> {
     dataDir: config.dataDir,
     khoraBaseUrl: requireKhoraBaseUrl(khoraBaseUrl),
     relayBaseUrl: requireRelayBaseUrl(relayBaseUrl),
+    memoriesBaseUrl: requireMemoriesBaseUrl(memoriesBaseUrl),
   });
   provideHarnessForSession(config.sessionId, harness);
 
