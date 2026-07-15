@@ -10,6 +10,7 @@
   "scripts": {
     "start": "bun run src/orchestrator.ts",
     "swarm": "bun run src/run-swarm.ts",
+    "events": "bun run src/events-cli.ts",
     "agent:dev": "nitro dev",
     "agent:setup": "workflow-turso-setup",
     "typecheck": "tsc --noEmit -p tsconfig.json"

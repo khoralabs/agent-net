@@ -24,7 +24,7 @@
     "reference:start": "bun run --filter @khoralabs/agent-net-reference start",
     "swarm": "bun run --filter @khoralabs/agent-net-reference swarm",
     "swarm:setup": "bun run --filter @khoralabs/agent-net-reference agent:setup",
-    "swarm:events": "bun run --filter @khoralabs/agent-net-swarm events",
+    "swarm:events": "bun run --filter @khoralabs/agent-net-reference events",
     "swarm:test": "bun run --filter @khoralabs/agent-net-swarm test && bun run --filter @khoralabs/agent-net test",
     "submodules:init": "git submodule update --init --recursive",
     "submodules:update": "git submodule update --remote --merge vendor/memories vendor/relay vendor/chat vendor/libs && bun install",
