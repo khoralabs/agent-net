@@ -1,0 +1,37 @@
+{
+  "name": "@khoralabs/agent-net-reference",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./world/turso": "./src/world/turso.ts"
+  },
+  "scripts": {
+    "start": "bun run src/orchestrator.ts",
+    "swarm": "bun run src/run-swarm.ts",
+    "agent:dev": "nitro dev",
+    "agent:setup": "workflow-turso-setup",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@khoralabs/agent-net": "workspace:*",
+    "@khoralabs/agent-net-swarm": "workspace:*",
+    "@khoralabs/memories-service-auth": "workspace:*",
+    "@khoralabs/memories-service-http": "workspace:*",
+    "@khoralabs/memories-service-storage-sqlite": "workspace:*",
+    "@khoralabs/observability": "workspace:*",
+    "@khoralabs/relay-server-http": "workspace:*",
+    "@opentelemetry/api": "^1.9.1",
+    "@workflow-worlds/turso": "^0.2.2",
+    "nitro": "^3.0.0",
+    "workflow": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

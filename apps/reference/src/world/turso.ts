@@ -1,9 +1,9 @@
+import { resolveHarnessDataDir, workflowDbPath } from "@khoralabs/agent-net";
 import { getWorld } from "workflow/runtime";
-
-import { resolveHarnessDataDir, workflowDbPath } from "./paths.ts";
 
 const startedForDataDir = new Set<string>();
 
+/** Configure Workflow SDK to use the Turso world for this process. */
 export function configureTursoWorldEnv(opts?: { dataDir?: string }): string {
   const dataDir = resolveHarnessDataDir(opts?.dataDir);
   process.env.WORKFLOW_TARGET_WORLD ??= "@workflow-worlds/turso";

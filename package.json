@@ -1,15 +1,11 @@
 {
-  "name": "@khoralabs/agent-net",
+  "name": "@khoralabs/agent-net-workspace",
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "module": "src/index.ts",
-  "exports": {
-    ".": "./src/index.ts",
-    "./network": "./src/network/index.ts"
-  },
   "workspaces": [
     "packages/*",
+    "apps/*",
     "vendor/libs/packages/*/**",
     "vendor/chat/core",
     "vendor/chat/persistence",
@@ -19,60 +15,25 @@
     "vendor/memories/packages/memories-service/*/**"
   ],
   "scripts": {
-    "typecheck": "tsc --noEmit && bun run --filter @khoralabs/agent-net-swarm typecheck",
+    "typecheck": "bun run --filter '@khoralabs/agent-net' typecheck && bun run --filter '@khoralabs/agent-net-swarm' typecheck && bun run --filter '@khoralabs/agent-net-reference' typecheck",
     "format": "biome check --write .",
     "format:check": "biome check .",
-    "agent:dev": "nitro dev",
-    "agent:setup": "workflow-turso-setup",
-    "agent:test": "bun test src/agent",
-    "swarm": "bun run --filter @khoralabs/agent-net-swarm swarm",
-    "swarm:setup": "workflow-turso-setup",
+    "agent:dev": "bun run --filter @khoralabs/agent-net-reference agent:dev",
+    "agent:setup": "bun run --filter @khoralabs/agent-net-reference agent:setup",
+    "agent:test": "bun run --filter @khoralabs/agent-net test",
+    "reference:start": "bun run --filter @khoralabs/agent-net-reference start",
+    "swarm": "bun run --filter @khoralabs/agent-net-reference swarm",
+    "swarm:setup": "bun run --filter @khoralabs/agent-net-reference agent:setup",
     "swarm:events": "bun run --filter @khoralabs/agent-net-swarm events",
-    "swarm:test": "bun run --filter @khoralabs/agent-net-swarm test && bun test src/agent/tools/chat src/observability src/network",
+    "swarm:test": "bun run --filter @khoralabs/agent-net-swarm test && bun run --filter @khoralabs/agent-net test",
     "submodules:init": "git submodule update --init --recursive",
     "submodules:update": "git submodule update --remote --merge vendor/memories vendor/relay vendor/chat vendor/libs && bun install",
     "prepare": "husky"
   },
-  "dependencies": {
-    "@ai-sdk/google": "^4.0.3",
-    "@khoralabs/agent-capabilities": "^0.2.0",
-    "@khoralabs/agent-capabilities-ai-sdk": "^0.2.0",
-    "@khoralabs/agent-capabilities-otel": "^0.2.0",
-    "@khoralabs/did-key-identity": "^0.1.0",
-    "@khoralabs/chat-core": "workspace:*",
-    "@khoralabs/chat-persistence": "workspace:*",
-    "@khoralabs/chat-persistence-sqlite": "workspace:*",
-    "@khoralabs/khora-client": "^0.1.0",
-    "@khoralabs/vellum-client": "^0.1.0",
-    "@khoralabs/memories-core": "workspace:*",
-    "@khoralabs/memories-ontologies": "workspace:*",
-    "@khoralabs/memories-persistence-core": "workspace:*",
-    "@khoralabs/memories-service-auth": "workspace:*",
-    "@khoralabs/memories-service-client": "workspace:*",
-    "@khoralabs/memories-service-http": "workspace:*",
-    "@khoralabs/memories-service-storage-core": "workspace:*",
-    "@khoralabs/memories-service-storage-sqlite": "workspace:*",
-    "@khoralabs/observability": "workspace:*",
-    "@khoralabs/relay-client": "workspace:*",
-    "@khoralabs/relay-crypto": "workspace:*",
-    "@khoralabs/relay-server-http": "workspace:*",
-    "@libsql/client": "^0.14.0",
-    "@noble/ed25519": "^3.1.0",
-    "@opentelemetry/api": "^1.9.1",
-    "@workflow-worlds/turso": "^0.2.2",
-    "ai": "^7.0.9",
-    "nitro": "^3.0.0",
-    "pino": "^9.6.0",
-    "unstorage": "^1.17.5",
-    "workflow": "^4.5.0",
-    "zod": "^4"
-  },
   "devDependencies": {
     "@biomejs/biome": "^2.4.10",
     "@types/bun": "latest",
-    "husky": "^9.1.7"
-  },
-  "peerDependencies": {
+    "husky": "^9.1.7",
     "typescript": "^5"
   }
 }

@@ -1,10 +1,16 @@
+import {
+  type AgentUIMessage,
+  type AgentWorkflowParams,
+  agentResponse,
+  ensureAgentChatThread,
+  getAgentChatService,
+  getDevAgentDid,
+  HARNESS_AGENT_ID,
+} from "@khoralabs/agent-net";
 import { start } from "workflow/api";
-import { HARNESS_AGENT_ID } from "./agents/index.ts";
-import { ensureAgentChatThread, getAgentChatService, getDevAgentDid } from "./chat-service.ts";
+
 import "./otel.ts";
-import type { AgentUIMessage, AgentWorkflowParams } from "./types.ts";
-import { agentResponse } from "./workflows/agent-response.ts";
-import { startTursoWorldWorker } from "./world.ts";
+import { startTursoWorldWorker } from "../world/turso.ts";
 
 void startTursoWorldWorker();
 

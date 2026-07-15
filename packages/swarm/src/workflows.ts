@@ -1,6 +1,5 @@
 import {
   type AgentTurnParams,
-  configureTursoWorldEnv,
   emitNetworkEvent,
   networkEventId,
   runAgentTurn,
@@ -62,7 +61,6 @@ export async function setupSwarmStep(config: SwarmConfig): Promise<{
   agents: AgentLoopState[];
 }> {
   "use step";
-  configureTursoWorldEnv({ dataDir: config.dataDir });
   const harness = takeHarnessForSession(config.sessionId);
   return setupSwarm({ harness, config });
 }
@@ -103,6 +101,10 @@ export async function summarizeSwarmStep(
   return summarizeSwarmState(dataDir, swarmStateId, results);
 }
 
+/**
+ * Agent loop workflow. Hosting process must configure/start the Workflow world
+ * before `start(swarmOrchestrator, …)` runs.
+ */
 export async function agentLoop(
   config: SwarmConfig,
   agent: AgentLoopState,
@@ -110,7 +112,6 @@ export async function agentLoop(
 ): Promise<AgentLoopResult> {
   "use workflow";
 
-  configureTursoWorldEnv({ dataDir: config.dataDir });
   let turnCount = 0;
 
   while (await checkTokenBudgetRemainingStep(config.dataDir, swarmStateId)) {
@@ -156,7 +157,6 @@ export async function agentLoop(
 export async function swarmOrchestrator(config: SwarmConfig): Promise<SwarmResult> {
   "use workflow";
 
-  configureTursoWorldEnv({ dataDir: config.dataDir });
   const { swarmStateId, sessionId, agents } = await setupSwarmStep(config);
   const loopRunIds = await spawnAgentLoopsStep(config, agents, swarmStateId);
   const results = await awaitAgentLoopsStep(loopRunIds);

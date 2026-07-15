@@ -1,8 +1,10 @@
 # @khoralabs/agent-net-swarm
 
-Budgeted multi-agent orchestration on top of `@khoralabs/agent-net`.
+Budgeted multi-agent orchestration library on top of `@khoralabs/agent-net`.
 
-The CLI creates a `NetworkHarnessHandle` (remote Khora + relay + memories), then `setupSwarm({ harness, config })` spawns agents and runs durable workflow loops until the shared token budget is exhausted.
+Exports `setupSwarm`, `swarmOrchestrator`, session helpers, and related types. It does **not** select a Workflow world or host memories/relay.
+
+Run the swarm CLI from the reference app (which configures Turso and wires remote URLs):
 
 ```bash
 # from the agent-net repo root
@@ -15,21 +17,4 @@ bun run swarm -- \
 bun run --filter @khoralabs/agent-net-swarm test
 ```
 
-```ts
-import {
-  requireKhoraBaseUrl,
-  requireMemoriesBaseUrl,
-  requireRelayBaseUrl,
-  startNetworkHarness,
-} from "@khoralabs/agent-net";
-import { provideHarnessForSession, setupSwarm } from "@khoralabs/agent-net-swarm";
-
-const harness = await startNetworkHarness({
-  dataDir,
-  khoraBaseUrl: requireKhoraBaseUrl(undefined),
-  relayBaseUrl: requireRelayBaseUrl(undefined),
-  memoriesBaseUrl: requireMemoriesBaseUrl(undefined),
-});
-provideHarnessForSession(config.sessionId, harness);
-await setupSwarm({ harness, config });
-```
+The hosting process must configure/start the Workflow world before `start(swarmOrchestrator, …)`.

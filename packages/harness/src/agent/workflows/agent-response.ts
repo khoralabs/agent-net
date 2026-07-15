@@ -12,10 +12,14 @@ import {
 } from "../tools/khora/_helpers/khora-client-factory.ts";
 import { resolveHarnessEmbeddingModel } from "../tools/memories/_helpers/embedding-model.ts";
 import type { AgentWorkflowParams, AgentWorkflowResult } from "../types.ts";
-import { configureTursoWorldEnv } from "../world.ts";
 
 export type AgentResponseDeps = RunAgentWorkflowDependencies;
 
+/**
+ * Durable agent-response workflow.
+ * The hosting process must configure and start the Workflow world (e.g. Turso)
+ * before invoking this — harness workflows do not select a world backend.
+ */
 export async function agentResponse(params: AgentWorkflowParams): Promise<AgentWorkflowResult> {
   "use workflow";
 
@@ -27,8 +31,6 @@ export async function executeAgentResponse(
   deps?: AgentResponseDeps,
 ): Promise<AgentWorkflowResult> {
   "use step";
-
-  configureTursoWorldEnv();
 
   if (deps !== undefined) {
     return runAgentWorkflow(params, deps);
@@ -66,8 +68,6 @@ export async function runAgentResponseStep(
   params: AgentWorkflowParams,
 ): Promise<AgentWorkflowResult> {
   "use step";
-
-  configureTursoWorldEnv();
 
   const sessionId = params.context.sessionId;
   if (sessionId === undefined || sessionId.length === 0) {

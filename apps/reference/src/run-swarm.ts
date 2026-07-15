@@ -2,7 +2,6 @@ import path from "node:path";
 
 import {
   closeNetworkLog,
-  configureTursoWorldEnv,
   createNetworkLogger,
   initNetworkLog,
   requireKhoraBaseUrl,
@@ -10,13 +9,15 @@ import {
   requireRelayBaseUrl,
   resolveHarnessDataDir,
   startNetworkHarness,
-  startTursoWorldWorker,
 } from "@khoralabs/agent-net";
+import {
+  provideHarnessForSession,
+  type SwarmConfig,
+  swarmOrchestrator,
+} from "@khoralabs/agent-net-swarm";
 import { start } from "workflow/api";
 
-import { provideHarnessForSession } from "./pending-harness.ts";
-import type { SwarmConfig } from "./types.ts";
-import { swarmOrchestrator } from "./workflows.ts";
+import { configureTursoWorldEnv, startTursoWorldWorker } from "./world/turso.ts";
 
 function parseArgs(argv: string[]): {
   config: SwarmConfig;
@@ -69,6 +70,9 @@ function parseArgs(argv: string[]): {
   };
 }
 
+/**
+ * Reference swarm CLI: configure Turso world, then run the swarm orchestrator.
+ */
 async function main(): Promise<void> {
   const { config, khoraBaseUrl, relayBaseUrl, memoriesBaseUrl } = parseArgs(process.argv.slice(2));
   configureTursoWorldEnv({ dataDir: config.dataDir });

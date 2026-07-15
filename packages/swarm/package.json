@@ -8,18 +8,16 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "swarm": "bun run src/run.ts",
     "events": "bun run src/events-cli.ts",
     "test": "bun test src",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@khoralabs/agent-net": "file:../..",
+    "@khoralabs/agent-net": "workspace:*",
     "@khoralabs/chat-core": "workspace:*",
     "@khoralabs/did-key-identity": "^0.1.0",
     "@khoralabs/khora-client": "^0.1.0",
     "@libsql/client": "^0.14.0",
-    "@workflow-worlds/turso": "^0.2.2",
     "ai": "^7.0.9",
     "workflow": "^4.5.0"
   },

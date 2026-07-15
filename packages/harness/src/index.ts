@@ -4,6 +4,15 @@ export {
   MemoriesServiceClient,
   type MemoriesServiceClientOptions,
 } from "@khoralabs/memories-service-client";
+export { HARNESS_AGENT_ID } from "./agent/agents/index.ts";
+export {
+  ensureAgentChatThread,
+  ensureDevAgentIdentity,
+  getAgentChatService,
+  getDevAgentDid,
+} from "./agent/chat-service.ts";
+export type { AgentWorkflowParams, AgentWorkflowResult } from "./agent/types.ts";
+export { agentResponse } from "./agent/workflows/agent-response.ts";
 export type {
   AgentTurnDeps,
   AgentTurnParams,
@@ -48,11 +57,6 @@ export {
   resolveRelayBaseUrlFromEnv,
 } from "./lib/relay-base-url.ts";
 export {
-  type MemoriesServiceHandle,
-  type MemoriesServiceOptions,
-  startMemoriesService,
-} from "./memories";
-export {
   collectThreadHashSnapshots,
   getNetworkSession,
   type NetworkRuntimeSession,
@@ -74,6 +78,4 @@ export {
   initNetworkLog,
   listNetworkEvents,
 } from "./observability/network-log";
-export { type RelayServerHandle, type RelayServerOptions, startRelayServer } from "./relay";
 export { resolveHarnessDataDir, workflowDbPath } from "./workflow/paths.ts";
-export { configureTursoWorldEnv, startTursoWorldWorker } from "./workflow/world";
