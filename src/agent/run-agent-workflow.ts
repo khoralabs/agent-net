@@ -136,6 +136,7 @@ export async function runAgentWorkflow(
     khoraClient: deps.khoraClient,
     embeddingModel: deps.embeddingModel,
     agentChat: deps.agentChat,
+    agentDid: params.agent.actingFor.id,
     sessionId: deps.sessionId ?? params.context.sessionId,
     networkDataDir: deps.networkDataDir,
   });

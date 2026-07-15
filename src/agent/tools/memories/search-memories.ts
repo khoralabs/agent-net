@@ -3,6 +3,7 @@ import { type MemorySearchHit, runHybridMemorySearch } from "@khoralabs/memories
 import { z } from "zod";
 import { hasMemoriesClient } from "../policies";
 import type { HarnessToolkitEnv } from "../types";
+import { touchRecentNamespaces } from "./_helpers/recent-namespaces.ts";
 
 export const searchMemoriesTool = tool<
   "searchMemories",
@@ -23,10 +24,11 @@ export const searchMemoriesTool = tool<
     const client = ctx.env.memoriesClient;
     if (client === undefined) throw new Error("memories client is not configured");
 
+    const namespace = input.namespace.trim();
     const hits = await runHybridMemorySearch(
       client,
       {
-        namespace: input.namespace.trim(),
+        namespace,
         embeddingModel: ctx.env.embeddingModel,
         embeddingCache: ctx.env.embeddingCache,
         memoriesSnapshotRootHex: ctx.env.memoriesSnapshotRootHex,
@@ -40,6 +42,11 @@ export const searchMemoriesTool = tool<
         },
       },
     );
+
+    await touchRecentNamespaces(ctx.env.recentNamespaces, [
+      ...hits.map((hit) => hit.namespace),
+      namespace,
+    ]);
 
     return { hits };
   },

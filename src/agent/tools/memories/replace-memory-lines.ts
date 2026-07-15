@@ -11,6 +11,7 @@ import {
 import type { HarnessToolkitEnv } from "../types.ts";
 import { loadMemoryTextByKey } from "./_helpers/memory-text.ts";
 import { writeMemoryNode } from "./_helpers/memory-write.ts";
+import { touchRecentNamespaces } from "./_helpers/recent-namespaces.ts";
 
 const zLineChange = z.tuple([z.number().int().min(1), z.string()]);
 
@@ -56,6 +57,7 @@ export const replaceMemoryLinesTool = tool<
       }
     }
 
+    await touchRecentNamespaces(ctx.env.recentNamespaces, namespace);
     return { namespace, key, memoryIds, lines: readLines(updated) };
   },
 });

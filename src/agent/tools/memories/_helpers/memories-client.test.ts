@@ -50,4 +50,31 @@ describe("createLazyHarnessMemoriesClient", () => {
 
     expect(getCreateCount()).toBe(1);
   });
+
+  test("proxies persistence.listMemoryNamespaces through the lazy client", async () => {
+    let createCount = 0;
+    const mockClient = {
+      search: async () => [],
+      mergeMemory: async () => ["memory-1"],
+      deleteMemory: async () => undefined,
+      persistence: {
+        listMemoryNamespaces: async () => ["notes", "skills"],
+      },
+    } as unknown as RemoteMemoriesClientAsync;
+
+    const lazyClient = createLazyHarnessMemoriesClient(
+      { baseUrl: "http://localhost:1234", database },
+      async () => {
+        createCount += 1;
+        return mockClient;
+      },
+    );
+
+    expect(createCount).toBe(0);
+    const listFn = lazyClient.persistence.listMemoryNamespaces;
+    expect(listFn).toBeDefined();
+    const namespaces = await listFn?.call(lazyClient.persistence);
+    expect(namespaces).toEqual(["notes", "skills"]);
+    expect(createCount).toBe(1);
+  });
 });

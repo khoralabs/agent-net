@@ -4,6 +4,7 @@ import { evaluateComposable } from "@khoralabs/agent-capabilities";
 import type { SearchHit, SearchParams } from "@khoralabs/memories-core";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service-client";
 import { harnessToolkit } from "../_toolkit.ts";
+import { createEphemeralRecentNamespacesTracker } from "../memories/_helpers/recent-namespaces.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
 import { formatSkillDocument, SKILLS_NAMESPACE, skillRecordFromText } from "./_helpers/skills.ts";
 
@@ -33,6 +34,7 @@ function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEn
     skills: [],
     activatedSkillNames: new Set(),
     embeddingCache: new Map(),
+    recentNamespaces: createEphemeralRecentNamespacesTracker(),
     ...overrides,
   };
 }

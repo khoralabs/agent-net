@@ -7,6 +7,7 @@ import {
   agentMemoriesDatabase,
   createHarnessMemoriesClient,
 } from "../memories/_helpers/memories-client";
+import { resolveRecentNamespacesTracker } from "../memories/_helpers/recent-namespaces";
 import { discoverSkillsFromMemories } from "../skills/_helpers/skills";
 import type { HarnessToolkitEnv } from "../types";
 
@@ -23,20 +24,29 @@ export async function createHarnessToolkitEnv(input: {
   memoriesClient?: RemoteMemoriesClientAsync;
   khoraClient?: KhoraClient;
   agentChat?: AgentChatClient;
+  agentDid?: string;
   sessionId?: string;
   networkDataDir?: string;
   embeddingModel?: EmbeddingModel;
 }): Promise<HarnessToolkitEnv> {
+  const agentDid = input.agentDid?.trim() || input.agentChat?.did;
+  const recentNamespaces = await resolveRecentNamespacesTracker({
+    agentDid,
+    networkDataDir: input.networkDataDir,
+  });
+
   const env: HarnessToolkitEnv = {
     memoriesClient: input.memoriesClient,
     khoraClient: input.khoraClient,
     agentChat: input.agentChat,
+    agentDid,
     sessionId: input.sessionId,
     networkDataDir: input.networkDataDir,
     embeddingModel: input.embeddingModel,
     embeddingCache: new Map(),
     skills: [],
     activatedSkillNames: new Set(),
+    recentNamespaces,
   };
 
   if (input.memoriesClient === undefined) return env;

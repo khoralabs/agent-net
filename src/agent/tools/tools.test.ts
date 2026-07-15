@@ -4,6 +4,7 @@ import { evaluateComposable } from "@khoralabs/agent-capabilities";
 import type { MergeMemoryParamsNode, SearchHit, SearchParams } from "@khoralabs/memories-core";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service-client";
 import { harnessToolkit } from "./_toolkit.ts";
+import { createEphemeralRecentNamespacesTracker } from "./memories/_helpers/recent-namespaces.ts";
 import {
   defaultSkillKey,
   formatSkillDocument,
@@ -13,7 +14,7 @@ import {
 import { activateSkillByName } from "./skills/activate-skill.ts";
 import type { HarnessToolkitEnv } from "./types.ts";
 
-type HarnessToolName = "writeMemory" | "writeSkill" | "searchMemories";
+type HarnessToolName = "writeMemory" | "writeSkill" | "searchMemories" | "listNamespaces";
 
 type MergedMemory = {
   namespace: string;
@@ -33,6 +34,7 @@ type MockHarnessMemoriesClient = {
   persistence: {
     findMemoryIdByKey: (namespace: string, key: string) => Promise<string | undefined>;
     getSourceMapTextPreview: (sourceMapId: string, maxChars?: number) => Promise<string | null>;
+    listMemoryNamespaces: () => Promise<string[]>;
   };
 };
 
@@ -41,6 +43,7 @@ function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEn
     skills: [],
     activatedSkillNames: new Set(),
     embeddingCache: new Map(),
+    recentNamespaces: createEphemeralRecentNamespacesTracker(),
     ...overrides,
   };
 }
@@ -98,6 +101,8 @@ function createMockMemoriesClient(merged: MergedMemory[]): MockHarnessMemoriesCl
         const index = Number.parseInt(sourceMapId.replace("source-", ""), 10);
         return merged[index]?.text ?? null;
       },
+      listMemoryNamespaces: async () =>
+        [...new Set(merged.map((item) => item.namespace))].sort((a, b) => a.localeCompare(b)),
     },
   };
 }
@@ -218,6 +223,45 @@ describe("harness memory tools", () => {
     )) as { hits: Array<{ memory_key: string }> };
     expect(result.hits.length).toBeGreaterThan(0);
     expect(result.hits[0]?.memory_key).toBe("plan");
+  });
+
+  test("listNamespaces returns distinct namespaces from the memory db", async () => {
+    const writeMemory = await toolHandler("writeMemory");
+    const listNamespaces = await toolHandler("listNamespaces");
+
+    await writeMemory(
+      { env, agentId: "agent", agentName: "Agent" },
+      { namespace: "notes", key: "a", text: "A" },
+    );
+    await writeMemory(
+      { env, agentId: "agent", agentName: "Agent" },
+      { namespace: "inbox", key: "b", text: "B" },
+    );
+
+    const before = [...env.recentNamespaces.top()];
+    const result = (await listNamespaces({ env, agentId: "agent", agentName: "Agent" }, {})) as {
+      namespaces: string[];
+    };
+    expect(result.namespaces).toEqual(["inbox", "notes"]);
+    expect(env.recentNamespaces.top()).toEqual(before);
+  });
+
+  test("writeMemory and searchMemories update recentNamespaces MRU", async () => {
+    const writeMemory = await toolHandler("writeMemory");
+    const searchMemories = await toolHandler("searchMemories");
+
+    await writeMemory(
+      { env, agentId: "agent", agentName: "Agent" },
+      { namespace: "notes", key: "plan", text: "Ship the harness." },
+    );
+    expect(env.recentNamespaces.top()).toEqual(["notes"]);
+
+    await searchMemories(
+      { env, agentId: "agent", agentName: "Agent" },
+      { namespace: "inbox", query: "missing" },
+    );
+    expect(env.recentNamespaces.top()[0]).toBe("inbox");
+    expect(env.recentNamespaces.top()).toContain("notes");
   });
 
   test("activateSkill resolves skill content from the skills namespace", async () => {

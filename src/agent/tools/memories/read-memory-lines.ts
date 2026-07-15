@@ -5,6 +5,7 @@ import { type LineTuple, readLines } from "../_helpers/line-editing.ts";
 import { hasMemoriesClient } from "../policies.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
 import { loadMemoryTextByKey } from "./_helpers/memory-text.ts";
+import { touchRecentNamespaces } from "./_helpers/recent-namespaces.ts";
 
 export const readMemoryLinesTool = tool<
   "readMemoryLines",
@@ -30,6 +31,7 @@ export const readMemoryLinesTool = tool<
     const text = await loadMemoryTextByKey(client, namespace, key);
     if (text === undefined) throw new Error(`memory not found: ${namespace}/${key}`);
 
+    await touchRecentNamespaces(ctx.env.recentNamespaces, namespace);
     return { namespace, key, lines: readLines(text) };
   },
 });

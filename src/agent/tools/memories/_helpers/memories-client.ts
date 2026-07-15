@@ -44,5 +44,15 @@ export function createLazyHarnessMemoriesClient(
       getClient().then((client) => client.mergeMemory(params)),
     deleteMemory: (params: DeleteMemoryParams) =>
       getClient().then((client) => client.deleteMemory(params)),
+    persistence: {
+      listMemoryNamespaces: async () => {
+        const client = await getClient();
+        const listFn = client.persistence.listMemoryNamespaces;
+        if (listFn === undefined) {
+          throw new Error("memories client does not support listing namespaces");
+        }
+        return listFn.call(client.persistence);
+      },
+    },
   } as RemoteMemoriesClientAsync;
 }

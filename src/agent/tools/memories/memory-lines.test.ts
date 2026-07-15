@@ -6,6 +6,7 @@ import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service-clie
 
 import { harnessToolkit } from "../_toolkit.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
+import { createEphemeralRecentNamespacesTracker } from "./_helpers/recent-namespaces.ts";
 
 type MemoryLineToolName = "readMemoryLines" | "replaceMemoryLines";
 
@@ -33,6 +34,7 @@ function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEn
     skills: [],
     activatedSkillNames: new Set(),
     embeddingCache: new Map(),
+    recentNamespaces: createEphemeralRecentNamespacesTracker(),
     ...overrides,
   };
 }

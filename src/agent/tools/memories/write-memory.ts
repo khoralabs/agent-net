@@ -3,6 +3,7 @@ import { z } from "zod";
 import { hasMemoriesClient } from "../policies.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
 import { writeMemoryNode } from "./_helpers/memory-write.ts";
+import { touchRecentNamespaces } from "./_helpers/recent-namespaces.ts";
 
 const zMemoryLink = z.object({
   namespace: z.string().min(1).describe("Peer memory namespace."),
@@ -47,6 +48,10 @@ export const writeMemoryTool = tool<
     if (client === undefined) throw new Error("memories client is not configured");
 
     const memoryIds = await writeMemoryNode(client, input);
+    await touchRecentNamespaces(ctx.env.recentNamespaces, [
+      ...(input.links?.map((link) => link.namespace) ?? []),
+      input.namespace,
+    ]);
     return { memoryIds };
   },
 });
