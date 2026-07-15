@@ -1,16 +1,13 @@
-import { type AgentRegistry, createRegisteredAgent } from "@khoralabs/agent-capabilities";
+import type { NetworkHarnessHandle } from "@khoralabs/agent-net";
 
-import { harnessToolkit } from "../agent/tools/index.ts";
 import { loadSwarmStateBySessionId } from "./swarm-state.ts";
 
 export async function ensureSwarmAgentRegistered(
-  registry: AgentRegistry,
+  harness: NetworkHarnessHandle,
   dataDir: string,
   sessionId: string,
   agentDid: string,
 ): Promise<void> {
-  if (registry.has(agentDid)) return;
-
   const state = await loadSwarmStateBySessionId(dataDir, sessionId);
   if (state === null) {
     throw new Error(`swarm session ${sessionId} not found in workflow db`);
@@ -21,12 +18,10 @@ export async function ensureSwarmAgentRegistered(
     throw new Error(`agent ${agentDid} not registered in swarm session ${sessionId}`);
   }
 
-  const { agent } = await createRegisteredAgent({
-    agentId: agentDid,
+  await harness.ensureAgentRegistered({
+    agentDid,
     name: `Agent ${loopAgent.role}`,
     instructions: [state.config.goal, loopAgent.role],
     context: { sessionId, did: agentDid, role: loopAgent.role },
-    rootComposable: harnessToolkit,
   });
-  await registry.register(agent);
 }

@@ -1,11 +1,13 @@
 import type { Database } from "bun:sqlite";
+import type {
+  AgentChatClient,
+  AgentHandle,
+  HarnessAgentWorkflowDeps,
+  InboxConnection,
+  NetworkHarnessHandle,
+} from "@khoralabs/agent-net";
 import type { ChatService } from "@khoralabs/chat-core";
-import type { KhoraClient } from "@khoralabs/khora-client";
-import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service-client";
 
-import type { AgentHandle, InboxConnection } from "../agents";
-import type { AgentChatClient } from "../chat.ts";
-import type { NetworkHarnessHandle } from "../harness.ts";
 import type { AgentLoopState, SwarmConfig } from "./types.ts";
 
 export type SwarmRuntimeSession = {
@@ -44,15 +46,7 @@ export function getAgentChatClient(sessionId: string, did: string): AgentChatCli
   return agent.chat;
 }
 
-export type SwarmAgentWorkflowDeps = {
-  chatService: ChatService;
-  agentChat: AgentChatClient;
-  memoriesClient?: RemoteMemoriesClientAsync;
-  khoraClient?: KhoraClient;
-  sessionId: string;
-  networkDataDir: string;
-  chatDb: Database;
-};
+export type SwarmAgentWorkflowDeps = HarnessAgentWorkflowDeps;
 
 export async function resolveSwarmAgentWorkflowDeps(
   sessionId: string,
@@ -62,31 +56,8 @@ export async function resolveSwarmAgentWorkflowDeps(
   const agent = session.agents.find((entry) => entry.did === did);
   if (agent === undefined) throw new Error(`agent ${did} not found in session ${sessionId}`);
 
-  const { createHarnessMemoriesClient, agentMemoriesDatabase } = await import(
-    "../agent/tools/memories/_helpers/memories-client.ts"
-  );
-  const { createHarnessKhoraClientForAgent } = await import(
-    "../agent/tools/khora/_helpers/khora-client-factory.ts"
-  );
-
-  const memoriesClient = await createHarnessMemoriesClient({
-    baseUrl: session.harness.memoriesBaseUrl,
-    database: agentMemoriesDatabase(did),
-  });
-
-  const khoraClient = await createHarnessKhoraClientForAgent({
-    baseUrl: session.harness.serverBaseUrl,
-    agentDid: did,
-    agentsDataDir: `${session.config.dataDir}/agents`,
-  });
-
-  return {
-    chatService: session.chatService,
-    agentChat: agent.chat,
-    memoriesClient,
-    khoraClient,
+  return session.harness.resolveAgentWorkflowDeps(agent, {
     sessionId,
-    networkDataDir: session.config.dataDir,
-    chatDb: session.chatDb,
-  };
+    dataDir: session.config.dataDir,
+  });
 }

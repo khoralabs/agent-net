@@ -126,16 +126,34 @@ Env fallbacks used by swarm / tests:
 
 ```ts
 type NetworkHarnessHandle = {
-  serverBaseUrl: string;              // configured remote Khora URL
-  relayBaseUrl: string;               // configured remote relay URL
+  serverBaseUrl: string;
+  relayBaseUrl: string;
   memoriesBaseUrl: string;
   agentDids: readonly string[];
   memoriesClient: MemoriesServiceClient;
   pool: ManagedAgentPool;
   chat: HarnessChat;
-  stop(): void;                       // local memories only (not remote hosts)
+  signedChat: SignedChatBackend;
+  stop(): void;
+
+  // Agent facade used by swarm and other orchestrators
+  spawn(): Promise<AgentHandle>;
+  registerAgent(input): Promise<{ staticHash: string }>;
+  ensureAgentRegistered(input): Promise<void>;
+  resolveAgentWorkflowDeps(agent, opts): Promise<HarnessAgentWorkflowDeps>;
+  bindNetworkSession(input): void;
+  unbindNetworkSession(sessionId): void;
 };
 ```
+
+`spawnWithMemories(harness)` remains as a thin wrapper around `harness.spawn()`.
+
+## Workspace packages
+
+| Package | Path | Role |
+| --- | --- | --- |
+| `@khoralabs/agent-net` | repo root `src/` | Network harness library |
+| `@khoralabs/agent-net-swarm` | `packages/swarm` | Budgeted multi-agent orchestration on a harness |
 
 ## Data layout
 
@@ -169,7 +187,7 @@ bun test src/tests
 
 **Core harness** (`@khoralabs/agent-net`) — connect to remote Khora + relay, spawn agents, connect inboxes, run signed chat.
 
-**Automated swarm** (`@khoralabs/agent-net/swarm`) — spawns N agents on that harness, runs agent loops until a shared token budget is exhausted.
+**Automated swarm** (`@khoralabs/agent-net-swarm`) — takes a `NetworkHarnessHandle`, spawns N agents, runs agent loops until a shared token budget is exhausted.
 
 ```bash
 bun run swarm -- \

@@ -22,5 +22,5 @@
     "plugins": [{ "name": "workflow" }]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["node_modules", "vendor"]
+  "exclude": ["node_modules", "vendor", "packages"]
 }

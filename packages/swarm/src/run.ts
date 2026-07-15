@@ -1,18 +1,27 @@
 import path from "node:path";
 
-import { start } from "workflow/api";
-
 import {
   closeNetworkLog,
+  configureTursoWorldEnv,
   createNetworkLogger,
   initNetworkLog,
-} from "../observability/network-log.ts";
-import { resolveHarnessDataDir } from "../workflow/paths.ts";
-import { configureTursoWorldEnv, startTursoWorldWorker } from "../workflow/world.ts";
+  requireKhoraBaseUrl,
+  requireRelayBaseUrl,
+  resolveHarnessDataDir,
+  startNetworkHarness,
+  startTursoWorldWorker,
+} from "@khoralabs/agent-net";
+import { start } from "workflow/api";
+
+import { provideHarnessForSession } from "./pending-harness.ts";
 import type { SwarmConfig } from "./types.ts";
 import { swarmOrchestrator } from "./workflows.ts";
 
-function parseArgs(argv: string[]): SwarmConfig {
+function parseArgs(argv: string[]): {
+  config: SwarmConfig;
+  khoraBaseUrl?: string;
+  relayBaseUrl?: string;
+} {
   const args = new Map<string, string>();
   for (let i = 0; i < argv.length; i++) {
     const token = argv[i];
@@ -38,26 +47,35 @@ function parseArgs(argv: string[]): SwarmConfig {
   const relayBaseUrl = args.get("relay-url")?.trim();
 
   return {
-    sessionId,
-    dataDir,
+    config: {
+      sessionId,
+      dataDir,
+      goal: args.get("goal") ?? "Coordinate and share findings with peer agents.",
+      agentCount,
+      maxTokenBudget: Number.parseInt(args.get("max-tokens") ?? "500000", 10),
+      contextMessageLimit: Number.parseInt(args.get("context-limit") ?? "20", 10),
+      model: {
+        id: args.get("model") ?? "anthropic/claude-sonnet-4.6",
+        maxSteps: Number.parseInt(args.get("max-steps") ?? "8", 10),
+      },
+      roles,
+    },
     ...(khoraBaseUrl !== undefined && khoraBaseUrl.length > 0 ? { khoraBaseUrl } : {}),
     ...(relayBaseUrl !== undefined && relayBaseUrl.length > 0 ? { relayBaseUrl } : {}),
-    goal: args.get("goal") ?? "Coordinate and share findings with peer agents.",
-    agentCount,
-    maxTokenBudget: Number.parseInt(args.get("max-tokens") ?? "500000", 10),
-    contextMessageLimit: Number.parseInt(args.get("context-limit") ?? "20", 10),
-    model: {
-      id: args.get("model") ?? "anthropic/claude-sonnet-4.6",
-      maxSteps: Number.parseInt(args.get("max-steps") ?? "8", 10),
-    },
-    roles,
   };
 }
 
 async function main(): Promise<void> {
-  const config = parseArgs(process.argv.slice(2));
+  const { config, khoraBaseUrl, relayBaseUrl } = parseArgs(process.argv.slice(2));
   configureTursoWorldEnv({ dataDir: config.dataDir });
   await startTursoWorldWorker({ dataDir: config.dataDir });
+
+  const harness = await startNetworkHarness({
+    dataDir: config.dataDir,
+    khoraBaseUrl: requireKhoraBaseUrl(khoraBaseUrl),
+    relayBaseUrl: requireRelayBaseUrl(relayBaseUrl),
+  });
+  provideHarnessForSession(config.sessionId, harness);
 
   initNetworkLog({ dataDir: config.dataDir, sessionId: config.sessionId });
   const logger = createNetworkLogger({ name: "network-harness-swarm", source: "swarm" });

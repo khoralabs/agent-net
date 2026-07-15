@@ -2,10 +2,14 @@ import path from "node:path";
 
 import { loadIdentity } from "@khoralabs/did-key-identity";
 import { createNoAuthProvider, MemoriesServiceClient } from "@khoralabs/memories-service-client";
-import type { MemoriesDatabaseId } from "@khoralabs/memories-service-storage-core";
-import { createLazyHarnessMemoriesClient } from "./agent/tools/memories/_helpers/memories-client.ts";
-import { type AgentHandle, type AgentMemoriesClient, AgentStore, ManagedAgentPool } from "./agents";
-import { createSignedChatService, type HarnessChat, type SignedChatBackend } from "./chat";
+import { AgentStore, ManagedAgentPool } from "./agents";
+import { createSignedChatService, type HarnessChat } from "./chat";
+import {
+  createHarnessAgentApi,
+  harnessAgentsDataDir,
+  type NetworkHarnessAgentApi,
+  type NetworkHarnessCore,
+} from "./harness-agents.ts";
 import { startMemoriesService } from "./memories";
 import {
   emitNetworkEvent,
@@ -14,6 +18,15 @@ import {
 } from "./observability/network-log.ts";
 
 export type { AgentMemoriesClient } from "./agents";
+export type {
+  BindNetworkSessionInput,
+  EnsureHarnessAgentRegisteredInput,
+  HarnessAgentWorkflowDeps,
+  NetworkHarnessAgentApi,
+  RegisterHarnessAgentInput,
+  ResolveHarnessAgentWorkflowDepsOpts,
+} from "./harness-agents.ts";
+export { spawnWithMemories } from "./harness-agents.ts";
 
 export type NetworkHarnessOptions = {
   dataDir: string;
@@ -26,29 +39,7 @@ export type NetworkHarnessOptions = {
   sqlCipherKey?: string;
 };
 
-export type NetworkHarnessHandle = {
-  /** Base URL of the remote khora server. */
-  readonly serverBaseUrl: string;
-  /** Base URL of the remote relay server (for vellum channel operations). */
-  readonly relayBaseUrl: string;
-  /** Base URL of the shared memories service. */
-  readonly memoriesBaseUrl: string;
-  /** All agent DIDs currently in the pool. */
-  readonly agentDids: readonly string[];
-  /**
-   * Client for the memories management API. Use this to open, close, delete,
-   * or inspect any agent's database by passing their `MemoriesDatabaseId`.
-   */
-  readonly memoriesClient: MemoriesServiceClient;
-  /** The underlying managed agent pool — use for `focus`, `spawn`, `remove`. */
-  readonly pool: ManagedAgentPool;
-  /** Shared chat interface — each agent gets a scoped client via `forAgent(did)`. */
-  readonly chat: HarnessChat;
-  /** Underlying signed chat backend (service + db). */
-  readonly signedChat: SignedChatBackend;
-  /** Tear down memories. Does not stop the remote khora host, relay, or unregister agents. */
-  stop(): void;
-};
+export type NetworkHarnessHandle = NetworkHarnessCore & NetworkHarnessAgentApi;
 
 export async function startNetworkHarness(
   opts: NetworkHarnessOptions,
@@ -64,7 +55,7 @@ export async function startNetworkHarness(
   }
 
   const memoriesDataDir = path.join(opts.dataDir, "memories");
-  const agentsDataDir = path.join(opts.dataDir, "agents");
+  const agentsDataDir = harnessAgentsDataDir(opts.dataDir);
 
   // Memories must start first — it calls Database.setCustomSQLite which must
   // run before any bun:sqlite Database is opened (e.g. signed chat).
@@ -114,7 +105,7 @@ export async function startNetworkHarness(
     });
   }
 
-  return {
+  const core: NetworkHarnessCore = {
     serverBaseUrl: khoraBaseUrl,
     relayBaseUrl,
     memoriesBaseUrl: memories.baseUrl,
@@ -144,40 +135,7 @@ export async function startNetworkHarness(
       memories.stop();
     },
   };
-}
 
-/**
- * Spawn a new agent and bind memories + chat in one step.
- * Returns a single {@link AgentHandle} with inbox, vellum, memories, and chat.
- */
-export async function spawnWithMemories(harness: NetworkHarnessHandle): Promise<AgentHandle> {
-  let capturedHandle: AgentHandle | undefined;
-
-  const did = await harness.pool.spawn(async (handle) => {
-    capturedHandle = handle;
-    await harness.memoriesClient.openDatabase({ kind: "account", ownerKey: handle.did });
-  });
-
-  const agent = capturedHandle;
-  if (agent === undefined) {
-    throw new Error("Failed to capture agent handle during spawn");
-  }
-
-  const database: MemoriesDatabaseId = { kind: "account", ownerKey: did };
-  const { memoriesClient } = harness;
-  const memories: AgentMemoriesClient = {
-    database,
-    open: () => memoriesClient.openDatabase(database),
-    close: () => memoriesClient.closeDatabase(database),
-    checkpoint: () => memoriesClient.checkpointDatabase(database),
-    exists: () => memoriesClient.databaseExists(database),
-    delete: () => memoriesClient.deleteDatabase(database),
-    serviceClient: memoriesClient,
-    client: createLazyHarnessMemoriesClient({
-      baseUrl: harness.memoriesBaseUrl,
-      database,
-    }),
-  };
-
-  return agent.bindServices(memories, harness.chat.forAgent(did));
+  const agentApi = createHarnessAgentApi(core, { agentsDataDir });
+  return Object.assign(core, agentApi);
 }

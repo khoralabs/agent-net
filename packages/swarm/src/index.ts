@@ -1,5 +1,10 @@
 export { assembleTurnContext } from "./assemble-turn-context.ts";
 export {
+  clearPendingHarnessForTests,
+  provideHarnessForSession,
+  takeHarnessForSession,
+} from "./pending-harness.ts";
+export {
   getAgentChatClient,
   getSwarmSession,
   putSwarmSession,

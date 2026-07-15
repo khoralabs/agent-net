@@ -1,7 +1,6 @@
 import path from "node:path";
 
-import { listNetworkEvents } from "../observability/network-log.ts";
-import { resolveHarnessDataDir } from "../workflow/paths.ts";
+import { listNetworkEvents, resolveHarnessDataDir } from "@khoralabs/agent-net";
 
 function parseArgs(argv: string[]): {
   dataDir: string;

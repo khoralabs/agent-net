@@ -1,8 +1,6 @@
 import { expect, test } from "bun:test";
-
+import { createSignedChatService } from "@khoralabs/agent-net";
 import { generateIdentity } from "@khoralabs/did-key-identity";
-
-import { createSignedChatService } from "../chat.ts";
 import { assembleTurnContext } from "./assemble-turn-context.ts";
 import { appendInboxEntry } from "./swarm-state.ts";
 import type { AgentLoopState, SwarmConfig } from "./types.ts";

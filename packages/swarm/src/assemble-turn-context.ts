@@ -1,6 +1,6 @@
+import type { AgentChatClient, AgentTurnParams, AgentUIMessage } from "@khoralabs/agent-net";
 import type { UIMessage } from "ai";
-import type { AgentUIMessage, AgentWorkflowParams } from "../agent/types.ts";
-import type { AgentChatClient } from "../chat.ts";
+
 import type { InboxEntry } from "./swarm-state.ts";
 import type { AgentLoopState, SwarmConfig } from "./types.ts";
 
@@ -41,7 +41,7 @@ export async function assembleTurnContext(input: {
   agentChat: AgentChatClient;
   inboxEntries: InboxEntry[];
 }): Promise<{
-  params: AgentWorkflowParams;
+  params: AgentTurnParams;
   inboxEntryIds: string[];
 }> {
   const { config, agent, agentChat, inboxEntries } = input;
@@ -60,7 +60,7 @@ export async function assembleTurnContext(input: {
   }
 
   const runId = crypto.randomUUID();
-  const params: AgentWorkflowParams = {
+  const params: AgentTurnParams = {
     runId,
     agent: {
       id: agent.agentId,

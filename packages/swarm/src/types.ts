@@ -1,16 +1,16 @@
+import type {
+  AgentTurnResult,
+  NetworkAttribution,
+  NetworkEvent,
+  ThreadHashSnapshot,
+} from "@khoralabs/agent-net";
 import type { PostUsage } from "@khoralabs/chat-core";
 
-import type { AgentWorkflowResult } from "../agent/types.ts";
-
-export type { NetworkAttribution, NetworkEvent, ThreadHashSnapshot } from "../network/types.ts";
+export type { NetworkAttribution, NetworkEvent, ThreadHashSnapshot };
 
 export type SwarmConfig = {
   sessionId: string;
   dataDir: string;
-  /** Remote Khora host; falls back to KHORA_BASE_URL / HARNESS_KHORA_BASE_URL / KHORA_SERVER_URL. */
-  khoraBaseUrl?: string;
-  /** Remote relay host; falls back to RELAY_BASE_URL / HARNESS_RELAY_BASE_URL / RELAY_SERVER_URL. */
-  relayBaseUrl?: string;
   goal: string;
   agentCount: number;
   maxTokenBudget: number;
@@ -35,9 +35,9 @@ export type TurnTelemetry = {
   agentRole: string;
   runId: string;
   usage?: PostUsage;
-  capabilities: AgentWorkflowResult["capabilities"];
+  capabilities: AgentTurnResult["capabilities"];
   memoriesProvenanceRootHex: string;
-  threadHashes: import("../network/types.ts").ThreadHashSnapshot[];
+  threadHashes: ThreadHashSnapshot[];
   inboxEntryIds: string[];
 };
 

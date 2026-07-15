@@ -1,12 +1,6 @@
-import { createRegisteredAgent } from "@khoralabs/agent-capabilities";
+import type { NetworkHarnessHandle } from "@khoralabs/agent-net";
+import { emitNetworkEvent, networkEventId } from "@khoralabs/agent-net";
 
-import { getAgentRegistry } from "../agent/agent-runtime.ts";
-import { harnessToolkit } from "../agent/tools/index.ts";
-import { spawnWithMemories, startNetworkHarness } from "../harness.ts";
-import { requireKhoraBaseUrl } from "../lib/khora-base-url.ts";
-import { requireRelayBaseUrl } from "../lib/relay-base-url.ts";
-import { registerNetworkSession, removeNetworkSession } from "../network/session-registry.ts";
-import { emitNetworkEvent, networkEventId } from "../observability/network-log.ts";
 import { ensureSwarmAgentRegistered } from "./agent-registry.ts";
 import {
   putSwarmSession,
@@ -30,11 +24,15 @@ export function validateSwarmConfig(config: SwarmConfig): void {
   if (config.agentCount < 1) throw new Error("agentCount must be at least 1");
 }
 
-export async function setupSwarm(config: SwarmConfig): Promise<{
+export async function setupSwarm(input: {
+  harness: NetworkHarnessHandle;
+  config: SwarmConfig;
+}): Promise<{
   swarmStateId: string;
   sessionId: string;
   agents: AgentLoopState[];
 }> {
+  const { harness, config } = input;
   validateSwarmConfig(config);
 
   await emitNetworkEvent({
@@ -52,18 +50,12 @@ export async function setupSwarm(config: SwarmConfig): Promise<{
     },
   });
 
-  const harness = await startNetworkHarness({
-    dataDir: config.dataDir,
-    khoraBaseUrl: requireKhoraBaseUrl(config.khoraBaseUrl),
-    relayBaseUrl: requireRelayBaseUrl(config.relayBaseUrl),
-  });
   const spawned = [];
   for (let i = 0; i < config.agentCount; i++) {
-    spawned.push(await spawnWithMemories(harness));
+    spawned.push(await harness.spawn());
   }
 
   const inboxConnections = [];
-  const registry = getAgentRegistry();
   const loopStates: AgentLoopState[] = [];
 
   for (let i = 0; i < spawned.length; i++) {
@@ -77,16 +69,12 @@ export async function setupSwarm(config: SwarmConfig): Promise<{
       metadata: { kind: "self", title: `${agent.did} self thread` },
     });
 
-    const { staticHash, agent: registered } = await createRegisteredAgent({
-      agentId: agent.did,
+    const { staticHash } = await harness.registerAgent({
+      agent,
       name: `Agent ${i + 1}`,
       instructions: [config.goal, role],
       context: { sessionId: config.sessionId, did: agent.did, role },
-      rootComposable: harnessToolkit,
     });
-    if (!registry.has(agent.did)) {
-      await registry.register(registered);
-    }
 
     loopStates.push({
       did: agent.did,
@@ -117,12 +105,12 @@ export async function setupSwarm(config: SwarmConfig): Promise<{
   };
 
   putSwarmSession(config.sessionId, session);
-  registerNetworkSession({
+  harness.bindNetworkSession({
     sessionId: config.sessionId,
     dataDir: config.dataDir,
     resolveAgentWorkflowDeps: (did) => resolveSwarmAgentWorkflowDeps(config.sessionId, did),
     ensureAgentRegistered: (did) =>
-      ensureSwarmAgentRegistered(getAgentRegistry(), config.dataDir, config.sessionId, did),
+      ensureSwarmAgentRegistered(harness, config.dataDir, config.sessionId, did),
   });
 
   const swarmState = await createSwarmState(config.dataDir, config, loopStates);
@@ -155,8 +143,9 @@ export async function setupSwarm(config: SwarmConfig): Promise<{
 
 export async function teardownSwarm(sessionId: string): Promise<void> {
   const session = removeSwarmSession(sessionId);
-  removeNetworkSession(sessionId);
   if (session === undefined) return;
+
+  session.harness.unbindNetworkSession(sessionId);
 
   await emitNetworkEvent({
     dataDir: session.config.dataDir,

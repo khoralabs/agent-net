@@ -6,10 +6,10 @@
   "module": "src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./swarm": "./src/swarm/index.ts",
     "./network": "./src/network/index.ts"
   },
   "workspaces": [
+    "packages/*",
     "vendor/libs/packages/*/**",
     "vendor/chat/core",
     "vendor/chat/persistence",
@@ -19,16 +19,16 @@
     "vendor/memories/packages/memories-service/*/**"
   ],
   "scripts": {
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && bun run --filter @khoralabs/agent-net-swarm typecheck",
     "format": "biome check --write .",
     "format:check": "biome check .",
     "agent:dev": "nitro dev",
     "agent:setup": "workflow-turso-setup",
     "agent:test": "bun test src/agent",
-    "swarm": "bun run src/swarm/run.ts",
+    "swarm": "bun run --filter @khoralabs/agent-net-swarm swarm",
     "swarm:setup": "workflow-turso-setup",
-    "swarm:events": "bun run src/swarm/events-cli.ts",
-    "swarm:test": "bun test src/swarm src/agent/tools/chat src/observability src/network",
+    "swarm:events": "bun run --filter @khoralabs/agent-net-swarm events",
+    "swarm:test": "bun run --filter @khoralabs/agent-net-swarm test && bun test src/agent/tools/chat src/observability src/network",
     "submodules:init": "git submodule update --init --recursive",
     "submodules:update": "git submodule update --remote --merge vendor/memories vendor/relay vendor/chat vendor/libs && bun install",
     "prepare": "husky"

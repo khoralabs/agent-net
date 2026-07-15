@@ -47,6 +47,27 @@
         "typescript": "^5",
       },
     },
+    "packages/swarm": {
+      "name": "@khoralabs/agent-net-swarm",
+      "version": "0.0.0",
+      "dependencies": {
+        "@khoralabs/agent-net": "file:../..",
+        "@khoralabs/chat-core": "workspace:*",
+        "@khoralabs/did-key-identity": "^0.1.0",
+        "@khoralabs/khora-client": "^0.1.0",
+        "@libsql/client": "^0.14.0",
+        "@workflow-worlds/turso": "^0.2.2",
+        "ai": "^7.0.9",
+        "workflow": "^4.5.0",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "typescript": "^5",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "vendor/chat/core": {
       "name": "@khoralabs/chat-core",
       "version": "0.0.0",
@@ -833,6 +854,10 @@
     "@khoralabs/agent-capabilities-ai-sdk": ["@khoralabs/agent-capabilities-ai-sdk@0.2.0", "", { "dependencies": { "@khoralabs/agent-capabilities": "^0.1.1", "ai": "^7.0.9" }, "peerDependencies": { "typescript": "^5" } }, "sha512-xBlKeXzN3IF8nkntQNNGvP2EW3BQo4ebpo9uvs2AJiAKFpxtiWQjfcHplwTS0SsIc7zsIYEwzZq2PQJZEWQ90Q=="],
 
     "@khoralabs/agent-capabilities-otel": ["@khoralabs/agent-capabilities-otel@0.2.0", "", { "dependencies": { "@khoralabs/agent-capabilities": "^0.1.1", "@opentelemetry/api": "^1.9.0", "pino": "^9.6.0" }, "peerDependencies": { "typescript": "^5" } }, "sha512-hv1SDJhLel/iR3WEfkkzC9/hDc+hbxFWuwMmiW89kk1G8USeeJuESMYPx5pM7vHoYz90DSJqYfolwxyngiXFGA=="],
+
+    "@khoralabs/agent-net": ["@khoralabs/agent-net@root:", {}],
+
+    "@khoralabs/agent-net-swarm": ["@khoralabs/agent-net-swarm@workspace:packages/swarm"],
 
     "@khoralabs/blog": ["@khoralabs/blog@workspace:vendor/libs/packages/blog"],
 

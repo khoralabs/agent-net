@@ -1,10 +1,13 @@
 import { mkdirSync } from "node:fs";
+import {
+  buildNetworkAttribution,
+  emitNetworkEvent,
+  networkEventId,
+  queryNetworkEvents,
+  workflowDbPath,
+} from "@khoralabs/agent-net";
 import type { KhoraClientEvent } from "@khoralabs/khora-client";
 import { type Client, createClient } from "@libsql/client";
-import { networkEventId, queryNetworkEvents } from "../network/event-store.ts";
-import { buildNetworkAttribution } from "../observability/attribution-digest.ts";
-import { emitNetworkEvent } from "../observability/network-log.ts";
-import { workflowDbPath } from "../workflow/paths.ts";
 import type { AgentLoopState, SwarmConfig, SwarmState, TurnTelemetry } from "./types.ts";
 
 export type InboxEntry = {

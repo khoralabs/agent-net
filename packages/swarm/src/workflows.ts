@@ -1,9 +1,14 @@
+import {
+  type AgentTurnParams,
+  configureTursoWorldEnv,
+  emitNetworkEvent,
+  networkEventId,
+  runAgentTurn,
+} from "@khoralabs/agent-net";
 import { getRun, start } from "workflow/api";
 
-import { runAgentResponseStep } from "../agent/workflows/agent-response.ts";
-import { emitNetworkEvent, networkEventId } from "../observability/network-log.ts";
-import { configureTursoWorldEnv } from "../workflow/world.ts";
 import { assembleTurnContext } from "./assemble-turn-context.ts";
+import { takeHarnessForSession } from "./pending-harness.ts";
 import { getSwarmSession } from "./session-store.ts";
 import { setupSwarm, teardownSwarm } from "./setup.ts";
 import {
@@ -22,7 +27,7 @@ export async function assembleTurnParamsStep(
   agent: AgentLoopState,
   config: SwarmConfig,
 ): Promise<{
-  params: import("../agent/types.ts").AgentWorkflowParams;
+  params: AgentTurnParams;
   inboxEntryIds: string[];
 }> {
   "use step";
@@ -58,7 +63,8 @@ export async function setupSwarmStep(config: SwarmConfig): Promise<{
 }> {
   "use step";
   configureTursoWorldEnv({ dataDir: config.dataDir });
-  return setupSwarm(config);
+  const harness = takeHarnessForSession(config.sessionId);
+  return setupSwarm({ harness, config });
 }
 
 export async function teardownSwarmStep(sessionId: string): Promise<void> {
@@ -127,7 +133,7 @@ export async function agentLoop(
       runId: params.runId,
       payload: { agentTurnIndex: turnCount, inboxEntryIds },
     });
-    const result = await runAgentResponseStep(params);
+    const result = await runAgentTurn(params);
     await recordTurnTelemetryStep(config.dataDir, swarmStateId, {
       sessionId: config.sessionId,
       agentTurnIndex: turnCount,
