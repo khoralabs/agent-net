@@ -1,4 +1,3 @@
-import type { Database } from "bun:sqlite";
 import type {
   AgentChatClient,
   AgentHandle,
@@ -16,7 +15,6 @@ export type SwarmRuntimeSession = {
   agents: AgentHandle[];
   loopStates: AgentLoopState[];
   chatService: ChatService;
-  chatDb: Database;
   inboxConnections: InboxConnection[];
 };
 

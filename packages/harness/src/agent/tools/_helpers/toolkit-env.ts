@@ -86,7 +86,6 @@ export type HarnessAgentWorkflowDeps = Pick<
   | "agentChat"
   | "sessionId"
   | "networkDataDir"
-  | "chatDb"
 >;
 
 export async function createHarnessAgentWorkflowDeps(input: {

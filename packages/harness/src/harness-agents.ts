@@ -57,7 +57,6 @@ export type HarnessAgentWorkflowDeps = {
   khoraClient?: KhoraClient;
   sessionId: string;
   networkDataDir: string;
-  chatDb: import("bun:sqlite").Database;
 };
 
 export type BindNetworkSessionInput = {
@@ -195,7 +194,6 @@ export function createHarnessAgentApi(
         khoraClient,
         sessionId: resolveOpts.sessionId,
         networkDataDir: resolveOpts.dataDir,
-        chatDb: harness.signedChat.db,
       };
     },
 

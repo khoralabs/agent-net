@@ -31,7 +31,6 @@ export type RunAgentWorkflowDependencies = {
   agentChat?: AgentChatClient;
   sessionId?: string;
   networkDataDir?: string;
-  chatDb?: import("bun:sqlite").Database;
   streamTextFn?: typeof streamText;
   memoriesClient?: RemoteMemoriesClientAsync;
   khoraClient?: KhoraClient;
@@ -226,8 +225,8 @@ export async function runAgentWorkflow(
       const message = await writer.complete();
 
       const threadHashes =
-        deps.agentChat !== undefined && deps.chatDb !== undefined
-          ? await collectThreadHashSnapshots(deps.chatDb, deps.agentChat)
+        deps.agentChat !== undefined && deps.chatService !== undefined
+          ? await collectThreadHashSnapshots(deps.chatService, deps.agentChat)
           : undefined;
 
       return {

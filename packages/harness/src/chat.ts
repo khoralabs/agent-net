@@ -2,7 +2,9 @@ import { Database } from "bun:sqlite";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 import type {
+  ChatPersistence,
   ChatService,
+  ChatSigner,
   JsonObject,
   Post,
   PostPage,
@@ -12,16 +14,20 @@ import type {
 } from "@khoralabs/chat-core";
 import { ChatNotFoundError, createChatService } from "@khoralabs/chat-core";
 import {
+  prepareAppendForSigning,
+  signPreparedAppendPost,
+  withSignedChatPersistence,
+} from "@khoralabs/chat-persistence";
+import {
   createSqliteChatPersistence,
   ensureChatSqliteSchema,
 } from "@khoralabs/chat-persistence-sqlite";
-import type { RelaySigner } from "@khoralabs/relay-crypto";
 import type { UIMessage } from "ai";
+
 import {
-  createSignedChatPersistence,
-  prepareSignedAppendPost,
-  signPreparedAppendPost,
-} from "./chat-signing";
+  createHarnessChatCrypto,
+  type ResolveHarnessChatSigner,
+} from "./chat-crypto.ts";
 
 export const HARNESS_CHAT_CHANNEL_ID = "harness-network";
 
@@ -50,11 +56,12 @@ export type AgentChatClient = {
 };
 
 export type HarnessChatOptions = {
-  resolveSigner: (did: string) => Promise<RelaySigner | undefined>;
+  resolveSigner: ResolveHarnessChatSigner;
 };
 
 export type SignedChatBackend = {
   readonly service: ChatService;
+  readonly persistence: ChatPersistence;
   readonly db: Database;
   readonly ready: Promise<void>;
   forAgent(did: string): AgentChatClient;
@@ -85,20 +92,18 @@ export function createSignedChatService(
   options: HarnessChatOptions,
 ): SignedChatBackend {
   const db = openHarnessChatDatabase(dataDir);
-  const persistence = createSignedChatPersistence(
-    createSqliteChatPersistence(db),
-    db,
-    options.resolveSigner,
-  );
+  const chatCrypto = createHarnessChatCrypto(options.resolveSigner);
+  const persistence = withSignedChatPersistence(createSqliteChatPersistence(db), chatCrypto);
   const service = createChatService(persistence);
   const ready = ensureHarnessChannel(service);
 
   return {
     service,
+    persistence,
     db,
     ready,
     forAgent(did: string) {
-      return createAgentChatClient(service, db, did, options.resolveSigner, ready);
+      return createAgentChatClient(service, persistence, did, chatCrypto.signer, ready);
     },
   };
 }
@@ -115,25 +120,11 @@ async function ensureHarnessChannel(service: ChatService): Promise<void> {
   }
 }
 
-function listAccessibleThreadIds(db: Database, scope: ScopeRef): string[] {
-  const rows = db
-    .prepare(
-      `SELECT p.thread_id
-       FROM chat_thread_participants p
-       INNER JOIN chat_threads t ON t.id = p.thread_id
-       WHERE p.scope_type = ? AND p.scope_id = ?
-         AND t.root_type = 'channel' AND t.root_id = ?
-       ORDER BY t.created_at_ms ASC`,
-    )
-    .all(scope.type, scope.id, HARNESS_CHAT_CHANNEL_ID) as Array<{ thread_id: string }>;
-  return rows.map((row) => row.thread_id);
-}
-
 function createAgentChatClient(
   service: ChatService,
-  db: Database,
+  persistence: ChatPersistence,
   did: string,
-  resolveSigner: (did: string) => Promise<RelaySigner | undefined>,
+  chatSigner: ChatSigner,
   ready: Promise<void>,
 ): AgentChatClient {
   const scope = agentScope(did);
@@ -194,10 +185,6 @@ function createAgentChatClient(
     sendMessage(threadId, input) {
       return whenReady(async () => {
         await requireParticipant(threadId);
-        const signer = await resolveSigner(did);
-        if (!signer) {
-          throw new Error(`no signing key for agent ${did}`);
-        }
 
         const message = textMessage(
           input.messageId ?? crypto.randomUUID(),
@@ -205,8 +192,8 @@ function createAgentChatClient(
           input.text,
         );
         const appendInput = { threadId, author: scope, message };
-        const prepared = prepareSignedAppendPost(db, appendInput);
-        const signature = await signPreparedAppendPost(signer, scope, prepared);
+        const prepared = await prepareAppendForSigning(persistence, appendInput);
+        const signature = await signPreparedAppendPost(chatSigner, scope, prepared);
 
         const { post } = await service.appendPost({
           ...appendInput,
@@ -229,17 +216,14 @@ function createAgentChatClient(
       });
     },
     listThreads(input) {
-      return whenReady(async () => {
-        const limit = input?.limit ?? 50;
-        const start = input?.cursor ? Number.parseInt(input.cursor, 10) : 0;
-        const threadIds = listAccessibleThreadIds(db, scope);
-        const slice = threadIds.slice(start, start + limit);
-        const items = await Promise.all(slice.map((id) => service.getThread(id)));
-        return {
-          items,
-          nextCursor: start + limit < threadIds.length ? String(start + limit) : null,
-        };
-      });
+      return whenReady(() =>
+        service.listThreads({
+          channelId: HARNESS_CHAT_CHANNEL_ID,
+          participant: scope,
+          limit: input?.limit,
+          cursor: input?.cursor,
+        }),
+      );
     },
     getThread(threadId) {
       return whenReady(() => service.getThread(threadId));
