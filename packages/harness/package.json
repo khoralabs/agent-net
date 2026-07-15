@@ -5,8 +5,7 @@
   "type": "module",
   "module": "src/index.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./network": "./src/network/index.ts"
+    ".": "./src/index.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.json",
