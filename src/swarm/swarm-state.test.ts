@@ -60,7 +60,7 @@ test("swarm state tracks shared token budget and telemetry", async () => {
   await recordTurnTelemetryStep(dataDir, state.id, {
     sessionId: config.sessionId,
     agentTurnIndex: 0,
-    agentDid: agents[0]?.did,
+    agentDid: agents[0]!.did,
     agentRole: "a",
     runId: "run-1",
     capabilities: {

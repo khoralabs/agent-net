@@ -7,6 +7,8 @@ export type { NetworkAttribution, NetworkEvent, ThreadHashSnapshot } from "../ne
 export type SwarmConfig = {
   sessionId: string;
   dataDir: string;
+  /** Remote Khora host; falls back to KHORA_BASE_URL / HARNESS_KHORA_BASE_URL / KHORA_SERVER_URL. */
+  khoraBaseUrl?: string;
   goal: string;
   agentCount: number;
   maxTokenBudget: number;

@@ -17,19 +17,24 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import os from "node:os";
 import path from "node:path";
 import { type NetworkHarnessHandle, startNetworkHarness } from "../harness";
+import { resolveKhoraBaseUrlFromEnv } from "../lib/khora-base-url";
 import { disconnectVellum, openVellumChain } from "../lib/vellum";
 import { waitFor } from "../lib/wait-for";
+
+const khoraBaseUrl = resolveKhoraBaseUrlFromEnv();
+const describeHarness = khoraBaseUrl !== undefined ? describe : describe.skip;
 
 const dataDir = path.join(os.tmpdir(), `khora-search-discovery-${process.pid}`);
 let harness: NetworkHarnessHandle;
 
 beforeAll(async () => {
-  harness = await startNetworkHarness({ dataDir });
+  if (khoraBaseUrl === undefined) return;
+  harness = await startNetworkHarness({ dataDir, khoraBaseUrl });
 }, 30_000);
 
 afterAll(() => harness?.stop());
 
-describe("search-based peer discovery", () => {
+describeHarness("search-based peer discovery", () => {
   test("agent finds unknown peers via network search and opens OBP channel", async () => {
     const agentsDataDir = path.join(dataDir, "agents");
 

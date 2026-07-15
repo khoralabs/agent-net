@@ -28,6 +28,11 @@ function readPostSignatures(threadId: string): string[] {
   return rows.map((row) => row.signature).filter((value): value is string => value !== null);
 }
 
+function firstTextPart(parts: ReadonlyArray<{ type: string; text?: string }>): string | undefined {
+  const part = parts[0];
+  return part?.type === "text" ? part.text : undefined;
+}
+
 beforeAll(() => {
   chat = createHarnessChat(dataDir, {
     resolveSigner: (did) => Promise.resolve(signers.get(did)),
@@ -61,7 +66,7 @@ describe("harness chat", () => {
 
     const posts = await charlie.listPosts(thread.id);
     expect(posts.items).toHaveLength(3);
-    expect(posts.items.map((post) => post.parts[0]?.text)).toEqual([
+    expect(posts.items.map((post) => firstTextPart(post.parts))).toEqual([
       "Let's coordinate.",
       "Sounds good.",
       "Thanks for the invite.",
@@ -121,6 +126,6 @@ describe("harness chat", () => {
     expect(threads.items.map((item) => item.id)).toContain(thread.id);
 
     const posts = await observer.listPosts(thread.id);
-    expect(posts.items.some((post) => post.parts[0]?.text === "result: 42")).toBe(true);
+    expect(posts.items.some((post) => firstTextPart(post.parts) === "result: 42")).toBe(true);
   });
 });

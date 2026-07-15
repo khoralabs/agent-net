@@ -1,5 +1,5 @@
 import { tool } from "@khoralabs/agent-capabilities";
-import type { KhoraProfile } from "@khoralabs/khora-contracts";
+import type { KhoraProfile } from "@khoralabs/khora-client";
 import { z } from "zod";
 
 import type { HarnessToolkitEnv } from "../types.ts";

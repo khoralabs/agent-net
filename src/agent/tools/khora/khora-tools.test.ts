@@ -6,7 +6,7 @@ import type {
   KhoraClient,
   PublicProfileResult,
 } from "@khoralabs/khora-client";
-import type { KhoraPost, KhoraProfile, KhoraSearchResponse } from "@khoralabs/khora-contracts";
+import type { KhoraPost, KhoraProfile, KhoraSearchResponse } from "@khoralabs/khora-client";
 
 import { harnessToolkit } from "../_toolkit.ts";
 import type { HarnessToolkitEnv } from "../types.ts";

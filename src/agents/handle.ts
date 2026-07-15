@@ -9,7 +9,7 @@ import type {
   ChainInitResponse,
   ChainStateResponse,
   VellumChainRow,
-} from "@khoralabs/vellum-contracts";
+} from "@khoralabs/vellum-client";
 
 import type { AgentChatClient } from "../chat";
 import type { AgentMemoriesClient } from "./memories-types";

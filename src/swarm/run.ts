@@ -34,10 +34,12 @@ function parseArgs(argv: string[]): SwarmConfig {
     .filter((role) => role.length > 0);
   const dataDir = resolveHarnessDataDir(args.get("data-dir"));
   const sessionId = args.get("session-id")?.trim() || crypto.randomUUID();
+  const khoraBaseUrl = args.get("khora-url")?.trim();
 
   return {
     sessionId,
     dataDir,
+    ...(khoraBaseUrl !== undefined && khoraBaseUrl.length > 0 ? { khoraBaseUrl } : {}),
     goal: args.get("goal") ?? "Coordinate and share findings with peer agents.",
     agentCount,
     maxTokenBudget: Number.parseInt(args.get("max-tokens") ?? "500000", 10),

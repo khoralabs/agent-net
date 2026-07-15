@@ -11,23 +11,28 @@ import path from "node:path";
 import type { KhoraClientEvent } from "@khoralabs/khora-client";
 import { type NetworkHarnessHandle, startNetworkHarness } from "../harness";
 import { inboxHasPost } from "../lib/inbox";
+import { resolveKhoraBaseUrlFromEnv } from "../lib/khora-base-url";
 import { openVellumChain } from "../lib/vellum";
 import { waitFor } from "../lib/wait-for";
 
 // ── harness ───────────────────────────────────────────────────────────────────
 
+const khoraBaseUrl = resolveKhoraBaseUrlFromEnv();
+const describeHarness = khoraBaseUrl !== undefined ? describe : describe.skip;
+
 const dataDir = path.join(os.tmpdir(), `khora-e2e-${process.pid}`);
 let harness: NetworkHarnessHandle;
 
 beforeAll(async () => {
-  harness = await startNetworkHarness({ dataDir });
+  if (khoraBaseUrl === undefined) return;
+  harness = await startNetworkHarness({ dataDir, khoraBaseUrl });
 }, 30_000);
 
 afterAll(() => harness?.stop());
 
 // ── test ──────────────────────────────────────────────────────────────────────
 
-describe("multi-agent OBP network", () => {
+describeHarness("multi-agent OBP network", () => {
   test("agents subscribe → post → notify → open vellum → chain → send offer", async () => {
     // Agents' key files live at this path (matches ManagedAgentPool internals)
     const agentsDataDir = path.join(dataDir, "agents");

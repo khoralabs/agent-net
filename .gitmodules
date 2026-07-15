@@ -1,0 +1,12 @@
+[submodule "vendor/memories"]
+	path = vendor/memories
+	url = git@github.com:khoralabs/memories.git
+[submodule "vendor/relay"]
+	path = vendor/relay
+	url = git@github.com:khoralabs/relay.git
+[submodule "vendor/chat"]
+	path = vendor/chat
+	url = git@github.com:khoralabs/chat.git
+[submodule "vendor/libs"]
+	path = vendor/libs
+	url = git@github.com:khoralabs/libs.git

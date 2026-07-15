@@ -9,6 +9,15 @@
     "./swarm": "./src/swarm/index.ts",
     "./network": "./src/network/index.ts"
   },
+  "workspaces": [
+    "vendor/libs/packages/*/**",
+    "vendor/chat/core",
+    "vendor/chat/persistence",
+    "vendor/chat/sqlite",
+    "vendor/relay/packages/*/**",
+    "vendor/memories/packages/*/**",
+    "vendor/memories/packages/memories-service/*/**"
+  ],
   "scripts": {
     "typecheck": "tsc --noEmit",
     "agent:dev": "nitro dev",
@@ -17,7 +26,9 @@
     "swarm": "bun run src/swarm/run.ts",
     "swarm:setup": "workflow-turso-setup",
     "swarm:events": "bun run src/swarm/events-cli.ts",
-    "swarm:test": "bun test src/swarm src/agent/tools/chat src/observability src/network"
+    "swarm:test": "bun test src/swarm src/agent/tools/chat src/observability src/network",
+    "submodules:init": "git submodule update --init --recursive",
+    "submodules:update": "git submodule update --remote --merge vendor/memories vendor/relay vendor/chat vendor/libs && bun install"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.3",
@@ -28,11 +39,8 @@
     "@khoralabs/chat-core": "workspace:*",
     "@khoralabs/chat-persistence": "workspace:*",
     "@khoralabs/chat-persistence-sqlite": "workspace:*",
-    "@khoralabs/khora-client": "workspace:*",
-    "@khoralabs/khora-contracts": "workspace:*",
-    "@khoralabs/khora-server": "workspace:*",
-    "@khoralabs/vellum-client": "workspace:*",
-    "@khoralabs/vellum-contracts": "workspace:*",
+    "@khoralabs/khora-client": "^0.1.0",
+    "@khoralabs/vellum-client": "^0.1.0",
     "@khoralabs/memories-core": "workspace:*",
     "@khoralabs/memories-ontologies": "workspace:*",
     "@khoralabs/memories-persistence-core": "workspace:*",
@@ -49,7 +57,7 @@
     "@noble/ed25519": "^3.1.0",
     "@opentelemetry/api": "^1.9.1",
     "@workflow-worlds/turso": "^0.2.2",
-    "ai": "^6.0.205",
+    "ai": "^7.0.9",
     "nitro": "^3.0.0",
     "pino": "^9.6.0",
     "unstorage": "^1.17.5",

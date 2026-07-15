@@ -23,19 +23,24 @@ import path from "node:path";
 import type { KhoraClientEvent } from "@khoralabs/khora-client";
 import { type NetworkHarnessHandle, startNetworkHarness } from "../harness";
 import { inboxHasPost, inboxPostAuthorDid } from "../lib/inbox";
+import { resolveKhoraBaseUrlFromEnv } from "../lib/khora-base-url";
 import { disconnectVellum, openVellumChain } from "../lib/vellum";
 import { waitFor } from "../lib/wait-for";
+
+const khoraBaseUrl = resolveKhoraBaseUrlFromEnv();
+const describeHarness = khoraBaseUrl !== undefined ? describe : describe.skip;
 
 const dataDir = path.join(os.tmpdir(), `khora-inbox-discovery-${process.pid}`);
 let harness: NetworkHarnessHandle;
 
 beforeAll(async () => {
-  harness = await startNetworkHarness({ dataDir });
+  if (khoraBaseUrl === undefined) return;
+  harness = await startNetworkHarness({ dataDir, khoraBaseUrl });
 }, 30_000);
 
 afterAll(() => harness?.stop());
 
-describe("inbox-based peer discovery", () => {
+describeHarness("inbox-based peer discovery", () => {
   test("agent discovers unknown peer via subscription match and opens OBP channel", async () => {
     const agentsDataDir = path.join(dataDir, "agents");
 
