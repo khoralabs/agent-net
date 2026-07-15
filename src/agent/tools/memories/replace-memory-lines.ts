@@ -23,6 +23,10 @@ export const replaceMemoryLinesTool = tool<
   name: "replaceMemoryLines",
   description:
     "Replace specific lines in a memory's stored text. Each change is a [lineNumber, newContent] tuple. Read lines first with readMemoryLines.",
+  instructions: [
+    "Refine a memory by replacing specific line numbers.",
+    "Prefer line edits over full writeMemory rewrites for small refinements.",
+  ],
   inputSchema: z.object({
     namespace: z.string().min(1).describe("Memory namespace path."),
     key: z.string().min(1).describe("Memory key within the namespace."),

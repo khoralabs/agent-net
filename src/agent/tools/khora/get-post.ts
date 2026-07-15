@@ -8,6 +8,7 @@ import { hasKhoraClient } from "./policies.ts";
 export const getPostTool = tool<"getPost", { id: string }, { post: KhoraPost }, HarnessToolkitEnv>({
   name: "getPost",
   description: "Fetch a Khora post by its address-encoded id.",
+  instructions: ["Fetch an existing post by id."],
   inputSchema: z.object({
     id: z.string().min(1).describe("Post id (atp0:…)."),
   }),

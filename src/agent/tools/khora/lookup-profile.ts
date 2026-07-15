@@ -24,6 +24,7 @@ export const lookupProfileTool = tool<
 >({
   name: "lookupProfile",
   description: "Look up a public Khora profile by username or DID. Returns null when not found.",
+  instructions: ["Resolve a username or DID to a public profile."],
   inputSchema: zLookupProfileInput,
   policies: [hasKhoraClient],
   handler: async (ctx, input) => {

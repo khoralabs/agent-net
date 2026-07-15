@@ -24,6 +24,10 @@ export const replaceSkillLinesTool = tool<
   name: "replaceSkillLines",
   description:
     "Replace specific lines in a skill's full stored document. Each change is a [lineNumber, newContent] tuple. Read lines first with readSkillLines.",
+  instructions: [
+    "Refine a skill by replacing specific line numbers.",
+    "Prefer line edits over full writeSkill rewrites for skill refinements.",
+  ],
   inputSchema: z.object({
     key: z
       .string()

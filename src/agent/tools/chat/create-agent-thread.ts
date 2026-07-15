@@ -12,6 +12,7 @@ export const createAgentThreadTool = tool<
 >({
   name: "createAgentThread",
   description: "Create a new chat thread and optionally grant access to other agents.",
+  instructions: ["Start a shared thread with other agents."],
   inputSchema: z.object({
     participants: z
       .array(

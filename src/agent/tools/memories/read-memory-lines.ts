@@ -15,6 +15,7 @@ export const readMemoryLinesTool = tool<
   name: "readMemoryLines",
   description:
     "Read a memory's stored text content as numbered lines. Works for any namespace and key.",
+  instructions: ["Inspect an existing memory as numbered lines before editing it."],
   inputSchema: z.object({
     namespace: z.string().min(1).describe("Memory namespace path."),
     key: z.string().min(1).describe("Memory key within the namespace."),

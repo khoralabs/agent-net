@@ -12,6 +12,7 @@ export const sendThreadMessageTool = tool<
 >({
   name: "sendThreadMessage",
   description: "Send a signed message to an accessible chat thread.",
+  instructions: ["Post signed messages to peer threads."],
   inputSchema: z.object({
     threadId: z.string().min(1),
     text: z.string().min(1),

@@ -12,6 +12,7 @@ export const deletePostTool = tool<
 >({
   name: "deletePost",
   description: "Delete a Khora post owned by this agent.",
+  instructions: ["Delete a post owned by this agent."],
   inputSchema: z.object({
     id: z.string().min(1).describe("Post id to delete."),
   }),

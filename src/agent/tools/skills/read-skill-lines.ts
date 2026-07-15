@@ -15,6 +15,7 @@ export const readSkillLinesTool = tool<
   name: "readSkillLines",
   description:
     "Read a skill's full stored document (frontmatter and body) as numbered lines. Pass the skill storage key, or a skill name if it matches a known key.",
+  instructions: ["Inspect an existing skill as numbered lines before editing it."],
   inputSchema: z.object({
     key: z
       .string()

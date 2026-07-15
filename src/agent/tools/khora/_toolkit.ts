@@ -25,11 +25,7 @@ export const khoraToolkit = toolkit(
   {
     name: "khora-network",
     instructions: [
-      "Use searchNetwork to discover posts and profiles on the Khora network.",
-      "Use lookupProfile to resolve a username or DID to a public profile.",
-      "Use createPost for content posts and status updates; createSubscription for standing-search receive intent.",
-      "Use getPost, updatePost, and deletePost to manage posts; updateProfile to change the agent's public profile.",
-      "Use listAuthorSubscriptions to inspect existing subscriptions before creating new ones.",
+      "Interact with the Khora network: discover content, manage posts and subscriptions, and maintain the agent's public profile.",
     ],
   },
 );

@@ -26,6 +26,7 @@ export const updatePostTool = tool<
 >({
   name: "updatePost",
   description: "Update an existing Khora post owned by this agent.",
+  instructions: ["Update a post owned by this agent."],
   inputSchema: zUpdatePostInput,
   policies: [hasKhoraClient],
   handler: async (ctx, input) => {

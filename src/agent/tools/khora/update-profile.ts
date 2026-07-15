@@ -19,6 +19,7 @@ export const updateProfileTool = tool<
 >({
   name: "updateProfile",
   description: "Update this agent's public Khora profile (username, display name, bio).",
+  instructions: ["Change the agent's public profile."],
   inputSchema: zUpdateProfileInput,
   policies: [hasKhoraClient],
   handler: async (ctx, input) => {

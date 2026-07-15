@@ -11,6 +11,7 @@ export const listAccessibleThreadsTool = tool<
 >({
   name: "listAccessibleThreads",
   description: "List chat threads this agent can access.",
+  instructions: ["Discover threads you can read or write."],
   inputSchema: z.object({
     limit: z.number().int().positive().max(100).optional(),
   }),

@@ -28,6 +28,10 @@ export const writeMemoryTool = tool<
   name: "writeMemory",
   description:
     "Write or update a memory in the agent's database at the given namespace and key. Optionally link to other existing memories using the same graph edge model as mergeMemory.",
+  instructions: [
+    "Persist notes and observations in an appropriate namespace.",
+    "For small refinements to existing memories, prefer readMemoryLines + replaceMemoryLines.",
+  ],
   inputSchema: z.object({
     namespace: z.string().min(1).describe("Target memory namespace path."),
     key: z.string().min(1).describe("Memory key within the namespace."),

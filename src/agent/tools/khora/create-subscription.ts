@@ -20,6 +20,7 @@ export const createSubscriptionTool = tool<
   name: "createSubscription",
   description:
     "Create a standing-search subscription post. Requires a search spec describing what content to receive.",
+  instructions: ["Create standing-search receive intent subscriptions."],
   inputSchema: z.object({
     search: zKhoraStandingSearchRequest.describe(
       "Standing search spec: content (text or vector) and/or scope (namespace, labels, searchEntireDatabase).",

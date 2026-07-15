@@ -10,11 +10,7 @@ export const memoriesToolkit = toolkit(
   {
     name: "memories",
     instructions: [
-      "Use searchMemories to recall relevant context from the agent's memory database.",
-      "Use writeMemory to persist notes and observations in an appropriate namespace.",
-      "Use readMemoryLines to inspect an existing memory as numbered lines before editing it.",
-      "Use replaceMemoryLines to refine a memory by replacing specific line numbers.",
-      "Prefer line edits over full writeMemory rewrites for small refinements.",
+      "Persistent memory database for recalling and storing notes, observations, and context across turns.",
     ],
   },
 );

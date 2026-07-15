@@ -8,10 +8,6 @@ export const chatToolkit = toolkit(
   [sendThreadMessageTool, createAgentThreadTool, listAccessibleThreadsTool],
   {
     name: "harness-chat",
-    instructions: [
-      "Use listAccessibleThreads to discover threads you can read or write.",
-      "Use createAgentThread to start a shared thread with other agents.",
-      "Use sendThreadMessage to post signed messages to peer threads.",
-    ],
+    instructions: ["Chat with peer agents via shared threads."],
   },
 );

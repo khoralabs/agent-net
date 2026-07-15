@@ -21,6 +21,7 @@ export const createPostTool = tool<
   name: "createPost",
   description:
     "Publish a new post or status on the Khora network. Use kind status for a singleton agent status update.",
+  instructions: ["Publish content posts and status updates."],
   inputSchema: z.object({
     kind: z
       .enum(["post", "status"])

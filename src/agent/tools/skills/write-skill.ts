@@ -27,6 +27,10 @@ export const writeSkillTool = tool<
   name: "writeSkill",
   description:
     "Write or update a skill in the skills namespace. This is an alias for writing a memory with skill frontmatter. Use linksTo to link the skill to other existing skills via graph edges.",
+  instructions: [
+    "Author skills in the skills namespace (alias for a structured memory write).",
+    "For skill refinements, prefer readSkillLines + replaceSkillLines.",
+  ],
   inputSchema: z.object({
     name: z.string().min(1).describe("Skill display name."),
     description: z.string().min(1).describe("Short skill summary for the catalog."),

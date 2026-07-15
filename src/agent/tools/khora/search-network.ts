@@ -20,6 +20,7 @@ export const searchNetworkTool = tool<
   name: "searchNetwork",
   description:
     "Search the Khora network index for posts and profiles matching a text query. Optional namespace scopes the search subtree.",
+  instructions: ["Discover posts and profiles on the Khora network."],
   inputSchema: z.object({
     q: z.string().min(1).describe("Natural language search query."),
     topK: z

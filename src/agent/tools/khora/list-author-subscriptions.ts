@@ -13,6 +13,7 @@ export const listAuthorSubscriptionsTool = tool<
 >({
   name: "listAuthorSubscriptions",
   description: "List this agent's standing-search subscription posts.",
+  instructions: ["Inspect existing subscriptions before creating new ones."],
   inputSchema: z.object({}),
   policies: [hasKhoraClient],
   handler: async (ctx) => {

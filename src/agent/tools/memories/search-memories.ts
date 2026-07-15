@@ -13,6 +13,7 @@ export const searchMemoriesTool = tool<
   name: "searchMemories",
   description:
     "Search the agent's memory database within a namespace subtree. Provide the namespace path and a natural-language query.",
+  instructions: ["Recall relevant context from the agent's memory database."],
   inputSchema: z.object({
     namespace: z.string().min(1).describe("Memory namespace subtree to search."),
     query: z.string().min(1).describe("Natural language search query."),
