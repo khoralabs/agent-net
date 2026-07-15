@@ -4,9 +4,11 @@ import { evaluateComposable } from "@khoralabs/agent-capabilities";
 import type {
   AuthorSubscriptionsSnapshot,
   KhoraClient,
+  KhoraPost,
+  KhoraProfile,
+  KhoraSearchResponse,
   PublicProfileResult,
 } from "@khoralabs/khora-client";
-import type { KhoraPost, KhoraProfile, KhoraSearchResponse } from "@khoralabs/khora-client";
 
 import { harnessToolkit } from "../_toolkit.ts";
 import type { HarnessToolkitEnv } from "../types.ts";

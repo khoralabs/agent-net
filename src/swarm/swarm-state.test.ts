@@ -57,10 +57,12 @@ test("swarm state tracks shared token budget and telemetry", async () => {
   await incrementTokensUsedStep(dataDir, state.id, 50);
   expect(await checkTokenBudgetRemainingStep(dataDir, state.id)).toBe(false);
 
+  const agentA = agents[0];
+  if (agentA === undefined) throw new Error("expected agent A");
   await recordTurnTelemetryStep(dataDir, state.id, {
     sessionId: config.sessionId,
     agentTurnIndex: 0,
-    agentDid: agents[0]!.did,
+    agentDid: agentA.did,
     agentRole: "a",
     runId: "run-1",
     capabilities: {

@@ -4,12 +4,12 @@ import {
   KhoraClient,
   type KhoraClientEvent,
 } from "@khoralabs/khora-client";
-import { VellumClient, type VellumClientOptions } from "@khoralabs/vellum-client";
 import type {
   ChainInitResponse,
   ChainStateResponse,
   VellumChainRow,
 } from "@khoralabs/vellum-client";
+import { VellumClient, type VellumClientOptions } from "@khoralabs/vellum-client";
 
 import type { AgentChatClient } from "../chat";
 import type { AgentMemoriesClient } from "./memories-types";
