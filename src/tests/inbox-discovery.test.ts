@@ -24,18 +24,21 @@ import type { KhoraClientEvent } from "@khoralabs/khora-client";
 import { type NetworkHarnessHandle, startNetworkHarness } from "../harness";
 import { inboxHasPost, inboxPostAuthorDid } from "../lib/inbox";
 import { resolveKhoraBaseUrlFromEnv } from "../lib/khora-base-url";
+import { resolveRelayBaseUrlFromEnv } from "../lib/relay-base-url";
 import { disconnectVellum, openVellumChain } from "../lib/vellum";
 import { waitFor } from "../lib/wait-for";
 
 const khoraBaseUrl = resolveKhoraBaseUrlFromEnv();
-const describeHarness = khoraBaseUrl !== undefined ? describe : describe.skip;
+const relayBaseUrl = resolveRelayBaseUrlFromEnv();
+const describeHarness =
+  khoraBaseUrl !== undefined && relayBaseUrl !== undefined ? describe : describe.skip;
 
 const dataDir = path.join(os.tmpdir(), `khora-inbox-discovery-${process.pid}`);
 let harness: NetworkHarnessHandle;
 
 beforeAll(async () => {
-  if (khoraBaseUrl === undefined) return;
-  harness = await startNetworkHarness({ dataDir, khoraBaseUrl });
+  if (khoraBaseUrl === undefined || relayBaseUrl === undefined) return;
+  harness = await startNetworkHarness({ dataDir, khoraBaseUrl, relayBaseUrl });
 }, 30_000);
 
 afterAll(() => harness?.stop());

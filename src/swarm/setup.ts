@@ -4,6 +4,7 @@ import { getAgentRegistry } from "../agent/agent-runtime.ts";
 import { harnessToolkit } from "../agent/tools/index.ts";
 import { spawnWithMemories, startNetworkHarness } from "../harness.ts";
 import { requireKhoraBaseUrl } from "../lib/khora-base-url.ts";
+import { requireRelayBaseUrl } from "../lib/relay-base-url.ts";
 import { registerNetworkSession, removeNetworkSession } from "../network/session-registry.ts";
 import { emitNetworkEvent, networkEventId } from "../observability/network-log.ts";
 import { ensureSwarmAgentRegistered } from "./agent-registry.ts";
@@ -54,6 +55,7 @@ export async function setupSwarm(config: SwarmConfig): Promise<{
   const harness = await startNetworkHarness({
     dataDir: config.dataDir,
     khoraBaseUrl: requireKhoraBaseUrl(config.khoraBaseUrl),
+    relayBaseUrl: requireRelayBaseUrl(config.relayBaseUrl),
   });
   const spawned = [];
   for (let i = 0; i < config.agentCount; i++) {

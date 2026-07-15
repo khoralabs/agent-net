@@ -9,6 +9,8 @@ export type SwarmConfig = {
   dataDir: string;
   /** Remote Khora host; falls back to KHORA_BASE_URL / HARNESS_KHORA_BASE_URL / KHORA_SERVER_URL. */
   khoraBaseUrl?: string;
+  /** Remote relay host; falls back to RELAY_BASE_URL / HARNESS_RELAY_BASE_URL / RELAY_SERVER_URL. */
+  relayBaseUrl?: string;
   goal: string;
   agentCount: number;
   maxTokenBudget: number;

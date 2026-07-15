@@ -12,7 +12,6 @@ import {
   getNetworkLogContext,
   networkEventId,
 } from "./observability/network-log.ts";
-import { startRelayServer } from "./relay";
 
 export type { AgentMemoriesClient } from "./agents";
 
@@ -20,17 +19,17 @@ export type NetworkHarnessOptions = {
   dataDir: string;
   /** Base URL of a running Khora host (e.g. http://127.0.0.1:8788). */
   khoraBaseUrl: string;
+  /** Base URL of a running relay server (e.g. http://127.0.0.1:8790). */
+  relayBaseUrl: string;
   /** Override the port the memories service binds to. Defaults to a random free port. */
   memoriesPort?: number;
-  /** Override the port the relay server binds to. Defaults to a random free port. */
-  relayPort?: number;
   sqlCipherKey?: string;
 };
 
 export type NetworkHarnessHandle = {
   /** Base URL of the remote khora server. */
   readonly serverBaseUrl: string;
-  /** Base URL of the relay server (for vellum channel operations). */
+  /** Base URL of the remote relay server (for vellum channel operations). */
   readonly relayBaseUrl: string;
   /** Base URL of the shared memories service. */
   readonly memoriesBaseUrl: string;
@@ -47,7 +46,7 @@ export type NetworkHarnessHandle = {
   readonly chat: HarnessChat;
   /** Underlying signed chat backend (service + db). */
   readonly signedChat: SignedChatBackend;
-  /** Tear down memories + relay. Does not stop the remote khora host or unregister agents. */
+  /** Tear down memories. Does not stop the remote khora host, relay, or unregister agents. */
   stop(): void;
 };
 
@@ -59,22 +58,20 @@ export async function startNetworkHarness(
     throw new Error("startNetworkHarness: khoraBaseUrl is required");
   }
 
+  const relayBaseUrl = opts.relayBaseUrl.trim().replace(/\/$/, "");
+  if (relayBaseUrl.length === 0) {
+    throw new Error("startNetworkHarness: relayBaseUrl is required");
+  }
+
   const memoriesDataDir = path.join(opts.dataDir, "memories");
   const agentsDataDir = path.join(opts.dataDir, "agents");
-  const relayDataDir = path.join(opts.dataDir, "relay");
 
   // Memories must start first — it calls Database.setCustomSQLite which must
-  // run before any bun:sqlite Database is opened by the relay server.
+  // run before any bun:sqlite Database is opened (e.g. signed chat).
   const memories = startMemoriesService({
     dataDir: memoriesDataDir,
     sqlCipherKey: opts.sqlCipherKey ?? "harness-memories-key",
     port: opts.memoriesPort,
-  });
-
-  const relay = await startRelayServer({
-    dataDir: relayDataDir,
-    port: opts.relayPort,
-    sqlCipherKey: opts.sqlCipherKey,
   });
 
   const memoriesClient = new MemoriesServiceClient({
@@ -111,7 +108,7 @@ export async function startNetworkHarness(
       message: "Network harness started",
       payload: {
         serverBaseUrl: khoraBaseUrl,
-        relayBaseUrl: relay.baseUrl,
+        relayBaseUrl,
         memoriesBaseUrl: memories.baseUrl,
       },
     });
@@ -119,7 +116,7 @@ export async function startNetworkHarness(
 
   return {
     serverBaseUrl: khoraBaseUrl,
-    relayBaseUrl: relay.baseUrl,
+    relayBaseUrl,
     memoriesBaseUrl: memories.baseUrl,
     get agentDids() {
       return pool.list();
@@ -145,7 +142,6 @@ export async function startNetworkHarness(
         });
       }
       memories.stop();
-      relay.stop();
     },
   };
 }
