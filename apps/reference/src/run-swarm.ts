@@ -4,6 +4,7 @@ import {
   closeNetworkLog,
   getHarnessObservability,
   initNetworkLog,
+  installMemoriesOntology,
   requireKhoraBaseUrl,
   requireMemoriesBaseUrl,
   requireRelayBaseUrl,
@@ -12,11 +13,13 @@ import {
 } from "@khoralabs/agent-net";
 import {
   provideHarnessForSession,
+  provideOntologyForSession,
   type SwarmConfig,
   swarmOrchestrator,
 } from "@khoralabs/agent-net-swarm";
 import { start } from "workflow/api";
 
+import { referenceMemoriesOntology } from "./memories/ontology.ts";
 import { installReferenceObservability } from "./observability/install.ts";
 import { configureTursoWorldEnv, startTursoWorldWorker } from "./world/turso.ts";
 
@@ -95,7 +98,9 @@ async function main(): Promise<void> {
     relayBaseUrl: requireRelayBaseUrl(relayBaseUrl),
     memoriesBaseUrl: requireMemoriesBaseUrl(memoriesBaseUrl),
   });
+  installMemoriesOntology(referenceMemoriesOntology);
   provideHarnessForSession(config.sessionId, harness);
+  provideOntologyForSession(config.sessionId, referenceMemoriesOntology);
 
   try {
     logger.info(

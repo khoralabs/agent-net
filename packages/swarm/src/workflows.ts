@@ -8,6 +8,7 @@ import { getRun, start } from "workflow/api";
 
 import { assembleTurnContext } from "./assemble-turn-context.ts";
 import { takeHarnessForSession } from "./pending-harness.ts";
+import { takeOntologyForSession } from "./pending-ontology.ts";
 import { getSwarmSession } from "./session-store.ts";
 import { setupSwarm, teardownSwarm } from "./setup.ts";
 import {
@@ -62,7 +63,8 @@ export async function setupSwarmStep(config: SwarmConfig): Promise<{
 }> {
   "use step";
   const harness = takeHarnessForSession(config.sessionId);
-  return setupSwarm({ harness, config });
+  const ontology = takeOntologyForSession(config.sessionId);
+  return setupSwarm({ harness, config, ontology });
 }
 
 export async function teardownSwarmStep(sessionId: string): Promise<void> {

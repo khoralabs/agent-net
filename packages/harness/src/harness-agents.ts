@@ -3,9 +3,12 @@ import path from "node:path";
 import { createRegisteredAgent } from "@khoralabs/agent-capabilities";
 import type { ChatService } from "@khoralabs/chat-core";
 import type { KhoraClient } from "@khoralabs/khora-client";
-import type {
-  MemoriesServiceClient,
-  RemoteMemoriesClientAsync,
+import type { LabelSchemaMap, OntologyDefinition } from "@khoralabs/memories-ontologies";
+import {
+  ensureDatabaseOntologyLink,
+  type MemoriesServiceClient,
+  type RemoteMemoriesClientAsync,
+  storedOntologyFromDefinition,
 } from "@khoralabs/memories-service-client";
 import type { MemoriesDatabaseId } from "@khoralabs/memories-service-storage-core";
 
@@ -17,10 +20,16 @@ import {
   agentMemoriesDatabase,
   createHarnessMemoriesClient,
   createLazyHarnessMemoriesClient,
+  type HarnessMemoriesOntology,
+  resolveHarnessMemoriesOntology,
 } from "./agent/tools/memories/_helpers/memories-client.ts";
 import type { AgentHandle, AgentMemoriesClient, ManagedAgentPool } from "./agents";
 import type { AgentChatClient, HarnessChat, SignedChatBackend } from "./chat.ts";
 import { registerNetworkSession, removeNetworkSession } from "./network/session-registry.ts";
+
+export type SpawnWithMemoriesOptions = {
+  ontology: OntologyDefinition<LabelSchemaMap, LabelSchemaMap>;
+};
 
 export type RegisterHarnessAgentInput = {
   agent: AgentHandle;
@@ -72,7 +81,7 @@ export type NetworkHarnessCore = {
 };
 
 export type NetworkHarnessAgentApi = {
-  spawn(): Promise<AgentHandle>;
+  spawn(opts: SpawnWithMemoriesOptions): Promise<AgentHandle>;
   registerAgent(input: RegisterHarnessAgentInput): Promise<{ staticHash: string }>;
   ensureAgentRegistered(input: EnsureHarnessAgentRegisteredInput): Promise<void>;
   resolveAgentWorkflowDeps(
@@ -87,12 +96,22 @@ export type NetworkHarnessAgentApi = {
  * Spawn a new agent and bind memories + chat in one step.
  * Returns a single {@link AgentHandle} with inbox, vellum, memories, and chat.
  */
-export async function spawnWithMemories(harness: NetworkHarnessCore): Promise<AgentHandle> {
+export async function spawnWithMemories(
+  harness: NetworkHarnessCore,
+  opts: SpawnWithMemoriesOptions,
+): Promise<AgentHandle> {
+  const ontology: HarnessMemoriesOntology = resolveHarnessMemoriesOntology(opts.ontology);
   let capturedHandle: AgentHandle | undefined;
 
   const did = await harness.pool.spawn(async (handle) => {
     capturedHandle = handle;
-    await harness.memoriesClient.openDatabase({ kind: "account", ownerKey: handle.did });
+    const database: MemoriesDatabaseId = { kind: "account", ownerKey: handle.did };
+    await harness.memoriesClient.openDatabase(database);
+    await ensureDatabaseOntologyLink({
+      serviceClient: harness.memoriesClient,
+      database,
+      schema: storedOntologyFromDefinition(ontology),
+    });
   });
 
   const agent = capturedHandle;
@@ -104,6 +123,7 @@ export async function spawnWithMemories(harness: NetworkHarnessCore): Promise<Ag
   const { memoriesClient } = harness;
   const memories: AgentMemoriesClient = {
     database,
+    ontology,
     open: () => memoriesClient.openDatabase(database),
     close: () => memoriesClient.closeDatabase(database),
     checkpoint: () => memoriesClient.checkpointDatabase(database),
@@ -113,6 +133,7 @@ export async function spawnWithMemories(harness: NetworkHarnessCore): Promise<Ag
     client: createLazyHarnessMemoriesClient({
       baseUrl: harness.memoriesBaseUrl,
       database,
+      ontology,
     }),
   };
 
@@ -124,8 +145,8 @@ export function createHarnessAgentApi(
   opts: { agentsDataDir: string },
 ): NetworkHarnessAgentApi {
   return {
-    spawn() {
-      return spawnWithMemories(harness);
+    spawn(spawnOpts) {
+      return spawnWithMemories(harness, spawnOpts);
     },
 
     async registerAgent(input) {
@@ -160,6 +181,7 @@ export function createHarnessAgentApi(
       const memoriesClient = await createHarnessMemoriesClient({
         baseUrl: harness.memoriesBaseUrl,
         database: agentMemoriesDatabase(agent.did),
+        ontology: agent.memories.ontology,
       });
       const khoraClient = await createHarnessKhoraClientForAgent({
         baseUrl: harness.serverBaseUrl,

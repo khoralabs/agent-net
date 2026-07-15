@@ -19,5 +19,6 @@ const harness = await startNetworkHarness({
   relayBaseUrl,
   memoriesBaseUrl,
 });
-const agent = await spawnWithMemories(harness);
+// Apps must supply an ontology — e.g. referenceMemoriesOntology from the reference app.
+const agent = await spawnWithMemories(harness, { ontology });
 ```

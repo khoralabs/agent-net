@@ -12,7 +12,11 @@ const zMemoryLink = z.object({
     .enum(["in", "out"])
     .optional()
     .describe("Edge direction from this memory to the peer. Defaults to out."),
-  label: z.string().min(1).optional().describe("Edge label kind. Defaults to references."),
+  label: z
+    .string()
+    .min(1)
+    .optional()
+    .describe("Edge label kind. Defaults to References (harness minimal ontology)."),
 });
 
 export const writeMemoryTool = tool<

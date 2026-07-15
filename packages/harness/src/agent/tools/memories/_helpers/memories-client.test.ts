@@ -18,7 +18,11 @@ function createMockClient() {
   };
 
   const lazyClient = createLazyHarnessMemoriesClient(
-    { baseUrl: "http://localhost:1234", database },
+    {
+      baseUrl: "http://localhost:1234",
+      database,
+      ontology: { nodeLabels: {}, edgeLabels: {} },
+    },
     createClient,
   );
 
@@ -63,7 +67,11 @@ describe("createLazyHarnessMemoriesClient", () => {
     } as unknown as RemoteMemoriesClientAsync;
 
     const lazyClient = createLazyHarnessMemoriesClient(
-      { baseUrl: "http://localhost:1234", database },
+      {
+        baseUrl: "http://localhost:1234",
+        database,
+        ontology: { nodeLabels: {}, edgeLabels: {} },
+      },
       async () => {
         createCount += 1;
         return mockClient;

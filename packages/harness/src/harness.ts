@@ -22,6 +22,7 @@ export type {
   NetworkHarnessAgentApi,
   RegisterHarnessAgentInput,
   ResolveHarnessAgentWorkflowDepsOpts,
+  SpawnWithMemoriesOptions,
 } from "./harness-agents.ts";
 export { spawnWithMemories } from "./harness-agents.ts";
 

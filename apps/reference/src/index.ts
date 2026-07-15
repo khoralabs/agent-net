@@ -1,4 +1,8 @@
 export {
+  REFERENCE_MEMORY_LINK_LABEL,
+  referenceMemoriesOntology,
+} from "./memories/ontology.ts";
+export {
   type MemoriesServiceHandle,
   type MemoriesServiceOptions,
   startMemoriesService,

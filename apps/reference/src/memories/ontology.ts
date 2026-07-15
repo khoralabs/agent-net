@@ -8,7 +8,7 @@ import {
   salienceMemoryOntology,
 } from "@khoralabs/memories-ontologies";
 
-const harnessKnowledgeGraphOntology = defineOntology({
+const referenceKnowledgeGraphOntology = defineOntology({
   nodeLabels: {
     ...canonicalKnowledgeNodeLabelShapes,
     ...canonicalTemporalNodeLabelShapes,
@@ -19,10 +19,10 @@ const harnessKnowledgeGraphOntology = defineOntology({
   },
 });
 
-/** Agent memory client ontology: salience, knowledge, temporal, and relation families. */
-export const harnessMemoriesOntology = mergeOntologies(
+/** Reference agent memories ontology: salience, knowledge, temporal, and relation families. */
+export const referenceMemoriesOntology = mergeOntologies(
   salienceMemoryOntology,
-  harnessKnowledgeGraphOntology,
+  referenceKnowledgeGraphOntology,
 );
 
-export const HARNESS_MEMORY_LINK_LABEL = "references" as const;
+export const REFERENCE_MEMORY_LINK_LABEL = "References" as const;

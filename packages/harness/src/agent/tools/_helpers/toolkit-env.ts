@@ -7,6 +7,7 @@ import { resolveMemoriesBaseUrlFromEnv } from "../../../lib/memories-base-url.ts
 import {
   agentMemoriesDatabase,
   createHarnessMemoriesClient,
+  type HarnessMemoriesOntology,
 } from "../memories/_helpers/memories-client";
 import { resolveRecentNamespacesTracker } from "../memories/_helpers/recent-namespaces";
 import { discoverSkillsFromMemories } from "../skills/_helpers/skills";
@@ -61,10 +62,12 @@ export async function createHarnessToolkitEnv(input: {
 export async function createHarnessMemoriesClientForAgent(opts: {
   baseUrl: string;
   agentDid: string;
+  ontology: HarnessMemoriesOntology;
 }): Promise<RemoteMemoriesClientAsync> {
   return createHarnessMemoriesClient({
     baseUrl: opts.baseUrl,
     database: agentMemoriesDatabase(opts.agentDid),
+    ontology: opts.ontology,
   });
 }
 
@@ -89,6 +92,7 @@ export type HarnessAgentWorkflowDeps = Pick<
 export async function createHarnessAgentWorkflowDeps(input: {
   memoriesBaseUrl: string;
   agentDid: string;
+  ontology: HarnessMemoriesOntology;
   khoraClient?: KhoraClient;
   embeddingModel?: import("@khoralabs/memories-core/helpers").EmbeddingModel;
 }): Promise<HarnessAgentWorkflowDeps> {
@@ -96,6 +100,7 @@ export async function createHarnessAgentWorkflowDeps(input: {
     memoriesClient: await createHarnessMemoriesClientForAgent({
       baseUrl: input.memoriesBaseUrl,
       agentDid: input.agentDid,
+      ontology: input.ontology,
     }),
     khoraClient: input.khoraClient,
     embeddingModel: input.embeddingModel,

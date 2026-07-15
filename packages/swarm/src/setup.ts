@@ -2,6 +2,7 @@ import type { NetworkHarnessHandle } from "@khoralabs/agent-net";
 import { emitNetworkEvent, networkEventId } from "@khoralabs/agent-net";
 
 import { ensureSwarmAgentRegistered } from "./agent-registry.ts";
+import type { SwarmMemoriesOntology } from "./pending-ontology.ts";
 import {
   putSwarmSession,
   removeSwarmSession,
@@ -27,12 +28,13 @@ export function validateSwarmConfig(config: SwarmConfig): void {
 export async function setupSwarm(input: {
   harness: NetworkHarnessHandle;
   config: SwarmConfig;
+  ontology: SwarmMemoriesOntology;
 }): Promise<{
   swarmStateId: string;
   sessionId: string;
   agents: AgentLoopState[];
 }> {
-  const { harness, config } = input;
+  const { harness, config, ontology } = input;
   validateSwarmConfig(config);
 
   await emitNetworkEvent({
@@ -52,7 +54,7 @@ export async function setupSwarm(input: {
 
   const spawned = [];
   for (let i = 0; i < config.agentCount; i++) {
-    spawned.push(await harness.spawn());
+    spawned.push(await harness.spawn({ ontology }));
   }
 
   const inboxConnections = [];

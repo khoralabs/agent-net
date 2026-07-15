@@ -1,23 +1,42 @@
 import type { DeleteMemoryParams, MergeMemoryParams, SearchParams } from "@khoralabs/memories-core";
 import {
+  type LabelSchemaMap,
+  mergeOntologies,
+  type OntologyDefinition,
+} from "@khoralabs/memories-ontologies";
+import {
   createNoAuthProvider,
   createRemoteMemoriesClientAsync,
   type RemoteMemoriesClientAsync,
 } from "@khoralabs/memories-service-client";
 import type { MemoriesDatabaseId } from "@khoralabs/memories-service-storage-core";
 
-export { HARNESS_MEMORY_LINK_LABEL, harnessMemoriesOntology } from "./harness-ontology.ts";
+import { minimalHarnessMemoriesOntology } from "./minimal-ontology.ts";
 
-import { harnessMemoriesOntology } from "./harness-ontology.ts";
+export type HarnessMemoriesOntology = OntologyDefinition<LabelSchemaMap, LabelSchemaMap>;
+
+export {
+  HARNESS_MEMORY_EDGE_KIND,
+  HARNESS_MEMORY_NODE_KIND,
+  minimalHarnessMemoriesOntology,
+} from "./minimal-ontology.ts";
+
+/** Merge app ontology onto the harness Memory/References baseline (app wins on key collision). */
+export function resolveHarnessMemoriesOntology(
+  appOntology: HarnessMemoriesOntology,
+): HarnessMemoriesOntology {
+  return mergeOntologies(minimalHarnessMemoriesOntology, appOntology);
+}
 
 export async function createHarnessMemoriesClient(opts: {
   baseUrl: string;
   database: MemoriesDatabaseId;
+  ontology: HarnessMemoriesOntology;
 }): Promise<RemoteMemoriesClientAsync> {
   return createRemoteMemoriesClientAsync({
     baseUrl: opts.baseUrl.replace(/\/$/, ""),
     database: opts.database,
-    ontology: harnessMemoriesOntology,
+    ontology: resolveHarnessMemoriesOntology(opts.ontology),
     auth: createNoAuthProvider(),
   });
 }
@@ -32,6 +51,7 @@ export function createLazyHarnessMemoriesClient(
   opts: {
     baseUrl: string;
     database: MemoriesDatabaseId;
+    ontology: HarnessMemoriesOntology;
   },
   createClient: CreateHarnessMemoriesClient = createHarnessMemoriesClient,
 ): RemoteMemoriesClientAsync {

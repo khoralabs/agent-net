@@ -5,6 +5,12 @@ export {
   takeHarnessForSession,
 } from "./pending-harness.ts";
 export {
+  clearPendingOntologyForTests,
+  provideOntologyForSession,
+  type SwarmMemoriesOntology,
+  takeOntologyForSession,
+} from "./pending-ontology.ts";
+export {
   getAgentChatClient,
   getSwarmSession,
   putSwarmSession,

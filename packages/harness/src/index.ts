@@ -11,6 +11,18 @@ export {
   getAgentChatService,
   getDevAgentDid,
 } from "./agent/chat-service.ts";
+export type { HarnessMemoriesOntology } from "./agent/tools/memories/_helpers/memories-client.ts";
+export {
+  HARNESS_MEMORY_EDGE_KIND,
+  HARNESS_MEMORY_NODE_KIND,
+  minimalHarnessMemoriesOntology,
+  resolveHarnessMemoriesOntology,
+} from "./agent/tools/memories/_helpers/memories-client.ts";
+export {
+  getInstalledMemoriesOntology,
+  installMemoriesOntology,
+  requireInstalledMemoriesOntology,
+} from "./agent/tools/memories/_helpers/memories-ontology-install.ts";
 export type { AgentWorkflowParams, AgentWorkflowResult } from "./agent/types.ts";
 export { agentResponse } from "./agent/workflows/agent-response.ts";
 export type {
@@ -41,6 +53,7 @@ export {
   type NetworkHarnessOptions,
   type RegisterHarnessAgentInput,
   type ResolveHarnessAgentWorkflowDepsOpts,
+  type SpawnWithMemoriesOptions,
   spawnWithMemories,
   startNetworkHarness,
 } from "./harness";

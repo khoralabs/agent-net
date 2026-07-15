@@ -1,3 +1,4 @@
+import type { LabelSchemaMap, OntologyDefinition } from "@khoralabs/memories-ontologies";
 import type {
   MemoriesServiceClient,
   RemoteMemoriesClientAsync,
@@ -8,6 +9,8 @@ import type { MemoriesDatabaseId } from "@khoralabs/memories-service-storage-cor
 export type AgentMemoriesClient = {
   /** The `MemoriesDatabaseId` for this agent. Pass to `MemoriesServiceClient` for raw access. */
   readonly database: MemoriesDatabaseId;
+  /** Ontology provided at spawn for this agent's memories DB. */
+  readonly ontology: OntologyDefinition<LabelSchemaMap, LabelSchemaMap>;
   open(): Promise<void>;
   close(): Promise<void>;
   checkpoint(): Promise<void>;

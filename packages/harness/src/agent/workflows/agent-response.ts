@@ -37,12 +37,17 @@ export async function executeAgentResponse(
   }
 
   const memoriesBaseUrl = resolveMemoriesServiceBaseUrl();
+  const { getInstalledMemoriesOntology } = await import(
+    "../tools/memories/_helpers/memories-ontology-install.ts"
+  );
+  const ontology = getInstalledMemoriesOntology();
   const memoriesClient =
-    memoriesBaseUrl === undefined
+    memoriesBaseUrl === undefined || ontology === undefined
       ? undefined
       : await createHarnessMemoriesClientForAgent({
           baseUrl: memoriesBaseUrl,
           agentDid: params.agent.actingFor.id,
+          ontology,
         });
 
   const khoraBaseUrl = resolveKhoraServerBaseUrl();
