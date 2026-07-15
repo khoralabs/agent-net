@@ -6,37 +6,21 @@ import {
   type ToolPipelineHooks,
 } from "@khoralabs/agent-capabilities";
 import { toolMapToAiTools } from "@khoralabs/agent-capabilities-ai-sdk";
-import { type AgentTelemetry, createAgentTelemetry } from "@khoralabs/agent-capabilities-otel";
-import { createLogger } from "@khoralabs/observability/logger";
-import { metrics, trace } from "@opentelemetry/api";
 import { getNetworkSession } from "../network/session-registry.ts";
-import { createNetworkLogger, getNetworkLogContext } from "../observability/network-log.ts";
+import { createHarnessAgentTelemetry } from "../observability/harness-observability.ts";
 import { defineHarnessAgent } from "./agents/index.ts";
 import type { HarnessToolkitEnv } from "./tools/types.ts";
 import type { AgentWorkflowParams } from "./types.ts";
+
+export { createHarnessAgentTelemetry };
 
 type CaptureEnvelope = Awaited<ReturnType<typeof captureAgentSnapshotEnvelope>>;
 
 let agentRegistry: AgentRegistry | undefined;
 
-function resolveHarnessLogger(name: string, agentDid?: string) {
-  if (getNetworkLogContext() !== undefined) {
-    return createNetworkLogger({ name, source: "agent", agentDid });
-  }
-  return createLogger({ name });
-}
-
-const otelTracer = trace.getTracer("network-harness-agent");
-const otelMeter = metrics.getMeter("network-harness-agent");
-
 export function getAgentRegistry(): AgentRegistry {
   if (agentRegistry === undefined) agentRegistry = createAgentRegistry();
   return agentRegistry;
-}
-
-export function createHarnessAgentTelemetry(agentDid?: string): AgentTelemetry {
-  const logger = resolveHarnessLogger("network-harness-agent", agentDid);
-  return createAgentTelemetry({ tracer: otelTracer, logger, meter: otelMeter });
 }
 
 export function resolveGatewayModel(modelId: string): string {

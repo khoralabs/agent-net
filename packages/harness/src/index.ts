@@ -71,11 +71,24 @@ export type {
   ThreadHashSnapshot,
 } from "./network/types";
 export { buildNetworkAttribution } from "./observability/attribution-digest.ts";
+export type {
+  CreateHarnessLoggerOptions,
+  HarnessAgentTelemetry,
+  HarnessLogger,
+  HarnessObservability,
+} from "./observability/harness-observability.ts";
+export {
+  createHarnessAgentTelemetry,
+  getHarnessObservability,
+  installHarnessObservability,
+} from "./observability/harness-observability.ts";
 export {
   closeNetworkLog,
-  createNetworkLogger,
   emitNetworkEvent,
+  getCurrentAttribution,
+  getNetworkLogContext,
   initNetworkLog,
   listNetworkEvents,
+  networkEventSessionJsonlPath,
 } from "./observability/network-log";
 export { resolveHarnessDataDir, workflowDbPath } from "./workflow/paths.ts";

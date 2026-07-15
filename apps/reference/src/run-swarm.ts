@@ -2,7 +2,7 @@ import path from "node:path";
 
 import {
   closeNetworkLog,
-  createNetworkLogger,
+  getHarnessObservability,
   initNetworkLog,
   requireKhoraBaseUrl,
   requireMemoriesBaseUrl,
@@ -17,6 +17,7 @@ import {
 } from "@khoralabs/agent-net-swarm";
 import { start } from "workflow/api";
 
+import { installReferenceObservability } from "./observability/install.ts";
 import { configureTursoWorldEnv, startTursoWorldWorker } from "./world/turso.ts";
 
 function parseArgs(argv: string[]): {
@@ -78,6 +79,16 @@ async function main(): Promise<void> {
   configureTursoWorldEnv({ dataDir: config.dataDir });
   await startTursoWorldWorker({ dataDir: config.dataDir });
 
+  initNetworkLog({ dataDir: config.dataDir, sessionId: config.sessionId });
+  installReferenceObservability({
+    serviceName: "network-harness-swarm",
+    sessionId: config.sessionId,
+  });
+  const logger = getHarnessObservability().createLogger({
+    name: "network-harness-swarm",
+    source: "swarm",
+  });
+
   const harness = await startNetworkHarness({
     dataDir: config.dataDir,
     khoraBaseUrl: requireKhoraBaseUrl(khoraBaseUrl),
@@ -85,9 +96,6 @@ async function main(): Promise<void> {
     memoriesBaseUrl: requireMemoriesBaseUrl(memoriesBaseUrl),
   });
   provideHarnessForSession(config.sessionId, harness);
-
-  initNetworkLog({ dataDir: config.dataDir, sessionId: config.sessionId });
-  const logger = createNetworkLogger({ name: "network-harness-swarm", source: "swarm" });
 
   try {
     logger.info(

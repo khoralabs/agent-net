@@ -6,7 +6,9 @@ import { runAgentWorkflow } from "./run-agent-workflow.ts";
 import type { AgentWorkflowParams } from "./types.ts";
 
 beforeEach(() => {
-  process.env.AI_GATEWAY_API_KEY = process.env.AI_GATEWAY_API_KEY ?? "";
+  if (!process.env.AI_GATEWAY_API_KEY?.trim()) {
+    process.env.AI_GATEWAY_API_KEY = "test-gateway-key";
+  }
 });
 
 function userMessage(text: string): UIMessage {
