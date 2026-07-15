@@ -18,7 +18,6 @@
     "@khoralabs/agent-capabilities-ai-sdk": "^0.2.0",
     "@khoralabs/chat-core": "workspace:*",
     "@khoralabs/chat-persistence": "workspace:*",
-    "@khoralabs/chat-persistence-sqlite": "workspace:*",
     "@khoralabs/did-key-identity": "^0.1.0",
     "@khoralabs/khora-client": "^0.1.0",
     "@khoralabs/memories-core": "workspace:*",

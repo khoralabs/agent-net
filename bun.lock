@@ -18,6 +18,7 @@
         "@khoralabs/agent-capabilities-otel": "^0.2.0",
         "@khoralabs/agent-net": "workspace:*",
         "@khoralabs/agent-net-swarm": "workspace:*",
+        "@khoralabs/chat-persistence-sqlite": "workspace:*",
         "@khoralabs/memories-ontologies": "workspace:*",
         "@khoralabs/memories-service-auth": "workspace:*",
         "@khoralabs/memories-service-http": "workspace:*",
@@ -47,7 +48,6 @@
         "@khoralabs/agent-capabilities-ai-sdk": "^0.2.0",
         "@khoralabs/chat-core": "workspace:*",
         "@khoralabs/chat-persistence": "workspace:*",
-        "@khoralabs/chat-persistence-sqlite": "workspace:*",
         "@khoralabs/did-key-identity": "^0.1.0",
         "@khoralabs/khora-client": "^0.1.0",
         "@khoralabs/memories-core": "workspace:*",
@@ -87,6 +87,7 @@
         "workflow": "^4.5.0",
       },
       "devDependencies": {
+        "@khoralabs/chat-persistence": "workspace:*",
         "@types/bun": "latest",
         "typescript": "^5",
       },

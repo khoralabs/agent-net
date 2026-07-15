@@ -19,6 +19,7 @@ import {
 } from "@khoralabs/agent-net-swarm";
 import { start } from "workflow/api";
 
+import { createReferenceChatPersistence } from "./chat/sqlite.ts";
 import { referenceMemoriesOntology } from "./memories/ontology.ts";
 import { installReferenceObservability } from "./observability/install.ts";
 import { configureTursoWorldEnv, startTursoWorldWorker } from "./world/turso.ts";
@@ -94,6 +95,7 @@ async function main(): Promise<void> {
 
   const harness = await startNetworkHarness({
     dataDir: config.dataDir,
+    chatPersistence: createReferenceChatPersistence(config.dataDir),
     khoraBaseUrl: requireKhoraBaseUrl(khoraBaseUrl),
     relayBaseUrl: requireRelayBaseUrl(relayBaseUrl),
     memoriesBaseUrl: requireMemoriesBaseUrl(memoriesBaseUrl),

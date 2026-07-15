@@ -6,11 +6,11 @@ import { AgentStore } from "../agents";
 
 import {
   type AgentChatClient,
+  type CreateSignedChatOptions,
   createSignedChatService,
   HARNESS_CHAT_CHANNEL_ID,
   type SignedChatBackend,
 } from "../chat.ts";
-import { resolveAgentDataDir } from "./paths.ts";
 import { resolveAgentsDataDir } from "./tools/khora/_helpers/khora-client-factory.ts";
 
 export const HARNESS_AGENT_DEV_THREAD_ID = "harness-agent-self";
@@ -32,7 +32,8 @@ export async function getDevAgentDid(): Promise<string> {
   return (await ensureDevAgentIdentity()).did;
 }
 
-async function resolveHarnessSigner(did: string): Promise<RelaySigner | undefined> {
+/** Default DID key resolution for the agent process (dev agent + AgentStore). */
+export async function resolveAgentChatSigner(did: string): Promise<RelaySigner | undefined> {
   const devDid = devAgentDid ?? (await ensureDevAgentIdentity()).did;
   if (did === devDid) {
     return loadOrCreateIdentity(devAgentKeyPath());
@@ -40,12 +41,15 @@ async function resolveHarnessSigner(did: string): Promise<RelaySigner | undefine
   return loadIdentity(AgentStore.keyPath(resolveAgentsDataDir(), did));
 }
 
+/** Install host-owned chat persistence for the agent process singleton. */
+export function installAgentChat(options: CreateSignedChatOptions): SignedChatBackend {
+  backend = createSignedChatService(options);
+  return backend;
+}
+
 function getSignedChatBackend(): SignedChatBackend {
   if (backend !== undefined) return backend;
-  backend = createSignedChatService(resolveAgentDataDir(), {
-    resolveSigner: resolveHarnessSigner,
-  });
-  return backend;
+  throw new Error("agent chat is not configured; call installAgentChat first");
 }
 
 export function getAgentChatService(): ChatService {

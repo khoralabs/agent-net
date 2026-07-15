@@ -24,6 +24,7 @@
     "workflow": "^4.5.0"
   },
   "devDependencies": {
+    "@khoralabs/chat-persistence": "workspace:*",
     "@types/bun": "latest",
     "typescript": "^5"
   },

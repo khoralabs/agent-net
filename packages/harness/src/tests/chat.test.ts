@@ -1,15 +1,12 @@
-import { Database } from "bun:sqlite";
 import { beforeAll, describe, expect, test } from "bun:test";
-import os from "node:os";
-import path from "node:path";
-
+import { createMemoryChatPersistence } from "@khoralabs/chat-persistence";
 import { generateIdentity } from "@khoralabs/did-key-identity";
 import type { RelaySigner } from "@khoralabs/relay-crypto";
 
-import { createHarnessChat, type HarnessChat } from "../chat";
+import { createSignedChatService, type HarnessChat, type SignedChatBackend } from "../chat";
 
-const dataDir = path.join(os.tmpdir(), `khora-chat-${process.pid}`);
 const signers = new Map<string, RelaySigner>();
+let backend: SignedChatBackend;
 let chat: HarnessChat;
 
 async function agentDid(): Promise<string> {
@@ -18,14 +15,14 @@ async function agentDid(): Promise<string> {
   return signer.did;
 }
 
-function readPostSignatures(threadId: string): string[] {
-  const db = new Database(path.join(dataDir, "chat", "chat.sqlite"));
-  const rows = db
-    .prepare(
-      "SELECT signature FROM chat_post_versions WHERE thread_id = ? ORDER BY created_at_ms ASC",
-    )
-    .all(threadId) as Array<{ signature: string | null }>;
-  return rows.map((row) => row.signature).filter((value): value is string => value !== null);
+async function readPostSignatures(threadId: string): Promise<
+  Array<{ algorithm: string; signer: { id: string } }>
+> {
+  const posts = await backend.service.listPosts({ threadId });
+  return posts.items.flatMap((post) => {
+    if (post.status !== "complete" || post.signature === undefined) return [];
+    return [post.signature];
+  });
 }
 
 function firstTextPart(parts: ReadonlyArray<{ type: string; text?: string }>): string | undefined {
@@ -34,9 +31,15 @@ function firstTextPart(parts: ReadonlyArray<{ type: string; text?: string }>): s
 }
 
 beforeAll(() => {
-  chat = createHarnessChat(dataDir, {
+  backend = createSignedChatService({
+    persistence: createMemoryChatPersistence(),
     resolveSigner: (did) => Promise.resolve(signers.get(did)),
   });
+  chat = {
+    forAgent(did: string) {
+      return backend.forAgent(did);
+    },
+  };
 });
 
 describe("harness chat", () => {
@@ -72,10 +75,9 @@ describe("harness chat", () => {
       "Thanks for the invite.",
     ]);
 
-    const signatures = readPostSignatures(thread.id);
+    const signatures = await readPostSignatures(thread.id);
     expect(signatures).toHaveLength(3);
-    for (const signatureJson of signatures) {
-      const envelope = JSON.parse(signatureJson) as { algorithm: string; signer: { id: string } };
+    for (const envelope of signatures) {
       expect(envelope.algorithm).toBe("ed25519");
       expect(signers.has(envelope.signer.id)).toBe(true);
     }

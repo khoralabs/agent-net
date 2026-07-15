@@ -92,16 +92,12 @@ test("runAgentWorkflow streams assistant text to signed chat thread", async () =
   const posts = await chat.service.listPosts({ threadId: chat.threadId });
   expect(posts.items.some((post) => post.role === "assistant")).toBe(true);
 
-  const signatures = readPostSignatures(chat.backend.db, chat.threadId);
+  const signatures = await readPostSignatures(chat.service, chat.threadId);
   expect(signatures).toHaveLength(1);
-  const firstSignature = signatures[0];
-  if (!firstSignature) {
+  const envelope = signatures[0];
+  if (!envelope) {
     throw new Error("No signatures found");
   }
-  const envelope = JSON.parse(firstSignature) as {
-    algorithm: string;
-    signer: { id: string };
-  };
   expect(envelope.algorithm).toBe("ed25519");
   expect(envelope.signer.id).toBe(chat.agentDid);
 });

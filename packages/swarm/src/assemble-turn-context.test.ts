@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import { createSignedChatService } from "@khoralabs/agent-net";
+import { createMemoryChatPersistence } from "@khoralabs/chat-persistence";
 import { generateIdentity } from "@khoralabs/did-key-identity";
 import { assembleTurnContext } from "./assemble-turn-context.ts";
 import { appendInboxEntry } from "./swarm-state.ts";
@@ -9,7 +10,8 @@ async function createChatFixture() {
   const dataDir = `/tmp/swarm-assemble-${process.pid}-${crypto.randomUUID()}`;
   const signer = await generateIdentity();
   const signers = new Map([[signer.did, signer]]);
-  const backend = createSignedChatService(dataDir, {
+  const backend = createSignedChatService({
+    persistence: createMemoryChatPersistence(),
     resolveSigner: (did) => Promise.resolve(signers.get(did)),
   });
   const client = backend.forAgent(signer.did);

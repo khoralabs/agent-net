@@ -16,6 +16,7 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import os from "node:os";
 import path from "node:path";
+import { createMemoryChatPersistence } from "@khoralabs/chat-persistence";
 import { type NetworkHarnessHandle, startNetworkHarness } from "../harness";
 import { resolveKhoraBaseUrlFromEnv } from "../lib/khora-base-url";
 import { resolveMemoriesBaseUrlFromEnv } from "../lib/memories-base-url";
@@ -40,6 +41,7 @@ beforeAll(async () => {
   }
   harness = await startNetworkHarness({
     dataDir,
+    chatPersistence: createMemoryChatPersistence(),
     khoraBaseUrl,
     relayBaseUrl,
     memoriesBaseUrl,

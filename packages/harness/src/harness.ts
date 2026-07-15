@@ -1,3 +1,4 @@
+import type { ChatPersistence } from "@khoralabs/chat-core";
 import { loadIdentity } from "@khoralabs/did-key-identity";
 import { createNoAuthProvider, MemoriesServiceClient } from "@khoralabs/memories-service-client";
 import { AgentStore, ManagedAgentPool } from "./agents";
@@ -28,6 +29,8 @@ export { spawnWithMemories } from "./harness-agents.ts";
 
 export type NetworkHarnessOptions = {
   dataDir: string;
+  /** Host-owned chat adapter (sqlite / memory / turso / other). */
+  chatPersistence: ChatPersistence;
   /** Base URL of a running Khora host (e.g. http://127.0.0.1:8788). */
   khoraBaseUrl: string;
   /** Base URL of a running relay server (e.g. http://127.0.0.1:8790). */
@@ -68,7 +71,8 @@ export async function startNetworkHarness(
     baseUrl: khoraBaseUrl,
   });
 
-  const signedChat = createSignedChatService(opts.dataDir, {
+  const signedChat = createSignedChatService({
+    persistence: opts.chatPersistence,
     resolveSigner: (did) => loadIdentity(AgentStore.keyPath(agentsDataDir, did)),
   });
   const chat: HarnessChat = {

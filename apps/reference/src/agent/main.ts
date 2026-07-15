@@ -6,13 +6,22 @@ import {
   getAgentChatService,
   getDevAgentDid,
   HARNESS_AGENT_ID,
+  installAgentChat,
+  resolveAgentChatSigner,
+  resolveHarnessDataDir,
 } from "@khoralabs/agent-net";
 import { start } from "workflow/api";
 
 import "./otel.ts";
+import { createReferenceChatPersistence } from "../chat/sqlite.ts";
 import { startTursoWorldWorker } from "../world/turso.ts";
 
 void startTursoWorldWorker();
+
+installAgentChat({
+  persistence: createReferenceChatPersistence(resolveHarnessDataDir(process.env.HARNESS_AGENT_DATA_DIR)),
+  resolveSigner: resolveAgentChatSigner,
+});
 
 function json(data: unknown, init?: ResponseInit): Response {
   return Response.json(data, init);

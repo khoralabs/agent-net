@@ -1,6 +1,3 @@
-import { Database } from "bun:sqlite";
-import { mkdirSync } from "node:fs";
-import path from "node:path";
 import type {
   ChatPersistence,
   ChatService,
@@ -18,10 +15,6 @@ import {
   signPreparedAppendPost,
   withSignedChatPersistence,
 } from "@khoralabs/chat-persistence";
-import {
-  createSqliteChatPersistence,
-  ensureChatSqliteSchema,
-} from "@khoralabs/chat-persistence-sqlite";
 import type { UIMessage } from "ai";
 
 import {
@@ -55,14 +48,15 @@ export type AgentChatClient = {
   listParticipants(threadId: string): Promise<ScopeRef[]>;
 };
 
-export type HarnessChatOptions = {
+export type CreateSignedChatOptions = {
+  /** Host-owned unsigned chat adapter (sqlite / memory / turso / other). */
+  persistence: ChatPersistence;
   resolveSigner: ResolveHarnessChatSigner;
 };
 
 export type SignedChatBackend = {
   readonly service: ChatService;
   readonly persistence: ChatPersistence;
-  readonly db: Database;
   readonly ready: Promise<void>;
   forAgent(did: string): AgentChatClient;
 };
@@ -79,28 +73,15 @@ function textMessage(id: string, role: UIMessage["role"], text: string): UIMessa
   return { id, role, parts: [{ type: "text", text }] };
 }
 
-function openHarnessChatDatabase(dataDir: string): Database {
-  const chatDir = path.join(dataDir, "chat");
-  mkdirSync(chatDir, { recursive: true });
-  const db = new Database(path.join(chatDir, "chat.sqlite"));
-  ensureChatSqliteSchema(db);
-  return db;
-}
-
-export function createSignedChatService(
-  dataDir: string,
-  options: HarnessChatOptions,
-): SignedChatBackend {
-  const db = openHarnessChatDatabase(dataDir);
+export function createSignedChatService(options: CreateSignedChatOptions): SignedChatBackend {
   const chatCrypto = createHarnessChatCrypto(options.resolveSigner);
-  const persistence = withSignedChatPersistence(createSqliteChatPersistence(db), chatCrypto);
+  const persistence = withSignedChatPersistence(options.persistence, chatCrypto);
   const service = createChatService(persistence);
   const ready = ensureHarnessChannel(service);
 
   return {
     service,
     persistence,
-    db,
     ready,
     forAgent(did: string) {
       return createAgentChatClient(service, persistence, did, chatCrypto.signer, ready);
@@ -234,8 +215,8 @@ function createAgentChatClient(
   };
 }
 
-export function createHarnessChat(dataDir: string, options: HarnessChatOptions): HarnessChat {
-  const backend = createSignedChatService(dataDir, options);
+export function createHarnessChat(options: CreateSignedChatOptions): HarnessChat {
+  const backend = createSignedChatService(options);
   return {
     forAgent(did: string) {
       return backend.forAgent(did);

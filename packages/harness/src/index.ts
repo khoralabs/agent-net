@@ -10,6 +10,8 @@ export {
   ensureDevAgentIdentity,
   getAgentChatService,
   getDevAgentDid,
+  installAgentChat,
+  resolveAgentChatSigner,
 } from "./agent/chat-service.ts";
 export type { HarnessMemoriesOntology } from "./agent/tools/memories/_helpers/memories-client.ts";
 export {
@@ -36,6 +38,7 @@ export type { AgentHandle, InboxConnection, VellumHandle } from "./agents";
 export {
   type AgentChatClient,
   type CreateAgentThreadInput,
+  type CreateSignedChatOptions,
   createHarnessChat,
   createSignedChatService,
   HARNESS_CHAT_CHANNEL_ID,
