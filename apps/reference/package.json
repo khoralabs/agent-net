@@ -19,6 +19,7 @@
     "@khoralabs/agent-net": "workspace:*",
     "@khoralabs/agent-net-swarm": "workspace:*",
     "@khoralabs/chat-persistence-sqlite": "workspace:*",
+    "@khoralabs/network-events-sqlite": "workspace:*",
     "@khoralabs/memories-ontologies": "workspace:*",
     "@khoralabs/memories-service-auth": "workspace:*",
     "@khoralabs/memories-service-http": "workspace:*",

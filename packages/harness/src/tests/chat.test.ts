@@ -15,9 +15,9 @@ async function agentDid(): Promise<string> {
   return signer.did;
 }
 
-async function readPostSignatures(threadId: string): Promise<
-  Array<{ algorithm: string; signer: { id: string } }>
-> {
+async function readPostSignatures(
+  threadId: string,
+): Promise<Array<{ algorithm: string; signer: { id: string } }>> {
   const posts = await backend.service.listPosts({ threadId });
   return posts.items.flatMap((post) => {
     if (post.status !== "complete" || post.signature === undefined) return [];

@@ -1,8 +1,5 @@
-import {
-  emitNetworkEvent,
-  getCurrentAttribution,
-  networkEventId,
-} from "../../../../observability/network-log.ts";
+import { emitNetworkEvent, networkEventId } from "../../../../network/index.ts";
+import { getCurrentAttribution } from "../../../../observability/network-log.ts";
 import type { HarnessToolkitEnv } from "../../types.ts";
 
 export async function emitChatNetworkEvent(input: {
@@ -12,18 +9,11 @@ export async function emitChatNetworkEvent(input: {
   extra: string;
 }): Promise<void> {
   const sessionId = input.env.sessionId?.trim();
-  const dataDir = input.env.networkDataDir?.trim();
   const agentDid = input.env.agentChat?.did;
-  if (
-    sessionId === undefined ||
-    sessionId.length === 0 ||
-    dataDir === undefined ||
-    dataDir.length === 0
-  ) {
+  if (sessionId === undefined || sessionId.length === 0) {
     return;
   }
   await emitNetworkEvent({
-    dataDir,
     eventId: networkEventId({
       sessionId,
       kind: input.kind,

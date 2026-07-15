@@ -19,7 +19,9 @@ import { startTursoWorldWorker } from "../world/turso.ts";
 void startTursoWorldWorker();
 
 installAgentChat({
-  persistence: createReferenceChatPersistence(resolveHarnessDataDir(process.env.HARNESS_AGENT_DATA_DIR)),
+  persistence: createReferenceChatPersistence(
+    resolveHarnessDataDir(process.env.HARNESS_AGENT_DATA_DIR),
+  ),
   resolveSigner: resolveAgentChatSigner,
 });
 

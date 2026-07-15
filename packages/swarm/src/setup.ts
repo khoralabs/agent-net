@@ -38,7 +38,6 @@ export async function setupSwarm(input: {
   validateSwarmConfig(config);
 
   await emitNetworkEvent({
-    dataDir: config.dataDir,
     eventId: networkEventId({ sessionId: config.sessionId, kind: "swarm.setup.started" }),
     sessionId: config.sessionId,
     tsMs: Date.now(),
@@ -117,7 +116,6 @@ export async function setupSwarm(input: {
   const swarmState = await createSwarmState(config.dataDir, config, loopStates);
 
   await emitNetworkEvent({
-    dataDir: config.dataDir,
     eventId: networkEventId({ sessionId: config.sessionId, kind: "swarm.setup.completed" }),
     sessionId: config.sessionId,
     tsMs: Date.now(),
@@ -149,7 +147,6 @@ export async function teardownSwarm(sessionId: string): Promise<void> {
   session.harness.unbindNetworkSession(sessionId);
 
   await emitNetworkEvent({
-    dataDir: session.config.dataDir,
     eventId: networkEventId({ sessionId, kind: "swarm.teardown" }),
     sessionId,
     tsMs: Date.now(),

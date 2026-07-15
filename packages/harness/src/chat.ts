@@ -17,10 +17,7 @@ import {
 } from "@khoralabs/chat-persistence";
 import type { UIMessage } from "ai";
 
-import {
-  createHarnessChatCrypto,
-  type ResolveHarnessChatSigner,
-} from "./chat-crypto.ts";
+import { createHarnessChatCrypto, type ResolveHarnessChatSigner } from "./chat-crypto.ts";
 
 export const HARNESS_CHAT_CHANNEL_ID = "harness-network";
 

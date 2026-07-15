@@ -1,6 +1,7 @@
 import path from "node:path";
 
-import { listNetworkEvents, resolveHarnessDataDir } from "@khoralabs/agent-net";
+import { resolveHarnessDataDir } from "@khoralabs/agent-net";
+import { createSqliteNetworkEventStore } from "@khoralabs/network-events-sqlite";
 
 function parseArgs(argv: string[]): {
   dataDir: string;
@@ -39,20 +40,25 @@ async function main(): Promise<void> {
     throw new Error("--session-id is required");
   }
 
-  const events = await listNetworkEvents(opts.dataDir, opts.sessionId, {
-    agentDid: opts.agentDid,
-    kind: opts.kind,
-    sinceSeq: opts.sinceSeq,
-  });
+  const store = createSqliteNetworkEventStore({ dataDir: opts.dataDir });
+  try {
+    const events = await store.list(opts.sessionId, {
+      agentDid: opts.agentDid,
+      kind: opts.kind,
+      sinceSeq: opts.sinceSeq,
+    });
 
-  for (const event of events) {
-    process.stdout.write(`${JSON.stringify(event)}\n`);
-  }
+    for (const event of events) {
+      process.stdout.write(`${JSON.stringify(event)}\n`);
+    }
 
-  if (events.length === 0) {
-    process.stderr.write(
-      `No events found for session ${opts.sessionId} in ${path.resolve(opts.dataDir)}\n`,
-    );
+    if (events.length === 0) {
+      process.stderr.write(
+        `No events found for session ${opts.sessionId} in ${path.resolve(opts.dataDir)}\n`,
+      );
+    }
+  } finally {
+    store.close();
   }
 }
 

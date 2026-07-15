@@ -74,10 +74,15 @@ export {
 } from "./lib/relay-base-url.ts";
 export {
   collectThreadHashSnapshots,
+  emitNetworkEvent,
+  getInstalledNetworkEventsPlugin,
   getNetworkSession,
+  installNetworkEventsPlugin,
+  type ListNetworkEventsOptions,
+  listNetworkEvents,
+  type NetworkEventsPlugin,
   type NetworkRuntimeSession,
   networkEventId,
-  queryNetworkEvents,
   registerNetworkSession,
   removeNetworkSession,
 } from "./network";
@@ -99,12 +104,14 @@ export {
   installHarnessObservability,
 } from "./observability/harness-observability.ts";
 export {
+  bindNetworkSessionContext,
+  clearNetworkSessionContext,
   closeNetworkLog,
-  emitNetworkEvent,
   getCurrentAttribution,
   getNetworkLogContext,
+  getNetworkSessionContext,
   initNetworkLog,
-  listNetworkEvents,
-  networkEventSessionJsonlPath,
+  runWithAttribution,
+  runWithAttributionAsync,
 } from "./observability/network-log";
 export { resolveHarnessDataDir, workflowDbPath } from "./workflow/paths.ts";

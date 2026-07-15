@@ -2,8 +2,8 @@ import { mkdirSync } from "node:fs";
 import {
   buildNetworkAttribution,
   emitNetworkEvent,
+  listNetworkEvents,
   networkEventId,
-  queryNetworkEvents,
   workflowDbPath,
 } from "@khoralabs/agent-net";
 import type { KhoraClientEvent } from "@khoralabs/khora-client";
@@ -142,7 +142,6 @@ export async function appendInboxEntry(
   });
 
   await emitNetworkEvent({
-    dataDir,
     eventId: networkEventId({
       sessionId,
       kind: "inbox.received",
@@ -264,12 +263,11 @@ export async function incrementTokensUsedStep(
 }
 
 export async function recordTurnTelemetryStep(
-  dataDir: string,
+  _dataDir: string,
   _swarmStateId: string,
   telemetry: TurnTelemetry,
 ): Promise<void> {
   await emitNetworkEvent({
-    dataDir,
     eventId: networkEventId({
       sessionId: telemetry.sessionId,
       kind: "agent.turn.completed",
@@ -299,10 +297,10 @@ export async function recordTurnTelemetryStep(
 }
 
 export async function listTurnTelemetry(
-  dataDir: string,
+  _dataDir: string,
   sessionId: string,
 ): Promise<TurnTelemetry[]> {
-  const events = await queryNetworkEvents(dataDir, sessionId, {
+  const events = await listNetworkEvents(sessionId, {
     kind: "agent.turn.completed",
   });
   return events.map((event) => {

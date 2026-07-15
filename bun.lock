@@ -23,6 +23,7 @@
         "@khoralabs/memories-service-auth": "workspace:*",
         "@khoralabs/memories-service-http": "workspace:*",
         "@khoralabs/memories-service-storage-sqlite": "workspace:*",
+        "@khoralabs/network-events-sqlite": "workspace:*",
         "@khoralabs/observability": "workspace:*",
         "@khoralabs/relay-server-http": "workspace:*",
         "@opentelemetry/api": "^1.9.1",
@@ -58,12 +59,26 @@
         "@khoralabs/relay-client": "workspace:*",
         "@khoralabs/relay-crypto": "workspace:*",
         "@khoralabs/vellum-client": "^0.1.0",
-        "@libsql/client": "^0.14.0",
         "@noble/ed25519": "^3.1.0",
         "ai": "^7.0.9",
         "unstorage": "^1.17.5",
         "workflow": "^4.5.0",
         "zod": "^4",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "typescript": "^5",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "packages/network-events-sqlite": {
+      "name": "@khoralabs/network-events-sqlite",
+      "version": "0.0.0",
+      "dependencies": {
+        "@khoralabs/agent-net": "workspace:*",
+        "@libsql/client": "^0.14.0",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -82,6 +97,7 @@
         "@khoralabs/did-key-identity": "^0.1.0",
         "@khoralabs/khora-client": "^0.1.0",
         "@khoralabs/memories-ontologies": "workspace:*",
+        "@khoralabs/network-events-sqlite": "workspace:*",
         "@libsql/client": "^0.14.0",
         "ai": "^7.0.9",
         "workflow": "^4.5.0",
@@ -949,6 +965,8 @@
     "@khoralabs/memories-tools": ["@khoralabs/memories-tools@workspace:vendor/memories/packages/agents/tools"],
 
     "@khoralabs/memories-turso-serverless": ["@khoralabs/memories-turso-serverless@workspace:vendor/memories/packages/persistence/turso-serverless"],
+
+    "@khoralabs/network-events-sqlite": ["@khoralabs/network-events-sqlite@workspace:packages/network-events-sqlite"],
 
     "@khoralabs/observability": ["@khoralabs/observability@workspace:vendor/libs/packages/observability"],
 

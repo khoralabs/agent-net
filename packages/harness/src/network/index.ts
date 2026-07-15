@@ -1,10 +1,12 @@
+export { networkEventId } from "./event-id.ts";
 export {
+  emitNetworkEvent,
+  getInstalledNetworkEventsPlugin,
+  installNetworkEventsPlugin,
   type ListNetworkEventsOptions,
-  networkEventId,
-  persistNetworkEvent,
-  queryNetworkEvents,
-  resetNetworkEventStoreForTests,
-} from "./event-store.ts";
+  listNetworkEvents,
+  type NetworkEventsPlugin,
+} from "./events-plugin.ts";
 export {
   getNetworkSession,
   type NetworkRuntimeSession,

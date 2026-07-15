@@ -1,9 +1,9 @@
 import path from "node:path";
 
 import {
-  closeNetworkLog,
+  bindNetworkSessionContext,
+  clearNetworkSessionContext,
   getHarnessObservability,
-  initNetworkLog,
   installMemoriesOntology,
   requireKhoraBaseUrl,
   requireMemoriesBaseUrl,
@@ -17,6 +17,7 @@ import {
   type SwarmConfig,
   swarmOrchestrator,
 } from "@khoralabs/agent-net-swarm";
+import { createNetworkEventPersistencePlugin } from "@khoralabs/network-events-sqlite";
 import { start } from "workflow/api";
 
 import { createReferenceChatPersistence } from "./chat/sqlite.ts";
@@ -83,10 +84,12 @@ async function main(): Promise<void> {
   configureTursoWorldEnv({ dataDir: config.dataDir });
   await startTursoWorldWorker({ dataDir: config.dataDir });
 
-  initNetworkLog({ dataDir: config.dataDir, sessionId: config.sessionId });
+  const networkEvents = createNetworkEventPersistencePlugin({ dataDir: config.dataDir });
+  bindNetworkSessionContext({ sessionId: config.sessionId });
   installReferenceObservability({
     serviceName: "network-harness-swarm",
     sessionId: config.sessionId,
+    sessionJsonlPath: networkEvents.sessionJsonlPath(config.sessionId),
   });
   const logger = getHarnessObservability().createLogger({
     name: "network-harness-swarm",
@@ -96,6 +99,7 @@ async function main(): Promise<void> {
   const harness = await startNetworkHarness({
     dataDir: config.dataDir,
     chatPersistence: createReferenceChatPersistence(config.dataDir),
+    networkEvents,
     khoraBaseUrl: requireKhoraBaseUrl(khoraBaseUrl),
     relayBaseUrl: requireRelayBaseUrl(relayBaseUrl),
     memoriesBaseUrl: requireMemoriesBaseUrl(memoriesBaseUrl),
@@ -118,7 +122,7 @@ async function main(): Promise<void> {
     const result = await run.returnValue;
     logger.info({ result }, "swarm.completed");
   } finally {
-    closeNetworkLog();
+    clearNetworkSessionContext();
   }
 }
 

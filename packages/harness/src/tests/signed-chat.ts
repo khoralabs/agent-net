@@ -1,5 +1,5 @@
-import { createMemoryChatPersistence } from "@khoralabs/chat-persistence";
 import type { ChatService, SignedEnvelope } from "@khoralabs/chat-core";
+import { createMemoryChatPersistence } from "@khoralabs/chat-persistence";
 import { generateIdentity } from "@khoralabs/did-key-identity";
 import type { RelaySigner } from "@khoralabs/relay-crypto";
 

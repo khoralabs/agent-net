@@ -3,9 +3,8 @@ import { createAgentTelemetry } from "@khoralabs/agent-capabilities-otel";
 import {
   type CreateHarnessLoggerOptions,
   getCurrentAttribution,
-  getNetworkLogContext,
+  getNetworkSessionContext,
   installHarnessObservability,
-  networkEventSessionJsonlPath,
 } from "@khoralabs/agent-net";
 import { metrics, trace } from "@opentelemetry/api";
 import type { Logger } from "pino";
@@ -13,13 +12,16 @@ import pino from "pino";
 
 export type InitReferenceObservabilityOptions = {
   serviceName: string;
-  /** When set with a bound network log context, append session id to OTEL resource attrs. */
+  /** When set, append session id to OTEL resource attrs. */
   sessionId?: string;
+  /** Optional pino dual-write path (from network-events plugin). */
+  sessionJsonlPath?: string;
 };
 
 let otelInitialized = false;
 let rootLogger: Logger | undefined;
 let pinoJsonlFd: number | undefined;
+let pendingJsonlPath: string | undefined;
 
 function initOtelOnce(opts: InitReferenceObservabilityOptions): void {
   if (otelInitialized) return;
@@ -44,12 +46,10 @@ function initOtelOnce(opts: InitReferenceObservabilityOptions): void {
 function ensureRootLogger(): Logger {
   if (rootLogger !== undefined) return rootLogger;
 
-  const ctx = getNetworkLogContext();
   const streams: pino.StreamEntry[] = [{ stream: pino.destination(2) }];
 
-  if (ctx !== undefined) {
-    const jsonlPath = networkEventSessionJsonlPath(ctx.dataDir, ctx.sessionId);
-    pinoJsonlFd = openSync(jsonlPath, "a");
+  if (pendingJsonlPath !== undefined) {
+    pinoJsonlFd = openSync(pendingJsonlPath, "a");
     streams.unshift({ stream: pino.destination({ dest: pinoJsonlFd, sync: true }) });
   }
 
@@ -59,7 +59,7 @@ function ensureRootLogger(): Logger {
       name: "network-harness",
       mixin() {
         const attribution = getCurrentAttribution();
-        const sessionId = getNetworkLogContext()?.sessionId;
+        const sessionId = getNetworkSessionContext()?.sessionId;
         return {
           ...(sessionId !== undefined ? { sessionId } : {}),
           ...(attribution !== undefined
@@ -84,9 +84,10 @@ function createLogger(opts: CreateHarnessLoggerOptions): Logger {
 
 /**
  * Wire OTEL + Pino into the harness observability surface.
- * Call after `initNetworkLog` when a session JSONL sink is desired.
+ * Pass `sessionJsonlPath` from the network-events plugin when a session JSONL sink is desired.
  */
 export function installReferenceObservability(opts: InitReferenceObservabilityOptions): void {
+  pendingJsonlPath = opts.sessionJsonlPath?.trim() || undefined;
   initOtelOnce(opts);
 
   const tracer = trace.getTracer(opts.serviceName);

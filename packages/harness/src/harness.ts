@@ -11,9 +11,11 @@ import {
 } from "./harness-agents.ts";
 import {
   emitNetworkEvent,
-  getNetworkLogContext,
+  installNetworkEventsPlugin,
+  type NetworkEventsPlugin,
   networkEventId,
-} from "./observability/network-log.ts";
+} from "./network";
+import { getNetworkSessionContext } from "./observability/network-log.ts";
 
 export type { AgentMemoriesClient } from "./agents";
 export type {
@@ -31,6 +33,8 @@ export type NetworkHarnessOptions = {
   dataDir: string;
   /** Host-owned chat adapter (sqlite / memory / turso / other). */
   chatPersistence: ChatPersistence;
+  /** Optional host network-event sink (sqlite + JSONL, etc.). */
+  networkEvents?: NetworkEventsPlugin;
   /** Base URL of a running Khora host (e.g. http://127.0.0.1:8788). */
   khoraBaseUrl: string;
   /** Base URL of a running relay server (e.g. http://127.0.0.1:8790). */
@@ -59,6 +63,10 @@ export async function startNetworkHarness(
     throw new Error("startNetworkHarness: memoriesBaseUrl is required");
   }
 
+  if (opts.networkEvents !== undefined) {
+    installNetworkEventsPlugin(opts.networkEvents);
+  }
+
   const agentsDataDir = harnessAgentsDataDir(opts.dataDir);
 
   const memoriesClient = new MemoriesServiceClient({
@@ -81,15 +89,14 @@ export async function startNetworkHarness(
     },
   };
 
-  const logContext = getNetworkLogContext();
-  if (logContext !== undefined && logContext.dataDir === opts.dataDir) {
+  const session = getNetworkSessionContext();
+  if (session !== undefined) {
     void emitNetworkEvent({
-      dataDir: opts.dataDir,
       eventId: networkEventId({
-        sessionId: logContext.sessionId,
+        sessionId: session.sessionId,
         kind: "harness.started",
       }),
-      sessionId: logContext.sessionId,
+      sessionId: session.sessionId,
       tsMs: Date.now(),
       source: "harness",
       kind: "harness.started",
@@ -114,10 +121,9 @@ export async function startNetworkHarness(
     chat,
     signedChat,
     stop() {
-      const ctx = getNetworkLogContext();
-      if (ctx !== undefined && ctx.dataDir === opts.dataDir) {
+      const ctx = getNetworkSessionContext();
+      if (ctx !== undefined) {
         void emitNetworkEvent({
-          dataDir: opts.dataDir,
           eventId: networkEventId({
             sessionId: ctx.sessionId,
             kind: "harness.stopped",
@@ -129,6 +135,7 @@ export async function startNetworkHarness(
           message: "Network harness stopped",
         });
       }
+      opts.networkEvents?.close?.();
     },
   };
 

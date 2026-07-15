@@ -2,6 +2,9 @@ import { expect, test } from "bun:test";
 import os from "node:os";
 import path from "node:path";
 
+import { installNetworkEventsPlugin } from "@khoralabs/agent-net";
+import { createNetworkEventPersistencePlugin } from "@khoralabs/network-events-sqlite";
+
 import {
   appendInboxEntry,
   checkTokenBudgetRemainingStep,
@@ -17,6 +20,7 @@ import {
 import type { AgentLoopState, SwarmConfig } from "./types.ts";
 
 const dataDir = path.join(os.tmpdir(), `swarm-state-${process.pid}-${crypto.randomUUID()}`);
+installNetworkEventsPlugin(createNetworkEventPersistencePlugin({ dataDir }));
 
 const config: SwarmConfig = {
   sessionId: "session-budget",

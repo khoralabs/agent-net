@@ -28,7 +28,6 @@
     "@khoralabs/relay-client": "workspace:*",
     "@khoralabs/relay-crypto": "workspace:*",
     "@khoralabs/vellum-client": "^0.1.0",
-    "@libsql/client": "^0.14.0",
     "@noble/ed25519": "^3.1.0",
     "ai": "^7.0.9",
     "unstorage": "^1.17.5",

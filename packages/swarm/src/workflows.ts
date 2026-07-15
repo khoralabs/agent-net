@@ -119,7 +119,6 @@ export async function agentLoop(
   while (await checkTokenBudgetRemainingStep(config.dataDir, swarmStateId)) {
     const { params, inboxEntryIds } = await assembleTurnParamsStep(swarmStateId, agent, config);
     await emitNetworkEvent({
-      dataDir: config.dataDir,
       eventId: networkEventId({
         sessionId: config.sessionId,
         kind: "agent.turn.start",
