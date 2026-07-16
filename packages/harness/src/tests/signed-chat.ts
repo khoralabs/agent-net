@@ -1,42 +1,57 @@
-import type { ChatService, SignedEnvelope } from "@khoralabs/chat-core";
-import { createMemoryChatPersistence } from "@khoralabs/chat-persistence";
+import type { ChatSigner, SignedEnvelope } from "@khoralabs/chat-core";
 import { generateIdentity } from "@khoralabs/did-key-identity";
 import type { RelaySigner } from "@khoralabs/relay-crypto";
 
-import { createSignedChatService, type SignedChatBackend } from "../chat.ts";
+import type { ChatServiceClient, SignedChatBackend } from "../chat.ts";
+import { createHarnessChatCrypto } from "../chat-crypto.ts";
+import {
+  createTestHarnessChatBackend,
+  startTestChatHttp,
+  type TestChatHttpHandle,
+} from "./test-chat-http.ts";
 
 export type SignedTestChat = {
+  chatHttp: TestChatHttpHandle;
   backend: SignedChatBackend;
-  service: ChatService;
+  client: ChatServiceClient;
+  chatSigner: ChatSigner;
   agentDid: string;
   signer: RelaySigner;
   threadId: string;
+  stop(): void;
 };
 
 export async function createSignedTestChat(): Promise<SignedTestChat> {
   const signer = await generateIdentity();
   const signers = new Map([[signer.did, signer]]);
-  const backend = createSignedChatService({
-    persistence: createMemoryChatPersistence(),
-    resolveSigner: (did) => Promise.resolve(signers.get(did)),
+  const resolveSigner = (did: string) => Promise.resolve(signers.get(did));
+  const chatHttp = startTestChatHttp();
+  const backend = createTestHarnessChatBackend({
+    chatHttp,
+    resolveSigner,
   });
-  const client = backend.forAgent(signer.did);
-  const thread = await client.createThread({ metadata: { title: "test" } });
+  const agentClient = backend.forAgent(signer.did);
+  const thread = await agentClient.createThread({ metadata: { title: "test" } });
 
   return {
+    chatHttp,
     backend,
-    service: backend.service,
+    client: backend.client,
+    chatSigner: createHarnessChatCrypto(resolveSigner).signer,
     agentDid: signer.did,
     signer,
     threadId: thread.id,
+    stop() {
+      chatHttp.stop();
+    },
   };
 }
 
 export async function readPostSignatures(
-  service: ChatService,
+  client: ChatServiceClient,
   threadId: string,
 ): Promise<SignedEnvelope[]> {
-  const posts = await service.listPosts({ threadId });
+  const posts = await client.listPosts({ threadId });
   return posts.items.flatMap((post) => {
     if (post.status !== "complete" || post.signature === undefined) return [];
     return [post.signature];

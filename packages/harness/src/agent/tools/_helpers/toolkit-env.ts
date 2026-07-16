@@ -4,6 +4,7 @@ import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service-clie
 
 import type { AgentChatClient } from "../../../chat";
 import { resolveMemoriesBaseUrlFromEnv } from "../../../lib/memories-base-url.ts";
+import type { RunAgentWorkflowDependencies } from "../../run-agent-workflow.ts";
 import {
   agentMemoriesDatabase,
   createHarnessMemoriesClient,
@@ -78,11 +79,12 @@ export function resolveMemoriesServiceBaseUrl(
 }
 
 export type HarnessAgentWorkflowDeps = Pick<
-  import("../../run-agent-workflow.ts").RunAgentWorkflowDependencies,
+  RunAgentWorkflowDependencies,
   | "memoriesClient"
   | "khoraClient"
   | "embeddingModel"
   | "chatService"
+  | "chatSigner"
   | "agentChat"
   | "sessionId"
   | "networkDataDir"

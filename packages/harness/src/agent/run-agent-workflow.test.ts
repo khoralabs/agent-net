@@ -1,15 +1,32 @@
-import { beforeEach, expect, test } from "bun:test";
+import { afterEach, beforeEach, expect, test } from "bun:test";
 import type { UIMessage } from "ai";
-import { createSignedTestChat, readPostSignatures } from "../tests/signed-chat.ts";
+import {
+  createSignedTestChat,
+  readPostSignatures,
+  type SignedTestChat,
+} from "../tests/signed-chat.ts";
 import { HARNESS_AGENT_ID } from "./agents/index.ts";
 import { runAgentWorkflow } from "./run-agent-workflow.ts";
 import type { AgentWorkflowParams } from "./types.ts";
+
+let chats: SignedTestChat[] = [];
 
 beforeEach(() => {
   if (!process.env.AI_GATEWAY_API_KEY?.trim()) {
     process.env.AI_GATEWAY_API_KEY = "test-gateway-key";
   }
 });
+
+afterEach(() => {
+  for (const chat of chats) chat.stop();
+  chats = [];
+});
+
+async function openChat(): Promise<SignedTestChat> {
+  const chat = await createSignedTestChat();
+  chats.push(chat);
+  return chat;
+}
 
 function userMessage(text: string): UIMessage {
   return {
@@ -54,7 +71,7 @@ function params(input: {
 }
 
 test("runAgentWorkflow streams assistant text to signed chat thread", async () => {
-  const chat = await createSignedTestChat();
+  const chat = await openChat();
   const chunks = ["Hello", " from", " harness."];
 
   const result = await runAgentWorkflow(
@@ -65,7 +82,8 @@ test("runAgentWorkflow streams assistant text to signed chat thread", async () =
       agentDid: chat.agentDid,
     }),
     {
-      chatService: chat.service,
+      chatService: chat.client,
+      chatSigner: chat.chatSigner,
       streamTextFn: (() => ({
         textStream: (async function* () {
           for (const chunk of chunks) yield chunk;
@@ -91,10 +109,10 @@ test("runAgentWorkflow streams assistant text to signed chat thread", async () =
     result.message?.parts.some((part) => part.type === "text" && part.text === chunks.join("")),
   ).toBe(true);
 
-  const posts = await chat.service.listPosts({ threadId: chat.threadId });
+  const posts = await chat.client.listPosts({ threadId: chat.threadId });
   expect(posts.items.some((post) => post.role === "assistant")).toBe(true);
 
-  const signatures = await readPostSignatures(chat.service, chat.threadId);
+  const signatures = await readPostSignatures(chat.client, chat.threadId);
   expect(signatures).toHaveLength(1);
   const envelope = signatures[0];
   if (!envelope) {
@@ -105,7 +123,7 @@ test("runAgentWorkflow streams assistant text to signed chat thread", async () =
 });
 
 test("injects user-local datetime into system instructions when userTimeZone is set", async () => {
-  const chat = await createSignedTestChat();
+  const chat = await openChat();
   let system: string | undefined;
 
   await runAgentWorkflow(
@@ -117,7 +135,8 @@ test("injects user-local datetime into system instructions when userTimeZone is 
       userTimeZone: "America/New_York",
     }),
     {
-      chatService: chat.service,
+      chatService: chat.client,
+      chatSigner: chat.chatSigner,
       streamTextFn: ((input: { system?: string }) => {
         system = input.system;
         return {
@@ -142,7 +161,7 @@ test("injects user-local datetime into system instructions when userTimeZone is 
 
 test("resolveGatewayModel requires AI_GATEWAY_API_KEY", async () => {
   delete process.env.AI_GATEWAY_API_KEY;
-  const chat = await createSignedTestChat();
+  const chat = await openChat();
 
   await expect(
     runAgentWorkflow(
@@ -153,7 +172,8 @@ test("resolveGatewayModel requires AI_GATEWAY_API_KEY", async () => {
         agentDid: chat.agentDid,
       }),
       {
-        chatService: chat.service,
+        chatService: chat.client,
+        chatSigner: chat.chatSigner,
       },
     ),
   ).rejects.toThrow("AI_GATEWAY_API_KEY");

@@ -1,21 +1,24 @@
 import path from "node:path";
-import type { ChatService } from "@khoralabs/chat-core";
 import { loadIdentity, loadOrCreateIdentity } from "@khoralabs/did-key-identity";
 import type { RelaySigner } from "@khoralabs/relay-crypto";
 import { AgentStore } from "../agents";
 
 import {
   type AgentChatClient,
-  type CreateSignedChatOptions,
-  createSignedChatService,
+  type ChatServiceClient,
+  type CreateRemoteHarnessChatOptions,
+  createRemoteHarnessChat,
   HARNESS_CHAT_CHANNEL_ID,
   type SignedChatBackend,
 } from "../chat.ts";
+import { createHarnessChatCrypto } from "../chat-crypto.ts";
+import { requireChatBaseUrl, requireChatToken } from "../lib/chat-base-url.ts";
 import { resolveAgentsDataDir } from "./tools/khora/_helpers/khora-client-factory.ts";
 
 export const HARNESS_AGENT_DEV_THREAD_ID = "harness-agent-self";
 
 let backend: SignedChatBackend | undefined;
+let resolveSigner: CreateRemoteHarnessChatOptions["resolveSigner"] | undefined;
 let devAgentDid: string | undefined;
 
 function devAgentKeyPath(): string {
@@ -41,9 +44,22 @@ export async function resolveAgentChatSigner(did: string): Promise<RelaySigner |
   return loadIdentity(AgentStore.keyPath(resolveAgentsDataDir(), did));
 }
 
-/** Install host-owned chat persistence for the agent process singleton. */
-export function installAgentChat(options: CreateSignedChatOptions): SignedChatBackend {
-  backend = createSignedChatService(options);
+export type InstallAgentChatOptions = {
+  baseUrl?: string;
+  token?: string;
+  resolveSigner?: CreateRemoteHarnessChatOptions["resolveSigner"];
+};
+
+/** Install remote chat-http client for the agent process singleton. */
+export function installAgentChat(options: InstallAgentChatOptions = {}): SignedChatBackend {
+  const baseUrl = requireChatBaseUrl(options.baseUrl);
+  const token = requireChatToken(options.token);
+  resolveSigner = options.resolveSigner ?? resolveAgentChatSigner;
+  backend = createRemoteHarnessChat({
+    baseUrl,
+    token,
+    resolveSigner,
+  });
   return backend;
 }
 
@@ -52,8 +68,13 @@ function getSignedChatBackend(): SignedChatBackend {
   throw new Error("agent chat is not configured; call installAgentChat first");
 }
 
-export function getAgentChatService(): ChatService {
-  return getSignedChatBackend().service;
+export function getAgentChatService(): ChatServiceClient {
+  return getSignedChatBackend().client;
+}
+
+export function getAgentChatSigner() {
+  const resolve = resolveSigner ?? resolveAgentChatSigner;
+  return createHarnessChatCrypto(resolve).signer;
 }
 
 export async function getAgentChatClient(): Promise<AgentChatClient> {

@@ -1,6 +1,10 @@
 import { start } from "workflow/api";
 import { requireNetworkSession } from "../../network/session-registry.ts";
-import { ensureDevAgentIdentity, getAgentChatService } from "../chat-service.ts";
+import {
+  ensureDevAgentIdentity,
+  getAgentChatService,
+  getAgentChatSigner,
+} from "../chat-service.ts";
 import { type RunAgentWorkflowDependencies, runAgentWorkflow } from "../run-agent-workflow.ts";
 import {
   createHarnessMemoriesClientForAgent,
@@ -63,6 +67,7 @@ export async function executeAgentResponse(
 
   return runAgentWorkflow(params, {
     chatService: getAgentChatService(),
+    chatSigner: getAgentChatSigner(),
     memoriesClient,
     khoraClient,
     embeddingModel: resolveHarnessEmbeddingModel(),

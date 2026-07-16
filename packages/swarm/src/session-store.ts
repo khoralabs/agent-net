@@ -1,11 +1,11 @@
 import type {
   AgentChatClient,
   AgentHandle,
+  ChatServiceClient,
   HarnessAgentWorkflowDeps,
   InboxConnection,
   NetworkHarnessHandle,
 } from "@khoralabs/agent-net";
-import type { ChatService } from "@khoralabs/chat-core";
 
 import type { AgentLoopState, SwarmConfig } from "./types.ts";
 
@@ -14,7 +14,7 @@ export type SwarmRuntimeSession = {
   harness: NetworkHarnessHandle;
   agents: AgentHandle[];
   loopStates: AgentLoopState[];
-  chatService: ChatService;
+  chatService: ChatServiceClient;
   inboxConnections: InboxConnection[];
 };
 

@@ -5,6 +5,8 @@ import {
   clearNetworkSessionContext,
   getHarnessObservability,
   installMemoriesOntology,
+  requireChatBaseUrl,
+  requireChatToken,
   requireKhoraBaseUrl,
   requireMemoriesBaseUrl,
   requireRelayBaseUrl,
@@ -19,7 +21,6 @@ import {
 import { createNetworkEventPersistencePlugin } from "@khoralabs/network-events-sqlite";
 import { start } from "workflow/api";
 
-import { createReferenceChatPersistence } from "./chat/sqlite.ts";
 import { referenceMemoriesOntology } from "./memories/ontology.ts";
 import { installReferenceObservability } from "./observability/install.ts";
 import { resolveHarnessDataDir } from "./world/paths.ts";
@@ -30,6 +31,8 @@ function parseArgs(argv: string[]): {
   khoraBaseUrl?: string;
   relayBaseUrl?: string;
   memoriesBaseUrl?: string;
+  chatBaseUrl?: string;
+  chatToken?: string;
 } {
   const args = new Map<string, string>();
   for (let i = 0; i < argv.length; i++) {
@@ -55,6 +58,8 @@ function parseArgs(argv: string[]): {
   const khoraBaseUrl = args.get("khora-url")?.trim();
   const relayBaseUrl = args.get("relay-url")?.trim();
   const memoriesBaseUrl = args.get("memories-url")?.trim();
+  const chatBaseUrl = args.get("chat-url")?.trim();
+  const chatToken = args.get("chat-token")?.trim();
 
   return {
     config: {
@@ -73,6 +78,8 @@ function parseArgs(argv: string[]): {
     ...(khoraBaseUrl !== undefined && khoraBaseUrl.length > 0 ? { khoraBaseUrl } : {}),
     ...(relayBaseUrl !== undefined && relayBaseUrl.length > 0 ? { relayBaseUrl } : {}),
     ...(memoriesBaseUrl !== undefined && memoriesBaseUrl.length > 0 ? { memoriesBaseUrl } : {}),
+    ...(chatBaseUrl !== undefined && chatBaseUrl.length > 0 ? { chatBaseUrl } : {}),
+    ...(chatToken !== undefined && chatToken.length > 0 ? { chatToken } : {}),
   };
 }
 
@@ -80,7 +87,9 @@ function parseArgs(argv: string[]): {
  * Reference swarm CLI: configure Turso world, then run the swarm orchestrator.
  */
 async function main(): Promise<void> {
-  const { config, khoraBaseUrl, relayBaseUrl, memoriesBaseUrl } = parseArgs(process.argv.slice(2));
+  const { config, khoraBaseUrl, relayBaseUrl, memoriesBaseUrl, chatBaseUrl, chatToken } = parseArgs(
+    process.argv.slice(2),
+  );
   configureTursoWorldEnv({ dataDir: config.dataDir });
   await startTursoWorldWorker({ dataDir: config.dataDir });
 
@@ -98,7 +107,8 @@ async function main(): Promise<void> {
 
   const harness = await startNetworkHarness({
     dataDir: config.dataDir,
-    chatPersistence: createReferenceChatPersistence(config.dataDir),
+    chatBaseUrl: requireChatBaseUrl(chatBaseUrl),
+    chatToken: requireChatToken(chatToken),
     networkEvents,
     khoraBaseUrl: requireKhoraBaseUrl(khoraBaseUrl),
     relayBaseUrl: requireRelayBaseUrl(relayBaseUrl),

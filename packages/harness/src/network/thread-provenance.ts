@@ -1,10 +1,8 @@
-import type { ChatService } from "@khoralabs/chat-core";
-
-import type { AgentChatClient } from "../chat.ts";
+import type { AgentChatClient, ChatServiceClient } from "../chat.ts";
 import type { ThreadHashSnapshot } from "./types.ts";
 
 export async function collectThreadHashSnapshots(
-  chatService: ChatService,
+  chatService: ChatServiceClient,
   agentChat: AgentChatClient,
 ): Promise<ThreadHashSnapshot[]> {
   const threads = await agentChat.listThreads();

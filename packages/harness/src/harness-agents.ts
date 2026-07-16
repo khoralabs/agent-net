@@ -1,7 +1,8 @@
 import path from "node:path";
 
 import { createRegisteredAgent } from "@khoralabs/agent-capabilities";
-import type { ChatService } from "@khoralabs/chat-core";
+import type { ChatSigner } from "@khoralabs/chat-core";
+import { loadIdentity } from "@khoralabs/did-key-identity";
 import type { KhoraClient } from "@khoralabs/khora-client";
 import type { LabelSchemaMap, OntologyDefinition } from "@khoralabs/memories-ontologies";
 import {
@@ -23,8 +24,14 @@ import {
   type HarnessMemoriesOntology,
   resolveHarnessMemoriesOntology,
 } from "./agent/tools/memories/_helpers/memories-client.ts";
-import type { AgentHandle, AgentMemoriesClient, ManagedAgentPool } from "./agents";
-import type { AgentChatClient, HarnessChat, SignedChatBackend } from "./chat.ts";
+import {
+  type AgentHandle,
+  type AgentMemoriesClient,
+  AgentStore,
+  type ManagedAgentPool,
+} from "./agents";
+import type { AgentChatClient, ChatServiceClient, HarnessChat, SignedChatBackend } from "./chat.ts";
+import { createHarnessChatCrypto } from "./chat-crypto.ts";
 import { registerNetworkSession, removeNetworkSession } from "./network/session-registry.ts";
 
 export type SpawnWithMemoriesOptions = {
@@ -51,7 +58,8 @@ export type ResolveHarnessAgentWorkflowDepsOpts = {
 };
 
 export type HarnessAgentWorkflowDeps = {
-  chatService: ChatService;
+  chatService: ChatServiceClient;
+  chatSigner: ChatSigner;
   agentChat: AgentChatClient;
   memoriesClient?: RemoteMemoriesClientAsync;
   khoraClient?: KhoraClient;
@@ -71,6 +79,7 @@ export type NetworkHarnessCore = {
   readonly serverBaseUrl: string;
   readonly relayBaseUrl: string;
   readonly memoriesBaseUrl: string;
+  readonly chatBaseUrl: string;
   readonly agentDids: readonly string[];
   readonly memoriesClient: MemoriesServiceClient;
   readonly pool: ManagedAgentPool;
@@ -187,8 +196,12 @@ export function createHarnessAgentApi(
         agentDid: agent.did,
         agentsDataDir: opts.agentsDataDir,
       });
+      const chatCrypto = createHarnessChatCrypto((did) =>
+        loadIdentity(AgentStore.keyPath(opts.agentsDataDir, did)),
+      );
       return {
-        chatService: harness.signedChat.service,
+        chatService: harness.signedChat.client,
+        chatSigner: chatCrypto.signer,
         agentChat: agent.chat,
         memoriesClient,
         khoraClient,

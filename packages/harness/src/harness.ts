@@ -1,14 +1,14 @@
-import type { ChatPersistence } from "@khoralabs/chat-core";
 import { loadIdentity } from "@khoralabs/did-key-identity";
 import { createNoAuthProvider, MemoriesServiceClient } from "@khoralabs/memories-service-client";
 import { AgentStore, ManagedAgentPool } from "./agents";
-import { createSignedChatService, type HarnessChat } from "./chat";
+import { createRemoteHarnessChat, type HarnessChat } from "./chat";
 import {
   createHarnessAgentApi,
   harnessAgentsDataDir,
   type NetworkHarnessAgentApi,
   type NetworkHarnessCore,
 } from "./harness-agents.ts";
+import { requireChatBaseUrl, requireChatToken } from "./lib/chat-base-url.ts";
 import {
   emitNetworkEvent,
   installNetworkEventsPlugin,
@@ -31,8 +31,10 @@ export { spawnWithMemories } from "./harness-agents.ts";
 
 export type NetworkHarnessOptions = {
   dataDir: string;
-  /** Host-owned chat adapter (sqlite / memory / turso / other). */
-  chatPersistence: ChatPersistence;
+  /** Base URL of a running chat-http service. */
+  chatBaseUrl: string;
+  /** Shared-secret token for chat-http. */
+  chatToken: string;
   /** Optional host network-event sink (sqlite + JSONL, etc.). */
   networkEvents?: NetworkEventsPlugin;
   /** Base URL of a running Khora host (e.g. http://127.0.0.1:8788). */
@@ -63,6 +65,9 @@ export async function startNetworkHarness(
     throw new Error("startNetworkHarness: memoriesBaseUrl is required");
   }
 
+  const chatBaseUrl = requireChatBaseUrl(opts.chatBaseUrl);
+  const chatToken = requireChatToken(opts.chatToken);
+
   if (opts.networkEvents !== undefined) {
     installNetworkEventsPlugin(opts.networkEvents);
   }
@@ -79,8 +84,9 @@ export async function startNetworkHarness(
     baseUrl: khoraBaseUrl,
   });
 
-  const signedChat = createSignedChatService({
-    persistence: opts.chatPersistence,
+  const signedChat = createRemoteHarnessChat({
+    baseUrl: chatBaseUrl,
+    token: chatToken,
     resolveSigner: (did) => loadIdentity(AgentStore.keyPath(agentsDataDir, did)),
   });
   const chat: HarnessChat = {
@@ -105,6 +111,7 @@ export async function startNetworkHarness(
         serverBaseUrl: khoraBaseUrl,
         relayBaseUrl,
         memoriesBaseUrl,
+        chatBaseUrl,
       },
     });
   }
@@ -113,6 +120,7 @@ export async function startNetworkHarness(
     serverBaseUrl: khoraBaseUrl,
     relayBaseUrl,
     memoriesBaseUrl,
+    chatBaseUrl,
     get agentDids() {
       return pool.list();
     },

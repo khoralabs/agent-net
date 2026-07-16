@@ -19,7 +19,7 @@
     "@khoralabs/agent-capabilities-otel": "^0.2.0",
     "@khoralabs/agent-net": "workspace:*",
     "@khoralabs/agent-net-swarm": "workspace:*",
-    "@khoralabs/chat-persistence-sqlite": "workspace:*",
+    "@khoralabs/chat-http": "workspace:*",
     "@khoralabs/network-events-sqlite": "workspace:*",
     "@khoralabs/memories-ontologies": "workspace:*",
     "@khoralabs/memories-service-auth": "workspace:*",

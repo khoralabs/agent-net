@@ -14,14 +14,24 @@ export { runAgentTurn } from "./agent-turn.ts";
 export type { AgentHandle, InboxConnection } from "./agents";
 export {
   type AgentChatClient,
-  type CreateSignedChatOptions,
-  createSignedChatService,
+  type ChatServiceClient,
+  type CreateHarnessChatBackendOptions,
+  type CreateRemoteHarnessChatOptions,
+  createHarnessChatBackend,
+  createRemoteHarnessChat,
+  type SignedChatBackend,
 } from "./chat";
 export {
   type HarnessAgentWorkflowDeps,
   type NetworkHarnessHandle,
   startNetworkHarness,
 } from "./harness";
+export {
+  requireChatBaseUrl,
+  requireChatToken,
+  resolveChatBaseUrlFromEnv,
+  resolveChatTokenFromEnv,
+} from "./lib/chat-base-url.ts";
 export { requireKhoraBaseUrl } from "./lib/khora-base-url.ts";
 export { requireMemoriesBaseUrl } from "./lib/memories-base-url.ts";
 export { requireRelayBaseUrl } from "./lib/relay-base-url.ts";

@@ -10,6 +10,8 @@
     "vendor/chat/core",
     "vendor/chat/persistence",
     "vendor/chat/sqlite",
+    "vendor/chat/turso",
+    "vendor/chat/http",
     "vendor/relay/packages/*/**",
     "vendor/memories/packages/*/**",
     "vendor/memories/packages/memories-service/*/**"

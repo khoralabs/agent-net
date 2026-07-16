@@ -100,7 +100,7 @@ export async function setupSwarm(input: {
     harness,
     agents: spawned,
     loopStates,
-    chatService: harness.signedChat.service,
+    chatService: harness.signedChat.client,
     inboxConnections,
   };
 

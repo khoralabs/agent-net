@@ -1,4 +1,4 @@
-import type { ChatService, PostModelMetadata, PostUsage } from "@khoralabs/chat-core";
+import type { ChatSigner, PostModelMetadata, PostUsage } from "@khoralabs/chat-core";
 import type { KhoraClient } from "@khoralabs/khora-client";
 import type { EmbeddingModel } from "@khoralabs/memories-core/helpers";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service-client";
@@ -10,7 +10,7 @@ import {
   type UIMessage,
 } from "ai";
 
-import type { AgentChatClient } from "../chat.ts";
+import type { AgentChatClient, ChatServiceClient } from "../chat.ts";
 import { collectThreadHashSnapshots } from "../network/thread-provenance.ts";
 import { buildNetworkAttribution } from "../observability/attribution-digest.ts";
 import { runWithAttributionAsync } from "../observability/network-log.ts";
@@ -31,7 +31,8 @@ import {
 } from "./user-local-datetime.ts";
 
 export type RunAgentWorkflowDependencies = {
-  chatService?: ChatService;
+  chatService?: ChatServiceClient;
+  chatSigner?: ChatSigner;
   agentChat?: AgentChatClient;
   sessionId?: string;
   networkDataDir?: string;
@@ -178,7 +179,11 @@ export async function runAgentWorkflow(
   if (deps.chatService === undefined) {
     throw new Error("chatService is required");
   }
-  const writer = createAgentChatWriter(deps.chatService, params);
+  const writer = createAgentChatWriter({
+    client: deps.chatService,
+    params,
+    signer: deps.chatSigner,
+  });
   let text = "";
   let streamStarted = false;
   const modelId = resolveGatewayModel(params.model.id);

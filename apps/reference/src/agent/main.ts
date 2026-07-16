@@ -12,16 +12,11 @@ import {
 import { start } from "workflow/api";
 
 import "./otel.ts";
-import { createReferenceChatPersistence } from "../chat/sqlite.ts";
-import { resolveHarnessDataDir } from "../world/paths.ts";
 import { startTursoWorldWorker } from "../world/turso.ts";
 
 void startTursoWorldWorker();
 
 installAgentChat({
-  persistence: createReferenceChatPersistence(
-    resolveHarnessDataDir(process.env.HARNESS_AGENT_DATA_DIR),
-  ),
   resolveSigner: resolveAgentChatSigner,
 });
 
@@ -57,6 +52,7 @@ export default async function handler(req: Request): Promise<Response> {
       threadId?: string;
       modelId?: string;
       streamDeltas?: boolean;
+      userTimeZone?: string;
     };
 
     const text = body.text?.trim();
@@ -92,6 +88,7 @@ export default async function handler(req: Request): Promise<Response> {
         threadId: body.threadId?.trim() || threadId,
         messages: [message],
         instructions: ["Respond concisely."],
+        userTimeZone: body.userTimeZone,
       },
       output: {
         chat: {

@@ -8,7 +8,6 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import os from "node:os";
 import path from "node:path";
-import { createMemoryChatPersistence } from "@khoralabs/chat-persistence";
 import type { KhoraClientEvent } from "@khoralabs/khora-client";
 import { type NetworkHarnessHandle, startNetworkHarness } from "../harness";
 import { inboxHasPost } from "../lib/inbox";
@@ -17,6 +16,7 @@ import { resolveMemoriesBaseUrlFromEnv } from "../lib/memories-base-url";
 import { resolveRelayBaseUrlFromEnv } from "../lib/relay-base-url";
 import { openVellumChain } from "../lib/vellum";
 import { waitFor } from "../lib/wait-for";
+import { startTestChatHttp, type TestChatHttpHandle } from "./test-chat-http.ts";
 
 // ── harness ───────────────────────────────────────────────────────────────────
 
@@ -30,21 +30,27 @@ const describeHarness =
 
 const dataDir = path.join(os.tmpdir(), `khora-e2e-${process.pid}`);
 let harness: NetworkHarnessHandle;
+let chatHttp: TestChatHttpHandle;
 
 beforeAll(async () => {
   if (khoraBaseUrl === undefined || relayBaseUrl === undefined || memoriesBaseUrl === undefined) {
     return;
   }
+  chatHttp = startTestChatHttp();
   harness = await startNetworkHarness({
     dataDir,
-    chatPersistence: createMemoryChatPersistence(),
+    chatBaseUrl: chatHttp.baseUrl,
+    chatToken: chatHttp.token,
     khoraBaseUrl,
     relayBaseUrl,
     memoriesBaseUrl,
   });
 }, 30_000);
 
-afterAll(() => harness?.stop());
+afterAll(() => {
+  harness?.stop();
+  chatHttp?.stop();
+});
 
 // ── test ──────────────────────────────────────────────────────────────────────
 

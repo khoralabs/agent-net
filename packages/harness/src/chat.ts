@@ -1,25 +1,29 @@
 import type {
-  ChatPersistence,
-  ChatService,
+  AppendPostInput,
   ChatSigner,
   JsonObject,
   Post,
   PostPage,
+  PreparedAppendPost,
   ScopeRef,
   Thread,
   ThreadPage,
+  ThreadTip,
 } from "@khoralabs/chat-core";
-import { ChatNotFoundError, createChatService } from "@khoralabs/chat-core";
+import { ChatNotFoundError } from "@khoralabs/chat-core";
 import {
-  prepareAppendForSigning,
-  signPreparedAppendPost,
-  withSignedChatPersistence,
-} from "@khoralabs/chat-persistence";
+  type ChatServiceClient,
+  type ChatServiceClientOptions,
+  createChatClient,
+} from "@khoralabs/chat-http/client";
+import { prepareAppendPost, signPreparedAppendPost } from "@khoralabs/chat-persistence";
 import type { UIMessage } from "ai";
 
 import { createHarnessChatCrypto, type ResolveHarnessChatSigner } from "./chat-crypto.ts";
 
 export const HARNESS_CHAT_CHANNEL_ID = "harness-network";
+
+export type { ChatServiceClient };
 
 export type CreateAgentThreadInput = {
   id?: string;
@@ -45,21 +49,26 @@ export type AgentChatClient = {
   listParticipants(threadId: string): Promise<ScopeRef[]>;
 };
 
-export type CreateSignedChatOptions = {
-  /** Host-owned unsigned chat adapter (sqlite / memory / turso / other). */
-  persistence: ChatPersistence;
+export type CreateHarnessChatBackendOptions = {
+  client: ChatServiceClient;
   resolveSigner: ResolveHarnessChatSigner;
 };
 
 export type SignedChatBackend = {
-  readonly service: ChatService;
-  readonly persistence: ChatPersistence;
+  readonly client: ChatServiceClient;
   readonly ready: Promise<void>;
   forAgent(did: string): AgentChatClient;
 };
 
 export type HarnessChat = {
   forAgent(did: string): AgentChatClient;
+};
+
+export type CreateRemoteHarnessChatOptions = {
+  baseUrl: string;
+  token: string;
+  resolveSigner: ResolveHarnessChatSigner;
+  fetchFn?: ChatServiceClientOptions["fetchFn"];
 };
 
 function agentScope(did: string): ScopeRef {
@@ -70,37 +79,61 @@ function textMessage(id: string, role: UIMessage["role"], text: string): UIMessa
   return { id, role, parts: [{ type: "text", text }] };
 }
 
-export function createSignedChatService(options: CreateSignedChatOptions): SignedChatBackend {
-  const chatCrypto = createHarnessChatCrypto(options.resolveSigner);
-  const persistence = withSignedChatPersistence(options.persistence, chatCrypto);
-  const service = createChatService(persistence);
-  const ready = ensureHarnessChannel(service);
-
-  return {
-    service,
-    persistence,
-    ready,
-    forAgent(did: string) {
-      return createAgentChatClient(service, persistence, did, chatCrypto.signer, ready);
-    },
-  };
+export function prepareAppendForSigningFromTip(
+  tip: ThreadTip | null,
+  input: AppendPostInput,
+): PreparedAppendPost {
+  return prepareAppendPost({
+    ...input,
+    previousPostVersionId: tip?.id ?? null,
+    previousLineageHash: tip?.lineageHash ?? null,
+  });
 }
 
-async function ensureHarnessChannel(service: ChatService): Promise<void> {
+async function ensureHarnessChannel(client: ChatServiceClient): Promise<void> {
   try {
-    await service.getChannel(HARNESS_CHAT_CHANNEL_ID);
+    await client.getChannel(HARNESS_CHAT_CHANNEL_ID);
   } catch (error) {
     if (!(error instanceof ChatNotFoundError)) throw error;
-    await service.createChannel({
+    await client.createChannel({
       id: HARNESS_CHAT_CHANNEL_ID,
       metadata: { title: "Network Harness", kind: "harness-network" },
     });
   }
 }
 
+export function createHarnessChatBackend(
+  options: CreateHarnessChatBackendOptions,
+): SignedChatBackend {
+  const chatCrypto = createHarnessChatCrypto(options.resolveSigner);
+  const ready = ensureHarnessChannel(options.client);
+
+  return {
+    client: options.client,
+    ready,
+    forAgent(did: string) {
+      return createAgentChatClient(options.client, did, chatCrypto.signer, ready);
+    },
+  };
+}
+
+/** Connect harness chat to a remote (or fetchFn-backed) chat-http service. */
+export function createRemoteHarnessChat(
+  options: CreateRemoteHarnessChatOptions,
+): SignedChatBackend {
+  const client = createChatClient({
+    baseUrl: options.baseUrl,
+    token: options.token,
+    fetchFn: options.fetchFn,
+  });
+  return createHarnessChatBackend({
+    client,
+    resolveSigner: options.resolveSigner,
+  });
+}
+
 function createAgentChatClient(
-  service: ChatService,
-  persistence: ChatPersistence,
+  client: ChatServiceClient,
   did: string,
   chatSigner: ChatSigner,
   ready: Promise<void>,
@@ -113,7 +146,7 @@ function createAgentChatClient(
   }
 
   async function requireParticipant(threadId: string): Promise<void> {
-    const participants = await service.listThreadParticipants(threadId);
+    const participants = await client.listThreadParticipants(threadId);
     const allowed = participants.some((p) => p.type === scope.type && p.id === scope.id);
     if (!allowed) {
       throw new Error(`agent ${did} does not have access to thread ${threadId}`);
@@ -124,13 +157,13 @@ function createAgentChatClient(
     did,
     createThread(input = {}) {
       return whenReady(async () => {
-        const thread = await service.createThread({
-          id: input.id,
+        const thread = await client.createThread({
+          id: input.id ?? crypto.randomUUID(),
           root: { type: "channel", channelId: HARNESS_CHAT_CHANNEL_ID },
           metadata: input.metadata,
         });
 
-        await service.addThreadParticipant({
+        await client.addThreadParticipant({
           threadId: thread.id,
           scope,
           role: "owner",
@@ -138,7 +171,7 @@ function createAgentChatClient(
         });
 
         for (const participant of input.participants ?? []) {
-          await service.addThreadParticipant({
+          await client.addThreadParticipant({
             threadId: thread.id,
             scope: participant.scope,
             role: participant.role ?? "participant",
@@ -152,7 +185,7 @@ function createAgentChatClient(
     grantAccess(threadId, participant, role = "participant") {
       return whenReady(async () => {
         await requireParticipant(threadId);
-        await service.addThreadParticipant({
+        await client.addThreadParticipant({
           threadId,
           scope: participant,
           role,
@@ -170,10 +203,11 @@ function createAgentChatClient(
           input.text,
         );
         const appendInput = { threadId, author: scope, message };
-        const prepared = await prepareAppendForSigning(persistence, appendInput);
+        const tip = await client.getThreadTip(threadId);
+        const prepared = prepareAppendForSigningFromTip(tip, appendInput);
         const signature = await signPreparedAppendPost(chatSigner, scope, prepared);
 
-        const { post } = await service.appendPost({
+        const { post } = await client.appendPost({
           ...appendInput,
           message: prepared.message,
           versionId: prepared.versionId,
@@ -186,7 +220,7 @@ function createAgentChatClient(
     listPosts(threadId, input) {
       return whenReady(async () => {
         await requireParticipant(threadId);
-        return service.listPosts({
+        return client.listPosts({
           threadId,
           limit: input?.limit,
           cursor: input?.cursor,
@@ -195,7 +229,7 @@ function createAgentChatClient(
     },
     listThreads(input) {
       return whenReady(() =>
-        service.listThreads({
+        client.listThreads({
           channelId: HARNESS_CHAT_CHANNEL_ID,
           participant: scope,
           limit: input?.limit,
@@ -204,16 +238,16 @@ function createAgentChatClient(
       );
     },
     getThread(threadId) {
-      return whenReady(() => service.getThread(threadId));
+      return whenReady(() => client.getThread(threadId));
     },
     listParticipants(threadId) {
-      return whenReady(() => service.listThreadParticipants(threadId));
+      return whenReady(() => client.listThreadParticipants(threadId));
     },
   };
 }
 
-export function createHarnessChat(options: CreateSignedChatOptions): HarnessChat {
-  const backend = createSignedChatService(options);
+export function createHarnessChat(options: CreateRemoteHarnessChatOptions): HarnessChat {
+  const backend = createRemoteHarnessChat(options);
   return {
     forAgent(did: string) {
       return backend.forAgent(did);
