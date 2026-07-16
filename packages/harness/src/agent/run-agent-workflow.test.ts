@@ -24,6 +24,7 @@ function params(input: {
   text: string;
   threadId: string;
   agentDid: string;
+  userTimeZone?: string;
 }): AgentWorkflowParams {
   return {
     runId: input.runId,
@@ -41,6 +42,7 @@ function params(input: {
       threadId: input.threadId,
       messages: [userMessage(input.text)],
       instructions: ["Keep the response concise."],
+      userTimeZone: input.userTimeZone,
     },
     output: {
       chat: {
@@ -100,6 +102,42 @@ test("runAgentWorkflow streams assistant text to signed chat thread", async () =
   }
   expect(envelope.algorithm).toBe("ed25519");
   expect(envelope.signer.id).toBe(chat.agentDid);
+});
+
+test("injects user-local datetime into system instructions when userTimeZone is set", async () => {
+  const chat = await createSignedTestChat();
+  let system: string | undefined;
+
+  await runAgentWorkflow(
+    params({
+      runId: "run-timezone",
+      text: "What day is it?",
+      threadId: chat.threadId,
+      agentDid: chat.agentDid,
+      userTimeZone: "America/New_York",
+    }),
+    {
+      chatService: chat.service,
+      streamTextFn: ((input: { system?: string }) => {
+        system = input.system;
+        return {
+          textStream: (async function* () {
+            yield "Tuesday";
+          })(),
+          text: Promise.resolve("Tuesday"),
+          finishReason: Promise.resolve("stop"),
+          usage: Promise.resolve({ inputTokens: 1, outputTokens: 1, totalTokens: 2 }),
+          response: Promise.resolve({
+            modelId: "anthropic/claude-sonnet-4.6",
+            provider: "gateway",
+          }),
+        };
+      }) as unknown as typeof import("ai").streamText,
+    },
+  );
+
+  expect(system).toContain("stakeholder's current local date and time");
+  expect(system).toContain("America/New_York");
 });
 
 test("resolveGatewayModel requires AI_GATEWAY_API_KEY", async () => {

@@ -24,6 +24,7 @@ export type AgentWorkflowParams = {
     threadId: string;
     messages: AgentUIMessage[];
     instructions?: string[];
+    userTimeZone?: string;
   };
   output: {
     chat: {

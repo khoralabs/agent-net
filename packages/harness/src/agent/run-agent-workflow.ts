@@ -25,6 +25,10 @@ import { createAgentChatWriter } from "./chat-writer.ts";
 import { createHarnessToolkitEnv } from "./tools/_helpers/toolkit-env.ts";
 import { formatSkillCatalog } from "./tools/skills/_helpers/skills.ts";
 import type { AgentWorkflowParams, AgentWorkflowResult } from "./types.ts";
+import {
+  buildUserLocalDateTimeContext,
+  formatUserLocalDateTimeInstruction,
+} from "./user-local-datetime.ts";
 
 export type RunAgentWorkflowDependencies = {
   chatService?: ChatService;
@@ -114,10 +118,19 @@ async function normalizeContext(params: AgentWorkflowParams): Promise<{
     })) as ModelMessage[];
   }
 
+  const userLocalDateTimeInstruction =
+    params.context.userTimeZone !== undefined
+      ? formatUserLocalDateTimeInstruction(
+          buildUserLocalDateTimeContext(params.context.userTimeZone),
+        )
+      : null;
+
   return {
     messages,
     modelMessages,
-    instructions: params.context.instructions ?? [],
+    instructions: [userLocalDateTimeInstruction, ...(params.context.instructions ?? [])].filter(
+      (instruction): instruction is string => instruction !== null,
+    ),
   };
 }
 
