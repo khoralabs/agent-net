@@ -682,6 +682,23 @@
       "name": "@khoralabs/memories-spec",
       "version": "0.1.0",
     },
+    "vendor/relay/apps/relay-server": {
+      "name": "@khoralabs/relay-server",
+      "version": "0.0.0",
+      "dependencies": {
+        "@khoralabs/relay-server-http": "workspace:*",
+      },
+      "devDependencies": {
+        "@khoralabs/relay-client": "workspace:*",
+        "@khoralabs/relay-contracts": "workspace:*",
+        "@noble/ed25519": "^3.1.0",
+        "@types/bun": "latest",
+        "typescript": "^5",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "vendor/relay/packages/relay-admission": {
       "name": "@khoralabs/relay-admission",
       "version": "0.0.0",
@@ -1029,6 +1046,8 @@
     "@khoralabs/relay-crypto": ["@khoralabs/relay-crypto@workspace:vendor/relay/packages/relay-crypto"],
 
     "@khoralabs/relay-mls": ["@khoralabs/relay-mls@workspace:vendor/relay/packages/relay-mls"],
+
+    "@khoralabs/relay-server": ["@khoralabs/relay-server@workspace:vendor/relay/apps/relay-server"],
 
     "@khoralabs/relay-server-http": ["@khoralabs/relay-server-http@workspace:vendor/relay/packages/relay-server-http"],
 

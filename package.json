@@ -13,6 +13,7 @@
     "vendor/chat/turso",
     "vendor/chat/http",
     "vendor/relay/packages/*/**",
+    "vendor/relay/apps/*",
     "vendor/memories/packages/*/**",
     "vendor/memories/packages/memories-service/*/**"
   ],
@@ -23,11 +24,12 @@
     "agent:dev": "bun run --filter @khoralabs/agent-net-reference agent:dev",
     "agent:setup": "bun run --filter @khoralabs/agent-net-reference agent:setup",
     "agent:test": "bun run --filter @khoralabs/agent-net test",
+    "test:with-sqlite": "bash scripts/test-with-homebrew-sqlite.sh",
     "reference:start": "bun run --filter @khoralabs/agent-net-reference start",
     "swarm": "bun run --filter @khoralabs/agent-net-reference swarm",
     "swarm:setup": "bun run --filter @khoralabs/agent-net-reference agent:setup",
     "swarm:events": "bun run --filter @khoralabs/agent-net-reference events",
-    "swarm:test": "bun run --filter @khoralabs/agent-net-swarm test && bun run --filter @khoralabs/agent-net test",
+    "swarm:test": "bash scripts/test-with-homebrew-sqlite.sh packages/swarm/src packages/harness/src",
     "submodules:init": "git submodule update --init --recursive",
     "submodules:update": "git submodule update --remote --merge vendor/memories vendor/relay vendor/chat vendor/libs && bun install",
     "prepare": "husky"
