@@ -1,5 +1,8 @@
 import { loadIdentity } from "@khoralabs/did-key-identity";
-import { createNoAuthProvider, MemoriesServiceClient } from "@khoralabs/memories-service-client";
+import {
+  createBearerTokenAuthProvider,
+  MemoriesServiceClient,
+} from "@khoralabs/memories-service-client";
 import { AgentStore, ManagedAgentPool } from "./agents";
 import { createRemoteHarnessChat, type HarnessChat } from "./chat";
 import {
@@ -9,6 +12,7 @@ import {
   type NetworkHarnessCore,
 } from "./harness-agents.ts";
 import { requireChatBaseUrl, requireChatToken } from "./lib/chat-base-url.ts";
+import { requireMemoriesAdminToken } from "./lib/memories-base-url.ts";
 import {
   emitNetworkEvent,
   installNetworkEventsPlugin,
@@ -43,6 +47,8 @@ export type NetworkHarnessOptions = {
   relayBaseUrl: string;
   /** Base URL of a running memories service (e.g. http://127.0.0.1:8791). */
   memoriesBaseUrl: string;
+  /** Shared-secret Bearer token for memories server-admin auth. */
+  memoriesAdminToken: string;
 };
 
 export type NetworkHarnessHandle = NetworkHarnessCore & NetworkHarnessAgentApi;
@@ -67,6 +73,7 @@ export async function startNetworkHarness(
 
   const chatBaseUrl = requireChatBaseUrl(opts.chatBaseUrl);
   const chatToken = requireChatToken(opts.chatToken);
+  const memoriesAdminToken = requireMemoriesAdminToken(opts.memoriesAdminToken);
 
   if (opts.networkEvents !== undefined) {
     installNetworkEventsPlugin(opts.networkEvents);
@@ -76,7 +83,7 @@ export async function startNetworkHarness(
 
   const memoriesClient = new MemoriesServiceClient({
     baseUrl: memoriesBaseUrl,
-    auth: createNoAuthProvider(),
+    auth: createBearerTokenAuthProvider(memoriesAdminToken),
   });
 
   const pool = await ManagedAgentPool.create({
@@ -120,6 +127,7 @@ export async function startNetworkHarness(
     serverBaseUrl: khoraBaseUrl,
     relayBaseUrl,
     memoriesBaseUrl,
+    memoriesAdminToken,
     chatBaseUrl,
     get agentDids() {
       return pool.list();

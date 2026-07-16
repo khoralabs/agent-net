@@ -3,7 +3,10 @@ import type { EmbeddingModel } from "@khoralabs/memories-core/helpers";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service-client";
 
 import type { AgentChatClient } from "../../../chat";
-import { resolveMemoriesBaseUrlFromEnv } from "../../../lib/memories-base-url.ts";
+import {
+  resolveMemoriesAdminTokenFromEnv,
+  resolveMemoriesBaseUrlFromEnv,
+} from "../../../lib/memories-base-url.ts";
 import type { RunAgentWorkflowDependencies } from "../../run-agent-workflow.ts";
 import {
   agentMemoriesDatabase,
@@ -64,11 +67,13 @@ export async function createHarnessMemoriesClientForAgent(opts: {
   baseUrl: string;
   agentDid: string;
   ontology: HarnessMemoriesOntology;
+  adminToken: string;
 }): Promise<RemoteMemoriesClientAsync> {
   return createHarnessMemoriesClient({
     baseUrl: opts.baseUrl,
     database: agentMemoriesDatabase(opts.agentDid),
     ontology: opts.ontology,
+    adminToken: opts.adminToken,
   });
 }
 
@@ -76,6 +81,12 @@ export function resolveMemoriesServiceBaseUrl(
   env: NodeJS.ProcessEnv = process.env,
 ): string | undefined {
   return resolveMemoriesBaseUrlFromEnv(env);
+}
+
+export function resolveMemoriesServiceAdminToken(
+  env: NodeJS.ProcessEnv = process.env,
+): string | undefined {
+  return resolveMemoriesAdminTokenFromEnv(env);
 }
 
 export type HarnessAgentWorkflowDeps = Pick<
@@ -92,6 +103,7 @@ export type HarnessAgentWorkflowDeps = Pick<
 
 export async function createHarnessAgentWorkflowDeps(input: {
   memoriesBaseUrl: string;
+  memoriesAdminToken: string;
   agentDid: string;
   ontology: HarnessMemoriesOntology;
   khoraClient?: KhoraClient;
@@ -102,6 +114,7 @@ export async function createHarnessAgentWorkflowDeps(input: {
       baseUrl: input.memoriesBaseUrl,
       agentDid: input.agentDid,
       ontology: input.ontology,
+      adminToken: input.memoriesAdminToken,
     }),
     khoraClient: input.khoraClient,
     embeddingModel: input.embeddingModel,

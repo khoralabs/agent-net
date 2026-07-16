@@ -8,6 +8,7 @@ import {
   requireChatBaseUrl,
   requireChatToken,
   requireKhoraBaseUrl,
+  requireMemoriesAdminToken,
   requireMemoriesBaseUrl,
   requireRelayBaseUrl,
   startNetworkHarness,
@@ -113,6 +114,7 @@ async function main(): Promise<void> {
     khoraBaseUrl: requireKhoraBaseUrl(khoraBaseUrl),
     relayBaseUrl: requireRelayBaseUrl(relayBaseUrl),
     memoriesBaseUrl: requireMemoriesBaseUrl(memoriesBaseUrl),
+    memoriesAdminToken: requireMemoriesAdminToken(undefined),
   });
   installMemoriesOntology(referenceMemoriesOntology);
   provideHarnessForSession(config.sessionId, harness);

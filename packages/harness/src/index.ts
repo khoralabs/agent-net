@@ -33,7 +33,10 @@ export {
   resolveChatTokenFromEnv,
 } from "./lib/chat-base-url.ts";
 export { requireKhoraBaseUrl } from "./lib/khora-base-url.ts";
-export { requireMemoriesBaseUrl } from "./lib/memories-base-url.ts";
+export {
+  requireMemoriesAdminToken,
+  requireMemoriesBaseUrl,
+} from "./lib/memories-base-url.ts";
 export { requireRelayBaseUrl } from "./lib/relay-base-url.ts";
 export {
   emitNetworkEvent,

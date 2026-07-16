@@ -5,7 +5,7 @@ import {
   type OntologyDefinition,
 } from "@khoralabs/memories-ontologies";
 import {
-  createNoAuthProvider,
+  createBearerTokenAuthProvider,
   createRemoteMemoriesClientAsync,
   type RemoteMemoriesClientAsync,
 } from "@khoralabs/memories-service-client";
@@ -32,12 +32,13 @@ export async function createHarnessMemoriesClient(opts: {
   baseUrl: string;
   database: MemoriesDatabaseId;
   ontology: HarnessMemoriesOntology;
+  adminToken: string;
 }): Promise<RemoteMemoriesClientAsync> {
   return createRemoteMemoriesClientAsync({
     baseUrl: opts.baseUrl.replace(/\/$/, ""),
     database: opts.database,
     ontology: resolveHarnessMemoriesOntology(opts.ontology),
-    auth: createNoAuthProvider(),
+    auth: createBearerTokenAuthProvider(opts.adminToken),
   });
 }
 
@@ -52,6 +53,7 @@ export function createLazyHarnessMemoriesClient(
     baseUrl: string;
     database: MemoriesDatabaseId;
     ontology: HarnessMemoriesOntology;
+    adminToken: string;
   },
   createClient: CreateHarnessMemoriesClient = createHarnessMemoriesClient,
 ): RemoteMemoriesClientAsync {

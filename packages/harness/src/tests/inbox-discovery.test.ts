@@ -54,6 +54,7 @@ beforeAll(async () => {
     khoraBaseUrl,
     relayBaseUrl,
     memoriesBaseUrl,
+    memoriesAdminToken: process.env.MEMORIES_SERVICE_ADMIN_TOKEN?.trim() || "test-memories-token",
   });
 }, 30_000);
 

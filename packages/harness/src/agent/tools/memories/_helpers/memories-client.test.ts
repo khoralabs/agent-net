@@ -22,6 +22,7 @@ function createMockClient() {
       baseUrl: "http://localhost:1234",
       database,
       ontology: { nodeLabels: {}, edgeLabels: {} },
+      adminToken: "test-token",
     },
     createClient,
   );
@@ -71,6 +72,7 @@ describe("createLazyHarnessMemoriesClient", () => {
         baseUrl: "http://localhost:1234",
         database,
         ontology: { nodeLabels: {}, edgeLabels: {} },
+        adminToken: "test-token",
       },
       async () => {
         createCount += 1;

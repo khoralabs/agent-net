@@ -79,6 +79,7 @@ export type NetworkHarnessCore = {
   readonly serverBaseUrl: string;
   readonly relayBaseUrl: string;
   readonly memoriesBaseUrl: string;
+  readonly memoriesAdminToken: string;
   readonly chatBaseUrl: string;
   readonly agentDids: readonly string[];
   readonly memoriesClient: MemoriesServiceClient;
@@ -142,6 +143,7 @@ export async function spawnWithMemories(
       baseUrl: harness.memoriesBaseUrl,
       database,
       ontology,
+      adminToken: harness.memoriesAdminToken,
     }),
   };
 
@@ -190,6 +192,7 @@ export function createHarnessAgentApi(
         baseUrl: harness.memoriesBaseUrl,
         database: agentMemoriesDatabase(agent.did),
         ontology: agent.memories.ontology,
+        adminToken: harness.memoriesAdminToken,
       });
       const khoraClient = await createHarnessKhoraClientForAgent({
         baseUrl: harness.serverBaseUrl,

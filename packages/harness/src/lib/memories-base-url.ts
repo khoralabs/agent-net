@@ -26,3 +26,24 @@ export function requireMemoriesBaseUrl(
   }
   return url;
 }
+
+export function resolveMemoriesAdminTokenFromEnv(
+  env: NodeJS.ProcessEnv = process.env,
+): string | undefined {
+  const value = env.MEMORIES_SERVICE_ADMIN_TOKEN?.trim();
+  if (value !== undefined && value.length > 0) return value;
+  return undefined;
+}
+
+export function requireMemoriesAdminToken(
+  explicit: string | undefined,
+  env: NodeJS.ProcessEnv = process.env,
+): string {
+  const token = explicit?.trim() || resolveMemoriesAdminTokenFromEnv(env);
+  if (token === undefined || token.length === 0) {
+    throw new Error(
+      "Memories admin token is required (pass memoriesAdminToken or set MEMORIES_SERVICE_ADMIN_TOKEN)",
+    );
+  }
+  return token;
+}

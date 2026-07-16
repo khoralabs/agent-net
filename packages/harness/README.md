@@ -18,6 +18,9 @@ const harness = await startNetworkHarness({
   khoraBaseUrl,
   relayBaseUrl,
   memoriesBaseUrl,
+  memoriesAdminToken,
+  chatBaseUrl,
+  chatToken,
 });
 // Apps must supply an ontology — e.g. referenceMemoriesOntology from the reference app.
 const agent = await spawnWithMemories(harness, { ontology });

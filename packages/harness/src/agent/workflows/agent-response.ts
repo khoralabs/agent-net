@@ -8,6 +8,7 @@ import {
 import { type RunAgentWorkflowDependencies, runAgentWorkflow } from "../run-agent-workflow.ts";
 import {
   createHarnessMemoriesClientForAgent,
+  resolveMemoriesServiceAdminToken,
   resolveMemoriesServiceBaseUrl,
 } from "../tools/_helpers/toolkit-env.ts";
 import {
@@ -41,17 +42,19 @@ export async function executeAgentResponse(
   }
 
   const memoriesBaseUrl = resolveMemoriesServiceBaseUrl();
+  const memoriesAdminToken = resolveMemoriesServiceAdminToken();
   const { getInstalledMemoriesOntology } = await import(
     "../tools/memories/_helpers/memories-ontology-install.ts"
   );
   const ontology = getInstalledMemoriesOntology();
   const memoriesClient =
-    memoriesBaseUrl === undefined || ontology === undefined
+    memoriesBaseUrl === undefined || memoriesAdminToken === undefined || ontology === undefined
       ? undefined
       : await createHarnessMemoriesClientForAgent({
           baseUrl: memoriesBaseUrl,
           agentDid: params.agent.actingFor.id,
           ontology,
+          adminToken: memoriesAdminToken,
         });
 
   const khoraBaseUrl = resolveKhoraServerBaseUrl();
