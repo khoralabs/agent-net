@@ -1,5 +1,6 @@
-import { resolveHarnessDataDir, workflowDbPath } from "@khoralabs/agent-net";
 import { getWorld } from "workflow/runtime";
+
+import { resolveHarnessDataDir, workflowDbPath } from "./paths.ts";
 
 const startedForDataDir = new Set<string>();
 

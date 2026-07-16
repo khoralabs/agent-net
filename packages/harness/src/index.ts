@@ -50,4 +50,3 @@ export {
   getCurrentAttribution,
   getNetworkSessionContext,
 } from "./observability/network-log";
-export { resolveHarnessDataDir, workflowDbPath } from "./workflow/paths.ts";

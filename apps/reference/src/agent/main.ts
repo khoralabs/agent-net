@@ -8,12 +8,12 @@ import {
   HARNESS_AGENT_ID,
   installAgentChat,
   resolveAgentChatSigner,
-  resolveHarnessDataDir,
 } from "@khoralabs/agent-net";
 import { start } from "workflow/api";
 
 import "./otel.ts";
 import { createReferenceChatPersistence } from "../chat/sqlite.ts";
+import { resolveHarnessDataDir } from "../world/paths.ts";
 import { startTursoWorldWorker } from "../world/turso.ts";
 
 void startTursoWorldWorker();

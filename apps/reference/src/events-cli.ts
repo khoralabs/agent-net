@@ -1,7 +1,8 @@
 import path from "node:path";
 
-import { resolveHarnessDataDir } from "@khoralabs/agent-net";
 import { createSqliteNetworkEventStore } from "@khoralabs/network-events-sqlite";
+
+import { resolveHarnessDataDir } from "./world/paths.ts";
 
 function parseArgs(argv: string[]): {
   dataDir: string;

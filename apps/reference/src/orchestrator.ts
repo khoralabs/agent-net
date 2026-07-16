@@ -1,9 +1,8 @@
 import path from "node:path";
 
-import { resolveHarnessDataDir } from "@khoralabs/agent-net";
-
 import { startMemoriesService } from "./services/memories.ts";
 import { startRelayServer } from "./services/relay.ts";
+import { resolveHarnessDataDir } from "./world/paths.ts";
 import { configureTursoWorldEnv, startTursoWorldWorker } from "./world/turso.ts";
 
 function parseArgs(argv: string[]): {

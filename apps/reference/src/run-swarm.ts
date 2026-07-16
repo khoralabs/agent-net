@@ -8,7 +8,6 @@ import {
   requireKhoraBaseUrl,
   requireMemoriesBaseUrl,
   requireRelayBaseUrl,
-  resolveHarnessDataDir,
   startNetworkHarness,
 } from "@khoralabs/agent-net";
 import {
@@ -23,6 +22,7 @@ import { start } from "workflow/api";
 import { createReferenceChatPersistence } from "./chat/sqlite.ts";
 import { referenceMemoriesOntology } from "./memories/ontology.ts";
 import { installReferenceObservability } from "./observability/install.ts";
+import { resolveHarnessDataDir } from "./world/paths.ts";
 import { configureTursoWorldEnv, startTursoWorldWorker } from "./world/turso.ts";
 
 function parseArgs(argv: string[]): {
