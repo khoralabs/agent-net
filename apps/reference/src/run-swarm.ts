@@ -115,6 +115,7 @@ async function main(): Promise<void> {
     relayBaseUrl: requireRelayBaseUrl(relayBaseUrl),
     memoriesBaseUrl: requireMemoriesBaseUrl(memoriesBaseUrl),
     memoriesAdminToken: requireMemoriesAdminToken(undefined),
+    // Optional: KHORA_ADMIN_TOKEN / HARNESS_IDENTITY_WRAP_KEY resolved inside startNetworkHarness
   });
   installMemoriesOntology(referenceMemoriesOntology);
   provideHarnessForSession(config.sessionId, harness);

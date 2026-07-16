@@ -2,7 +2,7 @@ import path from "node:path";
 
 import { createRegisteredAgent } from "@khoralabs/agent-capabilities";
 import type { ChatSigner } from "@khoralabs/chat-core";
-import { loadIdentity } from "@khoralabs/did-key-identity";
+import type { IdentitySecret } from "@khoralabs/did-key-identity";
 import type { KhoraClient } from "@khoralabs/khora-client";
 import type { LabelSchemaMap, OntologyDefinition } from "@khoralabs/memories-ontologies";
 import {
@@ -32,6 +32,8 @@ import {
 } from "./agents";
 import type { AgentChatClient, ChatServiceClient, HarnessChat, SignedChatBackend } from "./chat.ts";
 import { createHarnessChatCrypto } from "./chat-crypto.ts";
+import { loadHarnessIdentity } from "./lib/identity-wrap-key.ts";
+import type { PerAgentInviteBank } from "./lib/per-agent-invite-bank.ts";
 import { registerNetworkSession, removeNetworkSession } from "./network/session-registry.ts";
 
 export type SpawnWithMemoriesOptions = {
@@ -81,11 +83,15 @@ export type NetworkHarnessCore = {
   readonly memoriesBaseUrl: string;
   readonly memoriesAdminToken: string;
   readonly chatBaseUrl: string;
+  readonly identitySecret: IdentitySecret | undefined;
+  readonly inviteBank: PerAgentInviteBank;
   readonly agentDids: readonly string[];
   readonly memoriesClient: MemoriesServiceClient;
   readonly pool: ManagedAgentPool;
   readonly chat: HarnessChat;
   readonly signedChat: SignedChatBackend;
+  /** Decrypt and list registration-issued invites for an agent (sovereign viral use later). */
+  listInvitesForAgent(did: string): Promise<string[]>;
   stop(): void;
 };
 
@@ -152,8 +158,9 @@ export async function spawnWithMemories(
 
 export function createHarnessAgentApi(
   harness: NetworkHarnessCore,
-  opts: { agentsDataDir: string },
+  opts: { agentsDataDir: string; identitySecret?: IdentitySecret },
 ): NetworkHarnessAgentApi {
+  const identitySecret = opts.identitySecret ?? harness.identitySecret;
   return {
     spawn(spawnOpts) {
       return spawnWithMemories(harness, spawnOpts);
@@ -198,9 +205,10 @@ export function createHarnessAgentApi(
         baseUrl: harness.serverBaseUrl,
         agentDid: agent.did,
         agentsDataDir: opts.agentsDataDir,
+        identitySecret,
       });
       const chatCrypto = createHarnessChatCrypto((did) =>
-        loadIdentity(AgentStore.keyPath(opts.agentsDataDir, did)),
+        loadHarnessIdentity(AgentStore.keyPath(opts.agentsDataDir, did), identitySecret),
       );
       return {
         chatService: harness.signedChat.client,

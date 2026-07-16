@@ -1,7 +1,13 @@
 import { rm } from "node:fs/promises";
-import { generateIdentity, loadIdentity, saveIdentity } from "@khoralabs/did-key-identity";
+import {
+  generateIdentity,
+  type IdentitySecret,
+  type PersistableSigner,
+} from "@khoralabs/did-key-identity";
 import { KhoraClient } from "@khoralabs/khora-client";
 
+import { loadHarnessIdentity, saveHarnessIdentity } from "../lib/identity-wrap-key";
+import type { PerAgentInviteBank } from "../lib/per-agent-invite-bank";
 import { AgentHandle } from "./handle";
 import { AgentStore } from "./store";
 
@@ -17,17 +23,42 @@ export type ManagedAgentPoolOptions = {
    * filled by spawning new agents (generating keys + registering on the network).
    */
   count?: number;
+  /** When set, agent identity files are sealed with AES-256-GCM. */
+  identitySecret?: IdentitySecret;
+  /**
+   * When set, each spawn mints one invite (typically via Khora admin API)
+   * and passes it to `register({ inviteToken })`.
+   */
+  mintInvite?: () => Promise<string>;
+  /**
+   * Stores registration-issued invite tokens per agent (encrypted).
+   * Not consumed by spawn — for future sovereign viral flows.
+   */
+  inviteBank?: PerAgentInviteBank;
 };
 
 export class ManagedAgentPool {
   readonly #store: AgentStore;
   readonly #baseUrl: string;
   readonly #dataDir: string;
+  readonly #identitySecret: IdentitySecret | undefined;
+  readonly #mintInvite: (() => Promise<string>) | undefined;
+  readonly #inviteBank: PerAgentInviteBank | undefined;
 
-  private constructor(store: AgentStore, baseUrl: string, dataDir: string) {
+  private constructor(
+    store: AgentStore,
+    baseUrl: string,
+    dataDir: string,
+    identitySecret: IdentitySecret | undefined,
+    mintInvite: (() => Promise<string>) | undefined,
+    inviteBank: PerAgentInviteBank | undefined,
+  ) {
     this.#store = store;
     this.#baseUrl = baseUrl;
     this.#dataDir = dataDir;
+    this.#identitySecret = identitySecret;
+    this.#mintInvite = mintInvite;
+    this.#inviteBank = inviteBank;
   }
 
   /**
@@ -36,7 +67,14 @@ export class ManagedAgentPool {
    */
   static async create(opts: ManagedAgentPoolOptions): Promise<ManagedAgentPool> {
     const store = await AgentStore.open(opts.dataDir);
-    const pool = new ManagedAgentPool(store, opts.baseUrl, opts.dataDir);
+    const pool = new ManagedAgentPool(
+      store,
+      opts.baseUrl,
+      opts.dataDir,
+      opts.identitySecret,
+      opts.mintInvite,
+      opts.inviteBank,
+    );
 
     if (opts.count !== undefined) {
       const shortfall = opts.count - store.all().length;
@@ -53,6 +91,10 @@ export class ManagedAgentPool {
     return this.#store.all().map((a) => a.did);
   }
 
+  async #loadSigner(keyPath: string): Promise<PersistableSigner | undefined> {
+    return loadHarnessIdentity(keyPath, this.#identitySecret);
+  }
+
   /**
    * Generate a fresh identity, persist the key, register on the network,
    * and add to the pool. The optional callback receives a focused handle
@@ -62,11 +104,24 @@ export class ManagedAgentPool {
   async spawn(onSpawned?: AgentCallback): Promise<string> {
     const signer = await generateIdentity();
     const keyPath = AgentStore.keyPath(this.#dataDir, signer.did);
-    await saveIdentity(keyPath, signer);
+    await saveHarnessIdentity(keyPath, signer, this.#identitySecret);
 
     const client = new KhoraClient({ baseUrl: this.#baseUrl, signer });
     const username = `agent-${crypto.randomUUID().replace(/-/g, "").slice(0, 8)}`;
-    await client.register({ metadata: { username } });
+
+    let inviteToken: string | undefined;
+    if (this.#mintInvite !== undefined) {
+      inviteToken = await this.#mintInvite();
+    }
+
+    const result = await client.register({
+      metadata: { username },
+      ...(inviteToken !== undefined ? { inviteToken } : {}),
+    });
+
+    if (this.#inviteBank !== undefined && result.inviteTokens !== undefined) {
+      await this.#inviteBank.deposit(signer, result.inviteTokens);
+    }
 
     await this.#store.add({ did: signer.did, keyPath });
 
@@ -90,7 +145,7 @@ export class ManagedAgentPool {
       throw new Error(`Agent ${did} is not managed by this pool`);
     }
 
-    const signer = await loadIdentity(record.keyPath);
+    const signer = await this.#loadSigner(record.keyPath);
 
     if (signer !== undefined) {
       if (onRemoving !== undefined) {
@@ -102,6 +157,7 @@ export class ManagedAgentPool {
       await client.unregister();
     }
 
+    await this.#inviteBank?.clear(did);
     await rm(record.keyPath, { force: true });
     await this.#store.remove(did);
   }
@@ -119,7 +175,7 @@ export class ManagedAgentPool {
       throw new Error(`Agent ${did} is not managed by this pool`);
     }
 
-    const signer = await loadIdentity(record.keyPath);
+    const signer = await this.#loadSigner(record.keyPath);
     if (signer === undefined) {
       throw new Error(`Key file missing for agent ${did} at ${record.keyPath}`);
     }

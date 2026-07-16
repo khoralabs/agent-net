@@ -32,11 +32,26 @@ export {
   resolveChatBaseUrlFromEnv,
   resolveChatTokenFromEnv,
 } from "./lib/chat-base-url.ts";
+export {
+  HARNESS_IDENTITY_WRAP_KEY_ENV,
+  loadHarnessIdentity,
+  parseIdentityWrapKey,
+  requireIdentitySecret,
+  resolveIdentitySecretFromEnv,
+  saveHarnessIdentity,
+  wrapKeySecretFromBytes,
+} from "./lib/identity-wrap-key.ts";
+export {
+  mintKhoraInviteTokens,
+  requireKhoraAdminToken,
+  resolveKhoraAdminTokenFromEnv,
+} from "./lib/khora-admin-invites.ts";
 export { requireKhoraBaseUrl } from "./lib/khora-base-url.ts";
 export {
   requireMemoriesAdminToken,
   requireMemoriesBaseUrl,
 } from "./lib/memories-base-url.ts";
+export { PerAgentInviteBank } from "./lib/per-agent-invite-bank.ts";
 export { requireRelayBaseUrl } from "./lib/relay-base-url.ts";
 export {
   emitNetworkEvent,

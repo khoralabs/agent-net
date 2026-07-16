@@ -1,8 +1,12 @@
 import path from "node:path";
 
-import { loadIdentity } from "@khoralabs/did-key-identity";
+import type { IdentitySecret } from "@khoralabs/did-key-identity";
 import { KhoraClient } from "@khoralabs/khora-client";
 import { AgentStore } from "../../../../agents";
+import {
+  loadHarnessIdentity,
+  resolveIdentitySecretFromEnv,
+} from "../../../../lib/identity-wrap-key.ts";
 
 export function resolveKhoraServerBaseUrl(): string | undefined {
   const value =
@@ -22,10 +26,12 @@ export async function createHarnessKhoraClientForAgent(opts: {
   baseUrl: string;
   agentDid: string;
   agentsDataDir?: string;
+  identitySecret?: IdentitySecret;
 }): Promise<KhoraClient | undefined> {
   const dataDir = opts.agentsDataDir ?? resolveAgentsDataDir();
   const keyPath = AgentStore.keyPath(dataDir, opts.agentDid);
-  const signer = await loadIdentity(keyPath);
+  const secret = opts.identitySecret ?? resolveIdentitySecretFromEnv();
+  const signer = await loadHarnessIdentity(keyPath, secret);
   if (signer === undefined) return undefined;
   return new KhoraClient({ baseUrl: opts.baseUrl, signer });
 }

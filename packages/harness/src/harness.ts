@@ -1,4 +1,4 @@
-import { loadIdentity } from "@khoralabs/did-key-identity";
+import type { IdentitySecret, PersistableSigner } from "@khoralabs/did-key-identity";
 import {
   createBearerTokenAuthProvider,
   MemoriesServiceClient,
@@ -12,7 +12,10 @@ import {
   type NetworkHarnessCore,
 } from "./harness-agents.ts";
 import { requireChatBaseUrl, requireChatToken } from "./lib/chat-base-url.ts";
+import { loadHarnessIdentity, resolveIdentitySecretFromEnv } from "./lib/identity-wrap-key.ts";
+import { mintKhoraInviteTokens, resolveKhoraAdminTokenFromEnv } from "./lib/khora-admin-invites.ts";
 import { requireMemoriesAdminToken } from "./lib/memories-base-url.ts";
+import { PerAgentInviteBank } from "./lib/per-agent-invite-bank.ts";
 import {
   emitNetworkEvent,
   installNetworkEventsPlugin,
@@ -49,6 +52,16 @@ export type NetworkHarnessOptions = {
   memoriesBaseUrl: string;
   /** Shared-secret Bearer token for memories server-admin auth. */
   memoriesAdminToken: string;
+  /**
+   * Khora host admin Bearer token for minting invites on spawn.
+   * Falls back to `KHORA_ADMIN_TOKEN` / `ADMIN_ROOT_TOKEN` / `KHORA_CONSOLE_ROOT_TOKEN`.
+   */
+  khoraAdminToken?: string;
+  /**
+   * Wrap key for sealing agent identity files.
+   * Falls back to `HARNESS_IDENTITY_WRAP_KEY` (32-byte base64/hex).
+   */
+  identitySecret?: IdentitySecret;
 };
 
 export type NetworkHarnessHandle = NetworkHarnessCore & NetworkHarnessAgentApi;
@@ -74,12 +87,16 @@ export async function startNetworkHarness(
   const chatBaseUrl = requireChatBaseUrl(opts.chatBaseUrl);
   const chatToken = requireChatToken(opts.chatToken);
   const memoriesAdminToken = requireMemoriesAdminToken(opts.memoriesAdminToken);
+  const khoraAdminToken =
+    opts.khoraAdminToken?.trim() || resolveKhoraAdminTokenFromEnv() || undefined;
+  const identitySecret = opts.identitySecret ?? resolveIdentitySecretFromEnv();
 
   if (opts.networkEvents !== undefined) {
     installNetworkEventsPlugin(opts.networkEvents);
   }
 
   const agentsDataDir = harnessAgentsDataDir(opts.dataDir);
+  const inviteBank = new PerAgentInviteBank(agentsDataDir);
 
   const memoriesClient = new MemoriesServiceClient({
     baseUrl: memoriesBaseUrl,
@@ -89,12 +106,33 @@ export async function startNetworkHarness(
   const pool = await ManagedAgentPool.create({
     dataDir: agentsDataDir,
     baseUrl: khoraBaseUrl,
+    identitySecret,
+    inviteBank,
+    ...(khoraAdminToken !== undefined && khoraAdminToken.length > 0
+      ? {
+          mintInvite: async () => {
+            const tokens = await mintKhoraInviteTokens({
+              baseUrl: khoraBaseUrl,
+              adminToken: khoraAdminToken,
+              count: 1,
+            });
+            const token = tokens[0];
+            if (token === undefined) {
+              throw new Error("startNetworkHarness: admin mint returned no token");
+            }
+            return token;
+          },
+        }
+      : {}),
   });
+
+  const loadSigner = (did: string): Promise<PersistableSigner | undefined> =>
+    loadHarnessIdentity(AgentStore.keyPath(agentsDataDir, did), identitySecret);
 
   const signedChat = createRemoteHarnessChat({
     baseUrl: chatBaseUrl,
     token: chatToken,
-    resolveSigner: (did) => loadIdentity(AgentStore.keyPath(agentsDataDir, did)),
+    resolveSigner: loadSigner,
   });
   const chat: HarnessChat = {
     forAgent(did: string) {
@@ -129,6 +167,8 @@ export async function startNetworkHarness(
     memoriesBaseUrl,
     memoriesAdminToken,
     chatBaseUrl,
+    identitySecret,
+    inviteBank,
     get agentDids() {
       return pool.list();
     },
@@ -136,6 +176,13 @@ export async function startNetworkHarness(
     pool,
     chat,
     signedChat,
+    async listInvitesForAgent(did: string) {
+      const signer = await loadSigner(did);
+      if (signer === undefined) {
+        throw new Error(`listInvitesForAgent: key file missing for ${did}`);
+      }
+      return inviteBank.list(signer);
+    },
     stop() {
       const ctx = getNetworkSessionContext();
       if (ctx !== undefined) {
@@ -155,6 +202,9 @@ export async function startNetworkHarness(
     },
   };
 
-  const agentApi = createHarnessAgentApi(core, { agentsDataDir });
+  const agentApi = createHarnessAgentApi(core, {
+    agentsDataDir,
+    identitySecret,
+  });
   return Object.assign(core, agentApi);
 }

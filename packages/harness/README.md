@@ -21,7 +21,12 @@ const harness = await startNetworkHarness({
   memoriesAdminToken,
   chatBaseUrl,
   chatToken,
+  // Optional: mint invites on every spawn (also reads KHORA_ADMIN_TOKEN / ADMIN_ROOT_TOKEN)
+  khoraAdminToken,
+  // Optional: seal agent identity files (also reads HARNESS_IDENTITY_WRAP_KEY)
+  identitySecret,
 });
 // Apps must supply an ontology — e.g. referenceMemoriesOntology from the reference app.
 const agent = await spawnWithMemories(harness, { ontology });
+// Registration-issued invites (encrypted per agent): await harness.listInvitesForAgent(agent.did)
 ```

@@ -1,9 +1,10 @@
 import path from "node:path";
-import { loadIdentity } from "@khoralabs/did-key-identity";
+import type { IdentitySecret } from "@khoralabs/did-key-identity";
 import { RelayClient } from "@khoralabs/relay-client";
 
 import type { AgentHandle, VellumHandle } from "../agents";
 import { AgentStore } from "../agents";
+import { loadHarnessIdentity, resolveIdentitySecretFromEnv } from "./identity-wrap-key";
 import { waitFor } from "./wait-for";
 
 export type VellumPairOptions = {
@@ -16,6 +17,8 @@ export type VellumPairOptions = {
   /** Label used to namespace each agent's vellum dir, e.g. "alice" / "bob". */
   initiatorLabel: string;
   responderLabel: string;
+  /** Optional wrap secret for sealed identity files. */
+  identitySecret?: IdentitySecret;
 };
 
 /**
@@ -37,9 +40,10 @@ export async function openVellumChain(
 }> {
   const initiatorKeyPath = AgentStore.keyPath(opts.agentsDataDir, initiator.did);
   const responderKeyPath = AgentStore.keyPath(opts.agentsDataDir, responder.did);
+  const identitySecret = opts.identitySecret ?? resolveIdentitySecretFromEnv();
 
-  const initiatorSigner = await loadIdentity(initiatorKeyPath);
-  const responderSigner = await loadIdentity(responderKeyPath);
+  const initiatorSigner = await loadHarnessIdentity(initiatorKeyPath, identitySecret);
+  const responderSigner = await loadHarnessIdentity(responderKeyPath, identitySecret);
   if (!initiatorSigner || !responderSigner) throw new Error("failed to load agent signers");
 
   const initiatorRelay = new RelayClient({
