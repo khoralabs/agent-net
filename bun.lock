@@ -492,6 +492,19 @@
         "typescript": "^5",
       },
     },
+    "vendor/memories/packages/memories-service/storage/contract": {
+      "name": "@khoralabs/memories-service-storage-contract",
+      "version": "0.1.0",
+      "dependencies": {
+        "@khoralabs/memories-service-storage-core": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "vendor/memories/packages/memories-service/storage/core": {
       "name": "@khoralabs/memories-service-storage-core",
       "version": "0.1.0",
@@ -499,6 +512,22 @@
         "@khoralabs/memories-persistence-core": "workspace:*",
       },
       "devDependencies": {
+        "@khoralabs/memories-service-storage-contract": "workspace:*",
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "vendor/memories/packages/memories-service/storage/libsql": {
+      "name": "@khoralabs/memories-service-storage-libsql",
+      "version": "0.1.0",
+      "dependencies": {
+        "@khoralabs/memories-libsql": "workspace:*",
+        "@khoralabs/memories-service-storage-core": "workspace:*",
+      },
+      "devDependencies": {
+        "@khoralabs/memories-service-storage-contract": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -512,11 +541,13 @@
         "@khoralabs/memories-persistence-core": "workspace:*",
         "@khoralabs/memories-service": "workspace:*",
         "@khoralabs/memories-service-storage-core": "workspace:*",
+        "@khoralabs/memories-service-storage-libsql": "workspace:*",
         "@khoralabs/memories-service-storage-turso-serverless": "workspace:*",
         "@khoralabs/memories-sqlite": "workspace:*",
         "@khoralabs/sqlite-crypto": "^0.1.0",
       },
       "devDependencies": {
+        "@khoralabs/memories-service-storage-contract": "workspace:*",
         "@khoralabs/sqlite-crypto": "^0.1.0",
         "@types/bun": "latest",
       },
@@ -532,6 +563,7 @@
         "@khoralabs/memories-turso-serverless": "workspace:*",
       },
       "devDependencies": {
+        "@khoralabs/memories-service-storage-contract": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -545,6 +577,20 @@
         "@khoralabs/memories-persistence-core": "workspace:*",
         "@standard-schema/spec": "^1.1.0",
         "zod": "^4.2",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "vendor/memories/packages/persistence/contract": {
+      "name": "@khoralabs/memories-persistence-contract",
+      "version": "0.1.0",
+      "dependencies": {
+        "@khoralabs/memories-core": "workspace:*",
+        "@khoralabs/memories-persistence-core": "workspace:*",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -568,6 +614,23 @@
         "typescript": "^5",
       },
     },
+    "vendor/memories/packages/persistence/libsql": {
+      "name": "@khoralabs/memories-libsql",
+      "version": "0.1.0",
+      "dependencies": {
+        "@khoralabs/memories-core": "workspace:*",
+        "@khoralabs/memories-persistence-core": "workspace:*",
+        "@libsql/client": "^0.17.4",
+        "ajv": "^8",
+      },
+      "devDependencies": {
+        "@khoralabs/memories-persistence-contract": "workspace:*",
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "vendor/memories/packages/persistence/sqlite": {
       "name": "@khoralabs/memories-sqlite",
       "version": "0.1.0",
@@ -580,6 +643,7 @@
         "sqlite-vec": "^0.1.9",
       },
       "devDependencies": {
+        "@khoralabs/memories-persistence-contract": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -594,6 +658,22 @@
         "@khoralabs/memories-persistence-core": "workspace:*",
         "@tursodatabase/serverless": "^0.2.0",
         "ajv": "^8",
+      },
+      "devDependencies": {
+        "@khoralabs/memories-persistence-contract": "workspace:*",
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
+    "vendor/memories/packages/projections/contract": {
+      "name": "@khoralabs/memories-projections-contract",
+      "version": "0.1.0",
+      "dependencies": {
+        "@khoralabs/memories-core": "workspace:*",
+        "@khoralabs/memories-persistence-core": "workspace:*",
+        "@khoralabs/memories-projections": "workspace:*",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -616,6 +696,22 @@
         "typescript": "^5",
       },
     },
+    "vendor/memories/packages/projections/libsql": {
+      "name": "@khoralabs/memories-projections-libsql",
+      "version": "0.1.0",
+      "dependencies": {
+        "@khoralabs/memories-persistence-core": "workspace:*",
+        "@khoralabs/memories-projections": "workspace:*",
+      },
+      "devDependencies": {
+        "@khoralabs/memories-libsql": "workspace:*",
+        "@khoralabs/memories-projections-contract": "workspace:*",
+        "@types/bun": "latest",
+      },
+      "peerDependencies": {
+        "typescript": "^5",
+      },
+    },
     "vendor/memories/packages/projections/sqlite": {
       "name": "@khoralabs/memories-projections-sqlite",
       "version": "0.1.0",
@@ -625,6 +721,7 @@
         "@khoralabs/memories-sqlite": "workspace:*",
       },
       "devDependencies": {
+        "@khoralabs/memories-projections-contract": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -639,6 +736,8 @@
         "@khoralabs/memories-projections": "workspace:*",
       },
       "devDependencies": {
+        "@khoralabs/memories-libsql": "workspace:*",
+        "@khoralabs/memories-projections-contract": "workspace:*",
         "@types/bun": "latest",
       },
       "peerDependencies": {
@@ -999,11 +1098,19 @@
 
     "@khoralabs/memories-investigator": ["@khoralabs/memories-investigator@workspace:vendor/memories/packages/agents/investigator"],
 
+    "@khoralabs/memories-libsql": ["@khoralabs/memories-libsql@workspace:vendor/memories/packages/persistence/libsql"],
+
     "@khoralabs/memories-ontologies": ["@khoralabs/memories-ontologies@workspace:vendor/memories/packages/ontologies"],
+
+    "@khoralabs/memories-persistence-contract": ["@khoralabs/memories-persistence-contract@workspace:vendor/memories/packages/persistence/contract"],
 
     "@khoralabs/memories-persistence-core": ["@khoralabs/memories-persistence-core@workspace:vendor/memories/packages/persistence/core"],
 
     "@khoralabs/memories-projections": ["@khoralabs/memories-projections@workspace:vendor/memories/packages/projections/core"],
+
+    "@khoralabs/memories-projections-contract": ["@khoralabs/memories-projections-contract@workspace:vendor/memories/packages/projections/contract"],
+
+    "@khoralabs/memories-projections-libsql": ["@khoralabs/memories-projections-libsql@workspace:vendor/memories/packages/projections/libsql"],
 
     "@khoralabs/memories-projections-sqlite": ["@khoralabs/memories-projections-sqlite@workspace:vendor/memories/packages/projections/sqlite"],
 
@@ -1019,7 +1126,11 @@
 
     "@khoralabs/memories-service-http": ["@khoralabs/memories-service-http@workspace:vendor/memories/packages/memories-service/http"],
 
+    "@khoralabs/memories-service-storage-contract": ["@khoralabs/memories-service-storage-contract@workspace:vendor/memories/packages/memories-service/storage/contract"],
+
     "@khoralabs/memories-service-storage-core": ["@khoralabs/memories-service-storage-core@workspace:vendor/memories/packages/memories-service/storage/core"],
+
+    "@khoralabs/memories-service-storage-libsql": ["@khoralabs/memories-service-storage-libsql@workspace:vendor/memories/packages/memories-service/storage/libsql"],
 
     "@khoralabs/memories-service-storage-sqlite": ["@khoralabs/memories-service-storage-sqlite@workspace:vendor/memories/packages/memories-service/storage/sqlite"],
 
@@ -1072,6 +1183,10 @@
     "@libsql/isomorphic-fetch": ["@libsql/isomorphic-fetch@0.3.1", "", {}, "sha512-6kK3SUK5Uu56zPq/Las620n5aS9xJq+jMBcNSOmjhNf/MUvdyji4vrMTqD7ptY7/4/CAVEAYDeotUz60LNQHtw=="],
 
     "@libsql/isomorphic-ws": ["@libsql/isomorphic-ws@0.1.5", "", { "dependencies": { "@types/ws": "^8.5.4", "ws": "^8.13.0" } }, "sha512-DtLWIH29onUYR00i0GlQ3UdcTRC6EP4u9w/h9LxpUZJWRMARk6dQwZ6Jkd+QdwVpuAOrdxt18v0K2uIYR3fwFg=="],
+
+    "@libsql/linux-arm-gnueabihf": ["@libsql/linux-arm-gnueabihf@0.5.29", "", { "os": "linux", "cpu": "arm" }, "sha512-CD4n4zj7SJTHso4nf5cuMoWoMSS7asn5hHygsDuhRl8jjjCTT3yE+xdUvI4J7zsyb53VO5ISh4cwwOtf6k2UhQ=="],
+
+    "@libsql/linux-arm-musleabihf": ["@libsql/linux-arm-musleabihf@0.5.29", "", { "os": "linux", "cpu": "arm" }, "sha512-2Z9qBVpEJV7OeflzIR3+l5yAd4uTOLxklScYTwpZnkm2vDSGlC1PRlueLaufc4EFITkLKXK2MWBpexuNJfMVcg=="],
 
     "@libsql/linux-arm64-gnu": ["@libsql/linux-arm64-gnu@0.4.7", "", { "os": "linux", "cpu": "arm64" }, "sha512-WlX2VYB5diM4kFfNaYcyhw5y+UJAI3xcMkEUJZPtRDEIu85SsSFrQ+gvoKfcVh76B//ztSeEX2wl9yrjF7BBCA=="],
 
@@ -2987,6 +3102,8 @@
 
     "@khoralabs/agent-capabilities-otel/@khoralabs/agent-capabilities": ["@khoralabs/agent-capabilities@0.1.1", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-JigiwTSewgyICse9eL8AvOcBgdzNkVtv4UyGPWQJEWRLQEutMziOnDqutAQ2W1gGu4LsP+EunhcJrXQv74Ofdg=="],
 
+    "@khoralabs/memories-libsql/@libsql/client": ["@libsql/client@0.17.4", "", { "dependencies": { "@libsql/core": "^0.17.4", "@libsql/hrana-client": "^0.10.0", "js-base64": "^3.7.5", "libsql": "^0.5.28", "promise-limit": "^2.7.0" } }, "sha512-lYayFWasDV78A+TjlEhr6ubb3odBV6OHjb+wdp8VQcyWWAEIjuwbCHaraEUS4m4yWoo0BvZo96It4VdzZRmRWw=="],
+
     "@khoralabs/memories-turso-serverless/@tursodatabase/serverless": ["@tursodatabase/serverless@0.2.4", "", {}, "sha512-kqf3FINvTGx8N1iH/4e1Dkbr/om5q9qitshzvljtQXwZFQIsVP/mDE76mGg9U2dg/ElOZKFKtT1VXDgd39Dr1w=="],
 
     "@nuxt/kit/semver": ["semver@7.8.5", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA=="],
@@ -3267,6 +3384,12 @@
 
     "wsl-utils/is-wsl": ["is-wsl@3.1.1", "", { "dependencies": { "is-inside-container": "^1.0.0" } }, "sha512-e6rvdUCiQCAuumZslxRJWR/Doq4VpPR82kqclvcS0efgt430SlGIk05vdCN58+VrzgtIcfNODjozVielycD4Sw=="],
 
+    "@khoralabs/memories-libsql/@libsql/client/@libsql/core": ["@libsql/core@0.17.4", "", { "dependencies": { "js-base64": "^3.7.5" } }, "sha512-LqF9gIvnJ38nmAH1y/ChizHqDO/MO1wLgA96XrraulEEbqXxLjleSH92YWTolbuJKgPUmGu4aJk9W3UnAcxLOQ=="],
+
+    "@khoralabs/memories-libsql/@libsql/client/@libsql/hrana-client": ["@libsql/hrana-client@0.10.0", "", { "dependencies": { "@libsql/isomorphic-ws": "^0.1.5", "js-base64": "^3.7.5" } }, "sha512-OoA4EMqRAC7kn7V2P6EQqRcpZf2W+AjsNIyCizBg339Tq/aMC7sRnzs3SklderhmQWAqEzvv8A2vhxVmWpkVvw=="],
+
+    "@khoralabs/memories-libsql/@libsql/client/libsql": ["libsql@0.5.29", "", { "dependencies": { "@neon-rs/load": "^0.0.4", "detect-libc": "2.0.2" }, "optionalDependencies": { "@libsql/darwin-arm64": "0.5.29", "@libsql/darwin-x64": "0.5.29", "@libsql/linux-arm-gnueabihf": "0.5.29", "@libsql/linux-arm-musleabihf": "0.5.29", "@libsql/linux-arm64-gnu": "0.5.29", "@libsql/linux-arm64-musl": "0.5.29", "@libsql/linux-x64-gnu": "0.5.29", "@libsql/linux-x64-musl": "0.5.29", "@libsql/win32-x64-msvc": "0.5.29" }, "os": [ "linux", "win32", "darwin", ], "cpu": [ "arm", "x64", "arm64", ] }, "sha512-8lMP8iMgiBzzoNbAPQ59qdVcj6UaE/Vnm+fiwX4doX4Narook0a4GPKWBEv+CR8a1OwbfkgL18uBfBjWdF0Fzg=="],
+
     "@opentelemetry/exporter-logs-otlp-grpc/@opentelemetry/sdk-logs/@opentelemetry/resources": ["@opentelemetry/resources@2.0.1", "", { "dependencies": { "@opentelemetry/core": "2.0.1", "@opentelemetry/semantic-conventions": "^1.29.0" }, "peerDependencies": { "@opentelemetry/api": ">=1.3.0 <1.10.0" } }, "sha512-dZOB3R6zvBwDKnHDTB4X1xtMArB/d324VsbiPkX/Yu0Q8T2xceRthoIVFhJdvgVM2QhGVUyX9tzwiNxGtoBJUw=="],
 
     "@opentelemetry/exporter-logs-otlp-http/@opentelemetry/sdk-logs/@opentelemetry/resources": ["@opentelemetry/resources@2.0.1", "", { "dependencies": { "@opentelemetry/core": "2.0.1", "@opentelemetry/semantic-conventions": "^1.29.0" }, "peerDependencies": { "@opentelemetry/api": ">=1.3.0 <1.10.0" } }, "sha512-dZOB3R6zvBwDKnHDTB4X1xtMArB/d324VsbiPkX/Yu0Q8T2xceRthoIVFhJdvgVM2QhGVUyX9tzwiNxGtoBJUw=="],
@@ -3444,6 +3567,20 @@
     "ora/log-symbols/is-unicode-supported": ["is-unicode-supported@1.3.0", "", {}, "sha512-43r2mRvz+8JRIKnWJ+3j8JtjRKZ6GmjzfaE/qiBJnikNnYv/6bagRJ1kUhNk8R5EX/GkobD+r+sfxCPJsiKBLQ=="],
 
     "ora/string-width/emoji-regex": ["emoji-regex@10.6.0", "", {}, "sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A=="],
+
+    "@khoralabs/memories-libsql/@libsql/client/libsql/@libsql/darwin-arm64": ["@libsql/darwin-arm64@0.5.29", "", { "os": "darwin", "cpu": "arm64" }, "sha512-K+2RIB1OGFPYQbfay48GakLhqf3ArcbHqPFu7EZiaUcRgFcdw8RoltsMyvbj5ix2fY0HV3Q3Ioa/ByvQdaSM0A=="],
+
+    "@khoralabs/memories-libsql/@libsql/client/libsql/@libsql/darwin-x64": ["@libsql/darwin-x64@0.5.29", "", { "os": "darwin", "cpu": "x64" }, "sha512-OtT+KFHsKFy1R5FVadr8FJ2Bb1mghtXTyJkxv0trocq7NuHntSki1eUbxpO5ezJesDvBlqFjnWaYYY516QNLhQ=="],
+
+    "@khoralabs/memories-libsql/@libsql/client/libsql/@libsql/linux-arm64-gnu": ["@libsql/linux-arm64-gnu@0.5.29", "", { "os": "linux", "cpu": "arm64" }, "sha512-gURBqaiXIGGwFNEaUj8Ldk7Hps4STtG+31aEidCk5evMMdtsdfL3HPCpvys+ZF/tkOs2MWlRWoSq7SOuCE9k3w=="],
+
+    "@khoralabs/memories-libsql/@libsql/client/libsql/@libsql/linux-arm64-musl": ["@libsql/linux-arm64-musl@0.5.29", "", { "os": "linux", "cpu": "arm64" }, "sha512-fwgYZ0H8mUkyVqXZHF3mT/92iIh1N94Owi/f66cPVNsk9BdGKq5gVpoKO+7UxaNzuEH1roJp2QEwsCZMvBLpqg=="],
+
+    "@khoralabs/memories-libsql/@libsql/client/libsql/@libsql/linux-x64-gnu": ["@libsql/linux-x64-gnu@0.5.29", "", { "os": "linux", "cpu": "x64" }, "sha512-y14V0vY0nmMC6G0pHeJcEarcnGU2H6cm21ZceRkacWHvQAEhAG0latQkCtoS2njFOXiYIg+JYPfAoWKbi82rkg=="],
+
+    "@khoralabs/memories-libsql/@libsql/client/libsql/@libsql/linux-x64-musl": ["@libsql/linux-x64-musl@0.5.29", "", { "os": "linux", "cpu": "x64" }, "sha512-gquqwA/39tH4pFl+J9n3SOMSymjX+6kZ3kWgY3b94nXFTwac9bnFNMffIomgvlFaC4ArVqMnOZD3nuJ3H3VO1w=="],
+
+    "@khoralabs/memories-libsql/@libsql/client/libsql/@libsql/win32-x64-msvc": ["@libsql/win32-x64-msvc@0.5.29", "", { "os": "win32", "cpu": "x64" }, "sha512-4/0CvEdhi6+KjMxMaVbFM2n2Z44escBRoEYpR+gZg64DdetzGnYm8mcNLcoySaDJZNaBd6wz5DNdgRmcI4hXcg=="],
 
     "@swc/cli/minimatch/brace-expansion/balanced-match": ["balanced-match@1.0.2", "", {}, "sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw=="],
 
