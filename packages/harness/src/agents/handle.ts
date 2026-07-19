@@ -66,6 +66,7 @@ const MAX_BACKOFF_MS = 30_000;
  */
 export class AgentHandle {
   readonly did: string;
+  readonly signer: PersistableSigner;
   readonly client: KhoraClient;
   readonly #keyPath: string | undefined;
   #memories: AgentMemoriesClient | undefined;
@@ -73,6 +74,7 @@ export class AgentHandle {
 
   constructor(opts: AgentHandleOptions) {
     this.did = opts.signer.did;
+    this.signer = opts.signer;
     this.client = new KhoraClient({ baseUrl: opts.baseUrl, signer: opts.signer });
     this.#keyPath = opts.keyPath;
   }

@@ -11,7 +11,12 @@ export type { AgentWorkflowParams } from "./agent/types.ts";
 export { agentResponse } from "./agent/workflows/agent-response.ts";
 export type { AgentTurnParams, AgentTurnResult, AgentUIMessage } from "./agent-turn.ts";
 export { runAgentTurn } from "./agent-turn.ts";
-export type { AgentHandle, InboxConnection } from "./agents";
+export {
+  AgentHandle,
+  connectPoolInbox,
+  type InboxConnection,
+  type PoolInboxOptions,
+} from "./agents";
 export {
   type AgentChatClient,
   type ChatServiceClient,

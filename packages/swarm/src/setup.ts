@@ -1,5 +1,5 @@
 import type { NetworkHarnessHandle } from "@khoralabs/agent-net";
-import { emitNetworkEvent, networkEventId } from "@khoralabs/agent-net";
+import { connectPoolInbox, emitNetworkEvent, networkEventId } from "@khoralabs/agent-net";
 
 import { ensureSwarmAgentRegistered } from "./agent-registry.ts";
 import type { SwarmMemoriesOntology } from "./pending-ontology.ts";
@@ -85,15 +85,16 @@ export async function setupSwarm(input: {
       registeredStaticHash: staticHash,
       turnCount: 0,
     });
-
-    inboxConnections.push(
-      agent.connectInbox({
-        onEvent: (event) => {
-          void appendInboxEntry(config.dataDir, config.sessionId, agent.did, event);
-        },
-      }),
-    );
   }
+
+  inboxConnections.push(
+    connectPoolInbox({
+      agents: spawned,
+      onEvent: (event) => {
+        void appendInboxEntry(config.dataDir, config.sessionId, event.did, event);
+      },
+    }),
+  );
 
   const session: SwarmRuntimeSession = {
     config,
