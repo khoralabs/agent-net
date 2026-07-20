@@ -3,7 +3,7 @@ import {
   createBearerTokenAuthProvider,
   MemoriesServiceClient,
 } from "@khoralabs/memories-service-client";
-import { AgentStore, ManagedAgentPool } from "./agents";
+import { AgentStore, HarnessPoolInbox, ManagedAgentPool } from "./agents";
 import { createRemoteHarnessChat, type HarnessChat } from "./chat";
 import {
   createHarnessAgentApi,
@@ -161,6 +161,12 @@ export async function startNetworkHarness(
     });
   }
 
+  const poolInbox = new HarnessPoolInbox({ khoraBaseUrl });
+  for (const did of pool.list()) {
+    const handle = await pool.focus(did);
+    await poolInbox.add(handle.signer);
+  }
+
   const core: NetworkHarnessCore = {
     serverBaseUrl: khoraBaseUrl,
     relayBaseUrl,
@@ -174,6 +180,7 @@ export async function startNetworkHarness(
     },
     memoriesClient,
     pool,
+    poolInbox,
     chat,
     signedChat,
     async listInvitesForAgent(did: string) {
@@ -183,7 +190,11 @@ export async function startNetworkHarness(
       }
       return inviteBank.list(signer);
     },
+    subscribeInbox(onEvent) {
+      return poolInbox.subscribe(onEvent);
+    },
     stop() {
+      poolInbox.close();
       const ctx = getNetworkSessionContext();
       if (ctx !== undefined) {
         void emitNetworkEvent({

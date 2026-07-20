@@ -28,7 +28,9 @@ import {
   type AgentHandle,
   type AgentMemoriesClient,
   AgentStore,
+  type HarnessPoolInbox,
   type ManagedAgentPool,
+  type PoolInboxEvent,
 } from "./agents";
 import type { AgentChatClient, ChatServiceClient, HarnessChat, SignedChatBackend } from "./chat.ts";
 import { createHarnessChatCrypto } from "./chat-crypto.ts";
@@ -88,15 +90,20 @@ export type NetworkHarnessCore = {
   readonly agentDids: readonly string[];
   readonly memoriesClient: MemoriesServiceClient;
   readonly pool: ManagedAgentPool;
+  readonly poolInbox: HarnessPoolInbox;
   readonly chat: HarnessChat;
   readonly signedChat: SignedChatBackend;
   /** Decrypt and list registration-issued invites for an agent (sovereign viral use later). */
   listInvitesForAgent(did: string): Promise<string[]>;
+  /** Subscribe to harness multiplex inbox events (demux by `event.did`). */
+  subscribeInbox(onEvent: (event: PoolInboxEvent) => void): () => void;
   stop(): void;
 };
 
 export type NetworkHarnessAgentApi = {
   spawn(opts: SpawnWithMemoriesOptions): Promise<AgentHandle>;
+  /** Unregister + remove from pool and unbind from the harness inbox multiplex. */
+  removeAgent(did: string): Promise<void>;
   registerAgent(input: RegisterHarnessAgentInput): Promise<{ staticHash: string }>;
   ensureAgentRegistered(input: EnsureHarnessAgentRegisteredInput): Promise<void>;
   resolveAgentWorkflowDeps(
@@ -134,6 +141,8 @@ export async function spawnWithMemories(
     throw new Error("Failed to capture agent handle during spawn");
   }
 
+  await harness.poolInbox.add(agent.signer);
+
   const database: MemoriesDatabaseId = { kind: "account", ownerKey: did };
   const { memoriesClient } = harness;
   const memories: AgentMemoriesClient = {
@@ -164,6 +173,11 @@ export function createHarnessAgentApi(
   return {
     spawn(spawnOpts) {
       return spawnWithMemories(harness, spawnOpts);
+    },
+
+    async removeAgent(did) {
+      await harness.poolInbox.remove(did);
+      await harness.pool.remove(did);
     },
 
     async registerAgent(input) {

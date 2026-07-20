@@ -1,5 +1,5 @@
 import type { NetworkHarnessHandle } from "@khoralabs/agent-net";
-import { connectPoolInbox, emitNetworkEvent, networkEventId } from "@khoralabs/agent-net";
+import { emitNetworkEvent, networkEventId } from "@khoralabs/agent-net";
 
 import { ensureSwarmAgentRegistered } from "./agent-registry.ts";
 import type { SwarmMemoriesOntology } from "./pending-ontology.ts";
@@ -56,7 +56,7 @@ export async function setupSwarm(input: {
     spawned.push(await harness.spawn({ ontology }));
   }
 
-  const inboxConnections = [];
+  const inboxUnsubscribes: Array<() => void> = [];
   const loopStates: AgentLoopState[] = [];
 
   for (let i = 0; i < spawned.length; i++) {
@@ -87,12 +87,9 @@ export async function setupSwarm(input: {
     });
   }
 
-  inboxConnections.push(
-    connectPoolInbox({
-      agents: spawned,
-      onEvent: (event) => {
-        void appendInboxEntry(config.dataDir, config.sessionId, event.did, event);
-      },
+  inboxUnsubscribes.push(
+    harness.subscribeInbox((event) => {
+      void appendInboxEntry(config.dataDir, config.sessionId, event.did, event);
     }),
   );
 
@@ -102,7 +99,7 @@ export async function setupSwarm(input: {
     agents: spawned,
     loopStates,
     chatService: harness.signedChat.client,
-    inboxConnections,
+    inboxUnsubscribes,
   };
 
   putSwarmSession(config.sessionId, session);
@@ -156,8 +153,8 @@ export async function teardownSwarm(sessionId: string): Promise<void> {
     message: "Tearing down swarm session",
   });
 
-  for (const connection of session.inboxConnections ?? []) {
-    connection.close();
+  for (const unsub of session.inboxUnsubscribes ?? []) {
+    unsub();
   }
   session.harness.stop();
 }

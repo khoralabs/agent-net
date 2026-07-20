@@ -14,7 +14,9 @@ export { runAgentTurn } from "./agent-turn.ts";
 export {
   AgentHandle,
   connectPoolInbox,
+  HarnessPoolInbox,
   type InboxConnection,
+  type PoolInboxEvent,
   type PoolInboxOptions,
 } from "./agents";
 export {

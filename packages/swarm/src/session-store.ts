@@ -3,7 +3,6 @@ import type {
   AgentHandle,
   ChatServiceClient,
   HarnessAgentWorkflowDeps,
-  InboxConnection,
   NetworkHarnessHandle,
 } from "@khoralabs/agent-net";
 
@@ -15,7 +14,8 @@ export type SwarmRuntimeSession = {
   agents: AgentHandle[];
   loopStates: AgentLoopState[];
   chatService: ChatServiceClient;
-  inboxConnections: InboxConnection[];
+  /** Unsubscribes from harness.subscribeInbox (not separate sockets). */
+  inboxUnsubscribes: Array<() => void>;
 };
 
 /** Live process handles (harness, WS connections) — not serializable; keyed by sessionId for the active run. */
