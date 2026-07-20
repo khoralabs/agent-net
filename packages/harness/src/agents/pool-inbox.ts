@@ -7,7 +7,7 @@ import {
   type KhoraClientEvent,
 } from "@khoralabs/khora-client";
 
-import type { AgentHandle, AgentInboxLifecycleHandler, InboxConnection } from "./handle.ts";
+import type { AgentHandle } from "./handle.ts";
 
 const MIN_BACKOFF_MS = 1_000;
 const MAX_BACKOFF_MS = 30_000;
@@ -15,6 +15,16 @@ const MAX_BACKOFF_MS = 30_000;
 export type PoolInboxEvent = Extract<KhoraClientEvent, { type: `inbox:${string}` }>;
 
 export type { InboxConnectionHandle };
+
+/** Returned by {@link connectPoolInbox}. Call `close()` to tear down. */
+export type InboxConnection = {
+  close(): void;
+};
+
+export type PoolInboxLifecycleHandler = (
+  event: "connected" | "disconnected" | "connect_failed" | "reconnecting" | "stopped",
+  detail?: { error?: string; backoffMs?: number },
+) => void;
 
 export type OpenPoolInboxSession = (
   signers: readonly PersistableSigner[],
@@ -44,6 +54,7 @@ export class HarnessPoolInbox {
   #loopRunning = false;
   #session: InboxConnectionHandle | undefined;
   #clientUnsub: (() => void) | undefined;
+  #openSessionCount = 0;
 
   constructor(opts: HarnessPoolInboxOptions) {
     this.#baseUrl = opts.khoraBaseUrl.trim().replace(/\/$/, "");
@@ -76,6 +87,19 @@ export class HarnessPoolInbox {
   /** Current bound membership DIDs. */
   list(): readonly string[] {
     return [...this.#membership.keys()];
+  }
+
+  /** True while a multiplex WebSocket session handle is held. */
+  get isSessionOpen(): boolean {
+    return this.#session !== undefined;
+  }
+
+  /**
+   * How many multiplex sessions have been opened (reconnects increment).
+   * Live tests use this to assert membership changes rebind rather than opening a new socket.
+   */
+  get openSessionCount(): number {
+    return this.#openSessionCount;
   }
 
   /**
@@ -167,6 +191,7 @@ export class HarnessPoolInbox {
           },
         });
         this.#session = handle;
+        this.#openSessionCount += 1;
         const bound = new Set(signers.map((s) => s.did));
         const extras = [...this.#membership.values()].filter((s) => !bound.has(s.did));
         if (extras.length > 0) {
@@ -196,12 +221,12 @@ export class HarnessPoolInbox {
 export type PoolInboxOptions = {
   agents: readonly AgentHandle[];
   onEvent: (event: PoolInboxEvent) => void;
-  onLifecycle?: AgentInboxLifecycleHandler;
+  onLifecycle?: PoolInboxLifecycleHandler;
 };
 
 /**
- * Ad-hoc reconnecting multiplex for a fixed agent list (tests / one-shot tools).
- * Prefer {@link HarnessPoolInbox} for harness-owned membership.
+ * Ad-hoc reconnecting multiplex for a fixed agent list (one-shot tools).
+ * Prefer harness-owned {@link HarnessPoolInbox} / `harness.subscribeInbox`.
  */
 export function connectPoolInbox(opts: PoolInboxOptions): InboxConnection {
   if (opts.agents.length === 0) {

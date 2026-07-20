@@ -18,6 +18,7 @@ export {
   type InboxConnection,
   type InboxConnectionHandle,
   type PoolInboxEvent,
+  type PoolInboxLifecycleHandler,
   type PoolInboxOptions,
 } from "./agents";
 export {

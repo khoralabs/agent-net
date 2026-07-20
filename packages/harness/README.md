@@ -11,7 +11,7 @@ The process that hosts the workflow worker must configure the world **before** r
 ## Usage
 
 ```ts
-import { startNetworkHarness, spawnWithMemories } from "@khoralabs/agent-net";
+import { startNetworkHarness } from "@khoralabs/agent-net";
 
 const harness = await startNetworkHarness({
   dataDir,
@@ -27,6 +27,14 @@ const harness = await startNetworkHarness({
   identitySecret,
 });
 // Apps must supply an ontology — e.g. referenceMemoriesOntology from the reference app.
-const agent = await spawnWithMemories(harness, { ontology });
+const agent = await harness.spawn({ ontology });
 // Registration-issued invites (encrypted per agent): await harness.listInvitesForAgent(agent.did)
+
+// Inbox: one multiplex WebSocket for the whole pool — demux by event.did
+const unsub = harness.subscribeInbox((event) => {
+  console.log(event.did, event.type);
+});
 ```
+
+Spawning (`harness.spawn` or `harness.pool.spawn`) binds the agent DID on that shared socket;
+`harness.removeAgent` / `pool.remove` unbinds it. Do not open per-agent inbox WebSockets.

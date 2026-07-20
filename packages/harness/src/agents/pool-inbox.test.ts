@@ -43,9 +43,11 @@ describe("HarnessPoolInbox", () => {
 
     await pool.add(b);
     expect(binds.some((chunk) => chunk.includes(b.did))).toBe(true);
+    expect(pool.openSessionCount).toBe(1);
 
     await pool.remove(b.did);
     expect(unbinds.some((chunk) => chunk.includes(b.did))).toBe(true);
+    expect(pool.openSessionCount).toBe(1);
 
     pool.close();
   });
