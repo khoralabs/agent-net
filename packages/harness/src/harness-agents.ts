@@ -141,8 +141,6 @@ export async function spawnWithMemories(
     throw new Error("Failed to capture agent handle during spawn");
   }
 
-  await harness.poolInbox.add(agent.signer);
-
   const database: MemoriesDatabaseId = { kind: "account", ownerKey: did };
   const { memoriesClient } = harness;
   const memories: AgentMemoriesClient = {
@@ -176,7 +174,7 @@ export function createHarnessAgentApi(
     },
 
     async removeAgent(did) {
-      await harness.poolInbox.remove(did);
+      // ManagedAgentPool.onMemberRemoving unbinds from poolInbox.
       await harness.pool.remove(did);
     },
 

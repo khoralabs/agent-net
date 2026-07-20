@@ -35,6 +35,10 @@ export type ManagedAgentPoolOptions = {
    * Not consumed by spawn — for future sovereign viral flows.
    */
   inviteBank?: PerAgentInviteBank;
+  /** Fired after a new agent is registered and stored (e.g. bind inbox multiplex). */
+  onMemberAdded?: (handle: AgentHandle) => Promise<void>;
+  /** Fired before unregistering an agent (e.g. unbind inbox multiplex). */
+  onMemberRemoving?: (did: string) => Promise<void>;
 };
 
 export class ManagedAgentPool {
@@ -44,6 +48,8 @@ export class ManagedAgentPool {
   readonly #identitySecret: IdentitySecret | undefined;
   readonly #mintInvite: (() => Promise<string>) | undefined;
   readonly #inviteBank: PerAgentInviteBank | undefined;
+  readonly #onMemberAdded: ((handle: AgentHandle) => Promise<void>) | undefined;
+  readonly #onMemberRemoving: ((did: string) => Promise<void>) | undefined;
 
   private constructor(
     store: AgentStore,
@@ -52,6 +58,8 @@ export class ManagedAgentPool {
     identitySecret: IdentitySecret | undefined,
     mintInvite: (() => Promise<string>) | undefined,
     inviteBank: PerAgentInviteBank | undefined,
+    onMemberAdded: ((handle: AgentHandle) => Promise<void>) | undefined,
+    onMemberRemoving: ((did: string) => Promise<void>) | undefined,
   ) {
     this.#store = store;
     this.#baseUrl = baseUrl;
@@ -59,6 +67,8 @@ export class ManagedAgentPool {
     this.#identitySecret = identitySecret;
     this.#mintInvite = mintInvite;
     this.#inviteBank = inviteBank;
+    this.#onMemberAdded = onMemberAdded;
+    this.#onMemberRemoving = onMemberRemoving;
   }
 
   /**
@@ -74,6 +84,8 @@ export class ManagedAgentPool {
       opts.identitySecret,
       opts.mintInvite,
       opts.inviteBank,
+      opts.onMemberAdded,
+      opts.onMemberRemoving,
     );
 
     if (opts.count !== undefined) {
@@ -125,8 +137,10 @@ export class ManagedAgentPool {
 
     await this.#store.add({ did: signer.did, keyPath });
 
+    const handle = new AgentHandle({ signer, baseUrl: this.#baseUrl, keyPath });
+    await this.#onMemberAdded?.(handle);
     if (onSpawned !== undefined) {
-      await onSpawned(new AgentHandle({ signer, baseUrl: this.#baseUrl, keyPath }));
+      await onSpawned(handle);
     }
 
     return signer.did;
@@ -144,6 +158,8 @@ export class ManagedAgentPool {
     if (record === undefined) {
       throw new Error(`Agent ${did} is not managed by this pool`);
     }
+
+    await this.#onMemberRemoving?.(did);
 
     const signer = await this.#loadSigner(record.keyPath);
 

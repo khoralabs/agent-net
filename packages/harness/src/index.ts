@@ -16,6 +16,7 @@ export {
   connectPoolInbox,
   HarnessPoolInbox,
   type InboxConnection,
+  type InboxConnectionHandle,
   type PoolInboxEvent,
   type PoolInboxOptions,
 } from "./agents";

@@ -1,5 +1,6 @@
 import type { PersistableSigner } from "@khoralabs/did-key-identity";
 import {
+  type InboxConnectionHandle,
   type InboxWsHandlers,
   isDerivedInboxKindEvent,
   KhoraClient,
@@ -13,15 +14,7 @@ const MAX_BACKOFF_MS = 30_000;
 
 export type PoolInboxEvent = Extract<KhoraClientEvent, { type: `inbox:${string}` }>;
 
-/**
- * Multiplex inbox session handle (khora-client ≥0.1.2). Declared locally so harness
- * typechecks before the published package is upgraded in every environment.
- */
-export type InboxConnectionHandle = {
-  close(): void;
-  bind(signers: readonly PersistableSigner[]): Promise<void>;
-  unbind(dids: readonly string[]): Promise<void>;
-};
+export type { InboxConnectionHandle };
 
 export type OpenPoolInboxSession = (
   signers: readonly PersistableSigner[],
@@ -37,11 +30,6 @@ export type HarnessPoolInboxOptions = {
    */
   openSession?: OpenPoolInboxSession;
 };
-
-type ConnectInboxWithBind = (
-  handlers: InboxWsHandlers,
-  signers?: readonly PersistableSigner[],
-) => Promise<InboxConnectionHandle>;
 
 /**
  * Harness-owned multiplex inbox: one reconnecting socket, membership updated via
@@ -73,8 +61,7 @@ export class HarnessPoolInbox {
           if (isDerivedInboxKindEvent(event)) return;
           this.#fanout(event as PoolInboxEvent);
         });
-        const connect = client.connectInbox.bind(client) as ConnectInboxWithBind;
-        return connect(handlers, signers);
+        return client.connectInbox(handlers, signers);
       });
   }
 

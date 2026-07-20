@@ -80,16 +80,18 @@ describeHarness("multi-agent OBP network", () => {
       charlie.client.createSubscription(subscription),
     ]);
 
-    // ── 3. Connect inboxes ────────────────────────────────────────────────
+    // ── 3. Shared multiplex inbox (one WS for all harness agents) ────────
     const aliceEvents: KhoraClientEvent[] = [];
     const bobEvents: KhoraClientEvent[] = [];
     const charlieEvents: KhoraClientEvent[] = [];
 
-    const aliceConn = alice.connectInbox({ onEvent: (e) => aliceEvents.push(e) });
-    const bobConn = bob.connectInbox({ onEvent: (e) => bobEvents.push(e) });
-    const charlieConn = charlie.connectInbox({ onEvent: (e) => charlieEvents.push(e) });
+    const unsubInbox = harness.subscribeInbox((e) => {
+      if (e.did === aliceDid) aliceEvents.push(e);
+      else if (e.did === bobDid) bobEvents.push(e);
+      else if (e.did === charlieDid) charlieEvents.push(e);
+    });
 
-    // Brief settle so WebSocket connections establish before posting
+    // Brief settle so the pool WebSocket binds before posting
     await Bun.sleep(800);
 
     // ── 4. Charlie posts with "obp-test" keyword ─────────────────────────
@@ -97,15 +99,6 @@ describeHarness("multi-agent OBP network", () => {
       body: "obp-test handshake: looking for OBP peers",
     });
     expect(post.id).toBeTruthy();
-
-    // Allow the server to process the post and fan-out to Alice & Bob's inboxes
-    await Bun.sleep(500);
-
-    // Reconnect Alice & Bob's inbox WS so the drain picks up the new subscription match
-    aliceConn.close();
-    bobConn.close();
-    const aliceConn2 = alice.connectInbox({ onEvent: (e) => aliceEvents.push(e) });
-    const bobConn2 = bob.connectInbox({ onEvent: (e) => bobEvents.push(e) });
 
     // ── 5. Alice and Bob receive inbox notifications for Charlie's post ───
     await waitFor(() => inboxHasPost(aliceEvents, post.id), {
@@ -171,8 +164,6 @@ describeHarness("multi-agent OBP network", () => {
     // ── cleanup ───────────────────────────────────────────────────────────
     aliceVellum.disconnect();
     bobVellum.disconnect();
-    aliceConn2.close();
-    bobConn2.close();
-    charlieConn.close();
+    unsubInbox();
   }, 90_000);
 });

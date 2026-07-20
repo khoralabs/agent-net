@@ -80,11 +80,13 @@ describeHarness("inbox-based peer discovery", () => {
       search: { content: { text: "obp-seeking" } },
     });
 
-    // ── 3. Alice opens her inbox before Bob posts (live notification path) ─
+    // ── 3. Shared multiplex inbox before Bob posts (live notification path)
     const aliceEvents: KhoraClientEvent[] = [];
-    const aliceConn = alice.connectInbox({ onEvent: (e) => aliceEvents.push(e) });
+    const unsubInbox = harness.subscribeInbox((e) => {
+      if (e.did === aliceDid) aliceEvents.push(e);
+    });
 
-    // Allow inbox WS to establish.
+    // Allow pool inbox WS to bind.
     await Bun.sleep(500);
 
     // ── 4. Bob (unknown to Alice) broadcasts his intent ───────────────────
@@ -125,6 +127,6 @@ describeHarness("inbox-based peer discovery", () => {
 
     // ── cleanup ───────────────────────────────────────────────────────────
     disconnectVellum(initiatorVellum, responderVellum);
-    aliceConn.close();
+    unsubInbox();
   }, 90_000);
 });

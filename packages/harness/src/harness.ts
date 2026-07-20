@@ -103,11 +103,15 @@ export async function startNetworkHarness(
     auth: createBearerTokenAuthProvider(memoriesAdminToken),
   });
 
+  const poolInbox = new HarnessPoolInbox({ khoraBaseUrl });
+
   const pool = await ManagedAgentPool.create({
     dataDir: agentsDataDir,
     baseUrl: khoraBaseUrl,
     identitySecret,
     inviteBank,
+    onMemberAdded: (handle) => poolInbox.add(handle.signer),
+    onMemberRemoving: (did) => poolInbox.remove(did),
     ...(khoraAdminToken !== undefined && khoraAdminToken.length > 0
       ? {
           mintInvite: async () => {
@@ -161,8 +165,9 @@ export async function startNetworkHarness(
     });
   }
 
-  const poolInbox = new HarnessPoolInbox({ khoraBaseUrl });
+  // Bind agents already on disk (create().count may have already bound new ones).
   for (const did of pool.list()) {
+    if (poolInbox.list().includes(did)) continue;
     const handle = await pool.focus(did);
     await poolInbox.add(handle.signer);
   }
