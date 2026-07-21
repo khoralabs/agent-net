@@ -1,6 +1,3 @@
-[submodule "vendor/memories"]
-	path = vendor/memories
-	url = git@github.com:khoralabs/memories.git
 [submodule "vendor/relay"]
 	path = vendor/relay
 	url = git@github.com:khoralabs/relay.git
