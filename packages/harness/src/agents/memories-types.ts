@@ -1,9 +1,9 @@
 import type { LabelSchemaMap, OntologyDefinition } from "@khoralabs/memories-ontologies";
+import type { MemoriesDatabaseId } from "@khoralabs/memories-service";
 import type {
   MemoriesServiceClient,
   RemoteMemoriesClientAsync,
-} from "@khoralabs/memories-service-client";
-import type { MemoriesDatabaseId } from "@khoralabs/memories-service-storage-core";
+} from "@khoralabs/memories-service/client";
 
 /** A bound memories client scoped to a single agent's database. */
 export type AgentMemoriesClient = {

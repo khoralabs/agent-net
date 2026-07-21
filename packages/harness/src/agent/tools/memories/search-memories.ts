@@ -1,5 +1,5 @@
 import { tool } from "@khoralabs/agent-capabilities";
-import { type MemorySearchHit, runHybridMemorySearch } from "@khoralabs/memories-core/helpers";
+import { type MemorySearchHit, runHybridMemorySearch } from "@khoralabs/memories-node/helpers";
 import { z } from "zod";
 import { hasMemoriesClient } from "../policies";
 import type { HarnessToolkitEnv } from "../types";

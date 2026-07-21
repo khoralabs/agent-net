@@ -5,13 +5,13 @@ import type { ChatSigner } from "@khoralabs/chat-core";
 import type { IdentitySecret } from "@khoralabs/did-key-identity";
 import type { KhoraClient } from "@khoralabs/khora-client";
 import type { LabelSchemaMap, OntologyDefinition } from "@khoralabs/memories-ontologies";
+import type { MemoriesDatabaseId } from "@khoralabs/memories-service";
 import {
   ensureDatabaseOntologyLink,
   type MemoriesServiceClient,
   type RemoteMemoriesClientAsync,
   storedOntologyFromDefinition,
-} from "@khoralabs/memories-service-client";
-import type { MemoriesDatabaseId } from "@khoralabs/memories-service-storage-core";
+} from "@khoralabs/memories-service/client";
 
 import { getAgentRegistry } from "./agent/agent-runtime.ts";
 import type { RunAgentWorkflowDependencies } from "./agent/run-agent-workflow.ts";

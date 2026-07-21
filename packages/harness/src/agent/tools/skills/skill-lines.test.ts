@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import type { ToolRuntimeContext, ToolSpec } from "@khoralabs/agent-capabilities";
 import { evaluateComposable } from "@khoralabs/agent-capabilities";
-import type { SearchHit, SearchParams } from "@khoralabs/memories-core";
-import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service-client";
+import type { SearchHit, SearchOutput, SearchParams } from "@khoralabs/memories-node";
+import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import { harnessToolkit } from "../_toolkit.ts";
 import { createEphemeralRecentNamespacesTracker } from "../memories/_helpers/recent-namespaces.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
@@ -22,7 +22,7 @@ type MockSkillMemoriesClient = {
     key: string;
     content: Array<{ key: string; text: string }>;
   }) => Promise<string[]>;
-  search: (params: SearchParams) => Promise<SearchHit[]>;
+  search: (params: SearchParams) => Promise<SearchOutput>;
   persistence: {
     findMemoryIdByKey: (namespace: string, key: string) => Promise<string | undefined>;
     getSourceMapTextPreview: (sourceMapId: string, maxChars?: number) => Promise<string | null>;
@@ -54,8 +54,8 @@ function createMockSkillClient(stored: StoredSkill[]): MockSkillMemoriesClient {
       }
       return ["memory-1"];
     },
-    search: async (params) =>
-      stored
+    search: async (params) => ({
+      hits: stored
         .filter(
           (item) =>
             item.namespace.startsWith(params.namespace) &&
@@ -79,6 +79,7 @@ function createMockSkillClient(stored: StoredSkill[]): MockSkillMemoriesClient {
               graph: { kind: "node", nodeId: `node-${index}` },
             }) as unknown as SearchHit,
         ),
+    }),
     persistence: {
       findMemoryIdByKey: async (namespace, key) =>
         stored.some((item) => item.namespace === namespace && item.key === key)

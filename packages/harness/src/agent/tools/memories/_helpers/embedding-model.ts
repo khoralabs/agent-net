@@ -3,7 +3,7 @@ import {
   createMemoriesEmbeddingModel,
   type EmbeddingModel,
   mergeResolutionAndProviderOptions,
-} from "@khoralabs/memories-core/helpers";
+} from "@khoralabs/memories-node/helpers";
 
 function parseEmbeddingPreset(): "L" | "M" | "H" {
   const raw = process.env.MEMORIES_SEARCH_EMBEDDING_PRESET?.trim().toUpperCase();

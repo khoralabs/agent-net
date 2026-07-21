@@ -13,10 +13,18 @@
     "vendor/chat/turso",
     "vendor/chat/http",
     "vendor/relay/packages/*/**",
-    "vendor/relay/apps/*",
-    "vendor/memories/packages/*/**",
-    "vendor/memories/packages/memories-service/*/**"
+    "vendor/relay/apps/*"
   ],
+  "overrides": {
+    "@khoralabs/memories-node": "0.2.0",
+    "@khoralabs/memories-ontologies": "0.2.0",
+    "@khoralabs/memories-persistence-core": "0.2.0",
+    "@khoralabs/memories-service": "0.2.0",
+    "@khoralabs/memories-agents": "0.2.0",
+    "@khoralabs/memories-react-graph": "0.2.0",
+    "@khoralabs/memories-spec": "0.2.0",
+    "@libsql/client": "0.17.4"
+  },
   "scripts": {
     "typecheck": "bun run --filter '@khoralabs/agent-net' typecheck && bun run --filter '@khoralabs/agent-net-swarm' typecheck && bun run --filter '@khoralabs/agent-net-reference' typecheck",
     "format": "biome check --write .",
@@ -31,8 +39,11 @@
     "swarm:events": "bun run --filter @khoralabs/agent-net-reference events",
     "swarm:test": "bash scripts/test-with-homebrew-sqlite.sh packages/swarm/src packages/harness/src",
     "submodules:init": "git submodule update --init --recursive",
-    "submodules:update": "git submodule update --remote --merge vendor/memories vendor/relay vendor/chat vendor/libs && bun install",
+    "submodules:update": "git submodule update --remote --merge vendor/relay vendor/chat vendor/libs && bun install",
     "prepare": "husky"
+  },
+  "dependencies": {
+    "@khoralabs/memories-node": "^0.2.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.10",

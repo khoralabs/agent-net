@@ -51,7 +51,8 @@ Harness and swarm workflows use the abstract [Workflow SDK](https://useworkflow.
 
 | Path | Repo |
 | --- | --- |
-| `vendor/memories` | memories |
 | `vendor/relay` | relay |
 | `vendor/chat` | chat |
 | `vendor/libs` | libs |
+
+Memories is consumed from npm (`@khoralabs/memories-node`, `@khoralabs/memories-service`, etc.).

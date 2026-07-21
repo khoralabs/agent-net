@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@khoralabs/agent-net": "workspace:*",
-    "@libsql/client": "^0.14.0"
+    "@libsql/client": "^0.17.4"
   },
   "devDependencies": {
     "@types/bun": "latest",

@@ -2,7 +2,7 @@ import type { IdentitySecret, PersistableSigner } from "@khoralabs/did-key-ident
 import {
   createBearerTokenAuthProvider,
   MemoriesServiceClient,
-} from "@khoralabs/memories-service-client";
+} from "@khoralabs/memories-service/client";
 import { AgentStore, HarnessPoolInbox, ManagedAgentPool } from "./agents";
 import { createRemoteHarnessChat, type HarnessChat } from "./chat";
 import {

@@ -1,8 +1,13 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import type { ToolRuntimeContext, ToolSpec } from "@khoralabs/agent-capabilities";
 import { evaluateComposable } from "@khoralabs/agent-capabilities";
-import type { MergeMemoryParamsNode, SearchHit, SearchParams } from "@khoralabs/memories-core";
-import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service-client";
+import type {
+  MergeMemoryParamsNode,
+  SearchHit,
+  SearchOutput,
+  SearchParams,
+} from "@khoralabs/memories-node";
+import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import { harnessToolkit } from "./_toolkit.ts";
 import { createEphemeralRecentNamespacesTracker } from "./memories/_helpers/recent-namespaces.ts";
 import {
@@ -30,7 +35,7 @@ type MergedMemory = {
 
 type MockHarnessMemoriesClient = {
   mergeMemory: (params: MergeMemoryParamsNode) => Promise<string[]>;
-  search: (params: SearchParams) => Promise<SearchHit[]>;
+  search: (params: SearchParams) => Promise<SearchOutput>;
   persistence: {
     findMemoryIdByKey: (namespace: string, key: string) => Promise<string | undefined>;
     getSourceMapTextPreview: (sourceMapId: string, maxChars?: number) => Promise<string | null>;
@@ -68,29 +73,31 @@ function createMockMemoriesClient(merged: MergedMemory[]): MockHarnessMemoriesCl
     },
     search: async (params) => {
       const query = "text" in params.content ? params.content.text : "";
-      return merged
-        .filter(
-          (item) =>
-            item.namespace.startsWith(params.namespace) &&
-            (item.key.includes(query) || item.text.includes(query)),
-        )
-        .map(
-          (item, index) =>
-            ({
-              id: `source-${index}`,
-              score: 1,
-              source_key: "text",
-              memory: {
-                id: `memory-${index}`,
-                namespace: item.namespace,
-                key: item.key,
-                kind: "node",
-                _ts_created: Date.now(),
-              },
-              labels: [],
-              graph: { kind: "node", nodeId: `node-${index}` },
-            }) as unknown as SearchHit,
-        );
+      return {
+        hits: merged
+          .filter(
+            (item) =>
+              item.namespace.startsWith(params.namespace) &&
+              (item.key.includes(query) || item.text.includes(query)),
+          )
+          .map(
+            (item, index) =>
+              ({
+                id: `source-${index}`,
+                score: 1,
+                source_key: "text",
+                memory: {
+                  id: `memory-${index}`,
+                  namespace: item.namespace,
+                  key: item.key,
+                  kind: "node",
+                  _ts_created: Date.now(),
+                },
+                labels: [],
+                graph: { kind: "node", nodeId: `node-${index}` },
+              }) as unknown as SearchHit,
+          ),
+      };
     },
     persistence: {
       findMemoryIdByKey: async (namespace, key) =>

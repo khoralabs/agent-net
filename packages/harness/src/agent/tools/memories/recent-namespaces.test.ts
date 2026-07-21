@@ -3,7 +3,7 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { evaluateComposable } from "@khoralabs/agent-capabilities";
-import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service-client";
+import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 
 import type { HarnessToolkitEnv } from "../types.ts";
 import {

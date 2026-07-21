@@ -1,15 +1,15 @@
-import type { DeleteMemoryParams, MergeMemoryParams, SearchParams } from "@khoralabs/memories-core";
+import type { DeleteMemoryParams, MergeMemoryParams, SearchParams } from "@khoralabs/memories-node";
 import {
   type LabelSchemaMap,
   mergeOntologies,
   type OntologyDefinition,
 } from "@khoralabs/memories-ontologies";
+import type { MemoriesDatabaseId } from "@khoralabs/memories-service";
 import {
   createBearerTokenAuthProvider,
   createRemoteMemoriesClientAsync,
   type RemoteMemoriesClientAsync,
-} from "@khoralabs/memories-service-client";
-import type { MemoriesDatabaseId } from "@khoralabs/memories-service-storage-core";
+} from "@khoralabs/memories-service/client";
 
 import { minimalHarnessMemoriesOntology } from "./minimal-ontology.ts";
 

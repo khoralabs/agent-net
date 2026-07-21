@@ -1,5 +1,5 @@
-import type { SearchHit } from "@khoralabs/memories-core";
-import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service-client";
+import type { SearchHit } from "@khoralabs/memories-node";
+import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 
 function sourceMapIdFromHit(hit: SearchHit): string {
   return hit._id;
@@ -13,7 +13,7 @@ export async function loadMemoryTextByKey(
   const memoryId = await client.persistence.findMemoryIdByKey(namespace, key);
   if (memoryId === undefined) return undefined;
 
-  const hits = await client.search({
+  const { hits } = await client.search({
     namespace,
     content: { text: key },
     options: { topK: 8, neighbors: false, arms: { lexical: 1, vector: 0 } },

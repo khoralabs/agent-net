@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service-client";
+import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import { createLazyHarnessMemoriesClient } from "./memories-client.ts";
 
 const database = { kind: "account", ownerKey: "did:key:test" } as const;
