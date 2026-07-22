@@ -19,7 +19,7 @@
     "@khoralabs/chat-http": "workspace:*",
     "@khoralabs/chat-persistence": "workspace:*",
     "@khoralabs/did-key-identity": "^0.1.0",
-    "@khoralabs/khora-client": "^0.1.5",
+    "@khoralabs/khora-client": "^0.1.6",
     "@khoralabs/memories-node": "^0.5.0",
     "@khoralabs/memories-service": "^0.5.0",
     "@khoralabs/relay-client": "workspace:*",
