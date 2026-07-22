@@ -56,7 +56,7 @@
         "@khoralabs/chat-http": "workspace:*",
         "@khoralabs/chat-persistence": "workspace:*",
         "@khoralabs/did-key-identity": "^0.1.0",
-        "@khoralabs/khora-client": "^0.1.3",
+        "@khoralabs/khora-client": "^0.1.5",
         "@khoralabs/memories-node": "^0.3.0",
         "@khoralabs/memories-ontologies": "^0.3.0",
         "@khoralabs/memories-persistence-core": "^0.3.0",
@@ -101,7 +101,7 @@
         "@khoralabs/agent-net": "workspace:*",
         "@khoralabs/chat-core": "workspace:*",
         "@khoralabs/did-key-identity": "^0.1.0",
-        "@khoralabs/khora-client": "^0.1.4",
+        "@khoralabs/khora-client": "^0.1.5",
         "@khoralabs/memories-ontologies": "^0.3.0",
         "@libsql/client": "^0.17.4",
         "ai": "^7.0.9",
@@ -578,7 +578,7 @@
 
     "@khoralabs/did-key-identity": ["@khoralabs/did-key-identity@0.1.0", "", { "dependencies": { "@noble/ed25519": "^3.1.0", "@noble/hashes": "^2.2.0", "iso-base": "^4.2.1", "iso-signatures": "^0.5.1" }, "peerDependencies": { "typescript": "^5" } }, "sha512-ALGgj7L6iTBuEvQ0hnu1FLArd/69rjUKXBfUx1ZhN8JmOPU7NM+XK9HnbLBeg65/5q+CHaNl+KMdDq0i9uW/oA=="],
 
-    "@khoralabs/khora-client": ["@khoralabs/khora-client@0.1.4", "", { "dependencies": { "@khoralabs/did-key-identity": "^0.1.0", "zod": "^4" }, "peerDependencies": { "typescript": "^5" } }, "sha512-mMGRS7WfjpOWbEgcxqHMt7DHDlwoqDaseSIniiQQdNqJY+zwlQjR6rSrdTwneLjLuD/yUjp1vQMRCNid9IQeCg=="],
+    "@khoralabs/khora-client": ["@khoralabs/khora-client@0.1.5", "", { "dependencies": { "@khoralabs/did-key-identity": "^0.1.0", "zod": "^4" }, "peerDependencies": { "typescript": "^5" } }, "sha512-pFvXirjH09lXxDdzFwCJQzg+8zhch0Jqw09x2nG8fTry9n87TedS16PO1bssPVWjpcZMwqgZZl2qn6XT524yvA=="],
 
     "@khoralabs/memories-node": ["@khoralabs/memories-node@0.2.0", "", { "dependencies": { "@ai-sdk/provider-utils": "^5.0.2", "@khoralabs/memories-ontologies": "0.1.0", "@khoralabs/memories-persistence-core": "0.1.0", "@khoralabs/sourcemaps": "^0.1.0", "@standard-schema/spec": "^1.1.0", "ai": "^7.0.9", "js-sha256": "^0.11.0", "zod": "^4" }, "peerDependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "@khoralabs/sqlite-migrate": "^0.1.0", "@libsql/client": "^0.17.4", "@tursodatabase/serverless": "^0.2.0", "ajv": "^8", "sqlite-vec": "^0.1.10-alpha.4", "typescript": "^5", "umap-js": "^1.4.0", "workflow": "^4.5.0" }, "optionalPeers": ["@khoralabs/sqlite-crypto", "@khoralabs/sqlite-migrate", "@libsql/client", "@tursodatabase/serverless", "ajv", "sqlite-vec", "umap-js", "workflow"] }, "sha512-LRIU2z2g597xzlDBDG2sxbbv2uruK7uxlYcUD5AMVdo2FoePkaQjbps4VjXTXAiNosvvw5i5e3GFKlIpr91+tA=="],
 

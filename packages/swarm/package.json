@@ -15,7 +15,7 @@
     "@khoralabs/agent-net": "workspace:*",
     "@khoralabs/chat-core": "workspace:*",
     "@khoralabs/did-key-identity": "^0.1.0",
-    "@khoralabs/khora-client": "^0.1.4",
+    "@khoralabs/khora-client": "^0.1.5",
     "@khoralabs/memories-ontologies": "^0.3.0",
     "@libsql/client": "^0.17.4",
     "ai": "^7.0.9",
