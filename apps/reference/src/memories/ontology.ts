@@ -6,7 +6,7 @@ import {
   defineOntology,
   mergeOntologies,
   salienceMemoryOntology,
-} from "@khoralabs/memories-ontologies";
+} from "@khoralabs/memories-node/ontology";
 
 const referenceKnowledgeGraphOntology = defineOntology({
   nodeLabels: {

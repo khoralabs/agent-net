@@ -16,10 +16,10 @@
     "@khoralabs/chat-core": "workspace:*",
     "@khoralabs/did-key-identity": "^0.1.0",
     "@khoralabs/khora-client": "^0.1.5",
-    "@khoralabs/memories-ontologies": "^0.4.0",
     "@libsql/client": "^0.17.4",
     "ai": "^7.0.9",
-    "workflow": "^4.5.0"
+    "workflow": "^4.5.0",
+    "@khoralabs/memories-node": "^0.5.0"
   },
   "devDependencies": {
     "@khoralabs/chat-http": "workspace:*",

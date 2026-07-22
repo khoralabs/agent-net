@@ -4,7 +4,7 @@ import { createRegisteredAgent } from "@khoralabs/agent-capabilities";
 import type { ChatSigner } from "@khoralabs/chat-core";
 import type { IdentitySecret } from "@khoralabs/did-key-identity";
 import type { KhoraClient } from "@khoralabs/khora-client";
-import type { LabelSchemaMap, OntologyDefinition } from "@khoralabs/memories-ontologies";
+import type { LabelSchemaMap, OntologyDefinition } from "@khoralabs/memories-node/ontology";
 import type { MemoriesDatabaseId } from "@khoralabs/memories-service";
 import {
   ensureDatabaseOntologyLink,

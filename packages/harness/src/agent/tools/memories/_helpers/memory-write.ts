@@ -1,4 +1,4 @@
-import { ids } from "@khoralabs/memories-persistence-core";
+import { ids } from "@khoralabs/memories-node";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 
 import { HARNESS_MEMORY_EDGE_KIND, HARNESS_MEMORY_NODE_KIND } from "./minimal-ontology.ts";

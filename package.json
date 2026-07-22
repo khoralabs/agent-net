@@ -16,13 +16,11 @@
     "vendor/relay/apps/*"
   ],
   "overrides": {
-    "@khoralabs/memories-node": "0.4.0",
-    "@khoralabs/memories-ontologies": "0.4.0",
-    "@khoralabs/memories-persistence-core": "0.4.0",
-    "@khoralabs/memories-service": "0.4.0",
-    "@khoralabs/memories-agents": "0.4.0",
-    "@khoralabs/memories-react-graph": "0.4.0",
-    "@khoralabs/memories-spec": "0.4.0",
+    "@khoralabs/memories-node": "0.5.0",
+    "@khoralabs/memories-service": "0.5.0",
+    "@khoralabs/memories-agents": "0.5.0",
+    "@khoralabs/memories-react-graph": "0.5.0",
+    "@khoralabs/memories-spec": "0.5.0",
     "@libsql/client": "0.17.4"
   },
   "scripts": {
@@ -43,7 +41,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@khoralabs/memories-node": "^0.2.0"
+    "@khoralabs/memories-node": "^0.5.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.10",

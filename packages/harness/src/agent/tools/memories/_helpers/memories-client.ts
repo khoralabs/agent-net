@@ -3,7 +3,7 @@ import {
   type LabelSchemaMap,
   mergeOntologies,
   type OntologyDefinition,
-} from "@khoralabs/memories-ontologies";
+} from "@khoralabs/memories-node/ontology";
 import type { MemoriesDatabaseId } from "@khoralabs/memories-service";
 import {
   createBearerTokenAuthProvider,

@@ -1,4 +1,4 @@
-import { defineOntology } from "@khoralabs/memories-ontologies";
+import { defineOntology } from "@khoralabs/memories-node/ontology";
 import { z } from "zod";
 
 /** Default node label kind applied by harness memory writes. */

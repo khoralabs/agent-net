@@ -1,4 +1,4 @@
-import type { LabelSchemaMap, OntologyDefinition } from "@khoralabs/memories-ontologies";
+import type { LabelSchemaMap, OntologyDefinition } from "@khoralabs/memories-node/ontology";
 import type { MemoriesDatabaseId } from "@khoralabs/memories-service";
 import type {
   MemoriesServiceClient,

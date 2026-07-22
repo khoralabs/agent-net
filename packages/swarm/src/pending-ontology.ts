@@ -1,4 +1,4 @@
-import type { LabelSchemaMap, OntologyDefinition } from "@khoralabs/memories-ontologies";
+import type { LabelSchemaMap, OntologyDefinition } from "@khoralabs/memories-node/ontology";
 
 export type SwarmMemoriesOntology = OntologyDefinition<LabelSchemaMap, LabelSchemaMap>;
 
