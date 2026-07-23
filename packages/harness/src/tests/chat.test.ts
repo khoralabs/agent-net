@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { generateIdentity } from "@khoralabs/did-key-identity";
-import type { RelaySigner } from "@khoralabs/relay-crypto";
+import type { RelaySigner } from "@khoralabs/relay/crypto";
 
 import type { HarnessChat, SignedChatBackend } from "../chat";
 import {

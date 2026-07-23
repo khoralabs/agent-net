@@ -1,6 +1,3 @@
-[submodule "vendor/relay"]
-	path = vendor/relay
-	url = git@github.com:khoralabs/relay.git
 [submodule "vendor/chat"]
 	path = vendor/chat
 	url = git@github.com:khoralabs/chat.git

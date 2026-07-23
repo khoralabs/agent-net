@@ -1,12 +1,11 @@
 import path from "node:path";
 import {
-  createChannelRegistry,
   createRelayApp,
   createRelayHub,
-  createRelayStores,
   envRelayMaxChannels,
-  openRelayDatabase,
-} from "@khoralabs/relay-server-http";
+  openRelayPersistence,
+  sqliteBackend,
+} from "@khoralabs/relay/server";
 
 export type RelayServerOptions = {
   dataDir: string;
@@ -22,13 +21,21 @@ export type RelayServerHandle = {
 
 export async function startRelayServer(opts: RelayServerOptions): Promise<RelayServerHandle> {
   const dbPath = path.join(opts.dataDir, "relay.sqlite");
-  const db = openRelayDatabase(dbPath, opts.sqlCipherKey ?? "harness-relay-key");
-  const stores = createRelayStores(db);
-  const hub = createRelayHub({ admission: stores.admission, spool: stores.spool });
-  const registry = createChannelRegistry(db);
+  const { persistence, cleanup } = openRelayPersistence({
+    durable: sqliteBackend({
+      path: dbPath,
+      key: opts.sqlCipherKey ?? "harness-relay-key",
+    }),
+  });
+  const hub = createRelayHub({ admission: persistence.admission, spool: persistence.spool });
 
   const relayProfile = { mode: "pool" as const, maxRelayChannels: envRelayMaxChannels() };
-  const app = createRelayApp({ registry, hub, spool: stores.spool, relayProfile });
+  const app = createRelayApp({
+    hub,
+    spool: persistence.spool,
+    persistence,
+    relayProfile,
+  });
 
   const bunServer = Bun.serve({
     port: opts.port ?? 0,
@@ -47,7 +54,7 @@ export async function startRelayServer(opts: RelayServerOptions): Promise<RelayS
     },
     stop() {
       bunServer.stop(true);
-      db.close();
+      cleanup();
     },
   };
 }

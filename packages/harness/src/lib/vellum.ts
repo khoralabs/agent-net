@@ -1,6 +1,6 @@
 import path from "node:path";
 import type { IdentitySecret } from "@khoralabs/did-key-identity";
-import { RelayClient } from "@khoralabs/relay-client";
+import { RelayClient } from "@khoralabs/relay/client";
 
 import type { AgentHandle, VellumHandle } from "../agents";
 import { AgentStore } from "../agents";

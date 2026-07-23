@@ -1,6 +1,6 @@
 import type { ChatSigner, SignedEnvelope } from "@khoralabs/chat-core";
 import { generateIdentity } from "@khoralabs/did-key-identity";
-import type { RelaySigner } from "@khoralabs/relay-crypto";
+import type { RelaySigner } from "@khoralabs/relay/crypto";
 
 import type { ChatServiceClient, SignedChatBackend } from "../chat.ts";
 import { createHarnessChatCrypto } from "../chat-crypto.ts";

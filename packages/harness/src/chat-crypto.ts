@@ -1,6 +1,6 @@
 import type { ChatSigner, ChatVerifier, ScopeRef, SignedEnvelope } from "@khoralabs/chat-core";
-import type { RelaySigner } from "@khoralabs/relay-crypto";
-import { ed25519PublicKeyBytesFromDid } from "@khoralabs/relay-crypto";
+import type { RelaySigner } from "@khoralabs/relay/crypto";
+import { ed25519PublicKeyBytesFromDid } from "@khoralabs/relay/crypto";
 import { verifyAsync } from "@noble/ed25519";
 
 export const HARNESS_CHAT_SIGNATURE_ALGORITHM = "ed25519";

@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!!vendor/relay", "!!vendor/chat", "!!vendor/libs"]
+    "includes": ["**", "!!vendor/chat", "!!vendor/libs"]
   },
   "formatter": {
     "enabled": true,
