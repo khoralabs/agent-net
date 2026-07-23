@@ -1,4 +1,4 @@
-import type { ChatSigner, SignedEnvelope } from "@khoralabs/chat-core";
+import type { ChatSigner, SignedEnvelope } from "@khoralabs/chat";
 import { generateIdentity } from "@khoralabs/did-key-identity";
 import type { RelaySigner } from "@khoralabs/relay/crypto";
 

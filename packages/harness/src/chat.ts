@@ -9,14 +9,14 @@ import type {
   Thread,
   ThreadPage,
   ThreadTip,
-} from "@khoralabs/chat-core";
-import { ChatNotFoundError } from "@khoralabs/chat-core";
+} from "@khoralabs/chat";
+import { isChatNotFoundError } from "@khoralabs/chat";
 import {
   type ChatServiceClient,
   type ChatServiceClientOptions,
   createChatClient,
-} from "@khoralabs/chat-http/client";
-import { prepareAppendPost, signPreparedAppendPost } from "@khoralabs/chat-persistence";
+} from "@khoralabs/chat/http/client";
+import { prepareAppendPost, signPreparedAppendPost } from "@khoralabs/chat/persistence";
 import type { UIMessage } from "ai";
 
 import { createHarnessChatCrypto, type ResolveHarnessChatSigner } from "./chat-crypto.ts";
@@ -94,7 +94,7 @@ async function ensureHarnessChannel(client: ChatServiceClient): Promise<void> {
   try {
     await client.getChannel(HARNESS_CHAT_CHANNEL_ID);
   } catch (error) {
-    if (!(error instanceof ChatNotFoundError)) throw error;
+    if (!isChatNotFoundError(error)) throw error;
     await client.createChannel({
       id: HARNESS_CHAT_CHANNEL_ID,
       metadata: { title: "Network Harness", kind: "harness-network" },

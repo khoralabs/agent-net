@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@khoralabs/agent-net-harness": "workspace:*",
-    "@khoralabs/chat-core": "workspace:*",
+    "@khoralabs/chat": "^0.1.1",
     "@khoralabs/did-key-identity": "^0.1.0",
     "@khoralabs/khora-client": "^0.1.6",
     "@libsql/client": "^0.17.4",
@@ -22,8 +22,6 @@
     "@khoralabs/memories-node": "^0.5.0"
   },
   "devDependencies": {
-    "@khoralabs/chat-http": "workspace:*",
-    "@khoralabs/chat-persistence": "workspace:*",
     "@khoralabs/network-events-sqlite": "workspace:*",
     "@types/bun": "latest",
     "typescript": "^5"

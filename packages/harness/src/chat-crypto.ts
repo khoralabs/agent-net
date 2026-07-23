@@ -1,4 +1,4 @@
-import type { ChatSigner, ChatVerifier, ScopeRef, SignedEnvelope } from "@khoralabs/chat-core";
+import type { ChatSigner, ChatVerifier, ScopeRef, SignedEnvelope } from "@khoralabs/chat";
 import type { RelaySigner } from "@khoralabs/relay/crypto";
 import { ed25519PublicKeyBytesFromDid } from "@khoralabs/relay/crypto";
 import { verifyAsync } from "@noble/ed25519";

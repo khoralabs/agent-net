@@ -6,12 +6,7 @@
   "workspaces": [
     "packages/*",
     "apps/*",
-    "vendor/libs/packages/*/**",
-    "vendor/chat/core",
-    "vendor/chat/persistence",
-    "vendor/chat/sqlite",
-    "vendor/chat/turso",
-    "vendor/chat/http"
+    "vendor/libs/packages/*/**"
   ],
   "overrides": {
     "@khoralabs/memories-node": "0.5.0",
@@ -35,7 +30,7 @@
     "swarm:events": "bun run --filter @khoralabs/agent-net-reference events",
     "swarm:test": "bash scripts/test-with-homebrew-sqlite.sh packages/swarm/src packages/harness/src",
     "submodules:init": "git submodule update --init --recursive",
-    "submodules:update": "git submodule update --remote --merge vendor/chat vendor/libs && bun install",
+    "submodules:update": "git submodule update --remote --merge vendor/libs && bun install",
     "prepare": "husky"
   },
   "dependencies": {

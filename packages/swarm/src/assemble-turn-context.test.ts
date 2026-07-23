@@ -1,9 +1,9 @@
 import { afterAll, expect, test } from "bun:test";
 import { createHarnessChatBackend } from "@khoralabs/agent-net";
-import { createChatClient } from "@khoralabs/chat-http/client";
-import { createChatRoutesWithParams, dispatchChatRoute } from "@khoralabs/chat-http/routes";
-import { createChatHttpRuntime } from "@khoralabs/chat-http/service";
-import { createMemoryChatPersistence } from "@khoralabs/chat-persistence";
+import { createChatClient } from "@khoralabs/chat/http/client";
+import { createChatRoutesWithParams, dispatchChatRoute } from "@khoralabs/chat/http/routes";
+import { createChatHttpRuntime } from "@khoralabs/chat/http/service";
+import { createMemoryChatPersistence } from "@khoralabs/chat/persistence";
 import { generateIdentity } from "@khoralabs/did-key-identity";
 import { assembleTurnContext } from "./assemble-turn-context.ts";
 import { appendInboxEntry } from "./swarm-state.ts";

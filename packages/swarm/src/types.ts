@@ -4,7 +4,7 @@ import type {
   NetworkEvent,
   ThreadHashSnapshot,
 } from "@khoralabs/agent-net";
-import type { PostUsage } from "@khoralabs/chat-core";
+import type { PostUsage } from "@khoralabs/chat";
 
 export type { NetworkAttribution, NetworkEvent, ThreadHashSnapshot };
 

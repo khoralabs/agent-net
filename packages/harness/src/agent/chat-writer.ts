@@ -4,9 +4,9 @@ import type {
   PostUsage,
   ScopeRef,
   SignablePostVersion,
-} from "@khoralabs/chat-core";
-import { canonicalSignedPostVersionPayload, signedPayloadBytes } from "@khoralabs/chat-core";
-import type { ChatServiceClient } from "@khoralabs/chat-http/client";
+} from "@khoralabs/chat";
+import { canonicalSignedPostVersionPayload, signedPayloadBytes } from "@khoralabs/chat";
+import type { ChatServiceClient } from "@khoralabs/chat/http/client";
 import type { UIMessage } from "ai";
 
 import type { AgentWorkflowParams } from "./types.ts";

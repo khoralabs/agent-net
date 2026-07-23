@@ -1,11 +1,11 @@
-import { type ChatServiceClient, createChatClient } from "@khoralabs/chat-http/client";
+import { type ChatServiceClient, createChatClient } from "@khoralabs/chat/http/client";
 import {
   createChatRoutesWithParams,
   dispatchChatRoute,
   requireInternalToken,
-} from "@khoralabs/chat-http/routes";
-import { createChatHttpRuntime } from "@khoralabs/chat-http/service";
-import { createMemoryChatPersistence } from "@khoralabs/chat-persistence";
+} from "@khoralabs/chat/http/routes";
+import { createChatHttpRuntime } from "@khoralabs/chat/http/service";
+import { createMemoryChatPersistence } from "@khoralabs/chat/persistence";
 import type { ServerWebSocket } from "bun";
 
 import { createHarnessChatBackend, type SignedChatBackend } from "../chat.ts";

@@ -1,4 +1,4 @@
-import type { ChatSigner, PostModelMetadata, PostUsage } from "@khoralabs/chat-core";
+import type { ChatSigner, PostModelMetadata, PostUsage } from "@khoralabs/chat";
 import type { KhoraClient } from "@khoralabs/khora-client";
 import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";

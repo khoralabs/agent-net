@@ -1,7 +1,7 @@
 import path from "node:path";
 
 import { createRegisteredAgent } from "@khoralabs/agent-capabilities";
-import type { ChatSigner } from "@khoralabs/chat-core";
+import type { ChatSigner } from "@khoralabs/chat";
 import type { IdentitySecret } from "@khoralabs/did-key-identity";
 import type { KhoraClient } from "@khoralabs/khora-client";
 import type { LabelSchemaMap, OntologyDefinition } from "@khoralabs/memories-node/ontology";

@@ -21,7 +21,7 @@
         "@khoralabs/agent-capabilities-otel": "^0.2.0",
         "@khoralabs/agent-net-harness": "workspace:*",
         "@khoralabs/agent-net-swarm": "workspace:*",
-        "@khoralabs/chat-http": "workspace:*",
+        "@khoralabs/chat": "^0.1.1",
         "@khoralabs/memories-node": "^0.5.0",
         "@khoralabs/memories-service": "^0.5.0",
         "@khoralabs/network-events-sqlite": "workspace:*",
@@ -52,9 +52,7 @@
         "@ai-sdk/google": "^4.0.3",
         "@khoralabs/agent-capabilities": "^0.2.0",
         "@khoralabs/agent-capabilities-ai-sdk": "^0.2.0",
-        "@khoralabs/chat-core": "workspace:*",
-        "@khoralabs/chat-http": "workspace:*",
-        "@khoralabs/chat-persistence": "workspace:*",
+        "@khoralabs/chat": "^0.1.1",
         "@khoralabs/did-key-identity": "^0.1.0",
         "@khoralabs/khora-client": "^0.1.6",
         "@khoralabs/memories-node": "^0.5.0",
@@ -95,7 +93,7 @@
       "version": "0.0.0",
       "dependencies": {
         "@khoralabs/agent-net-harness": "workspace:*",
-        "@khoralabs/chat-core": "workspace:*",
+        "@khoralabs/chat": "^0.1.1",
         "@khoralabs/did-key-identity": "^0.1.0",
         "@khoralabs/khora-client": "^0.1.6",
         "@khoralabs/memories-node": "^0.5.0",
@@ -104,89 +102,7 @@
         "workflow": "^4.5.0",
       },
       "devDependencies": {
-        "@khoralabs/chat-http": "workspace:*",
-        "@khoralabs/chat-persistence": "workspace:*",
         "@khoralabs/network-events-sqlite": "workspace:*",
-        "@types/bun": "latest",
-        "typescript": "^5",
-      },
-      "peerDependencies": {
-        "typescript": "^5",
-      },
-    },
-    "vendor/chat/core": {
-      "name": "@khoralabs/chat-core",
-      "version": "0.0.0",
-      "dependencies": {
-        "ai": "^7.0.9",
-      },
-      "devDependencies": {
-        "@khoralabs/chat-persistence": "workspace:*",
-        "@types/bun": "latest",
-        "typescript": "^5",
-      },
-      "peerDependencies": {
-        "typescript": "^5",
-      },
-    },
-    "vendor/chat/http": {
-      "name": "@khoralabs/chat-http",
-      "version": "0.0.0",
-      "dependencies": {
-        "@khoralabs/chat-core": "workspace:*",
-        "@khoralabs/chat-persistence-turso": "workspace:*",
-        "ai": "^7.0.9",
-      },
-      "devDependencies": {
-        "@khoralabs/chat-persistence": "workspace:*",
-        "@types/bun": "latest",
-        "typescript": "^5",
-      },
-      "peerDependencies": {
-        "typescript": "^5",
-      },
-    },
-    "vendor/chat/persistence": {
-      "name": "@khoralabs/chat-persistence",
-      "version": "0.0.0",
-      "dependencies": {
-        "@khoralabs/chat-core": "workspace:*",
-        "ai": "^7.0.9",
-      },
-      "devDependencies": {
-        "@types/bun": "latest",
-        "typescript": "^5",
-      },
-      "peerDependencies": {
-        "typescript": "^5",
-      },
-    },
-    "vendor/chat/sqlite": {
-      "name": "@khoralabs/chat-persistence-sqlite",
-      "version": "0.0.0",
-      "dependencies": {
-        "@khoralabs/chat-core": "workspace:*",
-        "@khoralabs/chat-persistence": "workspace:*",
-        "ai": "^7.0.9",
-      },
-      "devDependencies": {
-        "@types/bun": "latest",
-        "typescript": "^5",
-      },
-      "peerDependencies": {
-        "typescript": "^5",
-      },
-    },
-    "vendor/chat/turso": {
-      "name": "@khoralabs/chat-persistence-turso",
-      "version": "0.0.0",
-      "dependencies": {
-        "@khoralabs/chat-core": "workspace:*",
-        "@khoralabs/chat-persistence": "workspace:*",
-        "@tursodatabase/serverless": "latest",
-        "ai": "^7.0.9",
-      },
-      "devDependencies": {
         "@types/bun": "latest",
         "typescript": "^5",
       },
@@ -439,15 +355,7 @@
 
     "@khoralabs/bun-web": ["@khoralabs/bun-web@workspace:vendor/libs/packages/bun-web"],
 
-    "@khoralabs/chat-core": ["@khoralabs/chat-core@workspace:vendor/chat/core"],
-
-    "@khoralabs/chat-http": ["@khoralabs/chat-http@workspace:vendor/chat/http"],
-
-    "@khoralabs/chat-persistence": ["@khoralabs/chat-persistence@workspace:vendor/chat/persistence"],
-
-    "@khoralabs/chat-persistence-sqlite": ["@khoralabs/chat-persistence-sqlite@workspace:vendor/chat/sqlite"],
-
-    "@khoralabs/chat-persistence-turso": ["@khoralabs/chat-persistence-turso@workspace:vendor/chat/turso"],
+    "@khoralabs/chat": ["@khoralabs/chat@0.1.1", "", { "dependencies": { "ai": "^7.0.9" }, "peerDependencies": { "@tursodatabase/serverless": "*", "typescript": "^5" }, "optionalPeers": ["@tursodatabase/serverless"] }, "sha512-BQFG3Gk7S/2j0jUbP2OcYXNhYWNPq26OqzI2k1qe4zLoGfP0MZYBnDYsTuYlkzyIZSTyZi8HcVRFvRL95qoDQw=="],
 
     "@khoralabs/cli-kit": ["@khoralabs/cli-kit@workspace:vendor/libs/packages/cli-kit"],
 
