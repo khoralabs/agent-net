@@ -25,8 +25,7 @@ function rewriteSpec(fromFile, spec) {
   return spec;
 }
 
-const re =
-  /((?:from|import)\s*\(?\s*|(?:export\s+\*\s+from\s+))(["'])(\.\.?\/[^"']+)\2/g;
+const re = /((?:from|import)\s*\(?\s*|(?:export\s+\*\s+from\s+))(["'])(\.\.?\/[^"']+)\2/g;
 let filesChanged = 0;
 let specsChanged = 0;
 

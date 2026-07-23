@@ -25,9 +25,7 @@ if (js.exitCode !== 0) {
   throw new Error("bun build failed");
 }
 
-const dts = await Bun.$`tsc -p ${tsconfigPath} --emitDeclarationOnly`
-  .cwd(pkgDir)
-  .nothrow();
+const dts = await Bun.$`tsc -p ${tsconfigPath} --emitDeclarationOnly`.cwd(pkgDir).nothrow();
 if (dts.exitCode !== 0) {
   console.error(dts.stderr.toString() || dts.stdout.toString());
   throw new Error("tsc --emitDeclarationOnly failed");
