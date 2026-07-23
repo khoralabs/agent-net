@@ -19,7 +19,7 @@
     "@libsql/client": "^0.17.4",
     "ai": "^7.0.9",
     "workflow": "^4.5.0",
-    "@khoralabs/memories-node": "^0.5.1"
+    "@khoralabs/memories-node": "^0.5.2"
   },
   "devDependencies": {
     "@khoralabs/network-events-sqlite": "workspace:*",
