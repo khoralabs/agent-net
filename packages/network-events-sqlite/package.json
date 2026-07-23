@@ -12,7 +12,7 @@
     "test": "bun test src"
   },
   "dependencies": {
-    "@khoralabs/agent-net": "workspace:*",
+    "@khoralabs/agent-net-harness": "workspace:*",
     "@libsql/client": "^0.17.4"
   },
   "devDependencies": {

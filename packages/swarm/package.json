@@ -12,7 +12,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@khoralabs/agent-net": "workspace:*",
+    "@khoralabs/agent-net-harness": "workspace:*",
     "@khoralabs/chat-core": "workspace:*",
     "@khoralabs/did-key-identity": "^0.1.0",
     "@khoralabs/khora-client": "^0.1.6",

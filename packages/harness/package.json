@@ -1,5 +1,5 @@
 {
-  "name": "@khoralabs/agent-net",
+  "name": "@khoralabs/agent-net-harness",
   "version": "0.0.0",
   "private": true,
   "type": "module",

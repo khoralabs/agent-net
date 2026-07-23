@@ -19,7 +19,7 @@
       "version": "0.0.0",
       "dependencies": {
         "@khoralabs/agent-capabilities-otel": "^0.2.0",
-        "@khoralabs/agent-net": "workspace:*",
+        "@khoralabs/agent-net-harness": "workspace:*",
         "@khoralabs/agent-net-swarm": "workspace:*",
         "@khoralabs/chat-http": "workspace:*",
         "@khoralabs/memories-node": "^0.5.0",
@@ -46,7 +46,7 @@
       },
     },
     "packages/harness": {
-      "name": "@khoralabs/agent-net",
+      "name": "@khoralabs/agent-net-harness",
       "version": "0.0.0",
       "dependencies": {
         "@ai-sdk/google": "^4.0.3",
@@ -79,7 +79,7 @@
       "name": "@khoralabs/network-events-sqlite",
       "version": "0.0.0",
       "dependencies": {
-        "@khoralabs/agent-net": "workspace:*",
+        "@khoralabs/agent-net-harness": "workspace:*",
         "@libsql/client": "^0.17.4",
       },
       "devDependencies": {
@@ -94,7 +94,7 @@
       "name": "@khoralabs/agent-net-swarm",
       "version": "0.0.0",
       "dependencies": {
-        "@khoralabs/agent-net": "workspace:*",
+        "@khoralabs/agent-net-harness": "workspace:*",
         "@khoralabs/chat-core": "workspace:*",
         "@khoralabs/did-key-identity": "^0.1.0",
         "@khoralabs/khora-client": "^0.1.6",
@@ -429,7 +429,7 @@
 
     "@khoralabs/agent-capabilities-otel": ["@khoralabs/agent-capabilities-otel@0.2.0", "", { "dependencies": { "@khoralabs/agent-capabilities": "^0.1.1", "@opentelemetry/api": "^1.9.0", "pino": "^9.6.0" }, "peerDependencies": { "typescript": "^5" } }, "sha512-hv1SDJhLel/iR3WEfkkzC9/hDc+hbxFWuwMmiW89kk1G8USeeJuESMYPx5pM7vHoYz90DSJqYfolwxyngiXFGA=="],
 
-    "@khoralabs/agent-net": ["@khoralabs/agent-net@workspace:packages/harness"],
+    "@khoralabs/agent-net-harness": ["@khoralabs/agent-net-harness@workspace:packages/harness"],
 
     "@khoralabs/agent-net-reference": ["@khoralabs/agent-net-reference@workspace:apps/reference"],
 

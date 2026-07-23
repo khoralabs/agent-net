@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@khoralabs/agent-capabilities-otel": "^0.2.0",
-    "@khoralabs/agent-net": "workspace:*",
+    "@khoralabs/agent-net-harness": "workspace:*",
     "@khoralabs/agent-net-swarm": "workspace:*",
     "@khoralabs/chat-http": "workspace:*",
     "@khoralabs/network-events-sqlite": "workspace:*",
