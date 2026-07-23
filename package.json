@@ -22,7 +22,7 @@
     "format:check": "biome check .",
     "agent:dev": "bun run --filter @khoralabs/agent-net-reference agent:dev",
     "agent:setup": "bun run --filter @khoralabs/agent-net-reference agent:setup",
-    "agent:test": "bun run --filter @khoralabs/agent-net test",
+    "agent:test": "bun run --filter @khoralabs/agent-net-harness test",
     "test:with-sqlite": "bash scripts/test-with-homebrew-sqlite.sh",
     "reference:start": "bun run --filter @khoralabs/agent-net-reference start",
     "swarm": "bun run --filter @khoralabs/agent-net-reference swarm",
