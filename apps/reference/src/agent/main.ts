@@ -8,7 +8,7 @@ import {
   HARNESS_AGENT_ID,
   installAgentChat,
   resolveAgentChatSigner,
-} from "@khoralabs/agent-net";
+} from "@khoralabs/agent-net-harness";
 import { start } from "workflow/api";
 
 import "./otel.ts";

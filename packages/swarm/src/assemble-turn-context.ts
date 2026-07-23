@@ -1,4 +1,8 @@
-import type { AgentChatClient, AgentTurnParams, AgentUIMessage } from "@khoralabs/agent-net";
+import type {
+  AgentChatClient,
+  AgentTurnParams,
+  AgentUIMessage,
+} from "@khoralabs/agent-net-harness";
 import type { UIMessage } from "ai";
 
 import type { InboxEntry } from "./swarm-state.ts";

@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-import { buildNetworkAttribution, networkEventId } from "@khoralabs/agent-net";
+import { buildNetworkAttribution, networkEventId } from "@khoralabs/agent-net-harness";
 
 import { createNetworkEventPersistencePlugin } from "./plugin.ts";
 

@@ -5,7 +5,7 @@ import {
   emitNetworkEvent,
   listNetworkEvents,
   networkEventId,
-} from "@khoralabs/agent-net";
+} from "@khoralabs/agent-net-harness";
 import type { KhoraClientEvent } from "@khoralabs/khora-client";
 import { type Client, createClient } from "@libsql/client";
 import type { AgentLoopState, SwarmConfig, SwarmState, TurnTelemetry } from "./types.ts";

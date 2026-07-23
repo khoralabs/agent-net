@@ -3,7 +3,7 @@ import type {
   NetworkAttribution,
   NetworkEvent,
   ThreadHashSnapshot,
-} from "@khoralabs/agent-net";
+} from "@khoralabs/agent-net-harness";
 import type { PostUsage } from "@khoralabs/chat";
 
 export type { NetworkAttribution, NetworkEvent, ThreadHashSnapshot };

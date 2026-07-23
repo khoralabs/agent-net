@@ -1,4 +1,4 @@
-import type { NetworkHarnessHandle } from "@khoralabs/agent-net";
+import type { NetworkHarnessHandle } from "@khoralabs/agent-net-harness";
 
 /** Process-local harness handed from CLI into setupSwarmStep (not serializable). */
 const pending = new Map<string, NetworkHarnessHandle>();

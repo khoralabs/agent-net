@@ -12,7 +12,7 @@ import {
   requireMemoriesBaseUrl,
   requireRelayBaseUrl,
   startNetworkHarness,
-} from "@khoralabs/agent-net";
+} from "@khoralabs/agent-net-harness";
 import {
   provideHarnessForSession,
   provideOntologyForSession,

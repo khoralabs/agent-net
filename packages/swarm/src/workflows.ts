@@ -3,7 +3,7 @@ import {
   emitNetworkEvent,
   networkEventId,
   runAgentTurn,
-} from "@khoralabs/agent-net";
+} from "@khoralabs/agent-net-harness";
 import { getRun, start } from "workflow/api";
 
 import { assembleTurnContext } from "./assemble-turn-context.ts";

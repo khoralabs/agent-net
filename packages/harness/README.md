@@ -11,7 +11,7 @@ The process that hosts the workflow worker must configure the world **before** r
 ## Usage
 
 ```ts
-import { startNetworkHarness } from "@khoralabs/agent-net";
+import { startNetworkHarness } from "@khoralabs/agent-net-harness";
 
 const harness = await startNetworkHarness({
   dataDir,

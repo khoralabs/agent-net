@@ -1,5 +1,5 @@
-import type { NetworkHarnessHandle } from "@khoralabs/agent-net";
-import { emitNetworkEvent, networkEventId } from "@khoralabs/agent-net";
+import type { NetworkHarnessHandle } from "@khoralabs/agent-net-harness";
+import { emitNetworkEvent, networkEventId } from "@khoralabs/agent-net-harness";
 
 import { ensureSwarmAgentRegistered } from "./agent-registry.ts";
 import type { SwarmMemoriesOntology } from "./pending-ontology.ts";

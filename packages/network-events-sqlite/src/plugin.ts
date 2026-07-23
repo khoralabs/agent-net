@@ -4,7 +4,7 @@ import type {
   ListNetworkEventsOptions,
   NetworkEvent,
   NetworkEventsPlugin,
-} from "@khoralabs/agent-net";
+} from "@khoralabs/agent-net-harness";
 
 import { createSqliteNetworkEventStore } from "./sqlite-store.ts";
 import type { NetworkEventStore } from "./store.ts";

@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import os from "node:os";
 import path from "node:path";
 
-import { installNetworkEventsPlugin } from "@khoralabs/agent-net";
+import { installNetworkEventsPlugin } from "@khoralabs/agent-net-harness";
 import { createNetworkEventPersistencePlugin } from "@khoralabs/network-events-sqlite";
 
 import {

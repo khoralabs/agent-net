@@ -1,5 +1,5 @@
 import { afterAll, expect, test } from "bun:test";
-import { createHarnessChatBackend } from "@khoralabs/agent-net";
+import { createHarnessChatBackend } from "@khoralabs/agent-net-harness";
 import { createChatClient } from "@khoralabs/chat/http/client";
 import { createChatRoutesWithParams, dispatchChatRoute } from "@khoralabs/chat/http/routes";
 import { createChatHttpRuntime } from "@khoralabs/chat/http/service";

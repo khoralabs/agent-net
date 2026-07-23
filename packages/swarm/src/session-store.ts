@@ -4,7 +4,7 @@ import type {
   ChatServiceClient,
   HarnessAgentWorkflowDeps,
   NetworkHarnessHandle,
-} from "@khoralabs/agent-net";
+} from "@khoralabs/agent-net-harness";
 
 import type { AgentLoopState, SwarmConfig } from "./types.ts";
 

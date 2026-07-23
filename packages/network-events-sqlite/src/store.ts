@@ -1,4 +1,4 @@
-import type { ListNetworkEventsOptions, NetworkEvent } from "@khoralabs/agent-net";
+import type { ListNetworkEventsOptions, NetworkEvent } from "@khoralabs/agent-net-harness";
 
 export type NetworkEventStore = {
   append(event: NetworkEvent): Promise<NetworkEvent | null>;

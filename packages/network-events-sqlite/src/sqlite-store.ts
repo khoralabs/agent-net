@@ -1,6 +1,6 @@
 import { mkdirSync } from "node:fs";
 import path from "node:path";
-import type { ListNetworkEventsOptions, NetworkEvent } from "@khoralabs/agent-net";
+import type { ListNetworkEventsOptions, NetworkEvent } from "@khoralabs/agent-net-harness";
 import { createClient } from "@libsql/client";
 
 import type { NetworkEventStore } from "./store.ts";
