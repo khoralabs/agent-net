@@ -1,8 +1,8 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import { type MemorySearchHit, runHybridMemorySearch } from "@khoralabs/memories-node/helpers";
 import { z } from "zod";
-import { hasMemoriesClient } from "../policies";
-import type { HarnessToolkitEnv } from "../types";
+import { hasMemoriesClient } from "../policies.ts";
+import type { HarnessToolkitEnv } from "../types.ts";
 import { touchRecentNamespaces } from "./_helpers/recent-namespaces.ts";
 
 export const searchMemoriesTool = tool<

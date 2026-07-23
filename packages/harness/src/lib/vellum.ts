@@ -2,10 +2,10 @@ import path from "node:path";
 import type { IdentitySecret } from "@khoralabs/did-key-identity";
 import { RelayClient } from "@khoralabs/relay/client";
 
-import type { AgentHandle, VellumHandle } from "../agents";
-import { AgentStore } from "../agents";
-import { loadHarnessIdentity, resolveIdentitySecretFromEnv } from "./identity-wrap-key";
-import { waitFor } from "./wait-for";
+import type { AgentHandle, VellumHandle } from "../agents/index.ts";
+import { AgentStore } from "../agents/index.ts";
+import { loadHarnessIdentity, resolveIdentitySecretFromEnv } from "./identity-wrap-key.ts";
+import { waitFor } from "./wait-for.ts";
 
 export type VellumPairOptions = {
   /** Base URL of the relay server. */

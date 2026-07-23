@@ -7,8 +7,8 @@ import type {
 } from "@khoralabs/vellum-client";
 import { VellumClient, type VellumClientOptions } from "@khoralabs/vellum-client";
 
-import type { AgentChatClient } from "../chat";
-import type { AgentMemoriesClient } from "./memories-types";
+import type { AgentChatClient } from "../chat.ts";
+import type { AgentMemoriesClient } from "./memories-types.ts";
 
 export type AgentHandleOptions = {
   signer: PersistableSigner;

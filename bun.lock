@@ -8,10 +8,10 @@
         "@khoralabs/memories-node": "^0.5.3",
       },
       "devDependencies": {
-        "@biomejs/biome": "^2.4.10",
+        "@biomejs/biome": "^2.5.5",
         "@types/bun": "latest",
         "husky": "^9.1.7",
-        "typescript": "^5",
+        "typescript": "^5.9.3",
       },
     },
     "apps/reference": {

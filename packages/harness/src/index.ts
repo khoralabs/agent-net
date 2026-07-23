@@ -20,7 +20,7 @@ export {
   type PoolInboxEvent,
   type PoolInboxLifecycleHandler,
   type PoolInboxOptions,
-} from "./agents";
+} from "./agents/index.ts";
 export {
   type AgentChatClient,
   type ChatServiceClient,
@@ -29,12 +29,12 @@ export {
   createHarnessChatBackend,
   createRemoteHarnessChat,
   type SignedChatBackend,
-} from "./chat";
+} from "./chat.ts";
 export {
   type HarnessAgentWorkflowDeps,
   type NetworkHarnessHandle,
   startNetworkHarness,
-} from "./harness";
+} from "./harness.ts";
 export {
   requireChatBaseUrl,
   requireChatToken,
@@ -69,12 +69,12 @@ export {
   listNetworkEvents,
   type NetworkEventsPlugin,
   networkEventId,
-} from "./network";
+} from "./network/index.ts";
 export type {
   NetworkAttribution,
   NetworkEvent,
   ThreadHashSnapshot,
-} from "./network/types";
+} from "./network/types.ts";
 export { buildNetworkAttribution } from "./observability/attribution-digest.ts";
 export type { CreateHarnessLoggerOptions } from "./observability/harness-observability.ts";
 export {
@@ -86,4 +86,4 @@ export {
   clearNetworkSessionContext,
   getCurrentAttribution,
   getNetworkSessionContext,
-} from "./observability/network-log";
+} from "./observability/network-log.ts";

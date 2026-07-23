@@ -31,7 +31,7 @@ import {
   type HarnessPoolInbox,
   type ManagedAgentPool,
   type PoolInboxEvent,
-} from "./agents";
+} from "./agents/index.ts";
 import type { AgentChatClient, ChatServiceClient, HarnessChat, SignedChatBackend } from "./chat.ts";
 import { createHarnessChatCrypto } from "./chat-crypto.ts";
 import { loadHarnessIdentity } from "./lib/identity-wrap-key.ts";

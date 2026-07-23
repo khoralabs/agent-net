@@ -25,7 +25,7 @@ export function resolveHarnessEmbeddingModel(): EmbeddingModel | undefined {
   if (apiKey === undefined || apiKey.length === 0) return undefined;
   const google = createGoogleGenerativeAI({ apiKey });
   return createMemoriesEmbeddingModel({
-    model: google.embedding("gemini-embedding-2-preview"),
+    model: google.embedding("gemini-embedding-2"),
     providerOptions: mergeResolutionAndProviderOptions(parseEmbeddingPreset()),
   });
 }

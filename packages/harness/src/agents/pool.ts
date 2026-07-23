@@ -6,10 +6,10 @@ import {
 } from "@khoralabs/did-key-identity";
 import { KhoraClient } from "@khoralabs/khora-client";
 
-import { loadHarnessIdentity, saveHarnessIdentity } from "../lib/identity-wrap-key";
-import type { PerAgentInviteBank } from "../lib/per-agent-invite-bank";
-import { AgentHandle } from "./handle";
-import { AgentStore } from "./store";
+import { loadHarnessIdentity, saveHarnessIdentity } from "../lib/identity-wrap-key.ts";
+import type { PerAgentInviteBank } from "../lib/per-agent-invite-bank.ts";
+import { AgentHandle } from "./handle.ts";
+import { AgentStore } from "./store.ts";
 
 export type AgentCallback = (handle: AgentHandle) => Promise<void>;
 

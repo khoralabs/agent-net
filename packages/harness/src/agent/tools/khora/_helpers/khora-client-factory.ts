@@ -2,7 +2,7 @@ import path from "node:path";
 
 import type { IdentitySecret } from "@khoralabs/did-key-identity";
 import { KhoraClient } from "@khoralabs/khora-client";
-import { AgentStore } from "../../../../agents";
+import { AgentStore } from "../../../../agents/index.ts";
 import {
   loadHarnessIdentity,
   resolveIdentitySecretFromEnv,

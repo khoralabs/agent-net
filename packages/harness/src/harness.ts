@@ -3,8 +3,8 @@ import {
   createBearerTokenAuthProvider,
   MemoriesServiceClient,
 } from "@khoralabs/memories-service/client";
-import { AgentStore, HarnessPoolInbox, ManagedAgentPool } from "./agents";
-import { createRemoteHarnessChat, type HarnessChat } from "./chat";
+import { AgentStore, HarnessPoolInbox, ManagedAgentPool } from "./agents/index.ts";
+import { createRemoteHarnessChat, type HarnessChat } from "./chat.ts";
 import {
   createHarnessAgentApi,
   harnessAgentsDataDir,
@@ -21,10 +21,10 @@ import {
   installNetworkEventsPlugin,
   type NetworkEventsPlugin,
   networkEventId,
-} from "./network";
+} from "./network/index.ts";
 import { getNetworkSessionContext } from "./observability/network-log.ts";
 
-export type { AgentMemoriesClient } from "./agents";
+export type { AgentMemoriesClient } from "./agents/index.ts";
 export type {
   BindNetworkSessionInput,
   EnsureHarnessAgentRegisteredInput,

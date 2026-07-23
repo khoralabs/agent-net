@@ -1,8 +1,8 @@
-export type { AgentHandleOptions, VellumHandle } from "./handle";
-export { AgentHandle } from "./handle";
-export type { AgentMemoriesClient } from "./memories-types";
-export type { AgentCallback, ManagedAgentPoolOptions } from "./pool";
-export { ManagedAgentPool } from "./pool";
+export type { AgentHandleOptions, VellumHandle } from "./handle.ts";
+export { AgentHandle } from "./handle.ts";
+export type { AgentMemoriesClient } from "./memories-types.ts";
+export type { AgentCallback, ManagedAgentPoolOptions } from "./pool.ts";
+export { ManagedAgentPool } from "./pool.ts";
 export type {
   HarnessPoolInboxOptions,
   InboxConnection,
@@ -10,7 +10,7 @@ export type {
   PoolInboxEvent,
   PoolInboxLifecycleHandler,
   PoolInboxOptions,
-} from "./pool-inbox";
-export { connectPoolInbox, HarnessPoolInbox } from "./pool-inbox";
-export type { AgentRecord } from "./store";
-export { AgentStore } from "./store";
+} from "./pool-inbox.ts";
+export { connectPoolInbox, HarnessPoolInbox } from "./pool-inbox.ts";
+export type { AgentRecord } from "./store.ts";
+export { AgentStore } from "./store.ts";

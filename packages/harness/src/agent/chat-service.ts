@@ -1,7 +1,7 @@
 import path from "node:path";
 import { loadOrCreateIdentity } from "@khoralabs/did-key-identity";
 import type { RelaySigner } from "@khoralabs/relay/crypto";
-import { AgentStore } from "../agents";
+import { AgentStore } from "../agents/index.ts";
 
 import {
   type AgentChatClient,

@@ -7,7 +7,7 @@ import {
   type NetworkEvent,
   type NetworkEventsPlugin,
   networkEventId,
-} from "../network";
+} from "../network/index.ts";
 import {
   bindNetworkSessionContext,
   clearNetworkSessionContext,

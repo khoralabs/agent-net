@@ -2,7 +2,7 @@ import type { KhoraClient } from "@khoralabs/khora-client";
 import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 
-import type { AgentChatClient } from "../../../chat";
+import type { AgentChatClient } from "../../../chat.ts";
 import {
   resolveMemoriesAdminTokenFromEnv,
   resolveMemoriesBaseUrlFromEnv,
@@ -12,10 +12,10 @@ import {
   agentMemoriesDatabase,
   createHarnessMemoriesClient,
   type HarnessMemoriesOntology,
-} from "../memories/_helpers/memories-client";
-import { resolveRecentNamespacesTracker } from "../memories/_helpers/recent-namespaces";
-import { discoverSkillsFromMemories } from "../skills/_helpers/skills";
-import type { HarnessToolkitEnv } from "../types";
+} from "../memories/_helpers/memories-client.ts";
+import { resolveRecentNamespacesTracker } from "../memories/_helpers/recent-namespaces.ts";
+import { discoverSkillsFromMemories } from "../skills/_helpers/skills.ts";
+import type { HarnessToolkitEnv } from "../types.ts";
 
 async function getMemoriesProvenanceHeadRootHex(
   client: RemoteMemoriesClientAsync,

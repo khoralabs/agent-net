@@ -16,12 +16,12 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import os from "node:os";
 import path from "node:path";
-import { type NetworkHarnessHandle, startNetworkHarness } from "../harness";
-import { resolveKhoraBaseUrlFromEnv } from "../lib/khora-base-url";
-import { resolveMemoriesBaseUrlFromEnv } from "../lib/memories-base-url";
-import { resolveRelayBaseUrlFromEnv } from "../lib/relay-base-url";
-import { disconnectVellum, openVellumChain } from "../lib/vellum";
-import { waitFor } from "../lib/wait-for";
+import { type NetworkHarnessHandle, startNetworkHarness } from "../harness.ts";
+import { resolveKhoraBaseUrlFromEnv } from "../lib/khora-base-url.ts";
+import { resolveMemoriesBaseUrlFromEnv } from "../lib/memories-base-url.ts";
+import { resolveRelayBaseUrlFromEnv } from "../lib/relay-base-url.ts";
+import { disconnectVellum, openVellumChain } from "../lib/vellum.ts";
+import { waitFor } from "../lib/wait-for.ts";
 import { startTestChatHttp, type TestChatHttpHandle } from "./test-chat-http.ts";
 
 const khoraBaseUrl = resolveKhoraBaseUrlFromEnv();
