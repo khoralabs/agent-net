@@ -17,7 +17,7 @@
     "@libsql/client": "0.17.4"
   },
   "scripts": {
-    "typecheck": "bun run --filter '@khoralabs/agent-net' typecheck && bun run --filter '@khoralabs/agent-net-swarm' typecheck && bun run --filter '@khoralabs/agent-net-reference' typecheck",
+    "typecheck": "bun run --filter '@khoralabs/agent-net-harness' typecheck && bun run --filter '@khoralabs/agent-net-swarm' typecheck && bun run --filter '@khoralabs/agent-net-reference' typecheck",
     "format": "biome check --write .",
     "format:check": "biome check .",
     "agent:dev": "bun run --filter @khoralabs/agent-net-reference agent:dev",
