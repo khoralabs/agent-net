@@ -110,7 +110,14 @@ export class HarnessPoolInbox {
     if (this.#closed) return;
     this.#membership.set(signer.did, signer);
     if (this.#session !== undefined) {
-      await this.#session.bind([signer]);
+      try {
+        await this.#session.bind([signer]);
+      } catch {
+        // Half-open / closing socket (e.g. Khora not ready yet). Tear down and let
+        // the reconnect loop rebind full membership — never fail harness boot.
+        this.#tearDownSession();
+        this.#ensureLoop();
+      }
       return;
     }
     this.#ensureLoop();
