@@ -1,6 +1,7 @@
 import { Database } from "bun:sqlite";
 import { existsSync } from "node:fs";
 import { ensureCustomSqliteForExtensions } from "@khoralabs/memories-node/sqlite";
+import type { MemoriesTelemetry } from "@khoralabs/memories-node/telemetry";
 import { createNoneAuthStrategy } from "@khoralabs/memories-service/auth";
 import { handleMemoriesServiceHttpRequest } from "@khoralabs/memories-service/http";
 import { createLocalSqliteServiceStack } from "@khoralabs/memories-service/storage/sqlite";
@@ -9,6 +10,8 @@ export type MemoriesServiceOptions = {
   dataDir: string;
   sqlCipherKey?: string;
   port?: number;
+  /** Structured telemetry for database lifecycle and node ops (e.g. from getHarnessMemoriesTelemetry). */
+  telemetry?: MemoriesTelemetry;
 };
 
 export type MemoriesServiceHandle = {
@@ -53,6 +56,7 @@ export function startMemoriesService(opts: MemoriesServiceOptions): MemoriesServ
   const stack = createLocalSqliteServiceStack({
     dataDir: opts.dataDir,
     sqlCipherKey: opts.sqlCipherKey ?? "harness-memories-key",
+    telemetry: opts.telemetry,
   });
   const auth = createNoneAuthStrategy();
 

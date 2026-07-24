@@ -24,3 +24,14 @@ bun run swarm -- \
 ```
 
 Orchestrator prints `memoriesBaseUrl` / `relayBaseUrl`. Point the harness or swarm CLI at those URLs plus a remote `KHORA_BASE_URL`.
+
+## Observability
+
+Set `OTEL_EXPORTER_OTLP_ENDPOINT` (and optional `LOG_LEVEL`) to export traces/metrics.
+
+| Process | What emits |
+|---------|------------|
+| Orchestrator (`reference:start`) | Memories database lifecycle + merge/search/delete via `@khoralabs/memories-otel` on the local SQLite stack |
+| Swarm / agent (`swarm`, `agent:dev`) | Agent session/tool OTEL via `installReferenceObservability` |
+
+The orchestrator calls `installReferenceObservability` then passes `getHarnessMemoriesTelemetry()` into `startMemoriesService`. Swarm against `--memories-url` observes memory systems through that host’s OTLP export, not through client-side HTTP wrappers.

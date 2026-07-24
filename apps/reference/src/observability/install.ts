@@ -6,6 +6,7 @@ import {
   getNetworkSessionContext,
   installHarnessObservability,
 } from "@khoralabs/agent-net-harness";
+import { createMemoriesOtelTelemetry } from "@khoralabs/memories-otel";
 import { metrics, trace } from "@opentelemetry/api";
 import type { Logger } from "pino";
 import pino from "pino";
@@ -83,7 +84,7 @@ function createLogger(opts: CreateHarnessLoggerOptions): Logger {
 }
 
 /**
- * Wire OTEL + Pino into the harness observability surface.
+ * Wire OTEL + Pino into the harness observability surface (agent + memories sinks).
  * Pass `sessionJsonlPath` from the network-events plugin when a session JSONL sink is desired.
  */
 export function installReferenceObservability(opts: InitReferenceObservabilityOptions): void {
@@ -102,6 +103,16 @@ export function installReferenceObservability(opts: InitReferenceObservabilityOp
         agentDid,
       });
       return createAgentTelemetry({ tracer, logger, meter });
+    },
+    createMemoriesTelemetry() {
+      return createMemoriesOtelTelemetry({
+        tracer,
+        meter,
+        logger: createLogger({
+          name: opts.serviceName,
+          source: "memories",
+        }),
+      });
     },
   });
 }

@@ -1,5 +1,8 @@
 import path from "node:path";
 
+import { getHarnessMemoriesTelemetry } from "@khoralabs/agent-net-harness";
+
+import { installReferenceObservability } from "./observability/install.ts";
 import { startChatHttpService } from "./services/chat.ts";
 import { startMemoriesService } from "./services/memories.ts";
 import { startRelayServer } from "./services/relay.ts";
@@ -53,9 +56,12 @@ async function main(): Promise<void> {
   configureTursoWorldEnv({ dataDir });
   await startTursoWorldWorker({ dataDir });
 
+  installReferenceObservability({ serviceName: "network-harness-memories" });
+
   const memories = startMemoriesService({
     dataDir: path.join(dataDir, "memories"),
     port: opts.memoriesPort,
+    telemetry: getHarnessMemoriesTelemetry(),
   });
   const relay = await startRelayServer({
     dataDir: path.join(dataDir, "relay"),

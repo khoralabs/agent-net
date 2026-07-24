@@ -22,6 +22,7 @@
     "@khoralabs/chat": "^0.1.1",
     "@khoralabs/network-events-sqlite": "workspace:*",
     "@khoralabs/memories-node": "^0.5.4",
+    "@khoralabs/memories-otel": "^0.5.4",
     "@khoralabs/memories-service": "^0.5.4",
     "@khoralabs/sqlite-migrate": "^0.1.0",
     "ajv": "^8",

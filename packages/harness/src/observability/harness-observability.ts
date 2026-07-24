@@ -1,4 +1,5 @@
 import type { CapabilityLink, ToolPipelineHooks } from "@khoralabs/agent-capabilities";
+import { type MemoriesTelemetry, noopMemoriesTelemetry } from "@khoralabs/memories-node/telemetry";
 
 export type HarnessLogger = {
   info: (obj: object, msg?: string) => void;
@@ -24,6 +25,8 @@ export type CreateHarnessLoggerOptions = {
 export type HarnessObservability = {
   createLogger: (opts: CreateHarnessLoggerOptions) => HarnessLogger;
   createAgentTelemetry: (agentDid?: string) => HarnessAgentTelemetry;
+  /** Sink for memories-service / node ops when the host embeds a memories stack. */
+  createMemoriesTelemetry: () => MemoriesTelemetry;
 };
 
 const noopLogger: HarnessLogger = {
@@ -44,6 +47,9 @@ const noopObservability: HarnessObservability = {
   createAgentTelemetry() {
     return noopTelemetry;
   },
+  createMemoriesTelemetry() {
+    return noopMemoriesTelemetry;
+  },
 };
 
 let installed: HarnessObservability | undefined;
@@ -58,6 +64,11 @@ export function getHarnessObservability(): HarnessObservability {
 
 export function createHarnessAgentTelemetry(agentDid?: string): HarnessAgentTelemetry {
   return getHarnessObservability().createAgentTelemetry(agentDid);
+}
+
+/** Memories telemetry sink from the installed host observability (noop until installed). */
+export function getHarnessMemoriesTelemetry(): MemoriesTelemetry {
+  return getHarnessObservability().createMemoriesTelemetry();
 }
 
 export function resetHarnessObservabilityForTests(): void {

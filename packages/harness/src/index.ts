@@ -76,10 +76,16 @@ export type {
   ThreadHashSnapshot,
 } from "./network/types.ts";
 export { buildNetworkAttribution } from "./observability/attribution-digest.ts";
-export type { CreateHarnessLoggerOptions } from "./observability/harness-observability.ts";
+export type {
+  CreateHarnessLoggerOptions,
+  HarnessObservability,
+} from "./observability/harness-observability.ts";
 export {
+  createHarnessAgentTelemetry,
+  getHarnessMemoriesTelemetry,
   getHarnessObservability,
   installHarnessObservability,
+  resetHarnessObservabilityForTests,
 } from "./observability/harness-observability.ts";
 export {
   bindNetworkSessionContext,

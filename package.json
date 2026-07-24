@@ -11,6 +11,7 @@
   "overrides": {
     "@khoralabs/memories-node": "0.5.4",
     "@khoralabs/memories-service": "0.5.4",
+    "@khoralabs/memories-otel": "0.5.4",
     "@khoralabs/memories-agents": "0.5.4",
     "@khoralabs/memories-react-graph": "0.5.4",
     "@khoralabs/memories-spec": "0.5.4",

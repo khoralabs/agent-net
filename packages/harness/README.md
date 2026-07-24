@@ -38,3 +38,31 @@ const unsub = harness.subscribeInbox((event) => {
 
 Spawning (`harness.spawn` or `harness.pool.spawn`) binds the agent DID on that shared socket;
 `harness.removeAgent` / `pool.remove` unbinds it. Do not open per-agent inbox WebSockets.
+
+## Telemetry
+
+Install host observability with `installHarnessObservability`. Besides agent OTEL (`createAgentTelemetry`), provide `createMemoriesTelemetry` when **this process hosts** a memories stack:
+
+```ts
+import { installHarnessObservability, getHarnessMemoriesTelemetry } from "@khoralabs/agent-net-harness";
+import { createMemoriesOtelTelemetry } from "@khoralabs/memories-otel";
+import { createLocalSqliteServiceStack } from "@khoralabs/memories-service/storage/sqlite";
+import { trace, metrics } from "@opentelemetry/api";
+
+const tracer = trace.getTracer("my-app");
+const meter = metrics.getMeter("my-app");
+
+installHarnessObservability({
+  createLogger,
+  createAgentTelemetry,
+  createMemoriesTelemetry: () => createMemoriesOtelTelemetry({ tracer, meter }),
+});
+
+const stack = createLocalSqliteServiceStack({
+  dataDir,
+  sqlCipherKey,
+  telemetry: getHarnessMemoriesTelemetry(),
+});
+```
+
+Memory merge/search/delete and database open/close/delete/evict spans emit in the **memories-service process**. Pointing the harness at a remote `memoriesBaseUrl` only surfaces those spans if that host is instrumented (the reference orchestrator does this). Agent tool OTEL remains separate via `createAgentTelemetry`.
