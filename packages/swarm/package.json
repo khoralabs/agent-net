@@ -13,13 +13,13 @@
   },
   "dependencies": {
     "@khoralabs/agent-net-harness": "workspace:*",
-    "@khoralabs/chat": "^0.1.1",
+    "@khoralabs/chat": "^0.1.2",
     "@khoralabs/did-key-identity": "^0.1.0",
     "@khoralabs/khora-client": "^0.1.6",
     "@libsql/client": "^0.17.4",
     "ai": "^7.0.9",
     "workflow": "^4.5.0",
-    "@khoralabs/memories-node": "^0.5.9"
+    "@khoralabs/memories-node": "^0.5.10"
   },
   "devDependencies": {
     "@khoralabs/network-events-sqlite": "workspace:*",
