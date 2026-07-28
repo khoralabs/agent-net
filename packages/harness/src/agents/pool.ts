@@ -103,6 +103,21 @@ export class ManagedAgentPool {
     return this.#store.all().map((a) => a.did);
   }
 
+  /** Lookup agent DID by opaque external id, if linked. */
+  getDidByExternalId(externalId: string): string | undefined {
+    return this.#store.getByExternalId(externalId)?.did;
+  }
+
+  /** Lookup opaque external id linked to an agent DID, if any. */
+  getExternalId(did: string): string | undefined {
+    return this.#store.get(did)?.externalId;
+  }
+
+  /** Persist an opaque external id ↔ DID mapping on an existing pool agent. */
+  async setExternalId(did: string, externalId: string): Promise<void> {
+    await this.#store.setExternalId(did, externalId);
+  }
+
   async #loadSigner(keyPath: string): Promise<PersistableSigner | undefined> {
     return loadHarnessIdentity(keyPath, this.#identitySecret);
   }
@@ -113,7 +128,15 @@ export class ManagedAgentPool {
    * immediately after registration — use it to perform per-agent setup
    * (e.g. initialising a memories database). Returns the new agent's DID.
    */
-  async spawn(onSpawned?: AgentCallback): Promise<string> {
+  async spawn(onSpawned?: AgentCallback, opts?: { externalId?: string }): Promise<string> {
+    const externalId = opts?.externalId?.trim();
+    if (externalId !== undefined && externalId.length > 0) {
+      const existing = this.#store.getByExternalId(externalId);
+      if (existing !== undefined) {
+        throw new Error(`externalId ${externalId} is already linked to agent ${existing.did}`);
+      }
+    }
+
     const signer = await generateIdentity();
     const keyPath = AgentStore.keyPath(this.#dataDir, signer.did);
     await saveHarnessIdentity(keyPath, signer, this.#identitySecret);
@@ -135,9 +158,18 @@ export class ManagedAgentPool {
       await this.#inviteBank.deposit(signer, result.inviteTokens);
     }
 
-    await this.#store.add({ did: signer.did, keyPath });
+    await this.#store.add({
+      did: signer.did,
+      keyPath,
+      ...(externalId !== undefined && externalId.length > 0 ? { externalId } : {}),
+    });
 
-    const handle = new AgentHandle({ signer, baseUrl: this.#baseUrl, keyPath });
+    const handle = new AgentHandle({
+      signer,
+      baseUrl: this.#baseUrl,
+      keyPath,
+      ...(externalId !== undefined && externalId.length > 0 ? { externalId } : {}),
+    });
     await this.#onMemberAdded?.(handle);
     if (onSpawned !== undefined) {
       await onSpawned(handle);
@@ -166,7 +198,12 @@ export class ManagedAgentPool {
     if (signer !== undefined) {
       if (onRemoving !== undefined) {
         await onRemoving(
-          new AgentHandle({ signer, baseUrl: this.#baseUrl, keyPath: record.keyPath }),
+          new AgentHandle({
+            signer,
+            baseUrl: this.#baseUrl,
+            keyPath: record.keyPath,
+            ...(record.externalId !== undefined ? { externalId: record.externalId } : {}),
+          }),
         );
       }
       const client = new KhoraClient({ baseUrl: this.#baseUrl, signer });
@@ -196,7 +233,12 @@ export class ManagedAgentPool {
       throw new Error(`Key file missing for agent ${did} at ${record.keyPath}`);
     }
 
-    const handle = new AgentHandle({ signer, baseUrl: this.#baseUrl, keyPath: record.keyPath });
+    const handle = new AgentHandle({
+      signer,
+      baseUrl: this.#baseUrl,
+      keyPath: record.keyPath,
+      ...(record.externalId !== undefined ? { externalId: record.externalId } : {}),
+    });
     await onFocused?.(handle);
     return handle;
   }

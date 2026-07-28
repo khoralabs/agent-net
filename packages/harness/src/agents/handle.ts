@@ -15,6 +15,11 @@ export type AgentHandleOptions = {
   baseUrl: string;
   /** Path to the agent's persisted Ed25519 key file (for vellum operations). */
   keyPath?: string;
+  /**
+   * Optional caller-defined id linking this agent to an external system.
+   * Opaque to the harness.
+   */
+  externalId?: string;
 };
 
 export type VellumHandle = {
@@ -48,6 +53,8 @@ export class AgentHandle {
   readonly signer: PersistableSigner;
   readonly baseUrl: string;
   readonly client: KhoraClient;
+  /** Optional opaque external linkage id (tenant/org/etc.). */
+  readonly externalId: string | undefined;
   readonly #keyPath: string | undefined;
   #memories: AgentMemoriesClient | undefined;
   #chat: AgentChatClient | undefined;
@@ -58,6 +65,8 @@ export class AgentHandle {
     this.baseUrl = opts.baseUrl.trim().replace(/\/$/, "");
     this.client = new KhoraClient({ baseUrl: this.baseUrl, signer: opts.signer });
     this.#keyPath = opts.keyPath;
+    const externalId = opts.externalId?.trim();
+    this.externalId = externalId !== undefined && externalId.length > 0 ? externalId : undefined;
   }
 
   get memories(): AgentMemoriesClient {

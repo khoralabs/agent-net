@@ -40,6 +40,8 @@ import { registerNetworkSession, removeNetworkSession } from "./network/session-
 
 export type SpawnWithMemoriesOptions = {
   ontology: OntologyDefinition<LabelSchemaMap, LabelSchemaMap>;
+  /** Optional opaque external linkage id (tenant/org/etc.). */
+  externalId?: string;
 };
 
 export type RegisterHarnessAgentInput = {
@@ -102,6 +104,14 @@ export type NetworkHarnessCore = {
 
 export type NetworkHarnessAgentApi = {
   spawn(opts: SpawnWithMemoriesOptions): Promise<AgentHandle>;
+  /**
+   * Return the agent linked to `externalId`, spawning one if missing.
+   * When `externalId` is omitted, always spawns a new agent.
+   */
+  getOrSpawn(opts: SpawnWithMemoriesOptions): Promise<{
+    agent: AgentHandle;
+    created: boolean;
+  }>;
   /** Unregister + remove from pool and unbind from the harness inbox multiplex. */
   removeAgent(did: string): Promise<void>;
   registerAgent(input: RegisterHarnessAgentInput): Promise<{ staticHash: string }>;
@@ -125,16 +135,19 @@ export async function spawnWithMemories(
   const ontology: HarnessMemoriesOntology = resolveHarnessMemoriesOntology(opts.ontology);
   let capturedHandle: AgentHandle | undefined;
 
-  const did = await harness.pool.spawn(async (handle) => {
-    capturedHandle = handle;
-    const database: MemoriesDatabaseId = { kind: "account", ownerKey: handle.did };
-    await harness.memoriesClient.openDatabase(database);
-    await ensureDatabaseOntologyLink({
-      serviceClient: harness.memoriesClient,
-      database,
-      schema: storedOntologyFromDefinition(ontology),
-    });
-  });
+  const did = await harness.pool.spawn(
+    async (handle) => {
+      capturedHandle = handle;
+      const database: MemoriesDatabaseId = { kind: "account", ownerKey: handle.did };
+      await harness.memoriesClient.openDatabase(database);
+      await ensureDatabaseOntologyLink({
+        serviceClient: harness.memoriesClient,
+        database,
+        schema: storedOntologyFromDefinition(ontology),
+      });
+    },
+    opts.externalId !== undefined ? { externalId: opts.externalId } : undefined,
+  );
 
   const agent = capturedHandle;
   if (agent === undefined) {
@@ -171,6 +184,51 @@ export function createHarnessAgentApi(
   return {
     spawn(spawnOpts) {
       return spawnWithMemories(harness, spawnOpts);
+    },
+
+    async getOrSpawn(opts) {
+      const externalId = opts.externalId?.trim();
+      if (externalId !== undefined && externalId.length > 0) {
+        const existingDid = harness.pool.getDidByExternalId(externalId);
+        if (existingDid !== undefined) {
+          const agent = await harness.pool.focus(existingDid);
+          const database: MemoriesDatabaseId = {
+            kind: "account",
+            ownerKey: existingDid,
+          };
+          const ontology: HarnessMemoriesOntology = resolveHarnessMemoriesOntology(opts.ontology);
+          const { memoriesClient } = harness;
+          const memories: AgentMemoriesClient = {
+            database,
+            ontology,
+            open: () => memoriesClient.openDatabase(database),
+            close: () => memoriesClient.closeDatabase(database),
+            checkpoint: () => memoriesClient.checkpointDatabase(database),
+            exists: () => memoriesClient.databaseExists(database),
+            delete: () => memoriesClient.deleteDatabase(database),
+            serviceClient: memoriesClient,
+            client: createLazyHarnessMemoriesClient({
+              baseUrl: harness.memoriesBaseUrl,
+              database,
+              ontology,
+              adminToken: harness.memoriesAdminToken,
+            }),
+          };
+          return {
+            agent: agent.bindServices(memories, harness.chat.forAgent(existingDid)),
+            created: false,
+          };
+        }
+        const agent = await spawnWithMemories(harness, {
+          ontology: opts.ontology,
+          externalId,
+        });
+        return { agent, created: true };
+      }
+      const agent = await spawnWithMemories(harness, {
+        ontology: opts.ontology,
+      });
+      return { agent, created: true };
     },
 
     async removeAgent(did) {

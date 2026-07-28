@@ -4,11 +4,35 @@ import path from "node:path";
 export type AgentRecord = {
   did: string;
   keyPath: string;
+  /**
+   * Optional caller-defined id linking this agent to an external system
+   * (tenant, org, account, etc.). Opaque to the harness.
+   */
+  externalId?: string;
 };
 
 type StoreFile = {
   agents: AgentRecord[];
 };
+
+function normalizeExternalId(value: string): string {
+  return value.trim();
+}
+
+/** Coerce legacy `platformCompanyId` field into `externalId` if present. */
+function normalizeRecord(raw: AgentRecord & { platformCompanyId?: string }): AgentRecord {
+  const externalId =
+    typeof raw.externalId === "string" && raw.externalId.trim().length > 0
+      ? normalizeExternalId(raw.externalId)
+      : typeof raw.platformCompanyId === "string" && raw.platformCompanyId.trim().length > 0
+        ? normalizeExternalId(raw.platformCompanyId)
+        : undefined;
+  return {
+    did: raw.did,
+    keyPath: raw.keyPath,
+    ...(externalId !== undefined ? { externalId } : {}),
+  };
+}
 
 export class AgentStore {
   readonly #filePath: string;
@@ -24,7 +48,10 @@ export class AgentStore {
     const file = Bun.file(filePath);
     if (await file.exists()) {
       const data = (await file.json()) as StoreFile;
-      return new AgentStore(filePath, data.agents ?? []);
+      const agents = (data.agents ?? []).map((a) =>
+        normalizeRecord(a as AgentRecord & { platformCompanyId?: string }),
+      );
+      return new AgentStore(filePath, agents);
     }
     return new AgentStore(filePath, []);
   }
@@ -37,8 +64,31 @@ export class AgentStore {
     return this.#agents.find((a) => a.did === did);
   }
 
+  getByExternalId(externalId: string): AgentRecord | undefined {
+    const id = normalizeExternalId(externalId);
+    if (id.length === 0) return undefined;
+    return this.#agents.find((a) => a.externalId === id);
+  }
+
   async add(record: AgentRecord): Promise<void> {
-    this.#agents.push(record);
+    this.#agents.push(normalizeRecord(record));
+    await this.#flush();
+  }
+
+  async setExternalId(did: string, externalId: string): Promise<void> {
+    const record = this.#agents.find((a) => a.did === did);
+    if (record === undefined) {
+      throw new Error(`Agent ${did} is not in the store`);
+    }
+    const id = normalizeExternalId(externalId);
+    if (id.length === 0) {
+      throw new Error("externalId is required");
+    }
+    const existing = this.getByExternalId(id);
+    if (existing !== undefined && existing.did !== did) {
+      throw new Error(`externalId ${id} is already linked to agent ${existing.did}`);
+    }
+    record.externalId = id;
     await this.#flush();
   }
 
