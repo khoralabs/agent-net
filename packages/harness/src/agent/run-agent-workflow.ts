@@ -6,8 +6,10 @@ import {
   convertToModelMessages,
   type ModelMessage,
   NoOutputGeneratedError,
+  readUIMessageStream,
   stepCountIs,
   streamText,
+  toUIMessageStream,
   type UIMessage,
 } from "ai";
 import { FatalError } from "workflow";
@@ -51,6 +53,13 @@ function assistantMessage(id: string, text: string): UIMessage {
     role: "assistant",
     parts: text.length > 0 ? [{ type: "text", text }] : [],
   };
+}
+
+function textFromUIMessage(message: UIMessage): string {
+  return message.parts
+    .filter((part): part is { type: "text"; text: string } => part.type === "text")
+    .map((part) => part.text)
+    .join("");
 }
 
 function errorMessage(error: unknown): string {
@@ -189,7 +198,7 @@ export async function runAgentWorkflow(
     params,
     signer: deps.chatSigner,
   });
-  let text = "";
+  let latest: UIMessage = assistantMessage(params.output.chat.postId ?? params.runId, "");
   let streamStarted = false;
   const modelId = resolveGatewayModel(params.model.id);
   const runStreamText = deps.streamTextFn ?? streamText;
@@ -217,21 +226,40 @@ export async function runAgentWorkflow(
       } as Parameters<typeof streamText>[0]);
       const finishReasonPromise = Promise.resolve(result.finishReason).catch(() => undefined);
       const usagePromise = Promise.resolve(result.usage).catch(() => undefined);
-      const responsePromise = Promise.resolve(result.response).catch(() => undefined);
+      const responsePromise = Promise.resolve(result.finalStep)
+        .then((step) => step.response)
+        .catch(() => undefined);
       const textPromise = Promise.resolve(result.text).catch(() => "");
 
       try {
-        for await (const delta of result.textStream) {
-          text += delta;
+        const uiChunkStream = toUIMessageStream({
+          stream: result.stream,
+          tools: aiTools,
+          generateMessageId: () => writer.postId,
+        });
+        for await (const message of readUIMessageStream({
+          message: latest,
+          stream: uiChunkStream,
+          onError: (error) => {
+            generationError = error;
+          },
+        })) {
+          latest = { ...message, id: writer.postId, role: "assistant" };
           if (params.output.chat.streamDeltas) {
-            await writer.apply(assistantMessage(writer.postId, text));
+            await writer.apply(latest);
           }
         }
       } catch (error) {
         generationError = error;
       }
 
-      text = text.length > 0 ? text : await textPromise;
+      let text = textFromUIMessage(latest);
+      if (text.length === 0) {
+        text = await textPromise;
+        if (text.length > 0) {
+          latest = assistantMessage(writer.postId, text);
+        }
+      }
       if (text.length === 0) {
         if (NoOutputGeneratedError.isInstance(generationError)) {
           rethrowAsFatalAiNoOutput(generationError, "agentResponse");
@@ -249,7 +277,7 @@ export async function runAgentWorkflow(
         model: modelMetadata({ requestedModel: modelId, finishReason, response }),
         usage: usageFromAiSdk(usage),
       };
-      await writer.apply(assistantMessage(writer.postId, text), metadata);
+      await writer.apply(latest, metadata);
       const message = await writer.complete();
 
       const threadHashes =
@@ -271,7 +299,7 @@ export async function runAgentWorkflow(
         capabilities,
       };
     } catch (error) {
-      if (streamStarted && text.length === 0) {
+      if (streamStarted && textFromUIMessage(latest).length === 0) {
         await writer
           .apply(assistantMessage(writer.postId, userFacingGenerationError()))
           .then(() => writer.complete())

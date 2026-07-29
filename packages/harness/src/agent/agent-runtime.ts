@@ -6,6 +6,7 @@ import {
   type ToolPipelineHooks,
 } from "@khoralabs/agent-capabilities";
 import { toolMapToAiTools } from "@khoralabs/agent-capabilities-ai-sdk";
+import type { ToolSet } from "ai";
 import { getNetworkSession } from "../network/session-registry.ts";
 import { createHarnessAgentTelemetry } from "../observability/harness-observability.ts";
 import { defineHarnessAgent } from "./agents/index.ts";
@@ -79,7 +80,7 @@ export async function captureHarnessCapabilities(input: {
   pipelineHooks?: ToolPipelineHooks;
 }): Promise<{
   capture: CaptureEnvelope;
-  aiTools: Record<string, unknown>;
+  aiTools: ToolSet;
   capabilities: {
     staticHash: string;
     runtimeHash: string;
@@ -107,7 +108,7 @@ export async function captureHarnessCapabilities(input: {
     env: input.env,
     resolvedPolicies: new Map(),
     pipelineHooks: input.pipelineHooks,
-  }) as Record<string, unknown>;
+  }) as ToolSet;
 
   return {
     capture,

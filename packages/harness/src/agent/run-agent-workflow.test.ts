@@ -36,6 +36,53 @@ function userMessage(text: string): UIMessage {
   };
 }
 
+function textStreamResult(chunks: string[]) {
+  const text = chunks.join("");
+  const stream = new ReadableStream({
+    start(controller) {
+      controller.enqueue({ type: "start" });
+      controller.enqueue({ type: "start-step", request: {}, warnings: [] });
+      controller.enqueue({ type: "text-start", id: "t1" });
+      for (const chunk of chunks) {
+        controller.enqueue({ type: "text-delta", id: "t1", text: chunk });
+      }
+      controller.enqueue({ type: "text-end", id: "t1" });
+      controller.enqueue({
+        type: "finish-step",
+        response: { id: "r1", timestamp: new Date(), modelId: "m" },
+        usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 },
+        performance: {},
+        finishReason: "stop",
+        rawFinishReason: "stop",
+        providerMetadata: undefined,
+      });
+      controller.enqueue({
+        type: "finish",
+        finishReason: "stop",
+        rawFinishReason: "stop",
+        totalUsage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 },
+      });
+      controller.close();
+    },
+  });
+  return {
+    stream,
+    text: Promise.resolve(text),
+    finishReason: Promise.resolve("stop"),
+    usage: Promise.resolve({
+      inputTokens: 10,
+      outputTokens: 5,
+      totalTokens: 15,
+    }),
+    finalStep: Promise.resolve({
+      response: {
+        modelId: "anthropic/claude-sonnet-4.6",
+        provider: "gateway",
+      },
+    }),
+  };
+}
+
 function params(input: {
   runId: string;
   text: string;
@@ -84,22 +131,7 @@ test("runAgentWorkflow streams assistant text to signed chat thread", async () =
     {
       chatService: chat.client,
       chatSigner: chat.chatSigner,
-      streamTextFn: (() => ({
-        textStream: (async function* () {
-          for (const chunk of chunks) yield chunk;
-        })(),
-        text: Promise.resolve(chunks.join("")),
-        finishReason: Promise.resolve("stop"),
-        usage: Promise.resolve({
-          inputTokens: 10,
-          outputTokens: 5,
-          totalTokens: 15,
-        }),
-        response: Promise.resolve({
-          modelId: "anthropic/claude-sonnet-4.6",
-          provider: "gateway",
-        }),
-      })) as unknown as typeof import("ai").streamText,
+      streamTextFn: (() => textStreamResult(chunks)) as unknown as typeof import("ai").streamText,
     },
   );
 
@@ -122,6 +154,86 @@ test("runAgentWorkflow streams assistant text to signed chat thread", async () =
   expect(envelope.signer.id).toBe(chat.agentDid);
 });
 
+test("runAgentWorkflow persists tool parts on the assistant chat post", async () => {
+  const chat = await openChat();
+  const stream = new ReadableStream({
+    start(controller) {
+      controller.enqueue({ type: "start" });
+      controller.enqueue({ type: "start-step", request: {}, warnings: [] });
+      controller.enqueue({
+        type: "tool-call",
+        toolCallId: "c1",
+        toolName: "lookup_profile",
+        input: { did: "did:example:1" },
+      });
+      controller.enqueue({
+        type: "tool-result",
+        toolCallId: "c1",
+        toolName: "lookup_profile",
+        input: { did: "did:example:1" },
+        output: { name: "Ada" },
+      });
+      controller.enqueue({ type: "text-start", id: "t1" });
+      controller.enqueue({ type: "text-delta", id: "t1", text: "Found Ada." });
+      controller.enqueue({ type: "text-end", id: "t1" });
+      controller.enqueue({
+        type: "finish-step",
+        response: { id: "r1", timestamp: new Date(), modelId: "m" },
+        usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 },
+        performance: {},
+        finishReason: "stop",
+        rawFinishReason: "stop",
+        providerMetadata: undefined,
+      });
+      controller.enqueue({
+        type: "finish",
+        finishReason: "stop",
+        rawFinishReason: "stop",
+        totalUsage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 },
+      });
+      controller.close();
+    },
+  });
+
+  const result = await runAgentWorkflow(
+    params({
+      runId: "run-tools",
+      text: "Lookup Ada",
+      threadId: chat.threadId,
+      agentDid: chat.agentDid,
+    }),
+    {
+      chatService: chat.client,
+      chatSigner: chat.chatSigner,
+      streamTextFn: (() => ({
+        stream,
+        text: Promise.resolve("Found Ada."),
+        finishReason: Promise.resolve("stop"),
+        usage: Promise.resolve({ inputTokens: 1, outputTokens: 1, totalTokens: 2 }),
+        finalStep: Promise.resolve({
+          response: {
+            modelId: "anthropic/claude-sonnet-4.6",
+            provider: "gateway",
+          },
+        }),
+      })) as unknown as typeof import("ai").streamText,
+    },
+  );
+
+  const toolPart = result.message?.parts.find((part) => part.type === "tool-lookup_profile");
+  expect(toolPart).toMatchObject({
+    type: "tool-lookup_profile",
+    toolCallId: "c1",
+    state: "output-available",
+    input: { did: "did:example:1" },
+    output: { name: "Ada" },
+  });
+
+  const posts = await chat.client.listPosts({ threadId: chat.threadId });
+  const assistant = posts.items.find((post) => post.role === "assistant");
+  expect(assistant?.parts.some((part) => part.type === "tool-lookup_profile")).toBe(true);
+});
+
 test("injects user-local datetime into system instructions when userTimeZone is set", async () => {
   const chat = await openChat();
   let system: string | undefined;
@@ -139,18 +251,7 @@ test("injects user-local datetime into system instructions when userTimeZone is 
       chatSigner: chat.chatSigner,
       streamTextFn: ((input: { system?: string }) => {
         system = input.system;
-        return {
-          textStream: (async function* () {
-            yield "Tuesday";
-          })(),
-          text: Promise.resolve("Tuesday"),
-          finishReason: Promise.resolve("stop"),
-          usage: Promise.resolve({ inputTokens: 1, outputTokens: 1, totalTokens: 2 }),
-          response: Promise.resolve({
-            modelId: "anthropic/claude-sonnet-4.6",
-            provider: "gateway",
-          }),
-        };
+        return textStreamResult(["Tuesday"]);
       }) as unknown as typeof import("ai").streamText,
     },
   );
