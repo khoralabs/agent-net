@@ -101,12 +101,19 @@ export function createSqliteNetworkEventStore(
         conditions.push("seq > ?");
         args.push(listOpts.sinceSeq);
       }
-      const result = await db.execute({
-        sql: `SELECT payload_json FROM network_events
+      if (listOpts.beforeSeq !== undefined) {
+        conditions.push("seq < ?");
+        args.push(listOpts.beforeSeq);
+      }
+      const order = listOpts.order === "desc" ? "DESC" : "ASC";
+      let sql = `SELECT payload_json FROM network_events
               WHERE ${conditions.join(" AND ")}
-              ORDER BY seq ASC`,
-        args,
-      });
+              ORDER BY seq ${order}`;
+      if (listOpts.limit !== undefined && listOpts.limit > 0) {
+        sql += ` LIMIT ?`;
+        args.push(Math.floor(listOpts.limit));
+      }
+      const result = await db.execute({ sql, args });
       return result.rows.map((row) => JSON.parse(String(row.payload_json)) as NetworkEvent);
     },
 

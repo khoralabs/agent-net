@@ -4,6 +4,10 @@ export type ListNetworkEventsOptions = {
   kind?: string;
   agentDid?: string;
   sinceSeq?: number;
+  /** Exclusive upper bound on seq (for paging older history). */
+  beforeSeq?: number;
+  limit?: number;
+  order?: "asc" | "desc";
 };
 
 /** Host-owned network event sink (persist, fan-out, etc.). */
