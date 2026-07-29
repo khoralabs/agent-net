@@ -45,6 +45,9 @@ beforeAll(() => {
     forAgent(did: string) {
       return backend.forAgent(did);
     },
+    forScope(scope) {
+      return backend.forScope(scope);
+    },
   };
 });
 

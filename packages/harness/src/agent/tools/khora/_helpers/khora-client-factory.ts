@@ -17,8 +17,15 @@ export function resolveKhoraServerBaseUrl(): string | undefined {
 }
 
 export function resolveAgentsDataDir(): string {
+  const base = process.env.DATA_DIR?.trim() || process.cwd();
   const configured = process.env.HARNESS_AGENTS_DATA_DIR?.trim();
-  if (configured !== undefined && configured.length > 0) return configured;
+  if (configured !== undefined && configured.length > 0) {
+    return path.resolve(base, configured);
+  }
+  const harnessData = process.env.HARNESS_DATA_DIR?.trim();
+  if (harnessData !== undefined && harnessData.length > 0) {
+    return path.join(path.resolve(base, harnessData), "agents");
+  }
   return path.join(process.cwd(), ".harness-data", "agents");
 }
 

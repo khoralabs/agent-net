@@ -95,6 +95,8 @@ export type NetworkHarnessCore = {
   readonly poolInbox: HarnessPoolInbox;
   readonly chat: HarnessChat;
   readonly signedChat: SignedChatBackend;
+  /** DID of an optional host-supplied operator (human ↔ agent chat). */
+  readonly uiUserDid: string | undefined;
   /** Decrypt and list registration-issued invites for an agent (sovereign viral use later). */
   listInvitesForAgent(did: string): Promise<string[]>;
   /** Subscribe to harness multiplex inbox events (demux by `event.did`). */

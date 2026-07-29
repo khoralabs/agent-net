@@ -2,10 +2,12 @@ import {
   type AgentUIMessage,
   type AgentWorkflowParams,
   agentResponse,
-  ensureAgentChatThread,
+  ensureThread,
+  getAgentChatClient,
   getAgentChatService,
   getDevAgentDid,
   HARNESS_AGENT_ID,
+  HARNESS_CHAT_CHANNEL_ID,
   installAgentChat,
   resolveAgentChatSigner,
 } from "@khoralabs/agent-net-harness";
@@ -16,9 +18,23 @@ import { startTursoWorldWorker } from "../world/turso.ts";
 
 void startTursoWorldWorker();
 
+const DEV_AGENT_SELF_THREAD_ID = "harness-agent-self";
+
 installAgentChat({
   resolveSigner: resolveAgentChatSigner,
 });
+
+async function ensureDevSelfThread(): Promise<{
+  channelId: string;
+  threadId: string;
+}> {
+  const chat = await getAgentChatClient();
+  const threadId = await ensureThread(chat, {
+    id: DEV_AGENT_SELF_THREAD_ID,
+    metadata: { title: "Agent self-thread", kind: "agent-monologue" },
+  });
+  return { channelId: HARNESS_CHAT_CHANNEL_ID, threadId };
+}
 
 function json(data: unknown, init?: ResponseInit): Response {
   return Response.json(data, init);
@@ -32,7 +48,7 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   if (req.method === "GET" && url.pathname === "/api/agent/bootstrap") {
-    const chat = await ensureAgentChatThread();
+    const chat = await ensureDevSelfThread();
     return json(chat);
   }
 
@@ -60,7 +76,7 @@ export default async function handler(req: Request): Promise<Response> {
       return json({ error: "text is required" }, { status: 400 });
     }
 
-    const { threadId } = await ensureAgentChatThread();
+    const { threadId } = await ensureDevSelfThread();
     const agentDid = await getDevAgentDid();
     const runId = body.runId?.trim() || crypto.randomUUID();
     const message: AgentUIMessage = {

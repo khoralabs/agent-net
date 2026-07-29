@@ -34,7 +34,7 @@ export type {
   ResolveHarnessAgentWorkflowDepsOpts,
   SpawnWithMemoriesOptions,
 } from "./harness-agents.ts";
-export { spawnWithMemories } from "./harness-agents.ts";
+export { harnessAgentsDataDir, spawnWithMemories } from "./harness-agents.ts";
 
 export type NetworkHarnessOptions = {
   dataDir: string;
@@ -42,6 +42,16 @@ export type NetworkHarnessOptions = {
   chatBaseUrl: string;
   /** Shared-secret token for chat-http. */
   chatToken: string;
+  /**
+   * Channel id for harness chat threads.
+   * Defaults to {@link createRemoteHarnessChat}'s soft default (`harness-network`).
+   */
+  chatChannelId?: string;
+  /**
+   * Optional operator principal for `forScope({ type: "user", id })` (e.g. Bloom UI).
+   * When omitted, no UI user identity is created or registered.
+   */
+  operator?: { signer: PersistableSigner };
   /** Optional host network-event sink (sqlite + JSONL, etc.). */
   networkEvents?: NetworkEventsPlugin;
   /** Base URL of a running Khora host (e.g. http://127.0.0.1:8788). */
@@ -90,6 +100,7 @@ export async function startNetworkHarness(
   const khoraAdminToken =
     opts.khoraAdminToken?.trim() || resolveKhoraAdminTokenFromEnv() || undefined;
   const identitySecret = opts.identitySecret ?? resolveIdentitySecretFromEnv();
+  const operatorSigner = opts.operator?.signer;
 
   if (opts.networkEvents !== undefined) {
     installNetworkEventsPlugin(opts.networkEvents);
@@ -130,17 +141,25 @@ export async function startNetworkHarness(
       : {}),
   });
 
-  const loadSigner = (did: string): Promise<PersistableSigner | undefined> =>
-    loadHarnessIdentity(AgentStore.keyPath(agentsDataDir, did), identitySecret);
+  const loadSigner = async (did: string): Promise<PersistableSigner | undefined> => {
+    if (operatorSigner !== undefined && did === operatorSigner.did) {
+      return operatorSigner;
+    }
+    return loadHarnessIdentity(AgentStore.keyPath(agentsDataDir, did), identitySecret);
+  };
 
   const signedChat = createRemoteHarnessChat({
     baseUrl: chatBaseUrl,
     token: chatToken,
     resolveSigner: loadSigner,
+    ...(opts.chatChannelId !== undefined ? { channelId: opts.chatChannelId } : {}),
   });
   const chat: HarnessChat = {
     forAgent(did: string) {
       return signedChat.forAgent(did);
+    },
+    forScope(scope) {
+      return signedChat.forScope(scope);
     },
   };
 
@@ -188,6 +207,7 @@ export async function startNetworkHarness(
     poolInbox,
     chat,
     signedChat,
+    uiUserDid: operatorSigner?.did,
     async listInvitesForAgent(did: string) {
       const signer = await loadSigner(did);
       if (signer === undefined) {

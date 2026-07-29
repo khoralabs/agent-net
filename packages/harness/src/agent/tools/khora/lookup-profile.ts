@@ -5,16 +5,32 @@ import { z } from "zod";
 import type { HarnessToolkitEnv } from "../types.ts";
 import { hasKhoraClient } from "./policies.ts";
 
-const zLookupProfileInput = z.discriminatedUnion("lookupBy", [
-  z.object({
-    lookupBy: z.literal("username"),
-    username: z.string().min(1).describe("Username to look up."),
-  }),
-  z.object({
-    lookupBy: z.literal("did"),
-    did: z.string().min(1).describe("DID to look up."),
-  }),
-]);
+/**
+ * Plain object schema (not a top-level union). AI Gateway / Anthropic require
+ * `input_schema.type` — zod discriminatedUnion emits `oneOf` without `type`.
+ */
+const zLookupProfileInput = z
+  .object({
+    lookupBy: z.enum(["username", "did"]).describe("How to look up the profile."),
+    username: z.string().min(1).optional().describe("Username when lookupBy is username."),
+    did: z.string().min(1).optional().describe("DID when lookupBy is did."),
+  })
+  .superRefine((value, ctx) => {
+    if (value.lookupBy === "username" && (value.username?.trim() ?? "").length === 0) {
+      ctx.addIssue({
+        code: "custom",
+        message: "username is required when lookupBy is username",
+        path: ["username"],
+      });
+    }
+    if (value.lookupBy === "did" && (value.did?.trim() ?? "").length === 0) {
+      ctx.addIssue({
+        code: "custom",
+        message: "did is required when lookupBy is did",
+        path: ["did"],
+      });
+    }
+  });
 
 export const lookupProfileTool = tool<
   "lookupProfile",
@@ -31,10 +47,14 @@ export const lookupProfileTool = tool<
     const client = ctx.env.khoraClient;
     if (client === undefined) throw new Error("khora client is not configured");
 
-    const profile =
-      input.lookupBy === "username"
-        ? await client.lookupProfileByUsername(input.username)
-        : await client.lookupProfileByDid(input.did);
-    return { profile };
+    if (input.lookupBy === "username") {
+      const username = input.username?.trim() ?? "";
+      if (username.length === 0) throw new Error("username is required");
+      return { profile: await client.lookupProfileByUsername(username) };
+    }
+
+    const did = input.did?.trim() ?? "";
+    if (did.length === 0) throw new Error("did is required");
+    return { profile: await client.lookupProfileByDid(did) };
   },
 });

@@ -6,9 +6,9 @@ import { AgentStore } from "../agents/index.ts";
 import {
   type AgentChatClient,
   type ChatServiceClient,
+  type CreateAgentThreadInput,
   type CreateRemoteHarnessChatOptions,
   createRemoteHarnessChat,
-  HARNESS_CHAT_CHANNEL_ID,
   type SignedChatBackend,
 } from "../chat.ts";
 import { createHarnessChatCrypto } from "../chat-crypto.ts";
@@ -16,10 +16,9 @@ import { requireChatBaseUrl, requireChatToken } from "../lib/chat-base-url.ts";
 import { loadHarnessIdentity, resolveIdentitySecretFromEnv } from "../lib/identity-wrap-key.ts";
 import { resolveAgentsDataDir } from "./tools/khora/_helpers/khora-client-factory.ts";
 
-export const HARNESS_AGENT_DEV_THREAD_ID = "harness-agent-self";
-
 let backend: SignedChatBackend | undefined;
 let resolveSigner: CreateRemoteHarnessChatOptions["resolveSigner"] | undefined;
+let chatChannelId: string | undefined;
 let devAgentDid: string | undefined;
 
 function identitySecret() {
@@ -57,6 +56,7 @@ export async function resolveAgentChatSigner(did: string): Promise<RelaySigner |
 export type InstallAgentChatOptions = {
   baseUrl?: string;
   token?: string;
+  channelId?: string;
   resolveSigner?: CreateRemoteHarnessChatOptions["resolveSigner"];
 };
 
@@ -65,17 +65,23 @@ export function installAgentChat(options: InstallAgentChatOptions = {}): SignedC
   const baseUrl = requireChatBaseUrl(options.baseUrl);
   const token = requireChatToken(options.token);
   resolveSigner = options.resolveSigner ?? resolveAgentChatSigner;
+  chatChannelId = options.channelId;
   backend = createRemoteHarnessChat({
     baseUrl,
     token,
     resolveSigner,
+    ...(options.channelId !== undefined ? { channelId: options.channelId } : {}),
   });
   return backend;
 }
 
 function getSignedChatBackend(): SignedChatBackend {
   if (backend !== undefined) return backend;
-  throw new Error("agent chat is not configured; call installAgentChat first");
+  // Workflow step isolates load steps.mjs without main.ts — install from env.
+  return installAgentChat({
+    resolveSigner: resolveSigner ?? resolveAgentChatSigner,
+    ...(chatChannelId !== undefined ? { channelId: chatChannelId } : {}),
+  });
 }
 
 export function getAgentChatService(): ChatServiceClient {
@@ -92,15 +98,35 @@ export async function getAgentChatClient(): Promise<AgentChatClient> {
   return getSignedChatBackend().forAgent(did);
 }
 
-export async function ensureAgentChatThread(): Promise<{ channelId: string; threadId: string }> {
-  const client = await getAgentChatClient();
+/** Chat client for a specific agent DID (workflow actingFor). */
+export function getAgentChatClientForDid(did: string): AgentChatClient {
+  const trimmed = did.trim();
+  if (trimmed.length === 0) {
+    throw new Error("agentDid is required");
+  }
+  return getSignedChatBackend().forAgent(trimmed);
+}
+
+/**
+ * Idempotently ensure a thread exists for the given chat client.
+ * Naming / topology is caller-owned — pass an explicit `id`.
+ */
+export async function ensureThread(
+  chat: AgentChatClient,
+  input: CreateAgentThreadInput & { id: string },
+): Promise<string> {
+  const threadId = input.id.trim();
+  if (threadId.length === 0) {
+    throw new Error("ensureThread: id is required");
+  }
   try {
-    await client.getThread(HARNESS_AGENT_DEV_THREAD_ID);
+    await chat.getThread(threadId);
   } catch {
-    await client.createThread({
-      id: HARNESS_AGENT_DEV_THREAD_ID,
-      metadata: { title: "Agent self-thread", kind: "agent-monologue" },
+    await chat.createThread({
+      id: threadId,
+      metadata: input.metadata,
+      participants: input.participants,
     });
   }
-  return { channelId: HARNESS_CHAT_CHANNEL_ID, threadId: HARNESS_AGENT_DEV_THREAD_ID };
+  return threadId;
 }

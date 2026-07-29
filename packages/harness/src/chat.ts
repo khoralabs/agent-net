@@ -21,6 +21,7 @@ import type { UIMessage } from "ai";
 
 import { createHarnessChatCrypto, type ResolveHarnessChatSigner } from "./chat-crypto.ts";
 
+/** Soft default channel id when the host does not pass `channelId`. */
 export const HARNESS_CHAT_CHANNEL_ID = "harness-network";
 
 export type { ChatServiceClient };
@@ -52,16 +53,22 @@ export type AgentChatClient = {
 export type CreateHarnessChatBackendOptions = {
   client: ChatServiceClient;
   resolveSigner: ResolveHarnessChatSigner;
+  /** Channel id for ensureChannel / createThread root / listThreads. */
+  channelId?: string;
 };
 
 export type SignedChatBackend = {
   readonly client: ChatServiceClient;
+  readonly channelId: string;
   readonly ready: Promise<void>;
   forAgent(did: string): AgentChatClient;
+  /** Chat client that authors as an arbitrary scope (agent, user, …). */
+  forScope(scope: ScopeRef): AgentChatClient;
 };
 
 export type HarnessChat = {
   forAgent(did: string): AgentChatClient;
+  forScope(scope: ScopeRef): AgentChatClient;
 };
 
 export type CreateRemoteHarnessChatOptions = {
@@ -69,6 +76,7 @@ export type CreateRemoteHarnessChatOptions = {
   token: string;
   resolveSigner: ResolveHarnessChatSigner;
   fetchFn?: ChatServiceClientOptions["fetchFn"];
+  channelId?: string;
 };
 
 function agentScope(did: string): ScopeRef {
@@ -90,13 +98,13 @@ export function prepareAppendForSigningFromTip(
   });
 }
 
-async function ensureHarnessChannel(client: ChatServiceClient): Promise<void> {
+async function ensureHarnessChannel(client: ChatServiceClient, channelId: string): Promise<void> {
   try {
-    await client.getChannel(HARNESS_CHAT_CHANNEL_ID);
+    await client.getChannel(channelId);
   } catch (error) {
     if (!isChatNotFoundError(error)) throw error;
     await client.createChannel({
-      id: HARNESS_CHAT_CHANNEL_ID,
+      id: channelId,
       metadata: { title: "Network Harness", kind: "harness-network" },
     });
   }
@@ -105,14 +113,25 @@ async function ensureHarnessChannel(client: ChatServiceClient): Promise<void> {
 export function createHarnessChatBackend(
   options: CreateHarnessChatBackendOptions,
 ): SignedChatBackend {
+  const channelId = options.channelId?.trim() || HARNESS_CHAT_CHANNEL_ID;
   const chatCrypto = createHarnessChatCrypto(options.resolveSigner);
-  const ready = ensureHarnessChannel(options.client);
+  const ready = ensureHarnessChannel(options.client, channelId);
 
   return {
     client: options.client,
+    channelId,
     ready,
     forAgent(did: string) {
-      return createAgentChatClient(options.client, did, chatCrypto.signer, ready);
+      return createScopedChatClient(
+        options.client,
+        agentScope(did),
+        chatCrypto.signer,
+        ready,
+        channelId,
+      );
+    },
+    forScope(scope: ScopeRef) {
+      return createScopedChatClient(options.client, scope, chatCrypto.signer, ready, channelId);
     },
   };
 }
@@ -129,17 +148,17 @@ export function createRemoteHarnessChat(
   return createHarnessChatBackend({
     client,
     resolveSigner: options.resolveSigner,
+    channelId: options.channelId,
   });
 }
 
-function createAgentChatClient(
+function createScopedChatClient(
   client: ChatServiceClient,
-  did: string,
+  scope: ScopeRef,
   chatSigner: ChatSigner,
   ready: Promise<void>,
+  channelId: string,
 ): AgentChatClient {
-  const scope = agentScope(did);
-
   async function whenReady<T>(fn: () => Promise<T>): Promise<T> {
     await ready;
     return fn();
@@ -149,17 +168,17 @@ function createAgentChatClient(
     const participants = await client.listThreadParticipants(threadId);
     const allowed = participants.some((p) => p.type === scope.type && p.id === scope.id);
     if (!allowed) {
-      throw new Error(`agent ${did} does not have access to thread ${threadId}`);
+      throw new Error(`${scope.type} ${scope.id} does not have access to thread ${threadId}`);
     }
   }
 
   return {
-    did,
+    did: scope.id,
     createThread(input = {}) {
       return whenReady(async () => {
         const thread = await client.createThread({
           id: input.id ?? crypto.randomUUID(),
-          root: { type: "channel", channelId: HARNESS_CHAT_CHANNEL_ID },
+          root: { type: "channel", channelId },
           metadata: input.metadata,
         });
 
@@ -230,7 +249,7 @@ function createAgentChatClient(
     listThreads(input) {
       return whenReady(() =>
         client.listThreads({
-          channelId: HARNESS_CHAT_CHANNEL_ID,
+          channelId,
           participant: scope,
           limit: input?.limit,
           cursor: input?.cursor,
@@ -251,6 +270,9 @@ export function createHarnessChat(options: CreateRemoteHarnessChatOptions): Harn
   return {
     forAgent(did: string) {
       return backend.forAgent(did);
+    },
+    forScope(scope: ScopeRef) {
+      return backend.forScope(scope);
     },
   };
 }

@@ -1,14 +1,16 @@
 export { HARNESS_AGENT_ID } from "./agent/agents/index.ts";
 export {
-  ensureAgentChatThread,
+  ensureThread,
+  getAgentChatClient,
+  getAgentChatClientForDid,
   getAgentChatService,
   getDevAgentDid,
   installAgentChat,
   resolveAgentChatSigner,
 } from "./agent/chat-service.ts";
 export { installMemoriesOntology } from "./agent/tools/memories/_helpers/memories-ontology-install.ts";
-export type { AgentWorkflowParams } from "./agent/types.ts";
-export { agentResponse } from "./agent/workflows/agent-response.ts";
+export type { AgentWorkflowParams, AgentWorkflowResult } from "./agent/types.ts";
+export { agentResponse, executeAgentResponse } from "./agent/workflows/agent-response.ts";
 export type { AgentTurnParams, AgentTurnResult, AgentUIMessage } from "./agent-turn.ts";
 export { runAgentTurn } from "./agent-turn.ts";
 export {
@@ -24,14 +26,17 @@ export {
 export {
   type AgentChatClient,
   type ChatServiceClient,
+  type CreateAgentThreadInput,
   type CreateHarnessChatBackendOptions,
   type CreateRemoteHarnessChatOptions,
   createHarnessChatBackend,
   createRemoteHarnessChat,
+  HARNESS_CHAT_CHANNEL_ID,
   type SignedChatBackend,
 } from "./chat.ts";
 export {
   type HarnessAgentWorkflowDeps,
+  harnessAgentsDataDir,
   type NetworkHarnessHandle,
   startNetworkHarness,
 } from "./harness.ts";

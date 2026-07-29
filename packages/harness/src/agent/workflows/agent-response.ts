@@ -2,6 +2,7 @@ import { start } from "workflow/api";
 import { requireNetworkSession } from "../../network/session-registry.ts";
 import {
   ensureDevAgentIdentity,
+  getAgentChatClientForDid,
   getAgentChatService,
   getAgentChatSigner,
 } from "../chat-service.ts";
@@ -42,18 +43,33 @@ export async function executeAgentResponse(
     return runAgentWorkflow(params, deps);
   }
 
-  const memoriesBaseUrl = resolveMemoriesServiceBaseUrl();
-  const memoriesAdminToken = resolveMemoriesServiceAdminToken();
-  const { getInstalledMemoriesOntology } = await import(
+  const { getInstalledMemoriesOntology, installMemoriesOntology } = await import(
     "../tools/memories/_helpers/memories-ontology-install.ts"
   );
+  // Step isolates skip main.ts/otel.ts. Optional host ontology package.
+  if (getInstalledMemoriesOntology() === undefined) {
+    try {
+      const mod = (await import("@bloom/memories-ontology")) as {
+        referenceMemoriesOntology?: Parameters<typeof installMemoriesOntology>[0];
+      };
+      if (mod.referenceMemoriesOntology !== undefined) {
+        installMemoriesOntology(mod.referenceMemoriesOntology);
+      }
+    } catch {
+      /* host without @bloom/memories-ontology */
+    }
+  }
+
+  const memoriesBaseUrl = resolveMemoriesServiceBaseUrl();
+  const memoriesAdminToken = resolveMemoriesServiceAdminToken();
   const ontology = getInstalledMemoriesOntology();
+  const agentDid = params.agent.actingFor.id;
   const memoriesClient =
     memoriesBaseUrl === undefined || memoriesAdminToken === undefined || ontology === undefined
       ? undefined
       : await createHarnessMemoriesClientForAgent({
           baseUrl: memoriesBaseUrl,
-          agentDid: params.agent.actingFor.id,
+          agentDid,
           ontology,
           adminToken: memoriesAdminToken,
         });
@@ -64,7 +80,7 @@ export async function executeAgentResponse(
       ? undefined
       : await createHarnessKhoraClientForAgent({
           baseUrl: khoraBaseUrl,
-          agentDid: params.agent.actingFor.id,
+          agentDid,
         });
 
   await ensureDevAgentIdentity();
@@ -72,6 +88,7 @@ export async function executeAgentResponse(
   return runAgentWorkflow(params, {
     chatService: getAgentChatService(),
     chatSigner: getAgentChatSigner(),
+    agentChat: getAgentChatClientForDid(agentDid),
     memoriesClient,
     khoraClient,
     embeddingModel: resolveHarnessEmbeddingModel(),
