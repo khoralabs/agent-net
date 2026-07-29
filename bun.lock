@@ -21,7 +21,7 @@
         "@khoralabs/agent-capabilities-otel": "^0.2.0",
         "@khoralabs/agent-net-harness": "workspace:*",
         "@khoralabs/agent-net-swarm": "workspace:*",
-        "@khoralabs/chat": "^0.1.4",
+        "@khoralabs/chat": "^0.1.5",
         "@khoralabs/memories-node": "^0.5.10",
         "@khoralabs/memories-otel": "^0.5.10",
         "@khoralabs/memories-service": "^0.5.10",
@@ -54,7 +54,7 @@
         "@ai-sdk/google": "^4.0.3",
         "@khoralabs/agent-capabilities": "^0.2.0",
         "@khoralabs/agent-capabilities-ai-sdk": "^0.2.0",
-        "@khoralabs/chat": "^0.1.4",
+        "@khoralabs/chat": "^0.1.5",
         "@khoralabs/did-key-identity": "^0.1.0",
         "@khoralabs/khora-client": "^0.1.6",
         "@khoralabs/memories-node": "^0.5.10",
@@ -97,7 +97,7 @@
       "version": "0.0.0",
       "dependencies": {
         "@khoralabs/agent-net-harness": "workspace:*",
-        "@khoralabs/chat": "^0.1.4",
+        "@khoralabs/chat": "^0.1.5",
         "@khoralabs/did-key-identity": "^0.1.0",
         "@khoralabs/khora-client": "^0.1.6",
         "@khoralabs/memories-node": "^0.5.10",
@@ -362,7 +362,7 @@
 
     "@khoralabs/bun-web": ["@khoralabs/bun-web@workspace:vendor/libs/packages/bun-web"],
 
-    "@khoralabs/chat": ["@khoralabs/chat@0.1.4", "", { "dependencies": { "ai": "^7.0.9" }, "peerDependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "@tursodatabase/serverless": "*", "typescript": "^5" }, "optionalPeers": ["@khoralabs/sqlite-crypto", "@tursodatabase/serverless"] }, "sha512-jk7OAUYHHdQfVqiYBWLBo1uRrFGl/I2C4GrS6q/RBCPcrKuQu8ofoR7zxbSObFX7jpsKz0xRxT4f1xFjt7+P7w=="],
+    "@khoralabs/chat": ["@khoralabs/chat@0.1.5", "", { "dependencies": { "ai": "^7.0.9" }, "peerDependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "@tursodatabase/serverless": "*", "typescript": "^5" }, "optionalPeers": ["@khoralabs/sqlite-crypto", "@tursodatabase/serverless"] }, "sha512-pz1FuXJyfddtx7ZjlAjYIju5wrHCSuKW9jqVWd/6cM66srHm6QCK86pvU5pE5NvNrzfbxQCm2jgexVlx5dfAnw=="],
 
     "@khoralabs/cli-kit": ["@khoralabs/cli-kit@workspace:vendor/libs/packages/cli-kit"],
 
