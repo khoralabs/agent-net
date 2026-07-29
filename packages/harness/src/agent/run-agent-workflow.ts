@@ -1,3 +1,4 @@
+import { AGENT_STEP_TIMEOUT_MS, rethrowAsFatalAiNoOutput } from "@bloom/workflow-resilience";
 import type { ChatSigner, PostModelMetadata, PostUsage } from "@khoralabs/chat";
 import type { KhoraClient } from "@khoralabs/khora-client";
 import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
@@ -5,10 +6,12 @@ import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/clie
 import {
   convertToModelMessages,
   type ModelMessage,
+  NoOutputGeneratedError,
   stepCountIs,
   streamText,
   type UIMessage,
 } from "ai";
+import { FatalError } from "workflow";
 
 import type { AgentChatClient, ChatServiceClient } from "../chat.ts";
 import { collectThreadHashSnapshots } from "../network/thread-provenance.ts";
@@ -196,6 +199,7 @@ export async function runAgentWorkflow(
       streamStarted = true;
 
       const maxSteps = params.model.maxSteps ?? 8;
+      const abortSignal = AbortSignal.timeout(AGENT_STEP_TIMEOUT_MS);
       const result = runStreamText({
         model: modelId,
         system: [capture.instructions, formatSkillCatalog(env.skills), ...context.instructions]
@@ -204,6 +208,7 @@ export async function runAgentWorkflow(
         messages: context.modelMessages,
         tools: aiTools,
         stopWhen: stepCountIs(maxSteps),
+        abortSignal,
         onError: ({ error }) => {
           generationError = error;
         },
@@ -226,8 +231,11 @@ export async function runAgentWorkflow(
 
       text = text.length > 0 ? text : await textPromise;
       if (text.length === 0) {
+        if (NoOutputGeneratedError.isInstance(generationError)) {
+          rethrowAsFatalAiNoOutput(generationError, "agentResponse");
+        }
         const detail = generationError === undefined ? "" : `: ${errorMessage(generationError)}`;
-        throw new Error(`agent workflow produced no text output${detail}`);
+        throw new FatalError(`agent workflow produced no text output${detail}`);
       }
 
       const [finishReason, usage, response] = await Promise.all([
@@ -269,7 +277,7 @@ export async function runAgentWorkflow(
       } else if (streamStarted) {
         await writer.abort().catch(() => undefined);
       }
-      throw error;
+      rethrowAsFatalAiNoOutput(error, "agentResponse");
     }
   });
 }

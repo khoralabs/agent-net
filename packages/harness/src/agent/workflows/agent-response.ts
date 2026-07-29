@@ -1,3 +1,4 @@
+import { AI_STEP_MAX_RETRIES } from "@bloom/workflow-resilience";
 import { start } from "workflow/api";
 import { requireNetworkSession } from "../../network/session-registry.ts";
 import {
@@ -76,6 +77,7 @@ export async function executeAgentResponse(
     embeddingModel: resolveHarnessEmbeddingModel(),
   });
 }
+executeAgentResponse.maxRetries = AI_STEP_MAX_RETRIES;
 
 export async function runAgentResponseStep(
   params: AgentWorkflowParams,
@@ -97,6 +99,7 @@ export async function runAgentResponseStep(
     embeddingModel: resolveHarnessEmbeddingModel(),
   });
 }
+runAgentResponseStep.maxRetries = AI_STEP_MAX_RETRIES;
 
 export async function startAgentResponseWorkflow(
   params: AgentWorkflowParams,
