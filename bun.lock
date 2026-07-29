@@ -60,6 +60,7 @@
         "@khoralabs/memories-node": "^0.5.13",
         "@khoralabs/memories-service": "^0.5.13",
         "@khoralabs/relay": "^0.1.1",
+        "@khoralabs/sourcemaps": "^0.1.0",
         "@khoralabs/sqlite-crypto": "^0.1.0",
         "@khoralabs/vellum-client": "^0.1.0",
         "@noble/ed25519": "^3.1.0",
