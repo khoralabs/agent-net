@@ -1,4 +1,3 @@
-import { AGENT_STEP_TIMEOUT_MS, rethrowAsFatalAiNoOutput } from "@bloom/workflow-resilience";
 import type { ChatSigner, PostModelMetadata, PostUsage } from "@khoralabs/chat";
 import type { KhoraClient } from "@khoralabs/khora-client";
 import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
@@ -32,6 +31,7 @@ import {
   buildUserLocalDateTimeContext,
   formatUserLocalDateTimeInstruction,
 } from "./user-local-datetime.ts";
+import { AGENT_STEP_TIMEOUT_MS, rethrowAsFatalAiNoOutput } from "./workflow-resilience.ts";
 
 export type RunAgentWorkflowDependencies = {
   chatService?: ChatServiceClient;

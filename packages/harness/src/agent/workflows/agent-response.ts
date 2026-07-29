@@ -1,4 +1,3 @@
-import { AI_STEP_MAX_RETRIES } from "@bloom/workflow-resilience";
 import { start } from "workflow/api";
 import { requireNetworkSession } from "../../network/session-registry.ts";
 import {
@@ -18,6 +17,7 @@ import {
 } from "../tools/khora/_helpers/khora-client-factory.ts";
 import { resolveHarnessEmbeddingModel } from "../tools/memories/_helpers/embedding-model.ts";
 import type { AgentWorkflowParams, AgentWorkflowResult } from "../types.ts";
+import { AI_STEP_MAX_RETRIES } from "../workflow-resilience.ts";
 
 export type AgentResponseDeps = RunAgentWorkflowDependencies;
 
