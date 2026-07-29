@@ -74,6 +74,7 @@ function textStreamResult(chunks: string[]) {
       outputTokens: 5,
       totalTokens: 15,
     }),
+    toolResults: Promise.resolve([]),
     finalStep: Promise.resolve({
       response: {
         modelId: "anthropic/claude-sonnet-4.6",
@@ -210,6 +211,7 @@ test("runAgentWorkflow persists tool parts on the assistant chat post", async ()
         text: Promise.resolve("Found Ada."),
         finishReason: Promise.resolve("stop"),
         usage: Promise.resolve({ inputTokens: 1, outputTokens: 1, totalTokens: 2 }),
+        toolResults: Promise.resolve([]),
         finalStep: Promise.resolve({
           response: {
             modelId: "anthropic/claude-sonnet-4.6",
@@ -232,6 +234,50 @@ test("runAgentWorkflow persists tool parts on the assistant chat post", async ()
   const posts = await chat.client.listPosts({ threadId: chat.threadId });
   const assistant = posts.items.find((post) => post.role === "assistant");
   expect(assistant?.parts.some((part) => part.type === "tool-lookup_profile")).toBe(true);
+});
+
+test("runAgentWorkflow merges toolResults when UI stream omits tool parts", async () => {
+  const chat = await openChat();
+  const result = await runAgentWorkflow(
+    params({
+      runId: "run-tools-from-results",
+      text: "Save a note",
+      threadId: chat.threadId,
+      agentDid: chat.agentDid,
+    }),
+    {
+      chatService: chat.client,
+      chatSigner: chat.chatSigner,
+      streamTextFn: ((input: {
+        onStepFinish?: (event: {
+          toolResults: Array<{
+            toolCallId: string;
+            toolName: string;
+            input: unknown;
+            output: unknown;
+          }>;
+        }) => void;
+      }) => {
+        queueMicrotask(() => {
+          input.onStepFinish?.({
+            toolResults: [
+              {
+                toolCallId: "w1",
+                toolName: "writeMemory",
+                input: { namespace: "ns", key: "k", text: "note" },
+                output: { memoryIds: ["mem-1"] },
+              },
+            ],
+          });
+        });
+        return textStreamResult(["Saved."]);
+      }) as unknown as typeof import("ai").streamText,
+    },
+  );
+
+  expect(result.message?.parts.some((part) => part.type === "tool-writeMemory")).toBe(true);
+  const sources = (result.message?.metadata as { sources?: unknown[] } | undefined)?.sources;
+  expect(Array.isArray(sources) && sources.length > 0).toBe(true);
 });
 
 test("injects user-local datetime into system instructions when userTimeZone is set", async () => {

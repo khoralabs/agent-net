@@ -18,6 +18,7 @@ import type { AgentChatClient, ChatServiceClient } from "../chat.ts";
 import { collectThreadHashSnapshots } from "../network/thread-provenance.ts";
 import { buildNetworkAttribution } from "../observability/attribution-digest.ts";
 import { runWithAttributionAsync } from "../observability/network-log.ts";
+import { sourcesFromMemoryToolParts } from "./agent-memory-source.ts";
 import {
   captureHarnessCapabilities,
   createHarnessAgentTelemetry,
@@ -60,6 +61,49 @@ function textFromUIMessage(message: UIMessage): string {
     .filter((part): part is { type: "text"; text: string } => part.type === "text")
     .map((part) => part.text)
     .join("");
+}
+
+type ToolResultLike = {
+  toolCallId: string;
+  toolName: string;
+  input: unknown;
+  output: unknown;
+};
+
+/**
+ * UI message streams sometimes omit tool parts even when tools executed.
+ * Merge completed tool results onto the assistant message before chat persistence.
+ */
+export function mergeToolResultsIntoMessage(
+  message: UIMessage,
+  toolResults: readonly ToolResultLike[],
+): UIMessage {
+  if (toolResults.length === 0) return message;
+  const existingIds = new Set<string>();
+  for (const part of message.parts) {
+    if (
+      typeof part === "object" &&
+      part !== null &&
+      typeof (part as { type?: unknown }).type === "string" &&
+      (part as { type: string }).type.startsWith("tool-") &&
+      typeof (part as { toolCallId?: unknown }).toolCallId === "string"
+    ) {
+      existingIds.add((part as { toolCallId: string }).toolCallId);
+    }
+  }
+  const additions: UIMessage["parts"] = [];
+  for (const result of toolResults) {
+    if (existingIds.has(result.toolCallId)) continue;
+    additions.push({
+      type: `tool-${result.toolName}`,
+      toolCallId: result.toolCallId,
+      state: "output-available",
+      input: result.input,
+      output: result.output,
+    } as UIMessage["parts"][number]);
+  }
+  if (additions.length === 0) return message;
+  return { ...message, parts: [...message.parts, ...additions] };
 }
 
 function errorMessage(error: unknown): string {
@@ -211,6 +255,7 @@ export async function runAgentWorkflow(
 
       const maxSteps = params.model.maxSteps ?? 8;
       const abortSignal = AbortSignal.timeout(AGENT_STEP_TIMEOUT_MS);
+      const collectedToolResults: ToolResultLike[] = [];
       const result = runStreamText({
         model: modelId,
         system: [capture.instructions, formatSkillCatalog(env.skills), ...context.instructions]
@@ -223,6 +268,16 @@ export async function runAgentWorkflow(
         onError: ({ error }) => {
           generationError = error;
         },
+        onStepFinish: ({ toolResults }) => {
+          for (const toolResult of toolResults) {
+            collectedToolResults.push({
+              toolCallId: toolResult.toolCallId,
+              toolName: toolResult.toolName,
+              input: toolResult.input,
+              output: toolResult.output,
+            });
+          }
+        },
       } as Parameters<typeof streamText>[0]);
       const finishReasonPromise = Promise.resolve(result.finishReason).catch(() => undefined);
       const usagePromise = Promise.resolve(result.usage).catch(() => undefined);
@@ -230,6 +285,9 @@ export async function runAgentWorkflow(
         .then((step) => step.response)
         .catch(() => undefined);
       const textPromise = Promise.resolve(result.text).catch(() => "");
+      const toolResultsPromise = Promise.resolve(result.toolResults).catch(
+        () => [] as ToolResultLike[],
+      );
 
       try {
         const uiChunkStream = toUIMessageStream({
@@ -268,6 +326,10 @@ export async function runAgentWorkflow(
         throw new FatalError(`agent workflow produced no text output${detail}`);
       }
 
+      const settledToolResults = await toolResultsPromise;
+      const toolResults = settledToolResults.length > 0 ? settledToolResults : collectedToolResults;
+      latest = mergeToolResultsIntoMessage(latest, toolResults);
+
       const [finishReason, usage, response] = await Promise.all([
         finishReasonPromise,
         usagePromise,
@@ -276,6 +338,20 @@ export async function runAgentWorkflow(
       const metadata = {
         model: modelMetadata({ requestedModel: modelId, finishReason, response }),
         usage: usageFromAiSdk(usage),
+      };
+      const memorySources = sourcesFromMemoryToolParts(latest.parts);
+      const priorMeta =
+        latest.metadata !== null &&
+        latest.metadata !== undefined &&
+        typeof latest.metadata === "object"
+          ? (latest.metadata as Record<string, unknown>)
+          : {};
+      latest = {
+        ...latest,
+        metadata: {
+          ...priorMeta,
+          ...(memorySources.length > 0 ? { sources: memorySources } : {}),
+        },
       };
       await writer.apply(latest, metadata);
       const message = await writer.complete();

@@ -1,3 +1,16 @@
+export {
+  AGENT_MEMORY_DOMAIN,
+  type AgentMemoryEntity,
+  type AgentMemoryEntityMap,
+  type AgentMemoryLocators,
+  type AgentMemorySourceRef,
+  type AgentMemoryStore,
+  agentMemoryChatSource,
+  agentMemorySourceRef,
+  createAgentMemoryStore,
+  isAgentMemorySourceRef,
+  sourcesFromMemoryToolParts,
+} from "./agent/agent-memory-source.ts";
 export { HARNESS_AGENT_ID } from "./agent/agents/index.ts";
 export {
   ensureThread,
