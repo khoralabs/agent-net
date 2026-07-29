@@ -1,5 +1,6 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import { z } from "zod";
+import { toolEnabled } from "../_helpers/disable-policies.ts";
 import { hasMemoriesClient } from "../policies.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
 import { writeMemoryNode } from "./_helpers/memory-write.ts";
@@ -46,7 +47,7 @@ export const writeMemoryTool = tool<
       .optional()
       .describe("Optional directed links to peer memories that already exist."),
   }),
-  policies: [hasMemoriesClient],
+  policies: [hasMemoriesClient, toolEnabled("writeMemory")],
   handler: async (ctx, input) => {
     const client = ctx.env.memoriesClient;
     if (client === undefined) throw new Error("memories client is not configured");

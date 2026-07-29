@@ -19,4 +19,18 @@ export type HarnessToolkitEnv = {
   skills: SkillRecord[];
   activatedSkillNames: Set<string>;
   recentNamespaces: RecentNamespacesTracker;
+  /** Toolkit names excluded for this invocation (policy-gated). */
+  disabledToolkits: ReadonlySet<string>;
+  /** Individual tool names excluded for this invocation (policy-gated). */
+  disabledTools: ReadonlySet<string>;
 };
+
+export function emptyDisabledToolSets(): {
+  disabledToolkits: ReadonlySet<string>;
+  disabledTools: ReadonlySet<string>;
+} {
+  return {
+    disabledToolkits: new Set(),
+    disabledTools: new Set(),
+  };
+}

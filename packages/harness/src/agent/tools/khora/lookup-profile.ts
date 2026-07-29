@@ -1,6 +1,7 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import type { PublicProfileResult } from "@khoralabs/khora-client";
 import { z } from "zod";
+import { toolEnabled } from "../_helpers/disable-policies.ts";
 
 import type { HarnessToolkitEnv } from "../types.ts";
 import { hasKhoraClient } from "./policies.ts";
@@ -42,7 +43,7 @@ export const lookupProfileTool = tool<
   description: "Look up a public Khora profile by username or DID. Returns null when not found.",
   instructions: ["Resolve a username or DID to a public profile."],
   inputSchema: zLookupProfileInput,
-  policies: [hasKhoraClient],
+  policies: [hasKhoraClient, toolEnabled("lookupProfile")],
   handler: async (ctx, input) => {
     const client = ctx.env.khoraClient;
     if (client === undefined) throw new Error("khora client is not configured");

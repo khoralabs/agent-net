@@ -1,5 +1,7 @@
 import { dynamicToolkit, toolkit } from "@khoralabs/agent-capabilities";
 
+import { toolkitEnabled } from "../_helpers/disable-policies.ts";
+import { HARNESS_TOOLKIT } from "../ids.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
 import {
   formatRecentNamespacesInstruction,
@@ -20,7 +22,8 @@ const memoriesTools = [
 ] as const;
 
 export const memoriesToolkit = dynamicToolkit<"memories", HarnessToolkitEnv>({
-  name: "memories",
+  name: HARNESS_TOOLKIT.memories,
+  policies: [toolkitEnabled(HARNESS_TOOLKIT.memories)],
   create: async (ctx) => {
     const instructions = [
       "Persistent memory database for recalling and storing notes, observations, and context across turns.",

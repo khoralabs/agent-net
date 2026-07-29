@@ -1,6 +1,7 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import type { KhoraSearchResponse } from "@khoralabs/khora-client";
 import { z } from "zod";
+import { toolEnabled } from "../_helpers/disable-policies.ts";
 
 import type { HarnessToolkitEnv } from "../types.ts";
 import { hasKhoraClient } from "./policies.ts";
@@ -40,7 +41,7 @@ export const searchNetworkTool = tool<
       .describe("Cap on neighbor hits when neighbors is true."),
     namespace: z.string().optional().describe("Optional namespace path to restrict search scope."),
   }),
-  policies: [hasKhoraClient],
+  policies: [hasKhoraClient, toolEnabled("searchNetwork")],
   handler: async (ctx, input) => {
     const client = ctx.env.khoraClient;
     if (client === undefined) throw new Error("khora client is not configured");

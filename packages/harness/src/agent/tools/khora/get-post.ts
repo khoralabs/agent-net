@@ -1,6 +1,7 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import type { KhoraPost } from "@khoralabs/khora-client";
 import { z } from "zod";
+import { toolEnabled } from "../_helpers/disable-policies.ts";
 
 import type { HarnessToolkitEnv } from "../types.ts";
 import { hasKhoraClient } from "./policies.ts";
@@ -12,7 +13,7 @@ export const getPostTool = tool<"getPost", { id: string }, { post: KhoraPost }, 
   inputSchema: z.object({
     id: z.string().min(1).describe("Post id (atp0:…)."),
   }),
-  policies: [hasKhoraClient],
+  policies: [hasKhoraClient, toolEnabled("getPost")],
   handler: async (ctx, input) => {
     const client = ctx.env.khoraClient;
     if (client === undefined) throw new Error("khora client is not configured");

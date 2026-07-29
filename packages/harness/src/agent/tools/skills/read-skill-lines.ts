@@ -1,5 +1,6 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import { z } from "zod";
+import { toolEnabled } from "../_helpers/disable-policies.ts";
 
 import { type LineTuple, readLines } from "../_helpers/line-editing.ts";
 import { hasMemoriesClient } from "../policies.ts";
@@ -22,7 +23,7 @@ export const readSkillLinesTool = tool<
       .min(1)
       .describe("Skill storage key in the skills namespace, or matching skill name."),
   }),
-  policies: [hasMemoriesClient],
+  policies: [hasMemoriesClient, toolEnabled("readSkillLines")],
   handler: async (ctx, input) => {
     const client = ctx.env.memoriesClient;
     if (client === undefined) throw new Error("memories client is not configured");

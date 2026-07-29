@@ -1,6 +1,7 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import type { KhoraProfile } from "@khoralabs/khora-client";
 import { z } from "zod";
+import { toolEnabled } from "../_helpers/disable-policies.ts";
 
 import type { HarnessToolkitEnv } from "../types.ts";
 import { hasKhoraClient } from "./policies.ts";
@@ -21,7 +22,7 @@ export const updateProfileTool = tool<
   description: "Update this agent's public Khora profile (username, display name, bio).",
   instructions: ["Change the agent's public profile."],
   inputSchema: zUpdateProfileInput,
-  policies: [hasKhoraClient],
+  policies: [hasKhoraClient, toolEnabled("updateProfile")],
   handler: async (ctx, input) => {
     const client = ctx.env.khoraClient;
     if (client === undefined) throw new Error("khora client is not configured");

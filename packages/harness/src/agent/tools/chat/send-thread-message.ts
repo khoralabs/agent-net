@@ -1,5 +1,6 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import { z } from "zod";
+import { toolEnabled } from "../_helpers/disable-policies.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
 import { emitChatNetworkEvent } from "./_helpers/network-events.ts";
 import { hasAgentChat } from "./policies.ts";
@@ -18,7 +19,7 @@ export const sendThreadMessageTool = tool<
     text: z.string().min(1),
     role: z.enum(["user", "assistant", "system"]).optional(),
   }),
-  policies: [hasAgentChat],
+  policies: [hasAgentChat, toolEnabled("sendThreadMessage")],
   handler: async (ctx, input) => {
     const chat = ctx.env.agentChat;
     if (chat === undefined) throw new Error("agent chat is not configured");

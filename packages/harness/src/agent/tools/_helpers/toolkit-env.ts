@@ -34,6 +34,8 @@ export async function createHarnessToolkitEnv(input: {
   sessionId?: string;
   networkDataDir?: string;
   embeddingModel?: EmbeddingModel;
+  disableToolkits?: readonly string[];
+  disableTools?: readonly string[];
 }): Promise<HarnessToolkitEnv> {
   const agentDid = input.agentDid?.trim() || input.agentChat?.did;
   const recentNamespaces = await resolveRecentNamespacesTracker({
@@ -53,6 +55,8 @@ export async function createHarnessToolkitEnv(input: {
     skills: [],
     activatedSkillNames: new Set(),
     recentNamespaces,
+    disabledToolkits: new Set(input.disableToolkits ?? []),
+    disabledTools: new Set(input.disableTools ?? []),
   };
 
   if (input.memoriesClient === undefined) return env;

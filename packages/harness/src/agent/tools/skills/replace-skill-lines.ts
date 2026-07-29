@@ -1,5 +1,6 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import { z } from "zod";
+import { toolEnabled } from "../_helpers/disable-policies.ts";
 
 import { applyLineChanges, type LineTuple, readLines } from "../_helpers/line-editing.ts";
 import { writeMemoryNode } from "../memories/_helpers/memory-write.ts";
@@ -38,7 +39,7 @@ export const replaceSkillLinesTool = tool<
       .min(1)
       .describe("Line replacements as [lineNumber, newContent] tuples."),
   }),
-  policies: [hasMemoriesClient],
+  policies: [hasMemoriesClient, toolEnabled("replaceSkillLines")],
   handler: async (ctx, input) => {
     const client = ctx.env.memoriesClient;
     if (client === undefined) throw new Error("memories client is not configured");

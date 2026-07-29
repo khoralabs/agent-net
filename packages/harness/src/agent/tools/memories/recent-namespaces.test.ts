@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { evaluateComposable } from "@khoralabs/agent-capabilities";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 
-import type { HarnessToolkitEnv } from "../types.ts";
+import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../types.ts";
 import {
   clearRecentNamespacesProcessCache,
   createEphemeralRecentNamespacesTracker,
@@ -103,6 +103,7 @@ describe("memories toolkit instruction injection", () => {
       activatedSkillNames: new Set(),
       embeddingCache: new Map(),
       recentNamespaces: createEphemeralRecentNamespacesTracker(["notes", "inbox"]),
+      ...emptyDisabledToolSets(),
       memoriesClient: {
         search: async () => [],
         mergeMemory: async () => [],

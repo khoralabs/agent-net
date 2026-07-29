@@ -5,7 +5,7 @@ import type { SearchHit, SearchOutput, SearchParams } from "@khoralabs/memories-
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import { harnessToolkit } from "../_toolkit.ts";
 import { createEphemeralRecentNamespacesTracker } from "../memories/_helpers/recent-namespaces.ts";
-import type { HarnessToolkitEnv } from "../types.ts";
+import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../types.ts";
 import { formatSkillDocument, SKILLS_NAMESPACE, skillRecordFromText } from "./_helpers/skills.ts";
 
 type SkillLineToolName = "readSkillLines" | "replaceSkillLines";
@@ -35,6 +35,7 @@ function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEn
     activatedSkillNames: new Set(),
     embeddingCache: new Map(),
     recentNamespaces: createEphemeralRecentNamespacesTracker(),
+    ...emptyDisabledToolSets(),
     ...overrides,
   };
 }

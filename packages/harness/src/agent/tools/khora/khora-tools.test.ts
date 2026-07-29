@@ -12,7 +12,7 @@ import type {
 
 import { harnessToolkit } from "../_toolkit.ts";
 import { createEphemeralRecentNamespacesTracker } from "../memories/_helpers/recent-namespaces.ts";
-import type { HarnessToolkitEnv } from "../types.ts";
+import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../types.ts";
 
 type KhoraToolName = "searchNetwork" | "createPost" | "lookupProfile" | "updateProfile";
 
@@ -41,6 +41,7 @@ function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEn
     activatedSkillNames: new Set(),
     embeddingCache: new Map(),
     recentNamespaces: createEphemeralRecentNamespacesTracker(),
+    ...emptyDisabledToolSets(),
     ...overrides,
   };
 }

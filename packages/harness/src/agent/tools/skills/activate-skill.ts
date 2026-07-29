@@ -1,5 +1,6 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import { z } from "zod";
+import { toolEnabled } from "../_helpers/disable-policies.ts";
 import { hasMemoriesClient } from "../policies.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
 import {
@@ -55,7 +56,7 @@ export const activateSkillTool = tool<
   inputSchema: z.object({
     name: z.string().min(1).describe("Name or key of the skill to activate."),
   }),
-  policies: [hasMemoriesClient],
+  policies: [hasMemoriesClient, toolEnabled("activateSkill")],
   handler: async (ctx, input) => activateSkillByName(ctx.env, input.name),
 });
 

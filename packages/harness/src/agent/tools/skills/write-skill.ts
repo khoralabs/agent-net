@@ -1,5 +1,6 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import { z } from "zod";
+import { toolEnabled } from "../_helpers/disable-policies.ts";
 
 import { writeMemoryNode } from "../memories/_helpers/memory-write.ts";
 import { hasMemoriesClient } from "../policies.ts";
@@ -45,7 +46,7 @@ export const writeSkillTool = tool<
       .optional()
       .describe("Other skill keys in the skills namespace to link to."),
   }),
-  policies: [hasMemoriesClient],
+  policies: [hasMemoriesClient, toolEnabled("writeSkill")],
   handler: async (ctx, input) => {
     const client = ctx.env.memoriesClient;
     if (client === undefined) throw new Error("memories client is not configured");

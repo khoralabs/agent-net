@@ -1,6 +1,7 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import { type KhoraPost, zKhoraStandingSearchRequest } from "@khoralabs/khora-client";
 import { z } from "zod";
+import { toolEnabled } from "../_helpers/disable-policies.ts";
 
 import type { HarnessToolkitEnv } from "../types.ts";
 import { hasKhoraClient } from "./policies.ts";
@@ -28,7 +29,7 @@ export const updatePostTool = tool<
   description: "Update an existing Khora post owned by this agent.",
   instructions: ["Update a post owned by this agent."],
   inputSchema: zUpdatePostInput,
-  policies: [hasKhoraClient],
+  policies: [hasKhoraClient, toolEnabled("updatePost")],
   handler: async (ctx, input) => {
     const client = ctx.env.khoraClient;
     if (client === undefined) throw new Error("khora client is not configured");

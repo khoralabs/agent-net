@@ -4,7 +4,7 @@ import { evaluateComposable } from "@khoralabs/agent-capabilities";
 import type { AgentChatClient } from "../../../chat.ts";
 import { harnessToolkit } from "../_toolkit.ts";
 import { createEphemeralRecentNamespacesTracker } from "../memories/_helpers/recent-namespaces.ts";
-import type { HarnessToolkitEnv } from "../types.ts";
+import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../types.ts";
 
 function createEnv(agentChat: AgentChatClient): HarnessToolkitEnv {
   return {
@@ -12,6 +12,7 @@ function createEnv(agentChat: AgentChatClient): HarnessToolkitEnv {
     activatedSkillNames: new Set(),
     embeddingCache: new Map(),
     recentNamespaces: createEphemeralRecentNamespacesTracker(),
+    ...emptyDisabledToolSets(),
     agentChat,
     sessionId: "session-1",
   };

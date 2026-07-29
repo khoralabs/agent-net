@@ -155,6 +155,8 @@ export async function runAgentWorkflow(
     agentDid: params.agent.actingFor.id,
     sessionId: deps.sessionId ?? params.context.sessionId,
     networkDataDir: deps.networkDataDir,
+    disableToolkits: params.tools?.disableToolkits,
+    disableTools: params.tools?.disableTools,
   });
   const telemetry = createHarnessAgentTelemetry(params.agent.actingFor.id);
   const { capture, aiTools, capabilities } = await captureHarnessCapabilities({

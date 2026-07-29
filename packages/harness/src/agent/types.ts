@@ -33,6 +33,11 @@ export type AgentWorkflowParams = {
       streamDeltas: boolean;
     };
   };
+  /** Per-invocation tool affordance filters (enforced via harness policies). */
+  tools?: {
+    disableToolkits?: string[];
+    disableTools?: string[];
+  };
 };
 
 export type AgentWorkflowResult = {

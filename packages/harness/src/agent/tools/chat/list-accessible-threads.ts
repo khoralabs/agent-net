@@ -1,5 +1,6 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import { z } from "zod";
+import { toolEnabled } from "../_helpers/disable-policies.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
 import { hasAgentChat } from "./policies.ts";
 
@@ -15,7 +16,7 @@ export const listAccessibleThreadsTool = tool<
   inputSchema: z.object({
     limit: z.number().int().positive().max(100).optional(),
   }),
-  policies: [hasAgentChat],
+  policies: [hasAgentChat, toolEnabled("listAccessibleThreads")],
   handler: async (ctx, input) => {
     const chat = ctx.env.agentChat;
     if (chat === undefined) throw new Error("agent chat is not configured");

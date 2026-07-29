@@ -17,7 +17,7 @@ import {
   skillRecordFromText,
 } from "./skills/_helpers/skills.ts";
 import { activateSkillByName } from "./skills/activate-skill.ts";
-import type { HarnessToolkitEnv } from "./types.ts";
+import { emptyDisabledToolSets, type HarnessToolkitEnv } from "./types.ts";
 
 type HarnessToolName = "writeMemory" | "writeSkill" | "searchMemories" | "listNamespaces";
 
@@ -49,6 +49,7 @@ function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEn
     activatedSkillNames: new Set(),
     embeddingCache: new Map(),
     recentNamespaces: createEphemeralRecentNamespacesTracker(),
+    ...emptyDisabledToolSets(),
     ...overrides,
   };
 }

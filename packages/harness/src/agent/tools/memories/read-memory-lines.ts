@@ -1,5 +1,6 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import { z } from "zod";
+import { toolEnabled } from "../_helpers/disable-policies.ts";
 
 import { type LineTuple, readLines } from "../_helpers/line-editing.ts";
 import { hasMemoriesClient } from "../policies.ts";
@@ -21,7 +22,7 @@ export const readMemoryLinesTool = tool<
     namespace: z.string().min(1).describe("Memory namespace path."),
     key: z.string().min(1).describe("Memory key within the namespace."),
   }),
-  policies: [hasMemoriesClient],
+  policies: [hasMemoriesClient, toolEnabled("readMemoryLines")],
   handler: async (ctx, input) => {
     const client = ctx.env.memoriesClient;
     if (client === undefined) throw new Error("memories client is not configured");

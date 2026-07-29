@@ -1,6 +1,7 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import { type KhoraPost, zKhoraStandingSearchRequest } from "@khoralabs/khora-client";
 import { z } from "zod";
+import { toolEnabled } from "../_helpers/disable-policies.ts";
 
 import type { HarnessToolkitEnv } from "../types.ts";
 import { hasKhoraClient } from "./policies.ts";
@@ -33,7 +34,7 @@ export const createSubscriptionTool = tool<
       .describe("Who may read this subscription post. Defaults to public."),
     expiresAtMs: z.number().min(0).optional().describe("Optional expiry timestamp (Unix ms)."),
   }),
-  policies: [hasKhoraClient],
+  policies: [hasKhoraClient, toolEnabled("createSubscription")],
   handler: async (ctx, input) => {
     const client = ctx.env.khoraClient;
     if (client === undefined) throw new Error("khora client is not configured");
