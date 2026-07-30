@@ -1,12 +1,19 @@
 import { describe, expect, test } from "bun:test";
+import { ids } from "@khoralabs/memories-node";
+import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import type { UIMessage } from "ai";
 
 import {
   AGENT_MEMORY_DOMAIN,
   agentMemorySourceRef,
+  createAgentMemoryStore,
   isAgentMemorySourceRef,
   sourcesFromMemoryToolParts,
 } from "./agent-memory-source.ts";
+import {
+  createRemoteSourceMapContentStore,
+  DEFAULT_MEMORY_SOURCE_KEY,
+} from "./tools/memories/_helpers/source-map-content-store.ts";
 
 function toolPart(
   name: string,
@@ -90,9 +97,9 @@ describe("agent-memory-source", () => {
     ] as UIMessage["parts"];
 
     const sources = sourcesFromMemoryToolParts(parts);
-    const ids = sources.map((s) => s.id).sort();
-    expect(ids).toContain("mem-b");
-    expect(ids).toContain("mem-c");
+    const sourceIds = sources.map((s) => s.id).sort();
+    expect(sourceIds).toContain("mem-b");
+    expect(sourceIds).toContain("mem-c");
     expect(sources.every((s) => isAgentMemorySourceRef(s.sourceRef))).toBe(true);
     expect(
       sources.some(
@@ -134,5 +141,84 @@ describe("agent-memory-source", () => {
       ),
     ] as UIMessage["parts"];
     expect(sourcesFromMemoryToolParts(parts)).toHaveLength(1);
+  });
+});
+
+describe("createRemoteSourceMapContentStore / createAgentMemoryStore", () => {
+  const namespace = "notes";
+  const memoryKey = "events/platform:product:abc/order-100-units";
+  const body = "Ordered one hundred units for the launch.";
+  const memoryId = ids.memory(namespace, memoryKey);
+
+  function mockClient(opts?: {
+    textBySourceMapId?: Map<string, string>;
+    missingBody?: boolean;
+  }): RemoteMemoriesClientAsync {
+    const textBySourceMapId =
+      opts?.textBySourceMapId ??
+      new Map([[ids.sourceMap(memoryId, DEFAULT_MEMORY_SOURCE_KEY), body]]);
+    return {
+      persistence: {
+        findMemoryIdByKey: async (ns: string, key: string) =>
+          ns === namespace && key === memoryKey ? memoryId : undefined,
+        loadMemoryNamespaceKey: async (id: string) =>
+          id === memoryId ? { namespace, key: memoryKey } : undefined,
+        getSourceMapTextPreview: async (sourceMapId: string) => {
+          if (opts?.missingBody) return null;
+          return textBySourceMapId.get(sourceMapId) ?? null;
+        },
+      },
+    } as unknown as RemoteMemoriesClientAsync;
+  }
+
+  test("content store resolves text without searching by key string", async () => {
+    const client = mockClient();
+    const store = createRemoteSourceMapContentStore(client);
+    const resolved = await store.resolve({
+      memory_id: memoryId,
+      source_key: DEFAULT_MEMORY_SOURCE_KEY,
+    });
+    expect(resolved).toEqual({ kind: "string", string: body });
+  });
+
+  test("AgentMemoryStore.resolve succeeds when body does not contain the key", async () => {
+    expect(body.includes(memoryKey)).toBe(false);
+    const store = createAgentMemoryStore(mockClient());
+    const ref = agentMemorySourceRef({
+      namespace,
+      memoryKey,
+      memoryId,
+    });
+    const resolved = await store.resolve(ref);
+    expect(resolved.kind).toBe("record");
+    if (resolved.kind !== "record") return;
+    expect(resolved.domain).toBe(AGENT_MEMORY_DOMAIN);
+    expect(resolved.value.namespace).toBe(namespace);
+    expect(resolved.value.memory_key).toBe(memoryKey);
+    expect(resolved.value.memory_id).toBe(memoryId);
+    expect(resolved.value.text).toBe(body);
+  });
+
+  test("AgentMemoryStore.resolve prefers store locators from memory_id", async () => {
+    const store = createAgentMemoryStore(mockClient());
+    const resolved = await store.resolve({
+      domain: AGENT_MEMORY_DOMAIN,
+      namespace: "stale/namespace",
+      memory_key: "stale-key",
+      memory_id: memoryId,
+    });
+    expect(resolved.kind).toBe("record");
+    if (resolved.kind !== "record") return;
+    expect(resolved.value.namespace).toBe(namespace);
+    expect(resolved.value.memory_key).toBe(memoryKey);
+  });
+
+  test("AgentMemoryStore.resolve returns locators when content is missing", async () => {
+    const store = createAgentMemoryStore(mockClient({ missingBody: true }));
+    const resolved = await store.resolve(agentMemorySourceRef({ namespace, memoryKey, memoryId }));
+    expect(resolved.kind).toBe("record");
+    if (resolved.kind !== "record") return;
+    expect(resolved.value.memory_id).toBe(memoryId);
+    expect(resolved.value.text).toBe("");
   });
 });

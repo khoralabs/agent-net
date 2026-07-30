@@ -1,10 +1,14 @@
 import type { ChatSourceWire } from "@khoralabs/chat";
+import type { SourceMap, Store } from "@khoralabs/memories-node";
 import { ids } from "@khoralabs/memories-node";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import type { ResolvedSource, Store as SourcemapsStore, SourceRef } from "@khoralabs/sourcemaps";
 import type { UIMessage } from "ai";
 
-import { loadMemoryTextByKey } from "./tools/memories/_helpers/memory-text.ts";
+import {
+  createRemoteSourceMapContentStore,
+  DEFAULT_MEMORY_SOURCE_KEY,
+} from "./tools/memories/_helpers/source-map-content-store.ts";
 
 /** Domain tag for memory citations on chat posts (`ChatSourceWire.sourceRef`). */
 export const AGENT_MEMORY_DOMAIN = "agent-memory" as const;
@@ -91,25 +95,62 @@ export function agentMemoryChatSource(input: {
   };
 }
 
-/** Resolve agent-memory refs via the memories service (text body as `record`). */
-export function createAgentMemoryStore(client: RemoteMemoriesClientAsync): AgentMemoryStore {
+/**
+ * Resolve agent-memory refs via key/`memory_id` lookup, then content
+ * {@link Store.resolve} (HTTP → SQLite text preview).
+ */
+export function createAgentMemoryStore(
+  client: RemoteMemoriesClientAsync,
+  contentStore: Store = createRemoteSourceMapContentStore(client),
+): AgentMemoryStore {
   return {
     async resolve(ref) {
       if (!isAgentMemorySourceRef(ref)) {
         throw new Error("invalid agent-memory source ref");
       }
-      const text = await loadMemoryTextByKey(client, ref.namespace, ref.memory_key);
-      if (text === undefined) {
-        throw new Error(`memory not found: ${ref.namespace}/${ref.memory_key}`);
+
+      let memoryId = ref.memory_id.trim();
+      let namespace = ref.namespace.trim();
+      let memoryKey = ref.memory_key.trim();
+
+      const byId = await client.persistence.loadMemoryNamespaceKey(memoryId);
+      if (byId !== undefined) {
+        namespace = byId.namespace;
+        memoryKey = byId.key;
+      } else {
+        const foundId = await client.persistence.findMemoryIdByKey(namespace, memoryKey);
+        if (foundId === undefined) {
+          throw new Error(`memory not found: ${namespace}/${memoryKey}`);
+        }
+        memoryId = foundId;
       }
+
+      const sourceKey = ref.source_key?.trim() || DEFAULT_MEMORY_SOURCE_KEY;
+      const sourceMapRef = {
+        memory_id: memoryId,
+        source_key: sourceKey,
+      } satisfies SourceMap;
+
+      let text = "";
+      try {
+        const content = await contentStore.resolve(sourceMapRef);
+        if (content.kind === "string") {
+          text = content.string;
+        } else if (content.kind === "json") {
+          text = typeof content.body === "string" ? content.body : await content.body.text();
+        }
+      } catch {
+        // Focus only needs locators; missing body is non-fatal.
+      }
+
       return {
         kind: "record",
         domain: AGENT_MEMORY_DOMAIN,
-        entity_id: ref.memory_id,
+        entity_id: memoryId,
         value: {
-          namespace: ref.namespace,
-          memory_key: ref.memory_key,
-          memory_id: ref.memory_id,
+          namespace,
+          memory_key: memoryKey,
+          memory_id: memoryId,
           text,
         },
       };

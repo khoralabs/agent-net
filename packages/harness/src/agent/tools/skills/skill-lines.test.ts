@@ -1,7 +1,12 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import type { ToolRuntimeContext, ToolSpec } from "@khoralabs/agent-capabilities";
 import { evaluateComposable } from "@khoralabs/agent-capabilities";
-import type { SearchHit, SearchOutput, SearchParams } from "@khoralabs/memories-node";
+import {
+  ids,
+  type SearchHit,
+  type SearchOutput,
+  type SearchParams,
+} from "@khoralabs/memories-node";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import { harnessToolkit } from "../_toolkit.ts";
 import { createEphemeralRecentNamespacesTracker } from "../memories/_helpers/recent-namespaces.ts";
@@ -15,6 +20,10 @@ type StoredSkill = {
   key: string;
   text: string;
 };
+
+function memoryIdFor(item: StoredSkill): string {
+  return `memory:${item.namespace}/${item.key}`;
+}
 
 type MockSkillMemoriesClient = {
   mergeMemory: (params: {
@@ -82,13 +91,17 @@ function createMockSkillClient(stored: StoredSkill[]): MockSkillMemoriesClient {
         ),
     }),
     persistence: {
-      findMemoryIdByKey: async (namespace, key) =>
-        stored.some((item) => item.namespace === namespace && item.key === key)
-          ? "memory-1"
-          : undefined,
+      findMemoryIdByKey: async (namespace, key) => {
+        const item = stored.find((row) => row.namespace === namespace && row.key === key);
+        return item !== undefined ? memoryIdFor(item) : undefined;
+      },
       getSourceMapTextPreview: async (sourceMapId) => {
-        const key = sourceMapId.replace("source-", "");
-        return stored.find((item) => item.key === key)?.text ?? null;
+        for (const item of stored) {
+          if (ids.sourceMap(memoryIdFor(item), "text") === sourceMapId) {
+            return item.text;
+          }
+        }
+        return null;
       },
     },
   };

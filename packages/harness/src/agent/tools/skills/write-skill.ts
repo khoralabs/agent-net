@@ -27,9 +27,9 @@ export const writeSkillTool = tool<
 >({
   name: "writeSkill",
   description:
-    "Write or update a skill in the skills namespace. This is an alias for writing a memory with skill frontmatter. Use linksTo to link the skill to other existing skills via graph edges.",
+    "Write or update a skill in the _root_/_skills_ namespace. This is an alias for writing a memory with skill frontmatter. Use linksTo to link the skill to other existing skills via graph edges.",
   instructions: [
-    "Author skills in the skills namespace (alias for a structured memory write).",
+    "Author skills in the _root_/_skills_ namespace (alias for a structured memory write).",
     "For skill refinements, prefer readSkillLines + replaceSkillLines.",
   ],
   inputSchema: z.object({
@@ -40,11 +40,11 @@ export const writeSkillTool = tool<
       .string()
       .min(1)
       .optional()
-      .describe("Storage key within the skills namespace. Defaults to a slug of name."),
+      .describe("Storage key within the _root_/_skills_ namespace. Defaults to a slug of name."),
     linksTo: z
       .array(z.string().min(1))
       .optional()
-      .describe("Other skill keys in the skills namespace to link to."),
+      .describe("Other skill keys in the _root_/_skills_ namespace to link to."),
   }),
   policies: [hasMemoriesClient, toolEnabled("writeSkill")],
   handler: async (ctx, input) => {

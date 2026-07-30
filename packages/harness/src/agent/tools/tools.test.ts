@@ -1,11 +1,12 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import type { ToolRuntimeContext, ToolSpec } from "@khoralabs/agent-capabilities";
 import { evaluateComposable } from "@khoralabs/agent-capabilities";
-import type {
-  MergeMemoryParamsNode,
-  SearchHit,
-  SearchOutput,
-  SearchParams,
+import {
+  ids,
+  type MergeMemoryParamsNode,
+  type SearchHit,
+  type SearchOutput,
+  type SearchParams,
 } from "@khoralabs/memories-node";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import { harnessToolkit } from "./_toolkit.ts";
@@ -101,13 +102,16 @@ function createMockMemoriesClient(merged: MergedMemory[]): MockHarnessMemoriesCl
       };
     },
     persistence: {
-      findMemoryIdByKey: async (namespace, key) =>
-        merged.some((item) => item.namespace === namespace && item.key === key)
-          ? "memory-1"
-          : undefined,
+      findMemoryIdByKey: async (namespace, key) => {
+        const item = merged.find((row) => row.namespace === namespace && row.key === key);
+        return item !== undefined ? ids.memory(namespace, key) : undefined;
+      },
       getSourceMapTextPreview: async (sourceMapId) => {
-        const index = Number.parseInt(sourceMapId.replace("source-", ""), 10);
-        return merged[index]?.text ?? null;
+        for (const item of merged) {
+          const memoryId = ids.memory(item.namespace, item.key);
+          if (sourceMapId === ids.sourceMap(memoryId, "text")) return item.text;
+        }
+        return null;
       },
       listMemoryNamespaces: async () =>
         [...new Set(merged.map((item) => item.namespace))].sort((a, b) => a.localeCompare(b)),
@@ -168,7 +172,7 @@ describe("harness memory tools", () => {
     expect(merged[1]?.links.length).toBe(1);
   });
 
-  test("writeSkill stores skill frontmatter in the skills namespace", async () => {
+  test("writeSkill stores skill frontmatter in the _root_/_skills_ namespace", async () => {
     const writeSkill = await toolHandler("writeSkill");
     const result = (await writeSkill(
       { env, agentId: "agent", agentName: "Agent" },
@@ -272,7 +276,7 @@ describe("harness memory tools", () => {
     expect(env.recentNamespaces.top()).toContain("notes");
   });
 
-  test("activateSkill resolves skill content from the skills namespace", async () => {
+  test("activateSkill resolves skill content from the _root_/_skills_ namespace", async () => {
     const skillBody = `---
 name: summarize-thread
 description: Summarize a chat thread

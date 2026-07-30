@@ -12,6 +12,7 @@ import {
 } from "@khoralabs/memories-service/client";
 
 import { minimalHarnessMemoriesOntology } from "./minimal-ontology.ts";
+import { createRemoteSourceMapContentStore } from "./source-map-content-store.ts";
 
 export type HarnessMemoriesOntology = OntologyDefinition<LabelSchemaMap, LabelSchemaMap>;
 
@@ -34,12 +35,28 @@ export async function createHarnessMemoriesClient(opts: {
   ontology: HarnessMemoriesOntology;
   adminToken: string;
 }): Promise<RemoteMemoriesClientAsync> {
-  return createRemoteMemoriesClientAsync({
-    baseUrl: opts.baseUrl.replace(/\/$/, ""),
-    database: opts.database,
-    ontology: resolveHarnessMemoriesOntology(opts.ontology),
-    auth: createBearerTokenAuthProvider(opts.adminToken),
+  const baseUrl = opts.baseUrl.replace(/\/$/, "");
+  const auth = createBearerTokenAuthProvider(opts.adminToken);
+  const ontology = resolveHarnessMemoriesOntology(opts.ontology);
+
+  const holder: { client?: RemoteMemoriesClientAsync } = {};
+  const store = createRemoteSourceMapContentStore({
+    get persistence() {
+      if (holder.client === undefined) {
+        throw new Error("memories client not ready");
+      }
+      return holder.client.persistence;
+    },
   });
+
+  holder.client = await createRemoteMemoriesClientAsync({
+    baseUrl,
+    database: opts.database,
+    ontology,
+    auth,
+    store,
+  });
+  return holder.client;
 }
 
 export function agentMemoriesDatabase(agentDid: string): MemoriesDatabaseId {

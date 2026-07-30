@@ -51,8 +51,10 @@ export const activateSkillTool = tool<
 >({
   name: "activateSkill",
   description:
-    "Load full instructions for a skill by name. Skills are resolved from the agent's memories database under the skills namespace.",
-  instructions: ["Load specialized instructions from skills stored in the skills namespace."],
+    "Load full instructions for a skill by name. Skills are resolved from the agent's memories database under the _root_/_skills_ namespace.",
+  instructions: [
+    "Load specialized instructions from skills stored in the _root_/_skills_ namespace.",
+  ],
   inputSchema: z.object({
     name: z.string().min(1).describe("Name or key of the skill to activate."),
   }),

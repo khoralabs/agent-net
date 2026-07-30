@@ -23,6 +23,11 @@ export {
 } from "./agent/chat-service.ts";
 export { HARNESS_TOOLKIT, type HarnessToolkitId } from "./agent/tools/ids.ts";
 export { installMemoriesOntology } from "./agent/tools/memories/_helpers/memories-ontology-install.ts";
+export {
+  createRemoteSourceMapContentStore,
+  DEFAULT_MEMORY_SOURCE_KEY,
+  type SourceMapTextPreviewClient,
+} from "./agent/tools/memories/_helpers/source-map-content-store.ts";
 export type { AgentWorkflowParams, AgentWorkflowResult } from "./agent/types.ts";
 export { agentResponse, executeAgentResponse } from "./agent/workflows/agent-response.ts";
 export type { AgentTurnParams, AgentTurnResult, AgentUIMessage } from "./agent-turn.ts";

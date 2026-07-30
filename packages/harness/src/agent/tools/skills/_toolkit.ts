@@ -13,7 +13,7 @@ const skillsCore = toolkit(
   {
     name: "skills-core",
     instructions: [
-      "Author, refine, and activate specialized skills stored in the skills memory namespace.",
+      "Author, refine, and activate specialized skills stored in the _root_/_skills_ memory namespace.",
     ],
   },
 );

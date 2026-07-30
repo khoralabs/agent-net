@@ -2,7 +2,7 @@ import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/clie
 
 import { loadMemoryTextByKey } from "../../memories/_helpers/memory-text.ts";
 
-export const SKILLS_NAMESPACE = "skills";
+export const SKILLS_NAMESPACE = "_root_/_skills_";
 
 const SKILL_SEARCH_OPTIONS = {
   topK: 100,

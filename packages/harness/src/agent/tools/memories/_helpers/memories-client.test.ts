@@ -63,7 +63,7 @@ describe("createLazyHarnessMemoriesClient", () => {
       mergeMemory: async () => ["memory-1"],
       deleteMemory: async () => undefined,
       persistence: {
-        listMemoryNamespaces: async () => ["notes", "skills"],
+        listMemoryNamespaces: async () => ["notes", "_root_/_skills_"],
       },
     } as unknown as RemoteMemoriesClientAsync;
 
@@ -84,7 +84,7 @@ describe("createLazyHarnessMemoriesClient", () => {
     const listFn = lazyClient.persistence.listMemoryNamespaces;
     expect(listFn).toBeDefined();
     const namespaces = await listFn?.call(lazyClient.persistence);
-    expect(namespaces).toEqual(["notes", "skills"]);
+    expect(namespaces).toEqual(["notes", "_root_/_skills_"]);
     expect(createCount).toBe(1);
   });
 });
