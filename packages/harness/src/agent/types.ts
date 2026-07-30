@@ -7,6 +7,19 @@ export type AgentUIMessage = {
   metadata?: unknown;
 };
 
+/** Host-supplied framing for the agent's memories database (injected into memories toolkit). */
+export type MemoriesDatabaseContext = {
+  /** One short paragraph: what this DB is about (host-defined domain; not harness-interpreted). */
+  about: string;
+  /** Optional short grounding prose the agent should treat as known. */
+  baseUnderstanding?: string;
+  /**
+   * Optional namespaces where durable grounding lives.
+   * Host-derived (project, org, personal, etc.) — harness only renders them.
+   */
+  groundingNamespaces?: string[];
+};
+
 export type AgentWorkflowParams = {
   runId: string;
   agent: {
@@ -25,6 +38,8 @@ export type AgentWorkflowParams = {
     messages: AgentUIMessage[];
     instructions?: string[];
     userTimeZone?: string;
+    /** When set, memories toolkit instructions use this instead of the generic DB blurb. */
+    memoriesDatabase?: MemoriesDatabaseContext;
   };
   output: {
     chat: {

@@ -22,13 +22,18 @@ export {
   resolveAgentChatSigner,
 } from "./agent/chat-service.ts";
 export { HARNESS_TOOLKIT, type HarnessToolkitId } from "./agent/tools/ids.ts";
+export { resolveAgentsDataDir } from "./agent/tools/khora/_helpers/khora-client-factory.ts";
 export { installMemoriesOntology } from "./agent/tools/memories/_helpers/memories-ontology-install.ts";
 export {
   createRemoteSourceMapContentStore,
   DEFAULT_MEMORY_SOURCE_KEY,
   type SourceMapTextPreviewClient,
 } from "./agent/tools/memories/_helpers/source-map-content-store.ts";
-export type { AgentWorkflowParams, AgentWorkflowResult } from "./agent/types.ts";
+export type {
+  AgentWorkflowParams,
+  AgentWorkflowResult,
+  MemoriesDatabaseContext,
+} from "./agent/types.ts";
 export { AI_STEP_MAX_RETRIES } from "./agent/workflow-resilience.ts";
 export { agentResponse } from "./agent/workflows/agent-response.ts";
 export {
@@ -43,6 +48,9 @@ export type { AgentTurnParams, AgentTurnResult, AgentUIMessage } from "./agent-t
 export { runAgentTurn } from "./agent-turn.ts";
 export {
   AgentHandle,
+  type AgentMemoriesFraming,
+  type AgentRecord,
+  AgentStore,
   connectPoolInbox,
   HarnessPoolInbox,
   type InboxConnection,

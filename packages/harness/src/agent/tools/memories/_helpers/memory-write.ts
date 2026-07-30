@@ -40,7 +40,7 @@ export type WriteMemoryNodeInput = {
 export type WriteMemoryIntegrateEnqueue = {
   baseUrl: string;
   token: string;
-  companyId: string;
+  ownerKey: string;
   /** Caller-owned integrate write scope. Defaults to `under`. */
   writeScope?: "exact" | "under";
   /** Payload.source for the integrate event. */
@@ -114,7 +114,7 @@ async function enqueueMemoryIntegrate(
       : `write-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
   const body = {
     kind: "memory",
-    companyId: integrate.companyId,
+    ownerKey: integrate.ownerKey,
     namespace: args.namespace,
     memoryKey: args.memoryKey,
     writeScope: integrate.writeScope ?? "under",

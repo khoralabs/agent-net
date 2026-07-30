@@ -9,7 +9,7 @@ import { KhoraClient } from "@khoralabs/khora-client";
 import { loadHarnessIdentity, saveHarnessIdentity } from "../lib/identity-wrap-key.ts";
 import type { PerAgentInviteBank } from "../lib/per-agent-invite-bank.ts";
 import { AgentHandle } from "./handle.ts";
-import { AgentStore } from "./store.ts";
+import { type AgentMemoriesFraming, AgentStore } from "./store.ts";
 
 export type AgentCallback = (handle: AgentHandle) => Promise<void>;
 
@@ -116,6 +116,16 @@ export class ManagedAgentPool {
   /** Persist an opaque external id ↔ DID mapping on an existing pool agent. */
   async setExternalId(did: string, externalId: string): Promise<void> {
     await this.#store.setExternalId(did, externalId);
+  }
+
+  /** Stored memories-framing prose overrides for an agent, if any. */
+  getMemoriesFraming(did: string): AgentMemoriesFraming | undefined {
+    return this.#store.get(did)?.memoriesFraming;
+  }
+
+  /** Persist or clear host-edited memories-framing prose (not derived namespaces). */
+  async setMemoriesFraming(did: string, framing: AgentMemoriesFraming | undefined): Promise<void> {
+    await this.#store.setMemoriesFraming(did, framing);
   }
 
   async #loadSigner(keyPath: string): Promise<PersistableSigner | undefined> {

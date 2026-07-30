@@ -3,6 +3,7 @@ import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 
 import type { AgentChatClient } from "../../chat.ts";
+import type { MemoriesDatabaseContext } from "../types.ts";
 import type { RecentNamespacesTracker } from "./memories/_helpers/recent-namespaces.ts";
 import type { SkillRecord } from "./skills/_helpers/skills.ts";
 
@@ -26,6 +27,8 @@ export type HarnessToolkitEnv = {
     /** Defaults to `under` when enqueueing. */
     writeScope?: "exact" | "under";
   };
+  /** Host framing for this agent's memories database (memories toolkit instructions). */
+  memoriesContext?: MemoriesDatabaseContext;
   skills: SkillRecord[];
   activatedSkillNames: Set<string>;
   recentNamespaces: RecentNamespacesTracker;

@@ -15,13 +15,13 @@ export function resolveWriteMemoryOptions(
   const ontology = requireInstalledMemoriesOntology();
 
   const integrateCfg = env.integrateMemories;
-  const companyId = env.agentDid?.trim();
+  const ownerKey = env.agentDid?.trim();
   const integrate =
-    integrateCfg !== undefined && companyId !== undefined && companyId.length > 0
+    integrateCfg !== undefined && ownerKey !== undefined && ownerKey.length > 0
       ? {
           baseUrl: integrateCfg.baseUrl,
           token: integrateCfg.token,
-          companyId,
+          ownerKey,
           writeScope: integrateCfg.writeScope ?? ("under" as const),
           source,
         }

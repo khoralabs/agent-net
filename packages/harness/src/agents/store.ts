@@ -1,6 +1,12 @@
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
 
+/** Editable host prose for memories-database framing (namespaces stay host-derived, not stored). */
+export type AgentMemoriesFraming = {
+  about?: string;
+  baseUnderstanding?: string;
+};
+
 export type AgentRecord = {
   did: string;
   keyPath: string;
@@ -9,6 +15,8 @@ export type AgentRecord = {
    * (tenant, org, account, etc.). Opaque to the harness.
    */
   externalId?: string;
+  /** Optional host-edited prose for memories DB contextualization. */
+  memoriesFraming?: AgentMemoriesFraming;
 };
 
 type StoreFile = {
@@ -19,6 +27,23 @@ function normalizeExternalId(value: string): string {
   return value.trim();
 }
 
+function normalizeFraming(raw: AgentMemoriesFraming | undefined): AgentMemoriesFraming | undefined {
+  if (raw === undefined || typeof raw !== "object" || raw === null) {
+    return undefined;
+  }
+  const about =
+    typeof raw.about === "string" && raw.about.trim().length > 0 ? raw.about.trim() : undefined;
+  const baseUnderstanding =
+    typeof raw.baseUnderstanding === "string" && raw.baseUnderstanding.trim().length > 0
+      ? raw.baseUnderstanding.trim()
+      : undefined;
+  if (about === undefined && baseUnderstanding === undefined) return undefined;
+  return {
+    ...(about !== undefined ? { about } : {}),
+    ...(baseUnderstanding !== undefined ? { baseUnderstanding } : {}),
+  };
+}
+
 /** Coerce legacy `platformCompanyId` field into `externalId` if present. */
 function normalizeRecord(raw: AgentRecord & { platformCompanyId?: string }): AgentRecord {
   const externalId =
@@ -27,10 +52,12 @@ function normalizeRecord(raw: AgentRecord & { platformCompanyId?: string }): Age
       : typeof raw.platformCompanyId === "string" && raw.platformCompanyId.trim().length > 0
         ? normalizeExternalId(raw.platformCompanyId)
         : undefined;
+  const memoriesFraming = normalizeFraming(raw.memoriesFraming);
   return {
     did: raw.did,
     keyPath: raw.keyPath,
     ...(externalId !== undefined ? { externalId } : {}),
+    ...(memoriesFraming !== undefined ? { memoriesFraming } : {}),
   };
 }
 
@@ -89,6 +116,20 @@ export class AgentStore {
       throw new Error(`externalId ${id} is already linked to agent ${existing.did}`);
     }
     record.externalId = id;
+    await this.#flush();
+  }
+
+  async setMemoriesFraming(did: string, framing: AgentMemoriesFraming | undefined): Promise<void> {
+    const record = this.#agents.find((a) => a.did === did);
+    if (record === undefined) {
+      throw new Error(`Agent ${did} is not in the store`);
+    }
+    const normalized = normalizeFraming(framing);
+    if (normalized === undefined) {
+      delete record.memoriesFraming;
+    } else {
+      record.memoriesFraming = normalized;
+    }
     await this.#flush();
   }
 
