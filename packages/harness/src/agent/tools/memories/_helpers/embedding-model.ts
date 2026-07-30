@@ -1,9 +1,10 @@
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import {
   createMemoriesEmbeddingModel,
   type EmbeddingModel,
   mergeResolutionAndProviderOptions,
 } from "@khoralabs/memories-node/helpers";
+
+const DEFAULT_EMBEDDING_MODEL = "google/gemini-embedding-2";
 
 function parseEmbeddingPreset(): "L" | "M" | "H" {
   const raw = process.env.MEMORIES_SEARCH_EMBEDDING_PRESET?.trim().toUpperCase();
@@ -11,21 +12,24 @@ function parseEmbeddingPreset(): "L" | "M" | "H" {
   return "M";
 }
 
-function resolveGeminiApiKey(): string | undefined {
-  return (
-    process.env.GOOGLE_GENERATIVE_AI_API_KEY?.trim() ||
-    process.env.GOOGLE_API_KEY?.trim() ||
-    process.env.GEMINI_API_KEY?.trim() ||
-    undefined
-  );
+/** Google embedding models accept outputDimensionality via providerOptions. */
+function isGoogleEmbeddingModelId(modelId: string): boolean {
+  const id = modelId.trim().toLowerCase();
+  return id.startsWith("google/") || id.startsWith("gemini-embedding-");
 }
 
+/**
+ * Resolve memories embedding via AI SDK gateway model id (same pattern as integrate-memories).
+ * Returns undefined when `AI_GATEWAY_API_KEY` is unset so search can soft-fallback to lexical.
+ */
 export function resolveHarnessEmbeddingModel(): EmbeddingModel | undefined {
-  const apiKey = resolveGeminiApiKey();
-  if (apiKey === undefined || apiKey.length === 0) return undefined;
-  const google = createGoogleGenerativeAI({ apiKey });
+  if (!process.env.AI_GATEWAY_API_KEY?.trim()) return undefined;
+  const modelId = process.env.MEMORIES_EMBEDDING_MODEL?.trim() || DEFAULT_EMBEDDING_MODEL;
+  if (modelId.length === 0) return undefined;
   return createMemoriesEmbeddingModel({
-    model: google.embedding("gemini-embedding-2"),
-    providerOptions: mergeResolutionAndProviderOptions(parseEmbeddingPreset()),
+    model: modelId,
+    providerOptions: isGoogleEmbeddingModelId(modelId)
+      ? mergeResolutionAndProviderOptions(parseEmbeddingPreset())
+      : undefined,
   });
 }

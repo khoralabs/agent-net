@@ -23,6 +23,7 @@ export {
 } from "./agent/chat-service.ts";
 export { HARNESS_TOOLKIT, type HarnessToolkitId } from "./agent/tools/ids.ts";
 export { resolveAgentsDataDir } from "./agent/tools/khora/_helpers/khora-client-factory.ts";
+export { resolveHarnessEmbeddingModel } from "./agent/tools/memories/_helpers/embedding-model.ts";
 export { installMemoriesOntology } from "./agent/tools/memories/_helpers/memories-ontology-install.ts";
 export {
   createRemoteSourceMapContentStore,

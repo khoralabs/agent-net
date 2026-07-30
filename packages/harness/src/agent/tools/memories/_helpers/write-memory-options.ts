@@ -9,7 +9,7 @@ export function resolveWriteMemoryOptions(
 ): WriteMemoryNodeOptions {
   if (env.embeddingModel === undefined) {
     throw new Error(
-      "embeddingModel is required for memory writes (set GOOGLE_GENERATIVE_AI_API_KEY / GEMINI_API_KEY)",
+      "embeddingModel is required for memory writes (set AI_GATEWAY_API_KEY; optional MEMORIES_EMBEDDING_MODEL)",
     );
   }
   const ontology = requireInstalledMemoriesOntology();
