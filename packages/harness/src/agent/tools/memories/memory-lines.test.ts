@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import type { ToolRuntimeContext, ToolSpec } from "@khoralabs/agent-capabilities";
 import { evaluateComposable } from "@khoralabs/agent-capabilities";
 import {
@@ -12,6 +12,11 @@ import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/clie
 import { harnessToolkit } from "../_toolkit.ts";
 import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../types.ts";
 import { createEphemeralRecentNamespacesTracker } from "./_helpers/recent-namespaces.ts";
+import {
+  createTestEmbeddingModel,
+  installTestMemoriesOntology,
+  resetTestMemoriesOntology,
+} from "./_helpers/test-embedding.ts";
 
 type MemoryLineToolName = "readMemoryLines" | "replaceMemoryLines";
 
@@ -29,7 +34,7 @@ type MockMemoriesClient = {
   mergeMemory: (params: {
     namespace: string;
     key: string;
-    content: Array<{ key: string; text: string }>;
+    content: Array<{ key: string; text?: string; vector?: number[] }>;
   }) => Promise<string[]>;
   search: (params: SearchParams) => Promise<SearchOutput>;
   persistence: {
@@ -43,6 +48,7 @@ function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEn
     skills: [],
     activatedSkillNames: new Set(),
     embeddingCache: new Map(),
+    embeddingModel: createTestEmbeddingModel(),
     recentNamespaces: createEphemeralRecentNamespacesTracker(),
     ...emptyDisabledToolSets(),
     ...overrides,
@@ -52,7 +58,10 @@ function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEn
 function createMockClient(stored: StoredMemory[]): MockMemoriesClient {
   return {
     mergeMemory: async (params) => {
-      const text = params.content.find((item) => item.key === "text")?.text ?? "";
+      const text = params.content
+        .map((item) => (typeof item.text === "string" ? item.text : ""))
+        .filter((t) => t.length > 0)
+        .join("\n\n");
       const existingIndex = stored.findIndex(
         (item) => item.namespace === params.namespace && item.key === params.key,
       );
@@ -62,7 +71,7 @@ function createMockClient(stored: StoredMemory[]): MockMemoriesClient {
       } else {
         stored.push(record);
       }
-      return ["memory-1"];
+      return [params.key];
     },
     search: async (params) => ({
       hits: stored
@@ -112,6 +121,7 @@ describe("memory line tools", () => {
   let env: HarnessToolkitEnv;
 
   beforeEach(() => {
+    installTestMemoriesOntology();
     stored = [
       {
         namespace: "notes",
@@ -122,6 +132,10 @@ describe("memory line tools", () => {
     env = createEnv({
       memoriesClient: createMockClient(stored) as unknown as RemoteMemoriesClientAsync,
     });
+  });
+
+  afterEach(() => {
+    resetTestMemoriesOntology();
   });
 
   async function toolHandler(name: MemoryLineToolName) {
@@ -175,7 +189,7 @@ describe("memory line tools", () => {
       lines: Array<[number, string]>;
     };
 
-    expect(result.memoryIds).toEqual(["memory-1"]);
+    expect(result.memoryIds).toEqual([memoryIdFor({ namespace: "notes", key: "plan", text: "" })]);
     expect(result.lines[1]).toEqual([2, "Updated line two."]);
     expect(stored[0]?.text).toBe("Line one.\nUpdated line two.\nLine three.");
   });

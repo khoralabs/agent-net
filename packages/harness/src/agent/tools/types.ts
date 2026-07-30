@@ -16,6 +16,16 @@ export type HarnessToolkitEnv = {
   embeddingModel?: EmbeddingModel;
   embeddingCache?: Map<string, number[]>;
   memoriesSnapshotRootHex?: string;
+  /**
+   * When set, memory/skill writes fire-and-forget a `kind: "memory"` integrate
+   * job after embed+merge.
+   */
+  integrateMemories?: {
+    baseUrl: string;
+    token: string;
+    /** Defaults to `under` when enqueueing. */
+    writeScope?: "exact" | "under";
+  };
   skills: SkillRecord[];
   activatedSkillNames: Set<string>;
   recentNamespaces: RecentNamespacesTracker;

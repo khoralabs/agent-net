@@ -13,6 +13,7 @@ import type { HarnessToolkitEnv } from "../types.ts";
 import { loadMemoryTextByKey } from "./_helpers/memory-text.ts";
 import { writeMemoryNode } from "./_helpers/memory-write.ts";
 import { touchRecentNamespaces } from "./_helpers/recent-namespaces.ts";
+import { resolveWriteMemoryOptions } from "./_helpers/write-memory-options.ts";
 
 const zLineChange = z.tuple([z.number().int().min(1), z.string()]);
 
@@ -48,7 +49,11 @@ export const replaceMemoryLinesTool = tool<
     if (text === undefined) throw new Error(`memory not found: ${namespace}/${key}`);
 
     const updated = applyLineChanges(text, input.changes);
-    const memoryIds = await writeMemoryNode(client, { namespace, key, text: updated });
+    const memoryIds = await writeMemoryNode(
+      client,
+      { namespace, key, text: updated },
+      resolveWriteMemoryOptions(ctx.env, "replaceMemoryLines"),
+    );
 
     if (namespace === SKILLS_NAMESPACE) {
       try {

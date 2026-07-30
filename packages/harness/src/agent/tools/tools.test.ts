@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import type { ToolRuntimeContext, ToolSpec } from "@khoralabs/agent-capabilities";
 import { evaluateComposable } from "@khoralabs/agent-capabilities";
 import {
@@ -11,6 +11,11 @@ import {
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import { harnessToolkit } from "./_toolkit.ts";
 import { createEphemeralRecentNamespacesTracker } from "./memories/_helpers/recent-namespaces.ts";
+import {
+  createTestEmbeddingModel,
+  installTestMemoriesOntology,
+  resetTestMemoriesOntology,
+} from "./memories/_helpers/test-embedding.ts";
 import {
   defaultSkillKey,
   formatSkillDocument,
@@ -49,6 +54,7 @@ function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEn
     skills: [],
     activatedSkillNames: new Set(),
     embeddingCache: new Map(),
+    embeddingModel: createTestEmbeddingModel(),
     recentNamespaces: createEphemeralRecentNamespacesTracker(),
     ...emptyDisabledToolSets(),
     ...overrides,
@@ -58,7 +64,10 @@ function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEn
 function createMockMemoriesClient(merged: MergedMemory[]): MockHarnessMemoriesClient {
   return {
     mergeMemory: async (params) => {
-      const text = params.content.find((item) => item.key === "text")?.text ?? "";
+      const text = params.content
+        .map((item) => (typeof item.text === "string" ? item.text : ""))
+        .filter((t) => t.length > 0)
+        .join("\n\n");
       merged.push({
         namespace: params.namespace,
         key: params.key,
@@ -71,7 +80,7 @@ function createMockMemoriesClient(merged: MergedMemory[]): MockHarnessMemoriesCl
             label: edge.label.kind,
           })) ?? [],
       });
-      return ["memory-1"];
+      return [params.key];
     },
     search: async (params) => {
       const query = "text" in params.content ? params.content.text : "";
@@ -124,10 +133,15 @@ describe("harness memory tools", () => {
   let env: HarnessToolkitEnv;
 
   beforeEach(() => {
+    installTestMemoriesOntology();
     merged = [];
     env = createEnv({
       memoriesClient: createMockMemoriesClient(merged) as unknown as RemoteMemoriesClientAsync,
     });
+  });
+
+  afterEach(() => {
+    resetTestMemoriesOntology();
   });
 
   async function toolHandler(name: HarnessToolName) {
@@ -146,7 +160,7 @@ describe("harness memory tools", () => {
       { env, agentId: "agent", agentName: "Agent" },
       { namespace: "notes", key: "plan", text: "Ship the harness." },
     )) as { memoryIds: string[] };
-    expect(result.memoryIds).toEqual(["memory-1"]);
+    expect(result.memoryIds).toEqual([ids.memory("notes", "plan")]);
     expect(merged).toEqual([
       { namespace: "notes", key: "plan", text: "Ship the harness.", links: [] },
     ]);

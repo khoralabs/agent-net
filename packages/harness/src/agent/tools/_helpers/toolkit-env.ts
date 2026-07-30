@@ -36,12 +36,15 @@ export async function createHarnessToolkitEnv(input: {
   embeddingModel?: EmbeddingModel;
   disableToolkits?: readonly string[];
   disableTools?: readonly string[];
+  integrateMemories?: HarnessToolkitEnv["integrateMemories"];
 }): Promise<HarnessToolkitEnv> {
   const agentDid = input.agentDid?.trim() || input.agentChat?.did;
   const recentNamespaces = await resolveRecentNamespacesTracker({
     agentDid,
     networkDataDir: input.networkDataDir,
   });
+
+  const integrateMemories = input.integrateMemories ?? resolveIntegrateMemoriesFromEnv();
 
   const env: HarnessToolkitEnv = {
     memoriesClient: input.memoriesClient,
@@ -57,6 +60,7 @@ export async function createHarnessToolkitEnv(input: {
     recentNamespaces,
     disabledToolkits: new Set(input.disableToolkits ?? []),
     disabledTools: new Set(input.disableTools ?? []),
+    ...(integrateMemories !== undefined ? { integrateMemories } : {}),
   };
 
   if (input.memoriesClient === undefined) return env;
@@ -65,6 +69,15 @@ export async function createHarnessToolkitEnv(input: {
     (await getMemoriesProvenanceHeadRootHex(input.memoriesClient)) ?? "";
   env.skills = await discoverSkillsFromMemories(input.memoriesClient);
   return env;
+}
+
+function resolveIntegrateMemoriesFromEnv(
+  env: NodeJS.ProcessEnv = process.env,
+): HarnessToolkitEnv["integrateMemories"] | undefined {
+  const baseUrl = env.INTEGRATE_MEMORIES_BASE_URL?.trim() || "http://127.0.0.1:3001";
+  const token = env.INTEGRATE_MEMORIES_INTERNAL_TOKEN?.trim();
+  if (token === undefined || token.length === 0) return undefined;
+  return { baseUrl, token, writeScope: "under" };
 }
 
 export async function createHarnessMemoriesClientForAgent(opts: {

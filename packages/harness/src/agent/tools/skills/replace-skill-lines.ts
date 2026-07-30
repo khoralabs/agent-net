@@ -4,6 +4,7 @@ import { toolEnabled } from "../_helpers/disable-policies.ts";
 
 import { applyLineChanges, type LineTuple, readLines } from "../_helpers/line-editing.ts";
 import { writeMemoryNode } from "../memories/_helpers/memory-write.ts";
+import { resolveWriteMemoryOptions } from "../memories/_helpers/write-memory-options.ts";
 import { hasMemoriesClient } from "../policies.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
 import {
@@ -56,11 +57,15 @@ export const replaceSkillLinesTool = tool<
       throw new Error(`skill document invalid after line changes: ${message}`);
     }
 
-    const memoryIds = await writeMemoryNode(client, {
-      namespace: SKILLS_NAMESPACE,
-      key,
-      text: updated,
-    });
+    const memoryIds = await writeMemoryNode(
+      client,
+      {
+        namespace: SKILLS_NAMESPACE,
+        key,
+        text: updated,
+      },
+      resolveWriteMemoryOptions(ctx.env, "replaceSkillLines"),
+    );
 
     upsertSkillInEnv(ctx.env.skills, skillRecordFromText(SKILLS_NAMESPACE, key, updated));
 

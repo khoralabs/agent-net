@@ -48,7 +48,7 @@ export type NetworkHarnessOptions = {
    */
   chatChannelId?: string;
   /**
-   * Optional operator principal for `forScope({ type: "user", id })` (e.g. Bloom UI).
+   * Optional operator principal for `forScope({ type: "user", id })` (e.g. host UI).
    * When omitted, no UI user identity is created or registered.
    */
   operator?: { signer: PersistableSigner };

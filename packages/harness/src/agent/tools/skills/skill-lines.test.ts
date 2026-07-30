@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "bun:test";
+import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import type { ToolRuntimeContext, ToolSpec } from "@khoralabs/agent-capabilities";
 import { evaluateComposable } from "@khoralabs/agent-capabilities";
 import {
@@ -10,6 +10,11 @@ import {
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import { harnessToolkit } from "../_toolkit.ts";
 import { createEphemeralRecentNamespacesTracker } from "../memories/_helpers/recent-namespaces.ts";
+import {
+  createTestEmbeddingModel,
+  installTestMemoriesOntology,
+  resetTestMemoriesOntology,
+} from "../memories/_helpers/test-embedding.ts";
 import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../types.ts";
 import { formatSkillDocument, SKILLS_NAMESPACE, skillRecordFromText } from "./_helpers/skills.ts";
 
@@ -29,7 +34,7 @@ type MockSkillMemoriesClient = {
   mergeMemory: (params: {
     namespace: string;
     key: string;
-    content: Array<{ key: string; text: string }>;
+    content: Array<{ key: string; text?: string; vector?: number[] }>;
   }) => Promise<string[]>;
   search: (params: SearchParams) => Promise<SearchOutput>;
   persistence: {
@@ -43,6 +48,7 @@ function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEn
     skills: [],
     activatedSkillNames: new Set(),
     embeddingCache: new Map(),
+    embeddingModel: createTestEmbeddingModel(),
     recentNamespaces: createEphemeralRecentNamespacesTracker(),
     ...emptyDisabledToolSets(),
     ...overrides,
@@ -52,7 +58,10 @@ function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEn
 function createMockSkillClient(stored: StoredSkill[]): MockSkillMemoriesClient {
   return {
     mergeMemory: async (params) => {
-      const text = params.content.find((item) => item.key === "text")?.text ?? "";
+      const text = params.content
+        .map((item) => (typeof item.text === "string" ? item.text : ""))
+        .filter((t) => t.length > 0)
+        .join("\n\n");
       const existingIndex = stored.findIndex(
         (item) => item.namespace === params.namespace && item.key === params.key,
       );
@@ -62,7 +71,7 @@ function createMockSkillClient(stored: StoredSkill[]): MockSkillMemoriesClient {
       } else {
         stored.push(record);
       }
-      return ["memory-1"];
+      return [params.key];
     },
     search: async (params) => ({
       hits: stored
@@ -112,6 +121,7 @@ describe("skill line tools", () => {
   let env: HarnessToolkitEnv;
 
   beforeEach(() => {
+    installTestMemoriesOntology();
     stored = [
       {
         namespace: SKILLS_NAMESPACE,
@@ -127,6 +137,10 @@ describe("skill line tools", () => {
       memoriesClient: createMockSkillClient(stored) as unknown as RemoteMemoriesClientAsync,
       skills: [skillRecordFromText(SKILLS_NAMESPACE, "summarize-thread", stored[0]?.text ?? "")],
     });
+  });
+
+  afterEach(() => {
+    resetTestMemoriesOntology();
   });
 
   async function toolHandler(name: SkillLineToolName) {
@@ -180,7 +194,13 @@ describe("skill line tools", () => {
       },
     )) as { key: string; memoryIds: string[]; lines: Array<[number, string]> };
 
-    expect(result.memoryIds).toEqual(["memory-1"]);
+    expect(result.memoryIds).toEqual([
+      memoryIdFor({
+        namespace: SKILLS_NAMESPACE,
+        key: "summarize-thread",
+        text: "",
+      }),
+    ]);
     expect(result.lines.some(([_, line]) => line === "Keep it brief and actionable.")).toBe(true);
     expect(stored[0]?.text).toContain("Keep it brief and actionable.");
     expect(env.skills[0]?.body).toContain("Keep it brief and actionable.");

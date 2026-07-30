@@ -1,0 +1,35 @@
+import type { HarnessToolkitEnv } from "../../types.ts";
+import { requireInstalledMemoriesOntology } from "./memories-ontology-install.ts";
+import type { WriteMemoryNodeOptions } from "./memory-write.ts";
+
+/** Resolve embedding + ontology (+ optional integrate enqueue) for writeMemoryNode. */
+export function resolveWriteMemoryOptions(
+  env: HarnessToolkitEnv,
+  source: string,
+): WriteMemoryNodeOptions {
+  if (env.embeddingModel === undefined) {
+    throw new Error(
+      "embeddingModel is required for memory writes (set GOOGLE_GENERATIVE_AI_API_KEY / GEMINI_API_KEY)",
+    );
+  }
+  const ontology = requireInstalledMemoriesOntology();
+
+  const integrateCfg = env.integrateMemories;
+  const companyId = env.agentDid?.trim();
+  const integrate =
+    integrateCfg !== undefined && companyId !== undefined && companyId.length > 0
+      ? {
+          baseUrl: integrateCfg.baseUrl,
+          token: integrateCfg.token,
+          companyId,
+          writeScope: integrateCfg.writeScope ?? ("under" as const),
+          source,
+        }
+      : undefined;
+
+  return {
+    embeddingModel: env.embeddingModel,
+    ontology,
+    ...(integrate !== undefined ? { integrate } : {}),
+  };
+}
