@@ -13,6 +13,24 @@
       "import": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./agent-workflow-types": {
+      "types": "./src/agent/types.ts",
+      "bun": "./src/agent/types.ts",
+      "import": "./src/agent/types.ts",
+      "default": "./src/agent/types.ts"
+    },
+    "./agent-response-run": {
+      "types": "./src/agent/workflows/agent-response-run.ts",
+      "bun": "./src/agent/workflows/agent-response-run.ts",
+      "import": "./src/agent/workflows/agent-response-run.ts",
+      "default": "./src/agent/workflows/agent-response-run.ts"
+    },
+    "./workflow-resilience": {
+      "types": "./src/agent/workflow-resilience.ts",
+      "bun": "./src/agent/workflow-resilience.ts",
+      "import": "./src/agent/workflow-resilience.ts",
+      "default": "./src/agent/workflow-resilience.ts"
+    },
     "./dist": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",

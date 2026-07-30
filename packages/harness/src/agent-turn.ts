@@ -8,7 +8,5 @@ export type {
   AgentWorkflowParams as AgentTurnParams,
   AgentWorkflowResult as AgentTurnResult,
 } from "./agent/types.ts";
-export {
-  type AgentResponseDeps as AgentTurnDeps,
-  runAgentResponseStep as runAgentTurn,
-} from "./agent/workflows/agent-response.ts";
+export type { AgentResponseDeps as AgentTurnDeps } from "./agent/workflows/agent-response-run.ts";
+export { runAgentResponseStep as runAgentTurn } from "./agent/workflows/agent-response-step.ts";
