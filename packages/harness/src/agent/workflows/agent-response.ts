@@ -17,6 +17,7 @@ import {
   resolveKhoraServerBaseUrl,
 } from "../tools/khora/_helpers/khora-client-factory.ts";
 import { resolveHarnessEmbeddingModel } from "../tools/memories/_helpers/embedding-model.ts";
+import { minimalHarnessMemoriesOntology } from "../tools/memories/_helpers/minimal-ontology.ts";
 import type { AgentWorkflowParams, AgentWorkflowResult } from "../types.ts";
 import { AI_STEP_MAX_RETRIES } from "../workflow-resilience.ts";
 
@@ -26,6 +27,12 @@ export type AgentResponseDeps = RunAgentWorkflowDependencies;
  * Durable agent-response workflow.
  * The hosting process must configure and start the Workflow world (e.g. Turso)
  * before invoking this — harness workflows do not select a world backend.
+ *
+ * Hosts that need a richer-than-minimal memories ontology must install it in the
+ * step isolate's module graph (static import side effects), then call
+ * {@link runExecuteAgentResponse} from their own `"use step"` entry — or start
+ * this default workflow, which uses {@link minimalHarnessMemoriesOntology} when
+ * none is installed.
  */
 export async function agentResponse(params: AgentWorkflowParams): Promise<AgentWorkflowResult> {
   "use workflow";
@@ -33,12 +40,28 @@ export async function agentResponse(params: AgentWorkflowParams): Promise<AgentW
   return await executeAgentResponse(params);
 }
 
+/**
+ * Default harness step entry. Hosts with custom step prelude should call
+ * {@link runExecuteAgentResponse} from their own `"use step"` instead.
+ */
 export async function executeAgentResponse(
   params: AgentWorkflowParams,
   deps?: AgentResponseDeps,
 ): Promise<AgentWorkflowResult> {
   "use step";
 
+  return runExecuteAgentResponse(params, deps);
+}
+executeAgentResponse.maxRetries = AI_STEP_MAX_RETRIES;
+
+/**
+ * Agent-response body without a workflow step directive. Safe to call from a
+ * host `"use step"` after the host has installed chat/ontology into the isolate.
+ */
+export async function runExecuteAgentResponse(
+  params: AgentWorkflowParams,
+  deps?: AgentResponseDeps,
+): Promise<AgentWorkflowResult> {
   if (deps !== undefined) {
     return runAgentWorkflow(params, deps);
   }
@@ -49,12 +72,11 @@ export async function executeAgentResponse(
 
   const memoriesBaseUrl = resolveMemoriesServiceBaseUrl();
   const memoriesAdminToken = resolveMemoriesServiceAdminToken();
-  const ontology = getInstalledMemoriesOntology();
-  if (ontology === undefined && memoriesBaseUrl !== undefined && memoriesAdminToken !== undefined) {
-    throw new Error(
-      "memories ontology is not installed in the workflow step isolate; memory tools would be unavailable",
-    );
-  }
+  const ontology =
+    getInstalledMemoriesOntology() ??
+    (memoriesBaseUrl !== undefined && memoriesAdminToken !== undefined
+      ? minimalHarnessMemoriesOntology
+      : undefined);
   const agentDid = params.agent.actingFor.id;
   const memoriesClient =
     memoriesBaseUrl === undefined || memoriesAdminToken === undefined || ontology === undefined
@@ -86,7 +108,6 @@ export async function executeAgentResponse(
     embeddingModel: resolveHarnessEmbeddingModel(),
   });
 }
-executeAgentResponse.maxRetries = AI_STEP_MAX_RETRIES;
 
 export async function runAgentResponseStep(
   params: AgentWorkflowParams,
@@ -95,7 +116,7 @@ export async function runAgentResponseStep(
 
   const sessionId = params.context.sessionId;
   if (sessionId === undefined || sessionId.length === 0) {
-    return executeAgentResponse(params);
+    return runExecuteAgentResponse(params);
   }
 
   const session = requireNetworkSession(sessionId);
