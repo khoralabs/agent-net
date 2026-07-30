@@ -43,23 +43,9 @@ export async function executeAgentResponse(
     return runAgentWorkflow(params, deps);
   }
 
-  const { getInstalledMemoriesOntology, installMemoriesOntology } = await import(
+  const { getInstalledMemoriesOntology } = await import(
     "../tools/memories/_helpers/memories-ontology-install.ts"
   );
-  // Workflow step isolates do not load the host's main.ts/otel.ts. Install the
-  // optional host ontology into *this* module instance so getInstalled* sees it.
-  if (getInstalledMemoriesOntology() === undefined) {
-    try {
-      const mod = (await import("@bloom/memories-ontology")) as {
-        referenceMemoriesOntology?: Parameters<typeof installMemoriesOntology>[0];
-      };
-      if (mod.referenceMemoriesOntology !== undefined) {
-        installMemoriesOntology(mod.referenceMemoriesOntology);
-      }
-    } catch {
-      /* host without @bloom/memories-ontology */
-    }
-  }
 
   const memoriesBaseUrl = resolveMemoriesServiceBaseUrl();
   const memoriesAdminToken = resolveMemoriesServiceAdminToken();
