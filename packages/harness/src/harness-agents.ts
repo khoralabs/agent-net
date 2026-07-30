@@ -236,6 +236,14 @@ export function createHarnessAgentApi(
     async removeAgent(did) {
       // ManagedAgentPool.onMemberRemoving unbinds from poolInbox.
       await harness.pool.remove(did);
+      const database = agentMemoriesDatabase(did);
+      try {
+        if (await harness.memoriesClient.databaseExists(database)) {
+          await harness.memoriesClient.deleteDatabase(database);
+        }
+      } catch (err) {
+        console.error(`removeAgent: failed to delete memories for ${did}`, err);
+      }
     },
 
     async registerAgent(input) {
