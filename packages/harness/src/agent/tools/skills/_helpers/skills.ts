@@ -1,18 +1,15 @@
+import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
+import { runHybridMemorySearch } from "@khoralabs/memories-node/helpers";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 
 import { loadMemoryTextByKey } from "../../memories/_helpers/memory-text.ts";
 
 export const SKILLS_NAMESPACE = "_root_/_skills_";
 
-const SKILL_SEARCH_OPTIONS = {
-  topK: 100,
-  neighbors: false as const,
-  arms: { lexical: 1, vector: 0 },
-};
+/** Frontmatter-stable lexical/vector query — every skill doc includes `name:`. */
+const SKILL_DISCOVERY_QUERY = "name:";
 
-function sourceMapIdFromHit(hit: import("@khoralabs/memories-node").SearchHit): string {
-  return hit._id;
-}
+const SKILL_DISCOVERY_TOP_K = 100;
 
 export type SkillRecord = {
   name: string;
@@ -20,6 +17,12 @@ export type SkillRecord = {
   body: string;
   namespace: string;
   key: string;
+};
+
+export type DiscoverSkillsOptions = {
+  embeddingModel?: EmbeddingModel;
+  embeddingCache?: Map<string, number[]>;
+  memoriesSnapshotRootHex?: string;
 };
 
 export function formatSkillDocument(name: string, description: string, body: string): string {
@@ -124,24 +127,45 @@ export async function loadSkillByKey(
   return skillRecordFromText(SKILLS_NAMESPACE, key, text);
 }
 
+/**
+ * Load skill catalog from `_root_/_skills_` via hybrid search (same pipeline as searchMemories).
+ * Query targets frontmatter (`name:`) present on every skill document.
+ */
 export async function discoverSkillsFromMemories(
   client: RemoteMemoriesClientAsync,
+  options: DiscoverSkillsOptions = {},
 ): Promise<SkillRecord[]> {
-  const { hits } = await client.search({
-    namespace: SKILLS_NAMESPACE,
-    content: { text: "skill" },
-    options: SKILL_SEARCH_OPTIONS,
-  });
+  const hits = await runHybridMemorySearch(
+    client,
+    {
+      namespace: SKILLS_NAMESPACE,
+      embeddingModel: options.embeddingModel,
+      embeddingCache: options.embeddingCache,
+      memoriesSnapshotRootHex: options.memoriesSnapshotRootHex,
+    },
+    {
+      content: { text: SKILL_DISCOVERY_QUERY },
+      searchScopeMode: "exactScope",
+      options: {
+        topK: SKILL_DISCOVERY_TOP_K,
+        neighbors: "off",
+        arms: options.embeddingModel ? undefined : { lexical: 1, vector: 0 },
+      },
+    },
+  );
 
   const byKey = new Map<string, SkillRecord>();
   for (const hit of hits) {
-    const key = hit.memory.key;
+    if (hit.kind === "edge") continue;
+    const key = hit.memory_key;
     if (byKey.has(key)) continue;
-    const text = await client.persistence.getSourceMapTextPreview(sourceMapIdFromHit(hit), 100_000);
-    if (text === null || text.length === 0) continue;
+    const text = await loadMemoryTextByKey(client, hit.namespace || SKILLS_NAMESPACE, key);
+    if (text === undefined || text.length === 0) continue;
     try {
       byKey.set(key, skillRecordFromText(SKILLS_NAMESPACE, key, text));
-    } catch {}
+    } catch {
+      // Skip non-skill documents in the skills namespace.
+    }
   }
   return [...byKey.values()].sort((a, b) => a.name.localeCompare(b.name));
 }

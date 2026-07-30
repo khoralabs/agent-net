@@ -3,6 +3,7 @@ import { z } from "zod";
 import { toolEnabled } from "../_helpers/disable-policies.ts";
 
 import { writeMemoryNode } from "../memories/_helpers/memory-write.ts";
+import { touchRecentNamespaces } from "../memories/_helpers/recent-namespaces.ts";
 import { resolveWriteMemoryOptions } from "../memories/_helpers/write-memory-options.ts";
 import { hasMemoriesClient } from "../policies.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
@@ -36,7 +37,7 @@ export const writeSkillTool = tool<
     /** @deprecated Prefer `links` with optional namespace for cross-NS peers. */
     linksTo?: string[];
   },
-  { memoryIds: string[]; key: string; name: string },
+  { memoryIds: string[]; key: string; name: string; namespace: string },
   HarnessToolkitEnv
 >({
   name: "writeSkill",
@@ -100,7 +101,8 @@ export const writeSkillTool = tool<
 
     const skill = skillRecordFromText(SKILLS_NAMESPACE, key, text);
     upsertSkillInEnv(ctx.env.skills, skill);
+    await touchRecentNamespaces(ctx.env.recentNamespaces, [SKILLS_NAMESPACE]);
 
-    return { memoryIds, key, name: skill.name };
+    return { memoryIds, key, name: skill.name, namespace: SKILLS_NAMESPACE };
   },
 });

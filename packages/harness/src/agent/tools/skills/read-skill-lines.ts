@@ -3,14 +3,15 @@ import { z } from "zod";
 import { toolEnabled } from "../_helpers/disable-policies.ts";
 
 import { type LineTuple, readLines } from "../_helpers/line-editing.ts";
+import { touchRecentNamespaces } from "../memories/_helpers/recent-namespaces.ts";
 import { hasMemoriesClient } from "../policies.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
-import { loadSkillTextByKey, resolveSkillStorageKey } from "./_helpers/skills.ts";
+import { loadSkillTextByKey, resolveSkillStorageKey, SKILLS_NAMESPACE } from "./_helpers/skills.ts";
 
 export const readSkillLinesTool = tool<
   "readSkillLines",
   { key: string },
-  { key: string; lines: LineTuple[] },
+  { key: string; lines: LineTuple[]; namespace: string },
   HarnessToolkitEnv
 >({
   name: "readSkillLines",
@@ -32,6 +33,8 @@ export const readSkillLinesTool = tool<
     const text = await loadSkillTextByKey(client, key);
     if (text === undefined) throw new Error(`skill not found: ${key}`);
 
-    return { key, lines: readLines(text) };
+    await touchRecentNamespaces(ctx.env.recentNamespaces, [SKILLS_NAMESPACE]);
+
+    return { key, lines: readLines(text), namespace: SKILLS_NAMESPACE };
   },
 });

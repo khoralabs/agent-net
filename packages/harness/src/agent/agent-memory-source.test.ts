@@ -142,6 +142,54 @@ describe("agent-memory-source", () => {
     ] as UIMessage["parts"];
     expect(sourcesFromMemoryToolParts(parts)).toHaveLength(1);
   });
+
+  test("sourcesFromMemoryToolParts collects skill search / write / replace / read", () => {
+    const parts = [
+      toolPart(
+        "searchSkills",
+        { query: "summarize" },
+        {
+          namespace: "_root_/_skills_",
+          hits: [
+            {
+              namespace: "_root_/_skills_",
+              memory_key: "summarize-thread",
+              kind: "node",
+              source_key: "text",
+              score: 1,
+              labels: [],
+            },
+          ],
+        },
+      ),
+      toolPart(
+        "writeSkill",
+        { name: "Draft", description: "d", body: "b" },
+        {
+          memoryIds: ["mem-skill"],
+          key: "draft",
+          name: "Draft",
+          namespace: "_root_/_skills_",
+        },
+      ),
+      toolPart(
+        "readSkillLines",
+        { key: "draft" },
+        { key: "draft", namespace: "_root_/_skills_", lines: [[1, "---"]] },
+      ),
+    ] as UIMessage["parts"];
+
+    const sources = sourcesFromMemoryToolParts(parts);
+    expect(sources.some((s) => s.id === "mem-skill")).toBe(true);
+    expect(
+      sources.some(
+        (s) =>
+          isAgentMemorySourceRef(s.sourceRef) &&
+          s.sourceRef.namespace === "_root_/_skills_" &&
+          s.sourceRef.memory_key === "summarize-thread",
+      ),
+    ).toBe(true);
+  });
 });
 
 describe("createRemoteSourceMapContentStore / createAgentMemoryStore", () => {

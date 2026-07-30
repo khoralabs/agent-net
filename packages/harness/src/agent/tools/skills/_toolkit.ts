@@ -6,14 +6,15 @@ import type { HarnessToolkitEnv } from "../types.ts";
 import { activateSkillTool } from "./activate-skill.ts";
 import { readSkillLinesTool } from "./read-skill-lines.ts";
 import { replaceSkillLinesTool } from "./replace-skill-lines.ts";
+import { searchSkillsTool } from "./search-skills.ts";
 import { writeSkillTool } from "./write-skill.ts";
 
 const skillsCore = toolkit(
-  [writeSkillTool, readSkillLinesTool, replaceSkillLinesTool, activateSkillTool],
+  [searchSkillsTool, writeSkillTool, readSkillLinesTool, replaceSkillLinesTool, activateSkillTool],
   {
     name: "skills-core",
     instructions: [
-      "Author, refine, and activate specialized skills stored in the _root_/_skills_ memory namespace.",
+      "Author, search, refine, and activate specialized skills stored in the _root_/_skills_ memory namespace.",
     ],
   },
 );

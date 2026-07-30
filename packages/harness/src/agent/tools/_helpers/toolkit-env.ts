@@ -69,7 +69,11 @@ export async function createHarnessToolkitEnv(input: {
 
   env.memoriesSnapshotRootHex =
     (await getMemoriesProvenanceHeadRootHex(input.memoriesClient)) ?? "";
-  env.skills = await discoverSkillsFromMemories(input.memoriesClient);
+  env.skills = await discoverSkillsFromMemories(input.memoriesClient, {
+    embeddingModel: input.embeddingModel,
+    embeddingCache: env.embeddingCache,
+    memoriesSnapshotRootHex: env.memoriesSnapshotRootHex,
+  });
   return env;
 }
 

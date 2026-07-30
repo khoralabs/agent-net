@@ -9,6 +9,7 @@ import {
   createRemoteSourceMapContentStore,
   DEFAULT_MEMORY_SOURCE_KEY,
 } from "./tools/memories/_helpers/source-map-content-store.ts";
+import { SKILLS_NAMESPACE } from "./tools/skills/_helpers/skills.ts";
 
 /** Domain tag for memory citations on chat posts (`ChatSourceWire.sourceRef`). */
 export const AGENT_MEMORY_DOMAIN = "agent-memory" as const;
@@ -233,14 +234,21 @@ export function sourcesFromMemoryToolParts(parts: UIMessage["parts"]): ChatSourc
     if (
       toolName === "writeMemory" ||
       toolName === "replaceMemoryLines" ||
-      toolName === "readMemoryLines"
+      toolName === "readMemoryLines" ||
+      toolName === "writeSkill" ||
+      toolName === "replaceSkillLines" ||
+      toolName === "readSkillLines"
     ) {
       const namespace =
         typeof output.namespace === "string"
           ? output.namespace
           : typeof input.namespace === "string"
             ? input.namespace
-            : undefined;
+            : toolName === "writeSkill" ||
+                toolName === "replaceSkillLines" ||
+                toolName === "readSkillLines"
+              ? SKILLS_NAMESPACE
+              : undefined;
       const memoryKey =
         typeof output.key === "string"
           ? output.key
@@ -258,6 +266,32 @@ export function sourcesFromMemoryToolParts(parts: UIMessage["parts"]): ChatSourc
         }
       } else {
         addSource(byId, { namespace, memoryKey });
+      }
+      continue;
+    }
+
+    if (toolName === "searchSkills") {
+      const hits = Array.isArray(output.hits) ? output.hits : [];
+      const namespace = typeof output.namespace === "string" ? output.namespace : SKILLS_NAMESPACE;
+      for (const hit of hits) {
+        if (hit === null || typeof hit !== "object") continue;
+        const row = hit as Record<string, unknown>;
+        if (row.kind === "edge") continue;
+        const memoryKey =
+          typeof row.memory_key === "string"
+            ? row.memory_key
+            : typeof row.key === "string"
+              ? row.key
+              : undefined;
+        if (memoryKey === undefined) continue;
+        addSource(byId, {
+          namespace:
+            typeof row.namespace === "string" && row.namespace.length > 0
+              ? row.namespace
+              : namespace,
+          memoryKey,
+          sourceKey: typeof row.source_key === "string" ? row.source_key : undefined,
+        });
       }
     }
   }

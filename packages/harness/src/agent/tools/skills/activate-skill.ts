@@ -6,13 +6,17 @@ import type { HarnessToolkitEnv } from "../types.ts";
 import {
   formatActivatedSkillContent,
   loadSkillByKey,
+  resolveSkillStorageKey,
   type SkillRecord,
+  upsertSkillInEnv,
 } from "./_helpers/skills.ts";
 
 export type ActivatedSkillContent = {
   name: string;
   alreadyActive: boolean;
   content?: string;
+  namespace?: string;
+  key?: string;
 };
 
 export async function activateSkillByName(
@@ -28,9 +32,10 @@ export async function activateSkillByName(
 
   let skill = env.skills.find((item) => item.name === skillName || item.key === skillName);
   if (skill === undefined && env.memoriesClient !== undefined) {
-    skill = await loadSkillByKey(env.memoriesClient, skillName);
+    const storageKey = resolveSkillStorageKey(env.skills, skillName);
+    skill = await loadSkillByKey(env.memoriesClient, storageKey);
     if (skill !== undefined) {
-      env.skills.push(skill);
+      upsertSkillInEnv(env.skills, skill);
     }
   }
   if (skill === undefined) throw new Error(`skill not found: ${skillName}`);
@@ -40,6 +45,8 @@ export async function activateSkillByName(
     name: skill.name,
     alreadyActive: false,
     content: formatActivatedSkillContent(skill),
+    namespace: skill.namespace,
+    key: skill.key,
   };
 }
 

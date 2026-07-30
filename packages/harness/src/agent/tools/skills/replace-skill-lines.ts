@@ -4,6 +4,7 @@ import { toolEnabled } from "../_helpers/disable-policies.ts";
 
 import { applyLineChanges, type LineTuple, readLines } from "../_helpers/line-editing.ts";
 import { writeMemoryNode } from "../memories/_helpers/memory-write.ts";
+import { touchRecentNamespaces } from "../memories/_helpers/recent-namespaces.ts";
 import { resolveWriteMemoryOptions } from "../memories/_helpers/write-memory-options.ts";
 import { hasMemoriesClient } from "../policies.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
@@ -20,7 +21,7 @@ const zLineChange = z.tuple([z.number().int().min(1), z.string()]);
 export const replaceSkillLinesTool = tool<
   "replaceSkillLines",
   { key: string; changes: LineTuple[] },
-  { key: string; memoryIds: string[]; lines: LineTuple[] },
+  { key: string; memoryIds: string[]; lines: LineTuple[]; namespace: string },
   HarnessToolkitEnv
 >({
   name: "replaceSkillLines",
@@ -68,7 +69,8 @@ export const replaceSkillLinesTool = tool<
     );
 
     upsertSkillInEnv(ctx.env.skills, skillRecordFromText(SKILLS_NAMESPACE, key, updated));
+    await touchRecentNamespaces(ctx.env.recentNamespaces, [SKILLS_NAMESPACE]);
 
-    return { key, memoryIds, lines: readLines(updated) };
+    return { key, memoryIds, lines: readLines(updated), namespace: SKILLS_NAMESPACE };
   },
 });
