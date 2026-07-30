@@ -22,16 +22,19 @@ describe("AgentStore memoriesFraming", () => {
     });
 
     await store.setMemoriesFraming("did:key:test", {
+      name: "Alpha Co",
       about: "About the alpha workspace",
       baseUnderstanding: "Base facts",
     });
     expect(store.get("did:key:test")?.memoriesFraming).toEqual({
+      name: "Alpha Co",
       about: "About the alpha workspace",
       baseUnderstanding: "Base facts",
     });
 
     const reopened = await AgentStore.open(dir);
     expect(reopened.get("did:key:test")?.memoriesFraming).toEqual({
+      name: "Alpha Co",
       about: "About the alpha workspace",
       baseUnderstanding: "Base facts",
     });

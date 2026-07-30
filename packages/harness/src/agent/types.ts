@@ -9,6 +9,8 @@ export type AgentUIMessage = {
 
 /** Host-supplied framing for the agent's memories database (injected into memories toolkit). */
 export type MemoriesDatabaseContext = {
+  /** Human label for this DB (e.g. company name). */
+  name?: string;
   /** One short paragraph: what this DB is about (host-defined domain; not harness-interpreted). */
   about: string;
   /** Optional short grounding prose the agent should treat as known. */

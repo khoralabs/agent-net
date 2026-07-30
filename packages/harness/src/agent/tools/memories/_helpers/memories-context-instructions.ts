@@ -11,8 +11,15 @@ export function formatMemoriesContextInstructions(
     return [GENERIC_MEMORIES_INSTRUCTION];
   }
 
+  const instructions: string[] = [];
+
+  const name = context.name?.trim();
+  if (name !== undefined && name.length > 0) {
+    instructions.push(`This memory database is for: ${name}.`);
+  }
+
   const about = context.about.trim();
-  const instructions: string[] = [about.length > 0 ? about : GENERIC_MEMORIES_INSTRUCTION];
+  instructions.push(about.length > 0 ? about : GENERIC_MEMORIES_INSTRUCTION);
 
   const base = context.baseUnderstanding?.trim();
   if (base !== undefined && base.length > 0) {

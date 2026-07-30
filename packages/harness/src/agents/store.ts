@@ -3,6 +3,8 @@ import path from "node:path";
 
 /** Editable host prose for memories-database framing (namespaces stay host-derived, not stored). */
 export type AgentMemoriesFraming = {
+  /** Human label for this DB (e.g. company name). */
+  name?: string;
   about?: string;
   baseUnderstanding?: string;
 };
@@ -31,14 +33,19 @@ function normalizeFraming(raw: AgentMemoriesFraming | undefined): AgentMemoriesF
   if (raw === undefined || typeof raw !== "object" || raw === null) {
     return undefined;
   }
+  const name =
+    typeof raw.name === "string" && raw.name.trim().length > 0 ? raw.name.trim() : undefined;
   const about =
     typeof raw.about === "string" && raw.about.trim().length > 0 ? raw.about.trim() : undefined;
   const baseUnderstanding =
     typeof raw.baseUnderstanding === "string" && raw.baseUnderstanding.trim().length > 0
       ? raw.baseUnderstanding.trim()
       : undefined;
-  if (about === undefined && baseUnderstanding === undefined) return undefined;
+  if (name === undefined && about === undefined && baseUnderstanding === undefined) {
+    return undefined;
+  }
   return {
+    ...(name !== undefined ? { name } : {}),
     ...(about !== undefined ? { about } : {}),
     ...(baseUnderstanding !== undefined ? { baseUnderstanding } : {}),
   };
