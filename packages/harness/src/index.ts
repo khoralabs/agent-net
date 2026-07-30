@@ -24,7 +24,12 @@ export {
 export { HARNESS_TOOLKIT, type HarnessToolkitId } from "./agent/tools/ids.ts";
 export { resolveAgentsDataDir } from "./agent/tools/khora/_helpers/khora-client-factory.ts";
 export { resolveHarnessEmbeddingModel } from "./agent/tools/memories/_helpers/embedding-model.ts";
+export {
+  agentMemoriesDatabase,
+  createHarnessMemoriesClient,
+} from "./agent/tools/memories/_helpers/memories-client.ts";
 export { installMemoriesOntology } from "./agent/tools/memories/_helpers/memories-ontology-install.ts";
+export { writeMemoryNode } from "./agent/tools/memories/_helpers/memory-write.ts";
 export {
   createRemoteSourceMapContentStore,
   DEFAULT_MEMORY_SOURCE_KEY,
