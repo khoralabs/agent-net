@@ -13,6 +13,7 @@ import {
 } from "@khoralabs/memories-node/ontology";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 
+import type { IntegrateMemoryWriteScope } from "../../../../integrate/write-scope.ts";
 import { HARNESS_MEMORY_EDGE_KIND, HARNESS_MEMORY_NODE_KIND } from "./minimal-ontology.ts";
 
 /**
@@ -42,7 +43,7 @@ export type WriteMemoryIntegrateEnqueue = {
   token: string;
   ownerKey: string;
   /** Caller-owned integrate write scope. Defaults to `under`. */
-  writeScope?: "exact" | "under";
+  writeScope?: IntegrateMemoryWriteScope;
   /** Payload.source for the integrate event. */
   source?: string;
 };

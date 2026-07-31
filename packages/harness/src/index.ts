@@ -84,6 +84,17 @@ export {
   startNetworkHarness,
 } from "./harness.ts";
 export {
+  type IntegrateMemoryWriteScope,
+  isIntegrateMemoryWriteScope,
+  isUnderNamespace,
+  parseIntegrateMemoryWriteScope,
+  resolveWriteNamespaceChoice,
+  type WriteScopeNeighborSearchOptions,
+  writeScopeNamespaceCandidates,
+  writeScopeNeedsNamespaceChoice,
+  writeScopeNeighborSearchOptions,
+} from "./integrate/write-scope.ts";
+export {
   requireChatBaseUrl,
   requireChatToken,
   resolveChatBaseUrlFromEnv,
