@@ -13,18 +13,10 @@ import {
   createHarnessMemoriesClient,
   type HarnessMemoriesOntology,
 } from "../memories/_helpers/memories-client.ts";
+import { resolveMemoriesHeadRootHex } from "../memories/_helpers/memory-search.ts";
 import { resolveRecentNamespacesTracker } from "../memories/_helpers/recent-namespaces.ts";
 import { discoverSkillsFromMemories } from "../skills/_helpers/skills.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
-
-async function getMemoriesProvenanceHeadRootHex(
-  client: RemoteMemoriesClientAsync,
-): Promise<string> {
-  const fn = client.persistence.getProvenanceHeadRootHex;
-  if (fn === undefined) return "";
-  const out = await fn.call(client.persistence);
-  return out ?? "";
-}
 
 export async function createHarnessToolkitEnv(input: {
   memoriesClient?: RemoteMemoriesClientAsync;
@@ -67,12 +59,10 @@ export async function createHarnessToolkitEnv(input: {
 
   if (input.memoriesClient === undefined) return env;
 
-  env.memoriesSnapshotRootHex =
-    (await getMemoriesProvenanceHeadRootHex(input.memoriesClient)) ?? "";
+  env.memoriesSnapshotRootHex = (await resolveMemoriesHeadRootHex(input.memoriesClient)) ?? "";
   env.skills = await discoverSkillsFromMemories(input.memoriesClient, {
     embeddingModel: input.embeddingModel,
     embeddingCache: env.embeddingCache,
-    memoriesSnapshotRootHex: env.memoriesSnapshotRootHex,
   });
   return env;
 }

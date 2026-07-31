@@ -1,9 +1,10 @@
 import { tool } from "@khoralabs/agent-capabilities";
-import { type MemorySearchHit, runHybridMemorySearch } from "@khoralabs/memories-node/helpers";
+import type { MemorySearchHit } from "@khoralabs/memories-node/helpers";
 import { z } from "zod";
 import { toolEnabled } from "../_helpers/disable-policies.ts";
 import { hasMemoriesClient } from "../policies.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
+import { runStandardHybridMemorySearch } from "./_helpers/memory-search.ts";
 import { touchRecentNamespaces } from "./_helpers/recent-namespaces.ts";
 
 export const searchMemoriesTool = tool<
@@ -26,23 +27,12 @@ export const searchMemoriesTool = tool<
     if (client === undefined) throw new Error("memories client is not configured");
 
     const namespace = input.namespace.trim();
-    const hits = await runHybridMemorySearch(
-      client,
-      {
-        namespace,
-        embeddingModel: ctx.env.embeddingModel,
-        embeddingCache: ctx.env.embeddingCache,
-        memoriesSnapshotRootHex: ctx.env.memoriesSnapshotRootHex,
-      },
-      {
-        content: { text: input.query.trim() },
-        options: {
-          topK: 12,
-          neighbors: "off",
-          arms: ctx.env.embeddingModel ? undefined : { lexical: 1, vector: 0 },
-        },
-      },
-    );
+    const hits = await runStandardHybridMemorySearch(client, {
+      namespace,
+      query: input.query.trim(),
+      embeddingModel: ctx.env.embeddingModel,
+      embeddingCache: ctx.env.embeddingCache,
+    });
 
     await touchRecentNamespaces(ctx.env.recentNamespaces, [
       ...hits.map((hit) => hit.namespace),

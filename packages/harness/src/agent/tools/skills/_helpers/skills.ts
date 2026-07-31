@@ -1,7 +1,9 @@
 import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
-import { runHybridMemorySearch } from "@khoralabs/memories-node/helpers";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
-
+import {
+  MEMORY_SEARCH_SCOPE_EXACT,
+  runStandardHybridMemorySearch,
+} from "../../memories/_helpers/memory-search.ts";
 import { loadMemoryTextByKey } from "../../memories/_helpers/memory-text.ts";
 
 export const SKILLS_NAMESPACE = "_root_/_skills_";
@@ -22,7 +24,6 @@ export type SkillRecord = {
 export type DiscoverSkillsOptions = {
   embeddingModel?: EmbeddingModel;
   embeddingCache?: Map<string, number[]>;
-  memoriesSnapshotRootHex?: string;
 };
 
 export function formatSkillDocument(name: string, description: string, body: string): string {
@@ -135,24 +136,14 @@ export async function discoverSkillsFromMemories(
   client: RemoteMemoriesClientAsync,
   options: DiscoverSkillsOptions = {},
 ): Promise<SkillRecord[]> {
-  const hits = await runHybridMemorySearch(
-    client,
-    {
-      namespace: SKILLS_NAMESPACE,
-      embeddingModel: options.embeddingModel,
-      embeddingCache: options.embeddingCache,
-      memoriesSnapshotRootHex: options.memoriesSnapshotRootHex,
-    },
-    {
-      content: { text: SKILL_DISCOVERY_QUERY },
-      searchScopeMode: "exactScope",
-      options: {
-        topK: SKILL_DISCOVERY_TOP_K,
-        neighbors: "off",
-        arms: options.embeddingModel ? undefined : { lexical: 1, vector: 0 },
-      },
-    },
-  );
+  const hits = await runStandardHybridMemorySearch(client, {
+    namespace: SKILLS_NAMESPACE,
+    query: SKILL_DISCOVERY_QUERY,
+    embeddingModel: options.embeddingModel,
+    embeddingCache: options.embeddingCache,
+    searchScopeMode: MEMORY_SEARCH_SCOPE_EXACT,
+    topK: SKILL_DISCOVERY_TOP_K,
+  });
 
   const byKey = new Map<string, SkillRecord>();
   for (const hit of hits) {

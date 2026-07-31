@@ -29,6 +29,15 @@ export {
   createHarnessMemoriesClient,
 } from "./agent/tools/memories/_helpers/memories-client.ts";
 export { installMemoriesOntology } from "./agent/tools/memories/_helpers/memories-ontology-install.ts";
+export {
+  MEMORY_SEARCH_SCOPE_EXACT,
+  MEMORY_SEARCH_SCOPE_SUBTREE,
+  type MemorySearchScopeMode,
+  resolveMemoriesHeadRootHex,
+  resolveMemoriesSearchAsOfTimestampMs,
+  runStandardHybridMemorySearch,
+  type StandardHybridMemorySearchInput,
+} from "./agent/tools/memories/_helpers/memory-search.ts";
 export { writeMemoryNode } from "./agent/tools/memories/_helpers/memory-write.ts";
 export {
   createRemoteSourceMapContentStore,
