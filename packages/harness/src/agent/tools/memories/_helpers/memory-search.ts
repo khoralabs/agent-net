@@ -16,6 +16,9 @@ export type MemorySearchScopeMode =
   | typeof MEMORY_SEARCH_SCOPE_SUBTREE
   | typeof MEMORY_SEARCH_SCOPE_EXACT;
 
+export const EMBEDDING_MODEL_REQUIRED_MESSAGE =
+  "AI_GATEWAY_API_KEY is required for hybrid memory search (set it on this service's env)";
+
 /**
  * Current provenance head root hex at call time (not session-cached).
  * Used so hybrid search `asOf` tracks live head on every request.
@@ -56,8 +59,14 @@ export type StandardHybridMemorySearchInput = {
   topK?: number;
   /** Defaults to `"off"` (agent tool default). */
   neighbors?: HybridMemorySearchNeighborsOption;
+  maxNeighbors?: number;
   maxVectorDistance?: number;
   arms?: { lexical: number; vector: number };
+  /**
+   * When true, throw if `embeddingModel` is missing instead of soft-falling
+   * back to lexical-only (empty hits for semantic queries).
+   */
+  requireEmbedding?: boolean;
 };
 
 /**
@@ -65,14 +74,18 @@ export type StandardHybridMemorySearchInput = {
  * - fresh provenance head `asOf` on every call
  * - default `pathSubtree` scope
  * - default neighbors off
- * - lexical-only arms when no embedding model
+ * - lexical-only arms when no embedding model (unless `requireEmbedding`)
  */
 export async function runStandardHybridMemorySearch(
   client: RemoteMemoriesClientAsync,
   input: StandardHybridMemorySearchInput,
 ): Promise<MemorySearchHit[]> {
-  const memoriesSnapshotRootHex = await resolveMemoriesHeadRootHex(client);
   const embeddingModel = input.embeddingModel;
+  if (input.requireEmbedding === true && embeddingModel === undefined) {
+    throw new Error(EMBEDDING_MODEL_REQUIRED_MESSAGE);
+  }
+
+  const memoriesSnapshotRootHex = await resolveMemoriesHeadRootHex(client);
   return runHybridMemorySearch(
     client,
     {
@@ -87,6 +100,7 @@ export async function runStandardHybridMemorySearch(
       options: {
         topK: input.topK ?? 12,
         neighbors: input.neighbors ?? "off",
+        ...(input.maxNeighbors !== undefined ? { maxNeighbors: input.maxNeighbors } : {}),
         ...(input.maxVectorDistance !== undefined
           ? { maxVectorDistance: input.maxVectorDistance }
           : {}),

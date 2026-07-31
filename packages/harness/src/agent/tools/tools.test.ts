@@ -290,6 +290,20 @@ describe("harness memory tools", () => {
     expect(env.recentNamespaces.top()).toContain("notes");
   });
 
+  test("searchMemories fails loud when embeddingModel is missing", async () => {
+    const searchMemories = await toolHandler("searchMemories");
+    const bare = createEnv({
+      embeddingModel: undefined,
+      memoriesClient: env.memoriesClient,
+    });
+    await expect(
+      searchMemories(
+        { env: bare, agentId: "agent", agentName: "Agent" },
+        { namespace: "_root_", query: "company products" },
+      ),
+    ).rejects.toThrow(/AI_GATEWAY_API_KEY/);
+  });
+
   test("activateSkill resolves skill content from the _root_/_skills_ namespace", async () => {
     const skillBody = `---
 name: summarize-thread

@@ -33,9 +33,15 @@ export async function runAgentResponseStep(
     "../tools/memories/_helpers/embedding-model.ts"
   );
   const networkDeps = await session.resolveAgentWorkflowDeps(params.agent.actingFor.id);
+  const embeddingModel = resolveHarnessEmbeddingModel();
+  if (networkDeps.memoriesClient !== undefined && embeddingModel === undefined) {
+    throw new Error(
+      "AI_GATEWAY_API_KEY is required for agent-response memory search (set it on this service's env)",
+    );
+  }
   return runAgentWorkflow(params, {
     ...networkDeps,
-    embeddingModel: resolveHarnessEmbeddingModel(),
+    embeddingModel,
   });
 }
 runAgentResponseStep.maxRetries = AI_STEP_MAX_RETRIES;

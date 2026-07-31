@@ -32,6 +32,10 @@ export const searchMemoriesTool = tool<
       query: input.query.trim(),
       embeddingModel: ctx.env.embeddingModel,
       embeddingCache: ctx.env.embeddingCache,
+      requireEmbedding: true,
+      neighbors: "all",
+      maxNeighbors: 5,
+      topK: 10,
     });
 
     await touchRecentNamespaces(ctx.env.recentNamespaces, [

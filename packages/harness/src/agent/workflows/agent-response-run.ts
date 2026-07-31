@@ -68,12 +68,19 @@ export async function runExecuteAgentResponse(
 
   await ensureDevAgentIdentity();
 
+  const embeddingModel = resolveHarnessEmbeddingModel();
+  if (memoriesClient !== undefined && embeddingModel === undefined) {
+    throw new Error(
+      "AI_GATEWAY_API_KEY is required for agent-response memory search (set it on this service's env)",
+    );
+  }
+
   return runAgentWorkflow(params, {
     chatService: getAgentChatService(),
     chatSigner: getAgentChatSigner(),
     agentChat: getAgentChatClientForDid(agentDid),
     memoriesClient,
     khoraClient,
-    embeddingModel: resolveHarnessEmbeddingModel(),
+    embeddingModel,
   });
 }

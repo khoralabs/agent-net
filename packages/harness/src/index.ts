@@ -30,6 +30,7 @@ export {
 } from "./agent/tools/memories/_helpers/memories-client.ts";
 export { installMemoriesOntology } from "./agent/tools/memories/_helpers/memories-ontology-install.ts";
 export {
+  EMBEDDING_MODEL_REQUIRED_MESSAGE,
   MEMORY_SEARCH_SCOPE_EXACT,
   MEMORY_SEARCH_SCOPE_SUBTREE,
   type MemorySearchScopeMode,
