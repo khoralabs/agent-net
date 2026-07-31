@@ -71,7 +71,7 @@ function parseArgs(argv: string[]): {
       maxTokenBudget: Number.parseInt(args.get("max-tokens") ?? "500000", 10),
       contextMessageLimit: Number.parseInt(args.get("context-limit") ?? "20", 10),
       model: {
-        id: args.get("model") ?? "anthropic/claude-sonnet-4.6",
+        id: args.get("model") ?? "zai/glm-5.2-fast",
         maxSteps: Number.parseInt(args.get("max-steps") ?? "8", 10),
       },
       roles,

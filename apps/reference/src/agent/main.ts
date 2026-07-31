@@ -93,10 +93,7 @@ export default async function handler(req: Request): Promise<Response> {
         actingFor: { type: "agent", id: agentDid },
       },
       model: {
-        id:
-          body.modelId?.trim() ||
-          process.env.AGENT_DEFAULT_MODEL?.trim() ||
-          "anthropic/claude-sonnet-4.6",
+        id: body.modelId?.trim() || process.env.AGENT_DEFAULT_MODEL?.trim() || "zai/glm-5.2-fast",
         maxSteps: 8,
       },
       context: {

@@ -77,7 +77,7 @@ function textStreamResult(chunks: string[]) {
     toolResults: Promise.resolve([]),
     finalStep: Promise.resolve({
       response: {
-        modelId: "anthropic/claude-sonnet-4.6",
+        modelId: "zai/glm-5.2-fast",
         provider: "gateway",
       },
     }),
@@ -99,7 +99,7 @@ function params(input: {
       actingFor: { type: "agent", id: input.agentDid },
     },
     model: {
-      id: "anthropic/claude-sonnet-4.6",
+      id: "zai/glm-5.2-fast",
       maxSteps: 3,
     },
     context: {
@@ -214,7 +214,7 @@ test("runAgentWorkflow persists tool parts on the assistant chat post", async ()
         toolResults: Promise.resolve([]),
         finalStep: Promise.resolve({
           response: {
-            modelId: "anthropic/claude-sonnet-4.6",
+            modelId: "zai/glm-5.2-fast",
             provider: "gateway",
           },
         }),
