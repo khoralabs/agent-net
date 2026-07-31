@@ -56,9 +56,9 @@ function createMockSkillClient(stored: StoredSkill[]): RemoteMemoriesClientAsync
           .map(
             (item, index) =>
               ({
-                _id: ids.sourceMap(memoryIdFor(item), "text"),
+                _id: ids.sourceMap(memoryIdFor(item), "text:0"),
                 score: 1,
-                source_key: "text",
+                source_key: "text:0",
                 memory: {
                   id: memoryIdFor(item),
                   namespace: item.namespace,
@@ -79,7 +79,7 @@ function createMockSkillClient(stored: StoredSkill[]): RemoteMemoriesClientAsync
       },
       getSourceMapTextPreview: async (sourceMapId: string) => {
         for (const item of stored) {
-          if (ids.sourceMap(memoryIdFor(item), "text") === sourceMapId) {
+          if (ids.sourceMap(memoryIdFor(item), "text:0") === sourceMapId) {
             return item.text;
           }
         }

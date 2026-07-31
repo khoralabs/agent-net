@@ -1,8 +1,11 @@
 import type { SourceMap, Store } from "@khoralabs/memories-node";
 import { ids } from "@khoralabs/memories-node";
 
-/** Default content source key used by harness `writeMemoryNode`. */
-export const DEFAULT_MEMORY_SOURCE_KEY = "text";
+/** Prefix used by `decomposeLogicalMemoryToContent` (`text:0`, `text:1`, …). */
+export const MEMORY_TEXT_SOURCE_PREFIX = "text";
+
+/** First chunk key for a logical memory (`text:0`). */
+export const DEFAULT_MEMORY_SOURCE_KEY = `${MEMORY_TEXT_SOURCE_PREFIX}:0`;
 
 /** Minimal client surface needed to resolve source-map text over HTTP. */
 export type SourceMapTextPreviewClient = {
@@ -14,6 +17,7 @@ export type SourceMapTextPreviewClient = {
 /**
  * Sourcemaps content {@link Store} for DB-backed memories: `resolve` loads
  * plaintext via `getSourceMapTextPreview` (HTTP → SQLite), not search.
+ * Default source key is {@link DEFAULT_MEMORY_SOURCE_KEY} (`text:0`).
  */
 export function createRemoteSourceMapContentStore(client: SourceMapTextPreviewClient): Store {
   return {

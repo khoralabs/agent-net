@@ -33,6 +33,7 @@ export { writeMemoryNode } from "./agent/tools/memories/_helpers/memory-write.ts
 export {
   createRemoteSourceMapContentStore,
   DEFAULT_MEMORY_SOURCE_KEY,
+  MEMORY_TEXT_SOURCE_PREFIX,
   type SourceMapTextPreviewClient,
 } from "./agent/tools/memories/_helpers/source-map-content-store.ts";
 export type {

@@ -25,7 +25,7 @@ export const replaceMemoryLinesTool = tool<
 >({
   name: "replaceMemoryLines",
   description:
-    "Replace specific lines in a memory's stored text. Each change is a [lineNumber, newContent] tuple. Read lines first with readMemoryLines.",
+    "Replace specific lines in a memory's stored text. Each change is a [lineNumber, newContent] tuple. Resolve with enumerateLines: true first via resolveMemories.",
   instructions: [
     "Refine a memory by replacing specific line numbers.",
     "Prefer line edits over full writeMemory rewrites for small refinements.",

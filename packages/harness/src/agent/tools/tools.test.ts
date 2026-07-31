@@ -96,7 +96,7 @@ function createMockMemoriesClient(merged: MergedMemory[]): MockHarnessMemoriesCl
               ({
                 id: `source-${index}`,
                 score: 1,
-                source_key: "text",
+                source_key: "text:0",
                 memory: {
                   id: `memory-${index}`,
                   namespace: item.namespace,
@@ -118,7 +118,7 @@ function createMockMemoriesClient(merged: MergedMemory[]): MockHarnessMemoriesCl
       getSourceMapTextPreview: async (sourceMapId) => {
         for (const item of merged) {
           const memoryId = ids.memory(item.namespace, item.key);
-          if (sourceMapId === ids.sourceMap(memoryId, "text")) return item.text;
+          if (sourceMapId === ids.sourceMap(memoryId, "text:0")) return item.text;
         }
         return null;
       },

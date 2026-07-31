@@ -18,7 +18,7 @@ import {
   resetTestMemoriesOntology,
 } from "./_helpers/test-embedding.ts";
 
-type MemoryLineToolName = "readMemoryLines" | "replaceMemoryLines";
+type MemoryToolName = "resolveMemories" | "replaceMemoryLines";
 
 type StoredMemory = {
   namespace: string;
@@ -86,7 +86,7 @@ function createMockClient(stored: StoredMemory[]): MockMemoriesClient {
             ({
               _id: `source-${item.namespace}::${item.key}`,
               score: 1,
-              source_key: "text",
+              source_key: "text:0",
               memory: {
                 id: `memory-${index}`,
                 namespace: item.namespace,
@@ -106,7 +106,7 @@ function createMockClient(stored: StoredMemory[]): MockMemoriesClient {
       },
       getSourceMapTextPreview: async (sourceMapId) => {
         for (const item of stored) {
-          if (ids.sourceMap(memoryIdFor(item), "text") === sourceMapId) {
+          if (ids.sourceMap(memoryIdFor(item), "text:0") === sourceMapId) {
             return item.text;
           }
         }
@@ -116,7 +116,7 @@ function createMockClient(stored: StoredMemory[]): MockMemoriesClient {
   };
 }
 
-describe("memory line tools", () => {
+describe("memory resolve / replace tools", () => {
   let stored: StoredMemory[];
   let env: HarnessToolkitEnv;
 
@@ -128,6 +128,11 @@ describe("memory line tools", () => {
         key: "plan",
         text: "Line one.\nLine two.\nLine three.",
       },
+      {
+        namespace: "notes",
+        key: "other",
+        text: "Only one line.",
+      },
     ];
     env = createEnv({
       memoriesClient: createMockClient(stored) as unknown as RemoteMemoriesClientAsync,
@@ -138,9 +143,9 @@ describe("memory line tools", () => {
     resetTestMemoriesOntology();
   });
 
-  async function toolHandler(name: MemoryLineToolName) {
+  async function toolHandler(name: MemoryToolName) {
     const { tools } = await evaluateComposable(harnessToolkit, { env });
-    const spec = (tools as Partial<Record<MemoryLineToolName, ToolSpec>>)[name];
+    const spec = (tools as Partial<Record<MemoryToolName, ToolSpec>>)[name];
     if (spec === undefined) throw new Error(`tool not available: ${name}`);
     return spec.handler.bind(spec) as (
       ctx: ToolRuntimeContext<HarnessToolkitEnv>,
@@ -148,29 +153,69 @@ describe("memory line tools", () => {
     ) => Promise<unknown>;
   }
 
-  test("memory line tools are hidden when memories client is not configured", async () => {
+  test("resolve / replace tools are hidden when memories client is not configured", async () => {
     const { tools } = await evaluateComposable(harnessToolkit, {
       env: createEnv(),
     });
-    const typed = tools as Partial<Record<MemoryLineToolName, ToolSpec>>;
-    expect(typed.readMemoryLines).toBeUndefined();
+    const typed = tools as Partial<Record<MemoryToolName, ToolSpec>>;
+    expect(typed.resolveMemories).toBeUndefined();
     expect(typed.replaceMemoryLines).toBeUndefined();
   });
 
-  test("readMemoryLines returns numbered tuples for any namespace", async () => {
-    const readMemoryLines = await toolHandler("readMemoryLines");
-    const result = (await readMemoryLines(
+  test("resolveMemories returns text by default", async () => {
+    const resolveMemories = await toolHandler("resolveMemories");
+    const result = (await resolveMemories(
       { env, agentId: "agent", agentName: "Agent" },
-      { namespace: "notes", key: "plan" },
-    )) as { namespace: string; key: string; lines: Array<[number, string]> };
+      { memories: [{ namespace: "notes", key: "plan" }] },
+    )) as { results: Array<{ namespace: string; key: string; text?: string }> };
 
-    expect(result.namespace).toBe("notes");
-    expect(result.key).toBe("plan");
-    expect(result.lines).toEqual([
+    expect(result.results).toEqual([
+      {
+        namespace: "notes",
+        key: "plan",
+        text: "Line one.\nLine two.\nLine three.",
+      },
+    ]);
+  });
+
+  test("resolveMemories enumerates lines when requested", async () => {
+    const resolveMemories = await toolHandler("resolveMemories");
+    const result = (await resolveMemories(
+      { env, agentId: "agent", agentName: "Agent" },
+      {
+        memories: [{ namespace: "notes", key: "plan" }],
+        enumerateLines: true,
+      },
+    )) as { results: Array<{ lines?: Array<[number, string]> }> };
+
+    expect(result.results[0]?.lines).toEqual([
       [1, "Line one."],
       [2, "Line two."],
       [3, "Line three."],
     ]);
+  });
+
+  test("resolveMemories batches and reports per-item errors", async () => {
+    const resolveMemories = await toolHandler("resolveMemories");
+    const result = (await resolveMemories(
+      { env, agentId: "agent", agentName: "Agent" },
+      {
+        memories: [
+          { namespace: "notes", key: "other" },
+          { namespace: "notes", key: "missing" },
+        ],
+      },
+    )) as {
+      results: Array<{ namespace: string; key: string; text?: string; error?: string }>;
+    };
+
+    expect(result.results).toHaveLength(2);
+    expect(result.results[0]).toEqual({
+      namespace: "notes",
+      key: "other",
+      text: "Only one line.",
+    });
+    expect(result.results[1]?.error).toMatch(/memory not found/);
   });
 
   test("replaceMemoryLines updates specific lines and persists merged text", async () => {

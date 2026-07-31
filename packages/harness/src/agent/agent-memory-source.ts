@@ -4,11 +4,8 @@ import { ids } from "@khoralabs/memories-node";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import type { ResolvedSource, Store as SourcemapsStore, SourceRef } from "@khoralabs/sourcemaps";
 import type { UIMessage } from "ai";
-
-import {
-  createRemoteSourceMapContentStore,
-  DEFAULT_MEMORY_SOURCE_KEY,
-} from "./tools/memories/_helpers/source-map-content-store.ts";
+import { loadMemoryTextByKey } from "./tools/memories/_helpers/memory-text.ts";
+import { createRemoteSourceMapContentStore } from "./tools/memories/_helpers/source-map-content-store.ts";
 import { SKILLS_NAMESPACE } from "./tools/skills/_helpers/skills.ts";
 
 /** Domain tag for memory citations on chat posts (`ChatSourceWire.sourceRef`). */
@@ -126,19 +123,21 @@ export function createAgentMemoryStore(
         memoryId = foundId;
       }
 
-      const sourceKey = ref.source_key?.trim() || DEFAULT_MEMORY_SOURCE_KEY;
-      const sourceMapRef = {
-        memory_id: memoryId,
-        source_key: sourceKey,
-      } satisfies SourceMap;
-
+      const sourceKey = ref.source_key?.trim();
       let text = "";
       try {
-        const content = await contentStore.resolve(sourceMapRef);
-        if (content.kind === "string") {
-          text = content.string;
-        } else if (content.kind === "json") {
-          text = typeof content.body === "string" ? content.body : await content.body.text();
+        if (sourceKey !== undefined && sourceKey.length > 0) {
+          const content = await contentStore.resolve({
+            memory_id: memoryId,
+            source_key: sourceKey,
+          } satisfies SourceMap);
+          if (content.kind === "string") {
+            text = content.string;
+          } else if (content.kind === "json") {
+            text = typeof content.body === "string" ? content.body : await content.body.text();
+          }
+        } else {
+          text = (await loadMemoryTextByKey(client, namespace, memoryKey)) ?? "";
         }
       } catch {
         // Focus only needs locators; missing body is non-fatal.
@@ -234,19 +233,15 @@ export function sourcesFromMemoryToolParts(parts: UIMessage["parts"]): ChatSourc
     if (
       toolName === "writeMemory" ||
       toolName === "replaceMemoryLines" ||
-      toolName === "readMemoryLines" ||
       toolName === "writeSkill" ||
-      toolName === "replaceSkillLines" ||
-      toolName === "readSkillLines"
+      toolName === "replaceSkillLines"
     ) {
       const namespace =
         typeof output.namespace === "string"
           ? output.namespace
           : typeof input.namespace === "string"
             ? input.namespace
-            : toolName === "writeSkill" ||
-                toolName === "replaceSkillLines" ||
-                toolName === "readSkillLines"
+            : toolName === "writeSkill" || toolName === "replaceSkillLines"
               ? SKILLS_NAMESPACE
               : undefined;
       const memoryKey =
@@ -265,6 +260,25 @@ export function sourcesFromMemoryToolParts(parts: UIMessage["parts"]): ChatSourc
           addSource(byId, { namespace, memoryKey, memoryId });
         }
       } else {
+        addSource(byId, { namespace, memoryKey });
+      }
+      continue;
+    }
+
+    if (toolName === "resolveMemories" || toolName === "resolveSkills") {
+      const rows = Array.isArray(output.results) ? output.results : [];
+      for (const row of rows) {
+        if (row === null || typeof row !== "object") continue;
+        const item = row as Record<string, unknown>;
+        if (typeof item.error === "string") continue;
+        const namespace =
+          typeof item.namespace === "string"
+            ? item.namespace
+            : toolName === "resolveSkills"
+              ? SKILLS_NAMESPACE
+              : undefined;
+        const memoryKey = typeof item.key === "string" ? item.key : undefined;
+        if (namespace === undefined || memoryKey === undefined) continue;
         addSource(byId, { namespace, memoryKey });
       }
       continue;

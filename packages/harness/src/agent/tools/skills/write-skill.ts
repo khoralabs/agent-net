@@ -45,7 +45,7 @@ export const writeSkillTool = tool<
     "Write or update a skill in the _root_/_skills_ namespace. Alias for an embedded memory write with skill frontmatter; enqueues the same async graph integration as writeMemory. Links may target memories outside the skills namespace.",
   instructions: [
     "Author skills in the _root_/_skills_ namespace (alias for a structured memory write).",
-    "For skill refinements, prefer readSkillLines + replaceSkillLines.",
+    "For skill refinements, prefer resolveSkills (enumerateLines: true) + replaceSkillLines.",
   ],
   inputSchema: z.object({
     name: z.string().min(1).describe("Skill display name."),

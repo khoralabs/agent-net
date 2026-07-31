@@ -18,7 +18,7 @@ import {
 import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../types.ts";
 import { formatSkillDocument, SKILLS_NAMESPACE, skillRecordFromText } from "./_helpers/skills.ts";
 
-type SkillLineToolName = "readSkillLines" | "replaceSkillLines";
+type SkillToolName = "resolveSkills" | "replaceSkillLines";
 
 type StoredSkill = {
   namespace: string;
@@ -86,7 +86,7 @@ function createMockSkillClient(stored: StoredSkill[]): MockSkillMemoriesClient {
             ({
               _id: `source-${item.key}`,
               score: 1,
-              source_key: "text",
+              source_key: "text:0",
               memory: {
                 id: `memory-${index}`,
                 namespace: item.namespace,
@@ -106,7 +106,7 @@ function createMockSkillClient(stored: StoredSkill[]): MockSkillMemoriesClient {
       },
       getSourceMapTextPreview: async (sourceMapId) => {
         for (const item of stored) {
-          if (ids.sourceMap(memoryIdFor(item), "text") === sourceMapId) {
+          if (ids.sourceMap(memoryIdFor(item), "text:0") === sourceMapId) {
             return item.text;
           }
         }
@@ -116,7 +116,7 @@ function createMockSkillClient(stored: StoredSkill[]): MockSkillMemoriesClient {
   };
 }
 
-describe("skill line tools", () => {
+describe("skill resolve / replace tools", () => {
   let stored: StoredSkill[];
   let env: HarnessToolkitEnv;
 
@@ -143,9 +143,9 @@ describe("skill line tools", () => {
     resetTestMemoriesOntology();
   });
 
-  async function toolHandler(name: SkillLineToolName) {
+  async function toolHandler(name: SkillToolName) {
     const { tools } = await evaluateComposable(harnessToolkit, { env });
-    const spec = (tools as Partial<Record<SkillLineToolName, ToolSpec>>)[name];
+    const spec = (tools as Partial<Record<SkillToolName, ToolSpec>>)[name];
     if (spec === undefined) throw new Error(`tool not available: ${name}`);
     return spec.handler.bind(spec) as (
       ctx: ToolRuntimeContext<HarnessToolkitEnv>,
@@ -153,37 +153,50 @@ describe("skill line tools", () => {
     ) => Promise<unknown>;
   }
 
-  test("skill line tools are hidden when memories client is not configured", async () => {
+  test("resolve / replace tools are hidden when memories client is not configured", async () => {
     const { tools } = await evaluateComposable(harnessToolkit, {
       env: createEnv(),
     });
-    const typed = tools as Partial<Record<SkillLineToolName, ToolSpec>>;
-    expect(typed.readSkillLines).toBeUndefined();
+    const typed = tools as Partial<Record<SkillToolName, ToolSpec>>;
+    expect(typed.resolveSkills).toBeUndefined();
     expect(typed.replaceSkillLines).toBeUndefined();
   });
 
-  test("readSkillLines returns numbered tuples for full skill document", async () => {
-    const readSkillLines = await toolHandler("readSkillLines");
-    const result = (await readSkillLines(
+  test("resolveSkills returns text by default", async () => {
+    const resolveSkills = await toolHandler("resolveSkills");
+    const result = (await resolveSkills(
       { env, agentId: "agent", agentName: "Agent" },
-      { key: "summarize-thread" },
-    )) as { key: string; lines: Array<[number, string]> };
+      { keys: ["summarize-thread"] },
+    )) as { results: Array<{ key: string; text?: string }> };
 
-    expect(result.key).toBe("summarize-thread");
-    expect(result.lines[0]).toEqual([1, "---"]);
-    expect(result.lines.some(([_, line]) => line === "name: Summarize Thread")).toBe(true);
-    expect(result.lines.some(([_, line]) => line === "Summarize the thread clearly.")).toBe(true);
+    expect(result.results[0]?.key).toBe("summarize-thread");
+    expect(result.results[0]?.text).toContain("name: Summarize Thread");
+    expect(result.results[0]?.text).toContain("Summarize the thread clearly.");
+  });
+
+  test("resolveSkills enumerates lines when requested", async () => {
+    const resolveSkills = await toolHandler("resolveSkills");
+    const result = (await resolveSkills(
+      { env, agentId: "agent", agentName: "Agent" },
+      { keys: ["summarize-thread"], enumerateLines: true },
+    )) as { results: Array<{ key: string; lines?: Array<[number, string]> }> };
+
+    expect(result.results[0]?.key).toBe("summarize-thread");
+    expect(result.results[0]?.lines?.[0]).toEqual([1, "---"]);
+    expect(result.results[0]?.lines?.some(([_, line]) => line === "name: Summarize Thread")).toBe(
+      true,
+    );
   });
 
   test("replaceSkillLines updates specific lines and persists merged text", async () => {
-    const readSkillLines = await toolHandler("readSkillLines");
+    const resolveSkills = await toolHandler("resolveSkills");
     const replaceSkillLines = await toolHandler("replaceSkillLines");
 
-    const before = (await readSkillLines(
+    const before = (await resolveSkills(
       { env, agentId: "agent", agentName: "Agent" },
-      { key: "summarize-thread" },
-    )) as { lines: Array<[number, string]> };
-    const bodyLine = before.lines.find(([_, line]) => line === "Keep it concise.");
+      { keys: ["summarize-thread"], enumerateLines: true },
+    )) as { results: Array<{ lines?: Array<[number, string]> }> };
+    const bodyLine = before.results[0]?.lines?.find(([_, line]) => line === "Keep it concise.");
     expect(bodyLine).toBeDefined();
 
     const result = (await replaceSkillLines(

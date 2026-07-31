@@ -35,7 +35,7 @@ export const writeMemoryTool = tool<
   instructions: [
     "Persist notes and observations in an appropriate namespace.",
     "Prefer ontology node labels that fit the content (person, organization, fact, event, memory, …).",
-    "For small refinements to existing memories, prefer readMemoryLines + replaceMemoryLines.",
+    "For small refinements to existing memories, prefer resolveMemories (enumerateLines: true) + replaceMemoryLines.",
   ],
   inputSchema: z.object({
     namespace: z.string().min(1).describe("Target memory namespace path."),

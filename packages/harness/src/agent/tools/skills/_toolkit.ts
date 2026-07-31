@@ -4,13 +4,13 @@ import { toolkitEnabled } from "../_helpers/disable-policies.ts";
 import { HARNESS_TOOLKIT } from "../ids.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
 import { activateSkillTool } from "./activate-skill.ts";
-import { readSkillLinesTool } from "./read-skill-lines.ts";
 import { replaceSkillLinesTool } from "./replace-skill-lines.ts";
+import { resolveSkillsTool } from "./resolve-skills.ts";
 import { searchSkillsTool } from "./search-skills.ts";
 import { writeSkillTool } from "./write-skill.ts";
 
 const skillsCore = toolkit(
-  [searchSkillsTool, writeSkillTool, readSkillLinesTool, replaceSkillLinesTool, activateSkillTool],
+  [searchSkillsTool, writeSkillTool, resolveSkillsTool, replaceSkillLinesTool, activateSkillTool],
   {
     name: "skills-core",
     instructions: [

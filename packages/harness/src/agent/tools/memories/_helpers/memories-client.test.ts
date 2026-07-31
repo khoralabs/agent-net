@@ -40,7 +40,7 @@ describe("createLazyHarnessMemoriesClient", () => {
       kind: "node",
       namespace: "notes",
       key: "observation-1",
-      content: [{ key: "text", text: "hello" }],
+      content: [{ key: "text:0", text: "hello" }],
       labels: [],
     });
 

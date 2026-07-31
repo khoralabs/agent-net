@@ -41,7 +41,7 @@ describe("agent-memory-source", () => {
     expect(isAgentMemorySourceRef({ domain: "other" })).toBe(false);
   });
 
-  test("sourcesFromMemoryToolParts collects search / write / replace / read", () => {
+  test("sourcesFromMemoryToolParts collects search / write / replace / resolve", () => {
     const parts = [
       toolPart(
         "searchMemories",
@@ -52,7 +52,7 @@ describe("agent-memory-source", () => {
               namespace: "agent/did",
               memory_key: "a",
               kind: "node",
-              source_key: "text",
+              source_key: "text:0",
               score: 1,
               labels: [],
             },
@@ -60,7 +60,7 @@ describe("agent-memory-source", () => {
               namespace: "agent/did",
               memory_key: "edge-1",
               kind: "edge",
-              source_key: "text",
+              source_key: "text:0",
               score: 0.5,
               labels: [],
             },
@@ -83,9 +83,11 @@ describe("agent-memory-source", () => {
         },
       ),
       toolPart(
-        "readMemoryLines",
-        { namespace: "agent/did", key: "a" },
-        { namespace: "agent/did", key: "a", lines: [[1, "x"]] },
+        "resolveMemories",
+        { memories: [{ namespace: "agent/did", key: "a" }] },
+        {
+          results: [{ namespace: "agent/did", key: "a", text: "x" }],
+        },
       ),
       toolPart("listNamespaces", {}, { namespaces: ["agent/did"] }),
       toolPart(
@@ -106,7 +108,7 @@ describe("agent-memory-source", () => {
         (s) =>
           isAgentMemorySourceRef(s.sourceRef) &&
           s.sourceRef.memory_key === "a" &&
-          s.sourceRef.source_key === "text",
+          s.sourceRef.source_key === "text:0",
       ),
     ).toBe(true);
     expect(
@@ -127,7 +129,7 @@ describe("agent-memory-source", () => {
               namespace: "ns",
               memory_key: "k",
               kind: "node",
-              source_key: "text",
+              source_key: "text:0",
               score: 1,
               labels: [],
             },
@@ -135,15 +137,15 @@ describe("agent-memory-source", () => {
         },
       ),
       toolPart(
-        "readMemoryLines",
-        { namespace: "ns", key: "k" },
-        { namespace: "ns", key: "k", lines: [] },
+        "resolveMemories",
+        { memories: [{ namespace: "ns", key: "k" }] },
+        { results: [{ namespace: "ns", key: "k", text: "" }] },
       ),
     ] as UIMessage["parts"];
     expect(sourcesFromMemoryToolParts(parts)).toHaveLength(1);
   });
 
-  test("sourcesFromMemoryToolParts collects skill search / write / replace / read", () => {
+  test("sourcesFromMemoryToolParts collects skill search / write / replace / resolve", () => {
     const parts = [
       toolPart(
         "searchSkills",
@@ -155,7 +157,7 @@ describe("agent-memory-source", () => {
               namespace: "_root_/_skills_",
               memory_key: "summarize-thread",
               kind: "node",
-              source_key: "text",
+              source_key: "text:0",
               score: 1,
               labels: [],
             },
@@ -173,9 +175,11 @@ describe("agent-memory-source", () => {
         },
       ),
       toolPart(
-        "readSkillLines",
-        { key: "draft" },
-        { key: "draft", namespace: "_root_/_skills_", lines: [[1, "---"]] },
+        "resolveSkills",
+        { keys: ["draft"] },
+        {
+          results: [{ key: "draft", namespace: "_root_/_skills_", text: "---" }],
+        },
       ),
     ] as UIMessage["parts"];
 

@@ -9,15 +9,15 @@ import {
   RECENT_NAMESPACES_TOP_K,
 } from "./_helpers/recent-namespaces.ts";
 import { listNamespacesTool } from "./list-namespaces.ts";
-import { readMemoryLinesTool } from "./read-memory-lines.ts";
 import { replaceMemoryLinesTool } from "./replace-memory-lines.ts";
+import { resolveMemoriesTool } from "./resolve-memories.ts";
 import { searchMemoriesTool } from "./search-memories.ts";
 import { writeMemoryTool } from "./write-memory.ts";
 
 const memoriesTools = [
   searchMemoriesTool,
   writeMemoryTool,
-  readMemoryLinesTool,
+  resolveMemoriesTool,
   replaceMemoryLinesTool,
   listNamespacesTool,
 ] as const;
