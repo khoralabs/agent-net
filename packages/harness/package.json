@@ -31,6 +31,12 @@
       "import": "./src/agent/workflow-resilience.ts",
       "default": "./src/agent/workflow-resilience.ts"
     },
+    "./integrate/write-scope": {
+      "types": "./src/integrate/write-scope.ts",
+      "bun": "./src/integrate/write-scope.ts",
+      "import": "./src/integrate/write-scope.ts",
+      "default": "./src/integrate/write-scope.ts"
+    },
     "./dist": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
