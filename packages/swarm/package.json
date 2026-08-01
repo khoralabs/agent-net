@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@khoralabs/agent-net-harness": "workspace:*",
-    "@khoralabs/chat": "^0.1.9",
+    "@khoralabs/chat": "^0.1.10",
     "@khoralabs/did-key-identity": "^0.1.0",
     "@khoralabs/khora-client": "^0.1.6",
     "@khoralabs/memories-node": "^0.5.15",

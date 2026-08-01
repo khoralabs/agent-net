@@ -21,7 +21,7 @@
         "@khoralabs/agent-capabilities-otel": "^0.2.0",
         "@khoralabs/agent-net-harness": "workspace:*",
         "@khoralabs/agent-net-swarm": "workspace:*",
-        "@khoralabs/chat": "^0.1.9",
+        "@khoralabs/chat": "^0.1.10",
         "@khoralabs/memories-node": "^0.5.15",
         "@khoralabs/memories-otel": "^0.5.15",
         "@khoralabs/memories-service": "^0.5.15",
@@ -53,7 +53,7 @@
       "dependencies": {
         "@khoralabs/agent-capabilities": "^0.2.0",
         "@khoralabs/agent-capabilities-ai-sdk": "^0.2.0",
-        "@khoralabs/chat": "^0.1.9",
+        "@khoralabs/chat": "^0.1.10",
         "@khoralabs/did-key-identity": "^0.1.0",
         "@khoralabs/khora-client": "^0.1.6",
         "@khoralabs/memories-node": "^0.5.15",
@@ -97,7 +97,7 @@
       "version": "0.0.0",
       "dependencies": {
         "@khoralabs/agent-net-harness": "workspace:*",
-        "@khoralabs/chat": "^0.1.9",
+        "@khoralabs/chat": "^0.1.10",
         "@khoralabs/did-key-identity": "^0.1.0",
         "@khoralabs/khora-client": "^0.1.6",
         "@khoralabs/memories-node": "^0.5.15",
@@ -360,7 +360,7 @@
 
     "@khoralabs/bun-web": ["@khoralabs/bun-web@workspace:vendor/libs/packages/bun-web"],
 
-    "@khoralabs/chat": ["@khoralabs/chat@0.1.9", "", { "dependencies": { "@khoralabs/sourcemaps": "^0.1.0", "ai": "^7.0.9" }, "peerDependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "@tursodatabase/serverless": "*", "typescript": "^5" }, "optionalPeers": ["@khoralabs/sqlite-crypto", "@tursodatabase/serverless"] }, "sha512-8F5889c3esRjvqEYRYzlxO5HrAv5HGfW2Jf4eRNi8Jg48HK+XEdv3U7d1lprPUQs4CHPBwAE82YUIVEsssM9RQ=="],
+    "@khoralabs/chat": ["@khoralabs/chat@0.1.10", "", { "dependencies": { "@khoralabs/sourcemaps": "^0.1.0", "ai": "^7.0.9" }, "peerDependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "@tursodatabase/serverless": "*", "typescript": "^5" }, "optionalPeers": ["@khoralabs/sqlite-crypto", "@tursodatabase/serverless"] }, "sha512-vKtRWdUciNJ/128i/StZl9u2LXUNvtzmgutD7VsUj6VKw548azjfXAPRdXNPAzWGqRk7BYswVQCBWaT+1sV2kw=="],
 
     "@khoralabs/cli-kit": ["@khoralabs/cli-kit@workspace:vendor/libs/packages/cli-kit"],
 
