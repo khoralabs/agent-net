@@ -27,8 +27,10 @@ type CatalogCache = {
 
 let catalogCache: CatalogCache | null = null;
 
+export type GatewayModelsFetch = (url: string, init?: RequestInit) => Promise<Response>;
+
 export type ResolveResponseModelCapabilitiesOptions = {
-  fetchFn?: typeof fetch;
+  fetchFn?: GatewayModelsFetch;
   nowMs?: () => number;
   cacheTtlMs?: number;
   /** When set, skip network and use this catalog (tests). */

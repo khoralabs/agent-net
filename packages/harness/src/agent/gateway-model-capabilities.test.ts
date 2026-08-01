@@ -119,7 +119,7 @@ describe("resolveResponseModelCapabilities", () => {
   test("fetch failure is unknown optimistic", async () => {
     clearGatewayModelCatalogCache();
     const caps = await resolveResponseModelCapabilities("any/model", {
-      fetchFn: (async () => new Response("nope", { status: 503 })) as typeof fetch,
+      fetchFn: async () => new Response("nope", { status: 503 }),
     });
     expect(caps).toEqual({
       modelId: "any/model",
