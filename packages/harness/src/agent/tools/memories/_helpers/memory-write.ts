@@ -27,6 +27,8 @@ export type MemoryLinkInput = {
   direction?: "in" | "out";
   /** Edge label kind. Defaults to ontology `references` when present. */
   label?: string;
+  /** Edge label props validated against ontology.edgeLabels[kind]. */
+  props?: Record<string, unknown>;
 };
 
 export type WriteMemoryNodeInput = {
@@ -88,14 +90,20 @@ function buildValidatedLabels(
   const labels: Array<{ kind: string; props: Record<string, unknown> }> = [];
   for (const [kind, props] of Object.entries(nodeLabels)) {
     if (props === undefined) continue;
-    const validated = validateNodeLabel(ontology, {
-      kind,
-      props: (props ?? {}) as Record<string, unknown>,
-    });
-    labels.push({
-      kind: validated.kind,
-      props: validated.props as Record<string, unknown>,
-    });
+    try {
+      const validated = validateNodeLabel(ontology, {
+        kind,
+        props: (props ?? {}) as Record<string, unknown>,
+      });
+      labels.push({
+        kind: validated.kind,
+        props: validated.props as Record<string, unknown>,
+      });
+    } catch (err) {
+      const detail =
+        err instanceof Error && err.message.trim().length > 0 ? err.message.trim() : String(err);
+      throw new Error(`writeMemory nodeLabels.${kind} invalid: ${detail}`);
+    }
   }
   if (labels.length === 0) {
     throw new Error("writeMemory requires at least one ontology node label");
@@ -168,18 +176,24 @@ export async function writeMemoryNode(
   const edges =
     input.links?.map((link) => {
       const kind = link.label?.trim() || edgeKindDefault;
-      const validated = validateEdgeLabel(ontology, {
-        kind,
-        props: {},
-      });
-      return {
-        peer_memory_id: ids.memory(link.namespace.trim(), link.key.trim()),
-        direction: (link.direction ?? "out") as "in" | "out",
-        label: {
-          kind: validated.kind,
-          props: validated.props as Record<string, unknown>,
-        },
-      };
+      try {
+        const validated = validateEdgeLabel(ontology, {
+          kind,
+          props: (link.props ?? {}) as Record<string, unknown>,
+        });
+        return {
+          peer_memory_id: ids.memory(link.namespace.trim(), link.key.trim()),
+          direction: (link.direction ?? "out") as "in" | "out",
+          label: {
+            kind: validated.kind,
+            props: validated.props as Record<string, unknown>,
+          },
+        };
+      } catch (err) {
+        const detail =
+          err instanceof Error && err.message.trim().length > 0 ? err.message.trim() : String(err);
+        throw new Error(`writeMemory link edge "${kind}" invalid: ${detail}`);
+      }
     }) ?? [];
 
   const content = await decomposeLogicalMemoryToContent({

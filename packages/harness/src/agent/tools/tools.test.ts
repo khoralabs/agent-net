@@ -186,6 +186,22 @@ describe("harness memory tools", () => {
     expect(merged[1]?.links.length).toBe(1);
   });
 
+  test("writeMemory returns error result for invalid nodeLabels", async () => {
+    const writeMemory = await toolHandler("writeMemory");
+    const result = (await writeMemory(
+      { env, agentId: "agent", agentName: "Agent" },
+      {
+        namespace: "notes",
+        key: "bad-fact",
+        text: "CFD means Coffee Fueled Dev.",
+        nodeLabels: { fact: { term: "CFD", category: "marketing" } },
+      },
+    )) as { memoryIds: string[]; error?: string };
+    expect(result.memoryIds).toEqual([]);
+    expect(result.error).toMatch(/nodeLabels\.fact|invalid|Unknown|fact/i);
+    expect(merged).toHaveLength(0);
+  });
+
   test("writeSkill stores skill frontmatter in the _root_/_skills_ namespace", async () => {
     const writeSkill = await toolHandler("writeSkill");
     const result = (await writeSkill(

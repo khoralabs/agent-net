@@ -3,7 +3,10 @@ import { dynamicToolkit, toolkit } from "@khoralabs/agent-capabilities";
 import { toolkitEnabled } from "../_helpers/disable-policies.ts";
 import { HARNESS_TOOLKIT } from "../ids.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
+import { resolveHarnessMemoriesOntology } from "./_helpers/memories-client.ts";
 import { formatMemoriesContextInstructions } from "./_helpers/memories-context-instructions.ts";
+import { getInstalledMemoriesOntology } from "./_helpers/memories-ontology-install.ts";
+import { minimalHarnessMemoriesOntology } from "./_helpers/minimal-ontology.ts";
 import {
   formatRecentNamespacesInstruction,
   RECENT_NAMESPACES_TOP_K,
@@ -12,15 +15,15 @@ import { listNamespacesTool } from "./list-namespaces.ts";
 import { replaceMemoryLinesTool } from "./replace-memory-lines.ts";
 import { resolveMemoriesTool } from "./resolve-memories.ts";
 import { searchMemoriesTool } from "./search-memories.ts";
-import { writeMemoryTool } from "./write-memory.ts";
+import { createWriteMemoryTool } from "./write-memory.ts";
 
-const memoriesTools = [
-  searchMemoriesTool,
-  writeMemoryTool,
-  resolveMemoriesTool,
-  replaceMemoryLinesTool,
-  listNamespacesTool,
-] as const;
+function resolveToolkitOntology() {
+  const installed = getInstalledMemoriesOntology();
+  if (installed !== undefined) {
+    return resolveHarnessMemoriesOntology(installed);
+  }
+  return minimalHarnessMemoriesOntology;
+}
 
 export const memoriesToolkit = dynamicToolkit<"memories", HarnessToolkitEnv>({
   name: HARNESS_TOOLKIT.memories,
@@ -32,11 +35,22 @@ export const memoriesToolkit = dynamicToolkit<"memories", HarnessToolkitEnv>({
     );
     if (recent !== undefined) instructions.push(recent);
 
+    const writeMemoryTool = createWriteMemoryTool(resolveToolkitOntology());
+
     return [
-      toolkit([...memoriesTools], {
-        name: "memories-core",
-        instructions,
-      }),
+      toolkit(
+        [
+          searchMemoriesTool,
+          writeMemoryTool,
+          resolveMemoriesTool,
+          replaceMemoryLinesTool,
+          listNamespacesTool,
+        ],
+        {
+          name: "memories-core",
+          instructions,
+        },
+      ),
     ];
   },
 });
