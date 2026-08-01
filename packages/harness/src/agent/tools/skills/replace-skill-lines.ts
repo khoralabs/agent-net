@@ -16,17 +16,22 @@ import {
   upsertSkillInEnv,
 } from "./_helpers/skills.ts";
 
-const zLineChange = z.tuple([z.number().int().min(1), z.string()]);
+const zLineChange = z.object({
+  lineNumber: z.number().int().min(1),
+  content: z.string(),
+});
+
+type LineChangeInput = z.infer<typeof zLineChange>;
 
 export const replaceSkillLinesTool = tool<
   "replaceSkillLines",
-  { key: string; changes: LineTuple[] },
+  { key: string; changes: LineChangeInput[] },
   { key: string; memoryIds: string[]; lines: LineTuple[]; namespace: string },
   HarnessToolkitEnv
 >({
   name: "replaceSkillLines",
   description:
-    "Replace specific lines in a skill's full stored document. Each change is a [lineNumber, newContent] tuple. Resolve with enumerateLines: true first via resolveSkills.",
+    "Replace specific lines in a skill's full stored document. Each change is an object with lineNumber and content. Resolve with enumerateLines: true first via resolveSkills.",
   instructions: [
     "Refine a skill by replacing specific line numbers.",
     "Prefer line edits over full writeSkill rewrites for skill refinements.",
@@ -39,7 +44,7 @@ export const replaceSkillLinesTool = tool<
     changes: z
       .array(zLineChange)
       .min(1)
-      .describe("Line replacements as [lineNumber, newContent] tuples."),
+      .describe("Line replacements: objects with lineNumber and new content."),
   }),
   policies: [hasMemoriesClient, toolEnabled("replaceSkillLines")],
   handler: async (ctx, input) => {
@@ -50,7 +55,8 @@ export const replaceSkillLinesTool = tool<
     const text = await loadSkillTextByKey(client, key);
     if (text === undefined) throw new Error(`skill not found: ${key}`);
 
-    const updated = applyLineChanges(text, input.changes);
+    const tuples: LineTuple[] = input.changes.map((c) => [c.lineNumber, c.content]);
+    const updated = applyLineChanges(text, tuples);
     try {
       skillRecordFromText(SKILLS_NAMESPACE, key, updated);
     } catch (error) {

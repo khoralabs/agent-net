@@ -203,7 +203,7 @@ describe("skill resolve / replace tools", () => {
       { env, agentId: "agent", agentName: "Agent" },
       {
         key: "summarize-thread",
-        changes: [[bodyLine?.[0] ?? 0, "Keep it brief and actionable."]],
+        changes: [{ lineNumber: bodyLine?.[0] ?? 0, content: "Keep it brief and actionable." }],
       },
     )) as { key: string; memoryIds: string[]; lines: Array<[number, string]> };
 
@@ -224,7 +224,7 @@ describe("skill resolve / replace tools", () => {
     await expect(
       replaceSkillLines(
         { env, agentId: "agent", agentName: "Agent" },
-        { key: "summarize-thread", changes: [[999, "nope"]] },
+        { key: "summarize-thread", changes: [{ lineNumber: 999, content: "nope" }] },
       ),
     ).rejects.toThrow(/out of range/);
   });

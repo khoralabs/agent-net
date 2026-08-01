@@ -15,17 +15,22 @@ import { writeMemoryNode } from "./_helpers/memory-write.ts";
 import { touchRecentNamespaces } from "./_helpers/recent-namespaces.ts";
 import { resolveWriteMemoryOptions } from "./_helpers/write-memory-options.ts";
 
-const zLineChange = z.tuple([z.number().int().min(1), z.string()]);
+const zLineChange = z.object({
+  lineNumber: z.number().int().min(1),
+  content: z.string(),
+});
+
+type LineChangeInput = z.infer<typeof zLineChange>;
 
 export const replaceMemoryLinesTool = tool<
   "replaceMemoryLines",
-  { namespace: string; key: string; changes: LineTuple[] },
+  { namespace: string; key: string; changes: LineChangeInput[] },
   { namespace: string; key: string; memoryIds: string[]; lines: LineTuple[] },
   HarnessToolkitEnv
 >({
   name: "replaceMemoryLines",
   description:
-    "Replace specific lines in a memory's stored text. Each change is a [lineNumber, newContent] tuple. Resolve with enumerateLines: true first via resolveMemories.",
+    "Replace specific lines in a memory's stored text. Each change is an object with lineNumber and content. Resolve with enumerateLines: true first via resolveMemories.",
   instructions: [
     "Refine a memory by replacing specific line numbers.",
     "Prefer line edits over full writeMemory rewrites for small refinements.",
@@ -36,7 +41,7 @@ export const replaceMemoryLinesTool = tool<
     changes: z
       .array(zLineChange)
       .min(1)
-      .describe("Line replacements as [lineNumber, newContent] tuples."),
+      .describe("Line replacements: objects with lineNumber and new content."),
   }),
   policies: [hasMemoriesClient, toolEnabled("replaceMemoryLines")],
   handler: async (ctx, input) => {
@@ -48,7 +53,8 @@ export const replaceMemoryLinesTool = tool<
     const text = await loadMemoryTextByKey(client, namespace, key);
     if (text === undefined) throw new Error(`memory not found: ${namespace}/${key}`);
 
-    const updated = applyLineChanges(text, input.changes);
+    const tuples: LineTuple[] = input.changes.map((c) => [c.lineNumber, c.content]);
+    const updated = applyLineChanges(text, tuples);
     const memoryIds = await writeMemoryNode(
       client,
       { namespace, key, text: updated },

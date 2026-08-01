@@ -225,7 +225,7 @@ describe("memory resolve / replace tools", () => {
       {
         namespace: "notes",
         key: "plan",
-        changes: [[2, "Updated line two."]],
+        changes: [{ lineNumber: 2, content: "Updated line two." }],
       },
     )) as {
       namespace: string;
@@ -244,7 +244,7 @@ describe("memory resolve / replace tools", () => {
     await expect(
       replaceMemoryLines(
         { env, agentId: "agent", agentName: "Agent" },
-        { namespace: "notes", key: "plan", changes: [[99, "nope"]] },
+        { namespace: "notes", key: "plan", changes: [{ lineNumber: 99, content: "nope" }] },
       ),
     ).rejects.toThrow(/out of range/);
   });
