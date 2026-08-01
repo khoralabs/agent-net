@@ -155,6 +155,42 @@ test("runAgentWorkflow streams assistant text to signed chat thread", async () =
   expect(envelope.signer.id).toBe(chat.agentDid);
 });
 
+test("runAgentWorkflow passes reasoning and maxOutputTokens to streamText", async () => {
+  const chat = await openChat();
+  let captured: {
+    reasoning?: string;
+    maxOutputTokens?: number;
+    system?: string;
+  } = {};
+
+  const base = params({
+    runId: "run-reasoning",
+    text: "Think carefully",
+    threadId: chat.threadId,
+    agentDid: chat.agentDid,
+  });
+  base.model.reasoning = "low";
+  base.model.maxOutputTokens = 1024;
+  base.responsePlan = { skillHints: ["missing-skill-should-skip"] };
+
+  const result = await runAgentWorkflow(base, {
+    chatService: chat.client,
+    chatSigner: chat.chatSigner,
+    streamTextFn: ((input: { reasoning?: string; maxOutputTokens?: number; system?: string }) => {
+      captured = {
+        reasoning: input.reasoning,
+        maxOutputTokens: input.maxOutputTokens,
+        system: input.system,
+      };
+      return textStreamResult(["ok"]);
+    }) as unknown as typeof import("ai").streamText,
+  });
+
+  expect(result.chat.status).toBe("complete");
+  expect(captured.reasoning).toBe("low");
+  expect(captured.maxOutputTokens).toBe(1024);
+});
+
 test("runAgentWorkflow persists tool parts on the assistant chat post", async () => {
   const chat = await openChat();
   const stream = new ReadableStream({

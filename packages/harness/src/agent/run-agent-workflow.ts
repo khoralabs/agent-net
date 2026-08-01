@@ -29,6 +29,7 @@ import {
 import { createAgentChatWriter } from "./chat-writer.ts";
 import { createHarnessToolkitEnv } from "./tools/_helpers/toolkit-env.ts";
 import { formatSkillCatalog } from "./tools/skills/_helpers/skills.ts";
+import { activateSkillByName } from "./tools/skills/activate-skill.ts";
 import type { AgentWorkflowParams, AgentWorkflowResult } from "./types.ts";
 import {
   buildUserLocalDateTimeContext,
@@ -231,6 +232,18 @@ export async function runAgentWorkflow(
     },
   });
 
+  const preActivatedSkillBodies: string[] = [];
+  for (const hint of params.responsePlan?.skillHints ?? []) {
+    try {
+      const activated = await activateSkillByName(env, hint);
+      if (activated.content !== undefined && activated.content.trim().length > 0) {
+        preActivatedSkillBodies.push(activated.content);
+      }
+    } catch {
+      // Unknown / unloadable hints must not fail the turn.
+    }
+  }
+
   const turnAttribution = buildNetworkAttribution({
     capabilities,
     memoriesProvenanceRootHex: env.memoriesSnapshotRootHex ?? "",
@@ -261,13 +274,22 @@ export async function runAgentWorkflow(
       const collectedToolResults: ToolResultLike[] = [];
       const result = runStreamText({
         model: modelId,
-        system: [capture.instructions, formatSkillCatalog(env.skills), ...context.instructions]
+        system: [
+          capture.instructions,
+          formatSkillCatalog(env.skills),
+          ...preActivatedSkillBodies,
+          ...context.instructions,
+        ]
           .filter((part) => part.length > 0)
           .join("\n\n"),
         messages: context.modelMessages,
         tools: aiTools,
         stopWhen: stepCountIs(maxSteps),
         abortSignal,
+        ...(params.model.reasoning !== undefined ? { reasoning: params.model.reasoning } : {}),
+        ...(params.model.maxOutputTokens !== undefined
+          ? { maxOutputTokens: params.model.maxOutputTokens }
+          : {}),
         onError: ({ error }) => {
           generationError = error;
         },

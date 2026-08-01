@@ -25,6 +25,24 @@
       "import": "./src/agent/workflows/agent-response-run.ts",
       "default": "./src/agent/workflows/agent-response-run.ts"
     },
+    "./classify-response-plan-run": {
+      "types": "./src/agent/workflows/classify-response-plan-run.ts",
+      "bun": "./src/agent/workflows/classify-response-plan-run.ts",
+      "import": "./src/agent/workflows/classify-response-plan-run.ts",
+      "default": "./src/agent/workflows/classify-response-plan-run.ts"
+    },
+    "./response-plan": {
+      "types": "./src/agent/response-plan.ts",
+      "bun": "./src/agent/response-plan.ts",
+      "import": "./src/agent/response-plan.ts",
+      "default": "./src/agent/response-plan.ts"
+    },
+    "./gateway-model-capabilities": {
+      "types": "./src/agent/gateway-model-capabilities.ts",
+      "bun": "./src/agent/gateway-model-capabilities.ts",
+      "import": "./src/agent/gateway-model-capabilities.ts",
+      "default": "./src/agent/gateway-model-capabilities.ts"
+    },
     "./workflow-resilience": {
       "types": "./src/agent/workflow-resilience.ts",
       "bun": "./src/agent/workflow-resilience.ts",

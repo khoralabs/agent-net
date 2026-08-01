@@ -33,6 +33,10 @@ export type AgentWorkflowParams = {
     id: string;
     fallbackIds?: string[];
     maxSteps?: number;
+    /** AI SDK reasoning effort (when set by response planner). */
+    reasoning?: "none" | "minimal" | "low" | "medium" | "high" | "xhigh";
+    /** Soft ceiling on visible completion tokens. */
+    maxOutputTokens?: number;
   };
   context: {
     sessionId?: string;
@@ -54,6 +58,10 @@ export type AgentWorkflowParams = {
   tools?: {
     disableToolkits?: string[];
     disableTools?: string[];
+  };
+  /** Applied response-plan fields (e.g. pre-activated skill hints). */
+  responsePlan?: {
+    skillHints?: string[];
   };
 };
 
