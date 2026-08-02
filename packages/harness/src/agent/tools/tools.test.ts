@@ -289,9 +289,7 @@ describe("harness memory tools", () => {
       }>;
     };
     expect(result.namespaces.map((n) => n.namespace)).toEqual(["inbox", "notes"]);
-    expect(result.namespaces.every((n) => n.alias === null && n.description === "")).toBe(
-      true,
-    );
+    expect(result.namespaces.every((n) => n.alias === null && n.description === "")).toBe(true);
     expect(env.recentNamespaces.top()).toEqual(before);
   });
 

@@ -61,9 +61,7 @@ export const listNamespacesTool = tool<
 
     const paths = await listFn.call(client.persistence);
     return {
-      namespaces: [...paths].map((namespace) =>
-        toListedNamespace({ namespace }),
-      ),
+      namespaces: [...paths].map((namespace) => toListedNamespace({ namespace })),
     };
   },
 });

@@ -6,10 +6,7 @@ import {
   type SignedTestChat,
 } from "../tests/signed-chat.ts";
 import { HARNESS_AGENT_ID } from "./agents/index.ts";
-import {
-  runAgentWorkflow,
-  withAssistantText,
-} from "./run-agent-workflow.ts";
+import { runAgentWorkflow, withAssistantText } from "./run-agent-workflow.ts";
 import type { AgentWorkflowParams } from "./types.ts";
 
 test("withAssistantText preserves reasoning and tool parts", () => {
@@ -28,22 +25,14 @@ test("withAssistantText preserves reasoning and tool parts", () => {
     ],
   };
   const next = withAssistantText(message, "Hello");
-  expect(next.parts.map((p) => p.type)).toEqual([
-    "reasoning",
-    "tool-lookup",
-    "text",
-  ]);
-  expect(
-    next.parts.find((p): p is { type: "text"; text: string } => p.type === "text")
-      ?.text,
-  ).toBe("Hello");
+  expect(next.parts.map((p) => p.type)).toEqual(["reasoning", "tool-lookup", "text"]);
+  expect(next.parts.find((p): p is { type: "text"; text: string } => p.type === "text")?.text).toBe(
+    "Hello",
+  );
 });
 
 test("withAssistantText builds text-only message when parts empty", () => {
-  const next = withAssistantText(
-    { id: "m1", role: "assistant", parts: [] },
-    "Hi",
-  );
+  const next = withAssistantText({ id: "m1", role: "assistant", parts: [] }, "Hi");
   expect(next.parts).toEqual([{ type: "text", text: "Hi" }]);
 });
 
