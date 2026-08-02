@@ -15,7 +15,7 @@ function signatureBytesFromB64Url(value: string): Uint8Array {
   return new Uint8Array(Buffer.from(value, "base64url"));
 }
 
-/** Adapt harness DID keys (`RelaySigner`) to chat-core `ChatSigner` / `ChatVerifier`. */
+/** Adapt harness DID keys (`RelaySigner`) to `@khoralabs/chat` `ChatSigner` / `ChatVerifier`. */
 export function createHarnessChatCrypto(resolveSigner: ResolveHarnessChatSigner): {
   signer: ChatSigner;
   verifier: ChatVerifier;

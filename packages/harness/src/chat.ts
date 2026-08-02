@@ -264,15 +264,3 @@ function createScopedChatClient(
     },
   };
 }
-
-export function createHarnessChat(options: CreateRemoteHarnessChatOptions): HarnessChat {
-  const backend = createRemoteHarnessChat(options);
-  return {
-    forAgent(did: string) {
-      return backend.forAgent(did);
-    },
-    forScope(scope: ScopeRef) {
-      return backend.forScope(scope);
-    },
-  };
-}
