@@ -55,6 +55,18 @@
       "import": "./src/integrate/write-scope.ts",
       "default": "./src/integrate/write-scope.ts"
     },
+    "./integrate/memory-event": {
+      "types": "./src/integrate/memory-event.ts",
+      "bun": "./src/integrate/memory-event.ts",
+      "import": "./src/integrate/memory-event.ts",
+      "default": "./src/integrate/memory-event.ts"
+    },
+    "./integrate/external-source": {
+      "types": "./src/integrate/external-source.ts",
+      "bun": "./src/integrate/external-source.ts",
+      "import": "./src/integrate/external-source.ts",
+      "default": "./src/integrate/external-source.ts"
+    },
     "./dist": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",

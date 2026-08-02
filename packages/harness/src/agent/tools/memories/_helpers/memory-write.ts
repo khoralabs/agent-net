@@ -13,6 +13,7 @@ import {
 } from "@khoralabs/memories-node/ontology";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 
+import type { IntegrateMemoryEvent } from "../../../../integrate/memory-event.ts";
 import type { IntegrateMemoryWriteScope } from "../../../../integrate/write-scope.ts";
 import { HARNESS_MEMORY_EDGE_KIND, HARNESS_MEMORY_NODE_KIND } from "./minimal-ontology.ts";
 
@@ -121,7 +122,7 @@ async function enqueueMemoryIntegrate(
     typeof crypto !== "undefined" && "randomUUID" in crypto
       ? crypto.randomUUID()
       : `write-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-  const body = {
+  const body: IntegrateMemoryEvent = {
     kind: "memory",
     ownerKey: integrate.ownerKey,
     namespace: args.namespace,
