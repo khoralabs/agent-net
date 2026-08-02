@@ -12,7 +12,8 @@ export const listNamespacesTool = tool<
   HarnessToolkitEnv
 >({
   name: "listNamespaces",
-  description: "List all namespaces currently present in the agent's memory database.",
+  description:
+    "List namespaces currently present in the agent's memory database (suppressed namespaces are omitted).",
   instructions: ["Discover namespaces currently in use before searching or writing memories."],
   inputSchema: z.object({}),
   policies: [hasMemoriesClient, toolEnabled("listNamespaces")],

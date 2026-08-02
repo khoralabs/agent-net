@@ -1,3 +1,4 @@
+import type { SearchAsOf } from "@khoralabs/memories-node";
 import {
   type EmbeddingModel,
   type HybridMemorySearchNeighborsOption,
@@ -34,19 +35,29 @@ export async function resolveMemoriesHeadRootHex(
 }
 
 /**
- * Resolve `asOfTimestampMs` for the current provenance head.
+ * Resolve {@link SearchAsOf} for the current provenance head (`{ lte: timestampMs }`).
  * Same semantics as `runHybridMemorySearch` when given a live head hex.
  */
-export async function resolveMemoriesSearchAsOfTimestampMs(
+export async function resolveMemoriesSearchAsOf(
   client: RemoteMemoriesClientAsync,
-): Promise<number | undefined> {
+): Promise<SearchAsOf | undefined> {
   const rootHex = await resolveMemoriesHeadRootHex(client);
   if (rootHex === undefined) return undefined;
   const tsFn = client.persistence.getProvenanceTimestampMsForRootHex;
   if (tsFn === undefined) return undefined;
   const out = tsFn.call(client.persistence, rootHex);
   const ts = await Promise.resolve(out);
-  return typeof ts === "number" && Number.isFinite(ts) ? ts : undefined;
+  return typeof ts === "number" && Number.isFinite(ts) ? { lte: ts } : undefined;
+}
+
+/**
+ * @deprecated Prefer {@link resolveMemoriesSearchAsOf}.
+ */
+export async function resolveMemoriesSearchAsOfTimestampMs(
+  client: RemoteMemoriesClientAsync,
+): Promise<number | undefined> {
+  const asOf = await resolveMemoriesSearchAsOf(client);
+  return asOf?.lte;
 }
 
 export type StandardHybridMemorySearchInput = {
@@ -71,7 +82,7 @@ export type StandardHybridMemorySearchInput = {
 
 /**
  * Hybrid memory search with shared standards:
- * - fresh provenance head `asOf` on every call
+ * - fresh provenance head `asOf` (`{ lte }`) on every call
  * - default `pathSubtree` scope
  * - default neighbors off
  * - lexical-only arms when no embedding model (unless `requireEmbedding`)

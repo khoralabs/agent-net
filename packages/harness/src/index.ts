@@ -26,6 +26,7 @@ export { resolveAgentsDataDir } from "./agent/tools/khora/_helpers/khora-client-
 export { resolveHarnessEmbeddingModel } from "./agent/tools/memories/_helpers/embedding-model.ts";
 export {
   agentMemoriesDatabase,
+  createDeferredHarnessMemoriesClient,
   createHarnessMemoriesClient,
 } from "./agent/tools/memories/_helpers/memories-client.ts";
 export { installMemoriesOntology } from "./agent/tools/memories/_helpers/memories-ontology-install.ts";
@@ -35,6 +36,7 @@ export {
   MEMORY_SEARCH_SCOPE_SUBTREE,
   type MemorySearchScopeMode,
   resolveMemoriesHeadRootHex,
+  resolveMemoriesSearchAsOf,
   resolveMemoriesSearchAsOfTimestampMs,
   runStandardHybridMemorySearch,
   type StandardHybridMemorySearchInput,

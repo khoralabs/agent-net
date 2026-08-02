@@ -3,6 +3,7 @@ import type { SearchOutput, SearchParams } from "@khoralabs/memories-node";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import {
   EMBEDDING_MODEL_REQUIRED_MESSAGE,
+  resolveMemoriesSearchAsOf,
   runStandardHybridMemorySearch,
 } from "./memory-search.ts";
 import { createTestEmbeddingModel } from "./test-embedding.ts";
@@ -43,5 +44,41 @@ describe("runStandardHybridMemorySearch", () => {
       query: "company products",
     });
     expect(hits).toEqual([]);
+  });
+
+  test("resolveMemoriesSearchAsOf returns { lte } from provenance timestamp", async () => {
+    const client = {
+      search: async (): Promise<SearchOutput> => ({ hits: [] }),
+      persistence: {
+        getProvenanceHeadRootHex: async () => "deadbeef",
+        getProvenanceTimestampMsForRootHex: async (rootHex: string) =>
+          rootHex === "deadbeef" ? 1_700_000_000_000 : undefined,
+      },
+    } as unknown as RemoteMemoriesClientAsync;
+
+    await expect(resolveMemoriesSearchAsOf(client)).resolves.toEqual({ lte: 1_700_000_000_000 });
+  });
+
+  test("passes provenance as-of cutoff into hybrid search params", async () => {
+    const captured: SearchParams[] = [];
+    const client = {
+      search: async (params: SearchParams): Promise<SearchOutput> => {
+        captured.push(params);
+        return { hits: [] };
+      },
+      persistence: {
+        getProvenanceHeadRootHex: async () => "deadbeef",
+        getProvenanceTimestampMsForRootHex: async (rootHex: string) =>
+          rootHex === "deadbeef" ? 1_700_000_000_000 : undefined,
+      },
+    } as unknown as RemoteMemoriesClientAsync;
+
+    await runStandardHybridMemorySearch(client, {
+      namespace: "_root_",
+      query: "company products",
+    });
+
+    expect(captured.length).toBeGreaterThan(0);
+    expect(captured.some((p) => p.asOf?.lte === 1_700_000_000_000)).toBe(true);
   });
 });

@@ -1,4 +1,3 @@
-import type { DeleteMemoryParams, MergeMemoryParams, SearchParams } from "@khoralabs/memories-node";
 import {
   type LabelSchemaMap,
   mergeOntologies,
@@ -7,6 +6,7 @@ import {
 import type { MemoriesDatabaseId } from "@khoralabs/memories-service";
 import {
   createBearerTokenAuthProvider,
+  createDeferredRemoteMemoriesClientAsync,
   createRemoteMemoriesClientAsync,
   type RemoteMemoriesClientAsync,
 } from "@khoralabs/memories-service/client";
@@ -28,57 +28,39 @@ export function resolveHarnessMemoriesOntology(
   return mergeOntologies(minimalHarnessMemoriesOntology, appOntology);
 }
 
+function remoteClientOptions(opts: {
+  baseUrl: string;
+  database: MemoriesDatabaseId;
+  ontology: HarnessMemoriesOntology;
+  adminToken: string;
+}) {
+  return {
+    baseUrl: opts.baseUrl.replace(/\/$/, ""),
+    database: opts.database,
+    ontology: resolveHarnessMemoriesOntology(opts.ontology),
+    auth: createBearerTokenAuthProvider(opts.adminToken),
+  };
+}
+
 export async function createHarnessMemoriesClient(opts: {
   baseUrl: string;
   database: MemoriesDatabaseId;
   ontology: HarnessMemoriesOntology;
   adminToken: string;
 }): Promise<RemoteMemoriesClientAsync> {
-  const baseUrl = opts.baseUrl.replace(/\/$/, "");
-  const auth = createBearerTokenAuthProvider(opts.adminToken);
-  const ontology = resolveHarnessMemoriesOntology(opts.ontology);
+  return createRemoteMemoriesClientAsync(remoteClientOptions(opts));
+}
 
-  return createRemoteMemoriesClientAsync({
-    baseUrl,
-    database: opts.database,
-    ontology,
-    auth,
-  });
+/** Sync handle that lazily materializes via memories-service deferred remote client. */
+export function createDeferredHarnessMemoriesClient(opts: {
+  baseUrl: string;
+  database: MemoriesDatabaseId;
+  ontology: HarnessMemoriesOntology;
+  adminToken: string;
+}): RemoteMemoriesClientAsync {
+  return createDeferredRemoteMemoriesClientAsync(remoteClientOptions(opts));
 }
 
 export function agentMemoriesDatabase(agentDid: string): MemoriesDatabaseId {
   return { kind: "account", ownerKey: agentDid };
-}
-
-export type CreateHarnessMemoriesClient = typeof createHarnessMemoriesClient;
-
-export function createLazyHarnessMemoriesClient(
-  opts: {
-    baseUrl: string;
-    database: MemoriesDatabaseId;
-    ontology: HarnessMemoriesOntology;
-    adminToken: string;
-  },
-  createClient: CreateHarnessMemoriesClient = createHarnessMemoriesClient,
-): RemoteMemoriesClientAsync {
-  let clientPromise: Promise<RemoteMemoriesClientAsync> | undefined;
-  const getClient = () => (clientPromise ??= createClient(opts));
-
-  return {
-    search: (params: SearchParams) => getClient().then((client) => client.search(params)),
-    mergeMemory: (params: MergeMemoryParams) =>
-      getClient().then((client) => client.mergeMemory(params)),
-    deleteMemory: (params: DeleteMemoryParams) =>
-      getClient().then((client) => client.deleteMemory(params)),
-    persistence: {
-      listMemoryNamespaces: async () => {
-        const client = await getClient();
-        const listFn = client.persistence.listMemoryNamespaces;
-        if (listFn === undefined) {
-          throw new Error("memories client does not support listing namespaces");
-        }
-        return listFn.call(client.persistence);
-      },
-    },
-  } as RemoteMemoriesClientAsync;
 }

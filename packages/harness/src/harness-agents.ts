@@ -19,8 +19,8 @@ import { harnessToolkit } from "./agent/tools/index.ts";
 import { createHarnessKhoraClientForAgent } from "./agent/tools/khora/_helpers/khora-client-factory.ts";
 import {
   agentMemoriesDatabase,
+  createDeferredHarnessMemoriesClient,
   createHarnessMemoriesClient,
-  createLazyHarnessMemoriesClient,
   type HarnessMemoriesOntology,
   resolveHarnessMemoriesOntology,
 } from "./agent/tools/memories/_helpers/memories-client.ts";
@@ -167,7 +167,7 @@ export async function spawnWithMemories(
     exists: () => memoriesClient.databaseExists(database),
     delete: () => memoriesClient.deleteDatabase(database),
     serviceClient: memoriesClient,
-    client: createLazyHarnessMemoriesClient({
+    client: createDeferredHarnessMemoriesClient({
       baseUrl: harness.memoriesBaseUrl,
       database,
       ontology,
@@ -209,7 +209,7 @@ export function createHarnessAgentApi(
             exists: () => memoriesClient.databaseExists(database),
             delete: () => memoriesClient.deleteDatabase(database),
             serviceClient: memoriesClient,
-            client: createLazyHarnessMemoriesClient({
+            client: createDeferredHarnessMemoriesClient({
               baseUrl: harness.memoriesBaseUrl,
               database,
               ontology,
