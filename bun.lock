@@ -5,7 +5,7 @@
     "": {
       "name": "@khoralabs/agent-net-workspace",
       "dependencies": {
-        "@khoralabs/memories-node": "^0.6.1",
+        "@khoralabs/memories-node": "^0.6.2",
       },
       "devDependencies": {
         "@biomejs/biome": "^2.5.5",
@@ -22,9 +22,9 @@
         "@khoralabs/agent-net-harness": "workspace:*",
         "@khoralabs/agent-net-swarm": "workspace:*",
         "@khoralabs/chat": "^0.1.11",
-        "@khoralabs/memories-node": "^0.6.1",
-        "@khoralabs/memories-otel": "^0.6.1",
-        "@khoralabs/memories-service": "^0.6.1",
+        "@khoralabs/memories-node": "^0.6.2",
+        "@khoralabs/memories-otel": "^0.6.2",
+        "@khoralabs/memories-service": "^0.6.2",
         "@khoralabs/network-events-sqlite": "workspace:*",
         "@khoralabs/observability": "workspace:*",
         "@khoralabs/relay": "^0.1.1",
@@ -56,8 +56,8 @@
         "@khoralabs/chat": "^0.1.11",
         "@khoralabs/did-key-identity": "^0.1.0",
         "@khoralabs/khora-client": "^0.1.6",
-        "@khoralabs/memories-node": "^0.6.1",
-        "@khoralabs/memories-service": "^0.6.1",
+        "@khoralabs/memories-node": "^0.6.2",
+        "@khoralabs/memories-service": "^0.6.2",
         "@khoralabs/relay": "^0.1.1",
         "@khoralabs/sourcemaps": "^0.1.0",
         "@khoralabs/sqlite-crypto": "^0.1.0",
@@ -100,7 +100,7 @@
         "@khoralabs/chat": "^0.1.11",
         "@khoralabs/did-key-identity": "^0.1.0",
         "@khoralabs/khora-client": "^0.1.6",
-        "@khoralabs/memories-node": "^0.6.1",
+        "@khoralabs/memories-node": "^0.6.2",
         "@khoralabs/sqlite-crypto": "^0.1.0",
         "@libsql/client": "^0.17.4",
         "@tursodatabase/serverless": "^1.3.2",
@@ -205,12 +205,12 @@
     },
   },
   "overrides": {
-    "@khoralabs/memories-agents": "0.6.1",
-    "@khoralabs/memories-node": "0.6.1",
-    "@khoralabs/memories-otel": "0.6.1",
-    "@khoralabs/memories-react-graph": "0.6.1",
-    "@khoralabs/memories-service": "0.6.1",
-    "@khoralabs/memories-spec": "0.6.1",
+    "@khoralabs/memories-agents": "0.6.2",
+    "@khoralabs/memories-node": "0.6.2",
+    "@khoralabs/memories-otel": "0.6.2",
+    "@khoralabs/memories-react-graph": "0.6.2",
+    "@khoralabs/memories-service": "0.6.2",
+    "@khoralabs/memories-spec": "0.6.2",
     "@libsql/client": "0.17.4",
   },
   "packages": {
@@ -368,11 +368,11 @@
 
     "@khoralabs/khora-client": ["@khoralabs/khora-client@0.1.6", "", { "dependencies": { "@khoralabs/did-key-identity": "^0.1.0", "zod": "^4" }, "peerDependencies": { "typescript": "^5" } }, "sha512-WskB2G7B2wslSUxZP/DogadBZ1uMFUBS4lxKy9ws2cGQbAAtJbUJ7+rbkHq+IpzhfhavSikhlZHPdBfqZ9nc6g=="],
 
-    "@khoralabs/memories-node": ["@khoralabs/memories-node@0.6.1", "", { "dependencies": { "@ai-sdk/provider-utils": "^5.0.2", "@khoralabs/sourcemaps": "^0.1.0", "@standard-schema/spec": "^1.1.0", "ai": "^7.0.9", "zod": "^4" }, "peerDependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "@khoralabs/sqlite-migrate": "^0.1.0", "@libsql/client": "^0.17.4", "@tursodatabase/serverless": "^0.2.0", "ajv": "^8", "sqlite-vec": "^0.1.10-alpha.4", "typescript": "^5", "umap-js": "^1.4.0", "workflow": "^4.5.0" }, "optionalPeers": ["@khoralabs/sqlite-crypto", "@khoralabs/sqlite-migrate", "@libsql/client", "@tursodatabase/serverless", "ajv", "sqlite-vec", "umap-js", "workflow"] }, "sha512-IPrZO7P4jt8RKGxWTeLQdsnI8NwH2e9+t+PmLolUnSROEXLbHOnXzgiA7hodxZozvOgW8orGvjH/bxMe/noBKw=="],
+    "@khoralabs/memories-node": ["@khoralabs/memories-node@0.6.2", "", { "dependencies": { "@ai-sdk/provider-utils": "^5.0.2", "@khoralabs/sourcemaps": "^0.1.0", "@standard-schema/spec": "^1.1.0", "ai": "^7.0.9", "zod": "^4" }, "peerDependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "@khoralabs/sqlite-migrate": "^0.1.0", "@libsql/client": "^0.17.4", "@tursodatabase/serverless": "^0.2.0", "ajv": "^8", "sqlite-vec": "^0.1.10-alpha.4", "typescript": "^5", "umap-js": "^1.4.0", "workflow": "^4.5.0" }, "optionalPeers": ["@khoralabs/sqlite-crypto", "@khoralabs/sqlite-migrate", "@libsql/client", "@tursodatabase/serverless", "ajv", "sqlite-vec", "umap-js", "workflow"] }, "sha512-/A0G2HTFCXAJNW9lFJ2PwKpz5hMUK0wIkbqPlNAAMgi0R9IXyTct982ECUivYl9ue9/Un5aP4p2hLB1W+w/vVg=="],
 
-    "@khoralabs/memories-otel": ["@khoralabs/memories-otel@0.6.1", "", { "dependencies": { "@khoralabs/memories-node": "0.6.1", "@opentelemetry/api": "^1.9.0" }, "peerDependencies": { "pino": "^9", "typescript": "^5" }, "optionalPeers": ["pino"] }, "sha512-atNk4cHBjooZhc5S46jujPjeThj3c+oGnzX089kMIze+IwItjxzdN2X3/u6V3QlsjEpoo4lZmE794KBmD0r4Ug=="],
+    "@khoralabs/memories-otel": ["@khoralabs/memories-otel@0.6.2", "", { "dependencies": { "@khoralabs/memories-node": "0.6.2", "@opentelemetry/api": "^1.9.0" }, "peerDependencies": { "pino": "^9", "typescript": "^5" }, "optionalPeers": ["pino"] }, "sha512-k5VZNB2tFDHKQQKZi179gkbsY9OuwQC2XQVZnfnshBPOgzFZN4YQTSySQg1QjKJrTNl4luQmPXZqeSn7XYI+QQ=="],
 
-    "@khoralabs/memories-service": ["@khoralabs/memories-service@0.6.1", "", { "dependencies": { "@khoralabs/memories-node": "0.6.1", "ajv": "^8", "lru-cache": "^11.5.1" }, "peerDependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "typescript": "^5" }, "optionalPeers": ["@khoralabs/sqlite-crypto"] }, "sha512-ZG8uubYZho988p4IcYc1Ut/piVKj8m7BFPv9KXUNO4xt7d38EW2lCoNhgtFJBw/cFSVOV+NyNeQBrMdqs+rRww=="],
+    "@khoralabs/memories-service": ["@khoralabs/memories-service@0.6.2", "", { "dependencies": { "@khoralabs/memories-node": "0.6.2", "ajv": "^8", "lru-cache": "^11.5.1" }, "peerDependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "typescript": "^5" }, "optionalPeers": ["@khoralabs/sqlite-crypto"] }, "sha512-Ff4Xpnd7eD/+ObdgaLmOkArG0WFHEA/fconM+FdWVnMRVrkxsny2ztHZormMI/64yWvFHXH7BsKgfN5S7U5Omg=="],
 
     "@khoralabs/network-events-sqlite": ["@khoralabs/network-events-sqlite@workspace:packages/network-events-sqlite"],
 
