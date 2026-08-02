@@ -64,6 +64,21 @@ function textFromUIMessage(message: UIMessage): string {
     .join("");
 }
 
+/**
+ * Set assistant text without wiping non-text parts (reasoning, tools).
+ * When there are no parts yet, returns a text-only message.
+ */
+export function withAssistantText(message: UIMessage, text: string): UIMessage {
+  if (message.parts.length === 0) {
+    return assistantMessage(message.id, text);
+  }
+  const nonText = message.parts.filter((part) => part.type !== "text");
+  return {
+    ...message,
+    parts: [...nonText, { type: "text", text }],
+  };
+}
+
 type ToolResultLike = {
   toolCallId: string;
   toolName: string;
@@ -340,7 +355,10 @@ export async function runAgentWorkflow(
       if (text.length === 0) {
         text = await textPromise;
         if (text.length > 0) {
-          latest = assistantMessage(writer.postId, text);
+          latest = withAssistantText(
+            { ...latest, id: writer.postId, role: "assistant" },
+            text,
+          );
         }
       }
       if (text.length === 0) {

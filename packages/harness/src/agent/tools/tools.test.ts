@@ -282,9 +282,16 @@ describe("harness memory tools", () => {
 
     const before = [...env.recentNamespaces.top()];
     const result = (await listNamespaces({ env, agentId: "agent", agentName: "Agent" }, {})) as {
-      namespaces: string[];
+      namespaces: Array<{
+        namespace: string;
+        alias: string | null;
+        description: string;
+      }>;
     };
-    expect(result.namespaces).toEqual(["inbox", "notes"]);
+    expect(result.namespaces.map((n) => n.namespace)).toEqual(["inbox", "notes"]);
+    expect(result.namespaces.every((n) => n.alias === null && n.description === "")).toBe(
+      true,
+    );
     expect(env.recentNamespaces.top()).toEqual(before);
   });
 
