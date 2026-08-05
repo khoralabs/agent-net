@@ -126,6 +126,15 @@ export class AgentStore {
     await this.#flush();
   }
 
+  async clearExternalId(did: string): Promise<void> {
+    const record = this.#agents.find((a) => a.did === did);
+    if (record === undefined) {
+      throw new Error(`Agent ${did} is not in the store`);
+    }
+    delete record.externalId;
+    await this.#flush();
+  }
+
   async setMemoriesFraming(did: string, framing: AgentMemoriesFraming | undefined): Promise<void> {
     const record = this.#agents.find((a) => a.did === did);
     if (record === undefined) {

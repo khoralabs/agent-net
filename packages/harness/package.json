@@ -61,18 +61,6 @@
       "import": "./src/integrate/memory-event.ts",
       "default": "./src/integrate/memory-event.ts"
     },
-    "./integrate/external-source": {
-      "types": "./src/integrate/external-source.ts",
-      "bun": "./src/integrate/external-source.ts",
-      "import": "./src/integrate/external-source.ts",
-      "default": "./src/integrate/external-source.ts"
-    },
-    "./integrate/spawn-from-external": {
-      "types": "./src/integrate/spawn-from-external.ts",
-      "bun": "./src/integrate/spawn-from-external.ts",
-      "import": "./src/integrate/spawn-from-external.ts",
-      "default": "./src/integrate/spawn-from-external.ts"
-    },
     "./dist": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",

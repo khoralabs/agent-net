@@ -118,6 +118,11 @@ export class ManagedAgentPool {
     await this.#store.setExternalId(did, externalId);
   }
 
+  /** Clear the opaque external id mapping for an agent. */
+  async clearExternalId(did: string): Promise<void> {
+    await this.#store.clearExternalId(did);
+  }
+
   /** Stored memories-framing prose overrides for an agent, if any. */
   getMemoriesFraming(did: string): AgentMemoriesFraming | undefined {
     return this.#store.get(did)?.memoriesFraming;
