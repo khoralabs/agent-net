@@ -5,7 +5,6 @@ import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/clie
 import { harnessToolkit } from "../_toolkit.ts";
 import { createEphemeralRecentNamespacesTracker } from "../memories/_helpers/recent-namespaces.ts";
 import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../types.ts";
-import { SKILLS_NAMESPACE } from "./_helpers/skills.ts";
 import { hasSkillsNamespace, skillsNamespaceExists } from "./policies.ts";
 
 function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEnv {
@@ -19,45 +18,23 @@ function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEn
   };
 }
 
-function mockClient(namespaces: string[]): RemoteMemoriesClientAsync {
+function mockClient(exists: boolean): RemoteMemoriesClientAsync {
   return {
     persistence: {
-      listMemoryNamespaces: async () => namespaces,
-    },
-  } as unknown as RemoteMemoriesClientAsync;
-}
-
-function mockClientWithMeta(
-  rows: Array<{ namespace: string; suppressed?: boolean }>,
-): RemoteMemoriesClientAsync {
-  return {
-    persistence: {
-      listNamespacesWithMetadata: async () =>
-        rows.map((row) => ({
-          namespace: row.namespace,
-          alias: null,
-          description: "",
-          ...(row.suppressed === true ? { suppressed: true as const } : {}),
-        })),
+      namespaceExistsUnderPrefix: async () => exists,
     },
   } as unknown as RemoteMemoriesClientAsync;
 }
 
 describe("hasSkillsNamespace", () => {
-  test("skillsNamespaceExists is true only when _skills_ is listed", async () => {
-    await expect(skillsNamespaceExists(mockClient(["notes"]))).resolves.toBe(false);
-    await expect(skillsNamespaceExists(mockClient([SKILLS_NAMESPACE]))).resolves.toBe(true);
+  test("skillsNamespaceExists follows namespaceExistsUnderPrefix", async () => {
+    await expect(skillsNamespaceExists(mockClient(false))).resolves.toBe(false);
+    await expect(skillsNamespaceExists(mockClient(true))).resolves.toBe(true);
   });
 
-  test("skillsNamespaceExists is false when _skills_ is suppressed", async () => {
-    await expect(
-      skillsNamespaceExists(
-        mockClientWithMeta([{ namespace: SKILLS_NAMESPACE, suppressed: true }]),
-      ),
-    ).resolves.toBe(false);
-    await expect(
-      skillsNamespaceExists(mockClientWithMeta([{ namespace: SKILLS_NAMESPACE }])),
-    ).resolves.toBe(true);
+  test("skillsNamespaceExists is false when exists API is missing", async () => {
+    const client = { persistence: {} } as unknown as RemoteMemoriesClientAsync;
+    await expect(skillsNamespaceExists(client)).resolves.toBe(false);
   });
 
   test("policy fails without memories client", async () => {
@@ -66,7 +43,7 @@ describe("hasSkillsNamespace", () => {
 
   test("skills tools are hidden when _skills_ is missing", async () => {
     const { tools } = await evaluateComposable(harnessToolkit, {
-      env: createEnv({ memoriesClient: mockClient(["notes"]) }),
+      env: createEnv({ memoriesClient: mockClient(false) }),
     });
     const typed = tools as Record<string, unknown>;
     expect(typed.searchSkills).toBeUndefined();
@@ -74,20 +51,9 @@ describe("hasSkillsNamespace", () => {
     expect(typed.activateSkill).toBeUndefined();
   });
 
-  test("skills tools are hidden when _skills_ is suppressed", async () => {
-    const { tools } = await evaluateComposable(harnessToolkit, {
-      env: createEnv({
-        memoriesClient: mockClientWithMeta([{ namespace: SKILLS_NAMESPACE, suppressed: true }]),
-      }),
-    });
-    const typed = tools as Record<string, unknown>;
-    expect(typed.searchSkills).toBeUndefined();
-    expect(typed.writeSkill).toBeUndefined();
-  });
-
   test("skills tools are visible when _skills_ exists", async () => {
     const { tools } = await evaluateComposable(harnessToolkit, {
-      env: createEnv({ memoriesClient: mockClient([SKILLS_NAMESPACE]) }),
+      env: createEnv({ memoriesClient: mockClient(true) }),
     });
     const typed = tools as Record<string, unknown>;
     expect(typed.searchSkills).toBeDefined();

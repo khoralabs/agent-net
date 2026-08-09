@@ -87,6 +87,8 @@ function createMockSkillClient(stored: StoredSkill[]): RemoteMemoriesClientAsync
       },
       listMemoryNamespaces: async () =>
         [...new Set(stored.map((item) => item.namespace))].sort((a, b) => a.localeCompare(b)),
+      namespaceExistsUnderPrefix: async (prefix: string) =>
+        stored.some((item) => item.namespace === prefix || item.namespace.startsWith(`${prefix}/`)),
     },
   } as unknown as RemoteMemoriesClientAsync;
 }

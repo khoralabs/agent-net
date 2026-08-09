@@ -46,6 +46,7 @@ type MockHarnessMemoriesClient = {
     findMemoryIdByKey: (namespace: string, key: string) => Promise<string | undefined>;
     getSourceMapTextPreview: (sourceMapId: string, maxChars?: number) => Promise<string | null>;
     listMemoryNamespaces: () => Promise<string[]>;
+    namespaceExistsUnderPrefix: (prefix: string) => Promise<boolean>;
   };
 };
 
@@ -130,6 +131,13 @@ function createMockMemoriesClient(
         [...new Set([...seedNamespaces, ...merged.map((item) => item.namespace)])].sort((a, b) =>
           a.localeCompare(b),
         ),
+      namespaceExistsUnderPrefix: async (prefix) => {
+        const paths = new Set([...seedNamespaces, ...merged.map((item) => item.namespace)]);
+        for (const path of paths) {
+          if (path === prefix || path.startsWith(`${prefix}/`)) return true;
+        }
+        return false;
+      },
     },
   };
 }

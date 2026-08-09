@@ -4,25 +4,14 @@ import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/clie
 import type { HarnessToolkitEnv } from "../types.ts";
 import { SKILLS_NAMESPACE } from "./_helpers/skills.ts";
 
-// TODO: Add a query in memories to check if a namespace exists by prefix
-// TODO: Add a query in memories to get a namespace by prefix
-// TODO: Use namespace exists prefix instead of listing namespaces and checking for inclusion
-
 /**
  * True when the agent's memories DB has an unsuppressed `_skills_` namespace
- * (catalog metadata preferred; path-only listing cannot detect suppression).
+ * (`namespaceExistsUnderPrefix` defaults to discovery-visible paths only).
  */
 export async function skillsNamespaceExists(client: RemoteMemoriesClientAsync): Promise<boolean> {
-  const withMeta = client.persistence.listNamespacesWithMetadata;
-  if (withMeta !== undefined) {
-    const rows = await withMeta.call(client.persistence);
-    const row = rows.find((entry) => entry.namespace === SKILLS_NAMESPACE);
-    return row !== undefined && row.suppressed !== true;
-  }
-  const listFn = client.persistence.listMemoryNamespaces;
-  if (listFn === undefined) return false;
-  const paths = await listFn.call(client.persistence);
-  return paths.includes(SKILLS_NAMESPACE);
+  const existsFn = client.persistence.namespaceExistsUnderPrefix;
+  if (existsFn === undefined) return false;
+  return existsFn.call(client.persistence, SKILLS_NAMESPACE);
 }
 
 /**

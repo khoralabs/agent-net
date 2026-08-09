@@ -41,6 +41,7 @@ type MockSkillMemoriesClient = {
     findMemoryIdByKey: (namespace: string, key: string) => Promise<string | undefined>;
     getSourceMapTextPreview: (sourceMapId: string, maxChars?: number) => Promise<string | null>;
     listMemoryNamespaces: () => Promise<string[]>;
+    namespaceExistsUnderPrefix: (prefix: string) => Promise<boolean>;
   };
 };
 
@@ -115,6 +116,8 @@ function createMockSkillClient(stored: StoredSkill[]): MockSkillMemoriesClient {
       },
       listMemoryNamespaces: async () =>
         [...new Set(stored.map((item) => item.namespace))].sort((a, b) => a.localeCompare(b)),
+      namespaceExistsUnderPrefix: async (prefix) =>
+        stored.some((item) => item.namespace === prefix || item.namespace.startsWith(`${prefix}/`)),
     },
   };
 }

@@ -161,6 +161,32 @@ async function enqueueMemoryIntegrate(
 }
 
 /**
+ * Refuse writes into namespaces that are exactly suppressed or under a
+ * suppressed ancestor (discovery-hidden paths). Uses catalog metadata when available.
+ */
+export async function assertNamespaceWritableForAgent(
+  client: RemoteMemoriesClientAsync,
+  namespace: string,
+): Promise<void> {
+  const getMeta = client.persistence.getNamespaceMetadata;
+  if (getMeta === undefined) return;
+
+  const segments = namespace.split("/").filter((part) => part.length > 0);
+  let path = "";
+  for (const segment of segments) {
+    path = path.length === 0 ? segment : `${path}/${segment}`;
+    const row = await getMeta.call(client.persistence, path);
+    if (row?.suppressed === true) {
+      const detail =
+        path === namespace
+          ? `namespace "${namespace}" is suppressed`
+          : `namespace "${namespace}" is under suppressed ancestor "${path}"`;
+      throw new Error(`Cannot write memory: ${detail}`);
+    }
+  }
+}
+
+/**
  * Embed + merge a memory node with ontology labels/edges, then optionally
  * fire-and-forget a deepen integrate job on the written key.
  */
@@ -173,6 +199,8 @@ export async function writeMemoryNode(
   const key = input.key.trim();
   const text = input.text;
   const { embeddingModel, ontology } = options;
+
+  await assertNamespaceWritableForAgent(client, namespace);
 
   const nodeLabels =
     input.nodeLabels !== undefined && Object.keys(input.nodeLabels).length > 0
