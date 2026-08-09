@@ -61,6 +61,25 @@
       "import": "./src/integrate/memory-event.ts",
       "default": "./src/integrate/memory-event.ts"
     },
+    "./step-context": {
+      "types": "./src/agent/step-context.ts",
+      "bun": "./src/agent/step-context.ts",
+      "import": "./src/agent/step-context.ts",
+      "default": "./src/agent/step-context.ts"
+    },
+    "./run-harness-agent-step": {
+      "types": "./src/agent/run-harness-agent-step.ts",
+      "bun": "./src/agent/run-harness-agent-step.ts",
+      "import": "./src/agent/run-harness-agent-step.ts",
+      "default": "./src/agent/run-harness-agent-step.ts"
+    },
+    "./structured-output": {
+      "types": "./src/agent/structured-output.ts",
+      "bun": "./src/agent/structured-output.ts",
+      "import": "./src/agent/structured-output.ts",
+      "default": "./src/agent/structured-output.ts"
+    },
+
     "./dist": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",

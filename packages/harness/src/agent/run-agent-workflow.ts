@@ -19,15 +19,10 @@ import { collectThreadHashSnapshots } from "../network/thread-provenance.ts";
 import { buildNetworkAttribution } from "../observability/attribution-digest.ts";
 import { runWithAttributionAsync } from "../observability/network-log.ts";
 import { sourcesFromMemoryToolParts } from "./agent-memory-source.ts";
-import {
-  captureHarnessCapabilities,
-  createHarnessAgentTelemetry,
-  getAgentRegistry,
-  resolveGatewayModel,
-  resolveWorkflowAgent,
-} from "./agent-runtime.ts";
+import { resolveGatewayModel } from "./agent-runtime.ts";
 import { createAgentChatWriter } from "./chat-writer.ts";
-import { createHarnessToolkitEnv } from "./tools/_helpers/toolkit-env.ts";
+import { prepareHarnessStepRuntime } from "./prepare-harness-step.ts";
+import { formatAgentStepContext } from "./step-context.ts";
 import { formatSkillCatalog } from "./tools/skills/_helpers/skills.ts";
 import { activateSkillByName } from "./tools/skills/activate-skill.ts";
 import type { AgentWorkflowParams, AgentWorkflowResult } from "./types.ts";
@@ -212,40 +207,39 @@ export async function runAgentWorkflow(
   deps: RunAgentWorkflowDependencies = {},
 ): Promise<AgentWorkflowResult> {
   const context = await normalizeContext(params);
-  const registry = getAgentRegistry();
-  const { agent } = await resolveWorkflowAgent(registry, params.agent.id, {
-    sessionId: deps.sessionId ?? params.context.sessionId,
-  });
-  const env = await createHarnessToolkitEnv({
-    memoriesClient: deps.memoriesClient,
-    khoraClient: deps.khoraClient,
-    embeddingModel: deps.embeddingModel,
-    agentChat: deps.agentChat,
-    agentDid: params.agent.actingFor.id,
-    sessionId: deps.sessionId ?? params.context.sessionId,
-    networkDataDir: deps.networkDataDir,
-    disableToolkits: params.tools?.disableToolkits,
-    disableTools: params.tools?.disableTools,
-    ...(params.context.memoriesDatabase !== undefined
-      ? { memoriesContext: params.context.memoriesDatabase }
-      : {}),
-  });
-  const telemetry = createHarnessAgentTelemetry(params.agent.actingFor.id);
-  const { capture, aiTools, capabilities } = await captureHarnessCapabilities({
-    agent,
-    env,
-    params,
-    pipelineHooks: telemetry.pipelineHooks,
-  });
-  telemetry.linkCapture({
-    link: capture.link,
-    toolRefs: capture.toolRefs,
-    invocationContext: { runId: params.runId },
-    sessionContext: {
-      sessionId: params.context.sessionId ?? params.runId,
+  const prepared = await prepareHarnessStepRuntime({
+    stepContext: params.context.stepContext,
+    memoriesDatabase: params.context.memoriesDatabase,
+    turnInstructions: context.instructions,
+    runtime: {
+      agentId: params.agent.id,
+      agentDid: params.agent.actingFor.id,
+      runId: params.runId,
+      sessionId: deps.sessionId ?? params.context.sessionId,
       threadId: params.output.chat.threadId,
+      networkDataDir: deps.networkDataDir,
+      memoriesClient: deps.memoriesClient,
+      khoraClient: deps.khoraClient,
+      embeddingModel: deps.embeddingModel,
+      agentChat: deps.agentChat,
+      disableToolkits: params.tools?.disableToolkits,
+      disableTools: params.tools?.disableTools,
+      captureTools: true,
+      workflowParams: params,
     },
   });
+  const env = prepared.env;
+  const capture = prepared.capture;
+  const aiTools = prepared.aiTools;
+  const capabilities = prepared.capabilities;
+  if (
+    env === undefined ||
+    capture === undefined ||
+    aiTools === undefined ||
+    capabilities === undefined
+  ) {
+    throw new Error("prepareHarnessStepRuntime failed to capture chat runtime");
+  }
 
   const preActivatedSkillBodies: string[] = [];
   for (const hint of params.responsePlan?.skillHints ?? []) {
@@ -287,13 +281,17 @@ export async function runAgentWorkflow(
       const maxSteps = params.model.maxSteps ?? 8;
       const abortSignal = AbortSignal.timeout(AGENT_STEP_TIMEOUT_MS);
       const collectedToolResults: ToolResultLike[] = [];
+      // DB framing stays in the memories toolkit; system gets other facets + turn.
+      const systemContext = formatAgentStepContext(prepared.stepContext, {
+        omitDatabase: true,
+      });
       const result = runStreamText({
         model: modelId,
         system: [
           capture.instructions,
           formatSkillCatalog(env.skills),
           ...preActivatedSkillBodies,
-          ...context.instructions,
+          ...systemContext,
         ]
           .filter((part) => part.length > 0)
           .join("\n\n"),

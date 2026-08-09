@@ -22,6 +22,36 @@ export type MemoriesDatabaseContext = {
   groundingNamespaces?: string[];
 };
 
+/** One namespace catalog row projected into LLM step context. */
+export type AgentStepNamespaceEntry = {
+  namespace: string;
+  alias?: string | null;
+  description?: string;
+};
+
+/** External ingest source facet (prose only; host maps domain ids into sourceId). */
+export type AgentStepSourceContext = {
+  /** Opaque host source id (e.g. connection id) for logs/UI — not a harness domain. */
+  sourceId?: string;
+  label?: string;
+  description?: string;
+  about?: string;
+  directives?: string;
+  /** One-shot override from a pull request (ephemeral; not stored on the source). */
+  pullDirective?: string;
+};
+
+/**
+ * Projection bag for an LLM step: gather via sourcemap Stores, then format
+ * and provide identically across chat / integrate modes.
+ */
+export type AgentStepContext = {
+  database?: MemoriesDatabaseContext;
+  namespaces?: AgentStepNamespaceEntry[];
+  source?: AgentStepSourceContext;
+  turn?: { instructions?: string[] };
+};
+
 export type AgentWorkflowParams = {
   runId: string;
   agent: {
@@ -44,8 +74,13 @@ export type AgentWorkflowParams = {
     messages: AgentUIMessage[];
     instructions?: string[];
     userTimeZone?: string;
-    /** When set, memories toolkit instructions use this instead of the generic DB blurb. */
+    /**
+     * @deprecated Prefer `stepContext.database`. Mapped into stepContext when
+     * stepContext.database is unset.
+     */
     memoriesDatabase?: MemoriesDatabaseContext;
+    /** Unified gather→provide bag for this LLM run. */
+    stepContext?: AgentStepContext;
   };
   output: {
     chat: {

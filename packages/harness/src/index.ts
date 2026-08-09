@@ -21,6 +21,41 @@ export {
   installAgentChat,
   resolveAgentChatSigner,
 } from "./agent/chat-service.ts";
+export {
+  type PreparedHarnessStep,
+  type PrepareHarnessStepInput,
+  prepareHarnessStepRuntime,
+} from "./agent/prepare-harness-step.ts";
+export { runHarnessAgentStep } from "./agent/run-harness-agent-step.ts";
+export {
+  AGENT_STEP_NAMESPACE_CATALOG_CAP,
+  formatAgentStepContext,
+  resolveAgentStepContext,
+} from "./agent/step-context.ts";
+export {
+  AGENT_DATABASE_DOMAIN,
+  type AgentDatabaseEntity,
+  type AgentDatabaseEntityMap,
+  type AgentDatabaseSourceRef,
+  type AgentDatabaseStore,
+  agentDatabaseSourceRef,
+  isAgentDatabaseSourceRef,
+  isNamespaceCatalogSourceRef,
+  type MemoriesContextRefs,
+  mergeAgentStepContextFacets,
+  NAMESPACE_CATALOG_DOMAIN,
+  type NamespaceCatalogEntity,
+  type NamespaceCatalogEntityMap,
+  type NamespaceCatalogSourceRef,
+  type NamespaceCatalogStore,
+  namespaceCatalogSourceRef,
+  resolveMemoriesStepContextFacets,
+} from "./agent/step-context-sources.ts";
+export {
+  describeGenerationFailure,
+  generateStructured,
+  repairTruncatedJson,
+} from "./agent/structured-output.ts";
 export { HARNESS_TOOLKIT, type HarnessToolkitId } from "./agent/tools/ids.ts";
 export { resolveAgentsDataDir } from "./agent/tools/khora/_helpers/khora-client-factory.ts";
 export { resolveHarnessEmbeddingModel } from "./agent/tools/memories/_helpers/embedding-model.ts";
@@ -49,11 +84,19 @@ export {
   type SourceMapTextPreviewClient,
 } from "./agent/tools/memories/_helpers/source-map-content-store.ts";
 export type {
+  AgentStepContext,
+  AgentStepNamespaceEntry,
+  AgentStepSourceContext,
   AgentWorkflowParams,
   AgentWorkflowResult,
   MemoriesDatabaseContext,
 } from "./agent/types.ts";
-export { AI_STEP_MAX_RETRIES } from "./agent/workflow-resilience.ts";
+export {
+  AI_STEP_MAX_RETRIES,
+  AI_STEP_TIMEOUT_MS,
+  isAbortError,
+  rethrowAsRetryableTimeout,
+} from "./agent/workflow-resilience.ts";
 export { agentResponse } from "./agent/workflows/agent-response.ts";
 export {
   type AgentResponseDeps,

@@ -3,6 +3,10 @@
  * Durable workflow steps stay in the host; this module owns the parse/types.
  */
 
+import type { ResolvedSourceWire } from "@khoralabs/sourcemaps";
+
+import type { MemoriesContextRefs } from "../agent/step-context-sources.ts";
+import type { AgentStepContext } from "../agent/types.ts";
 import { type IntegrateMemoryWriteScope, parseIntegrateMemoryWriteScope } from "./write-scope.ts";
 
 export type { IntegrateMemoryWriteScope } from "./write-scope.ts";
@@ -45,8 +49,17 @@ export type IntegrateMemoryEvent = {
   occurredAtMs: number;
   /** Serializable, kind-specific body. */
   payload: Record<string, unknown>;
-  /** Pre-extracted plaintext when available. */
+  /** Pre-extracted plaintext when available (content only — not source prose). */
   text?: string;
+  /** Memories-domain sourcemap addresses (database / namespace catalog). */
+  memoriesContextRefs?: MemoriesContextRefs;
+  /**
+   * Opaque frozen source original (sourcemaps wire). Domain string is host-owned
+   * (e.g. host `connection`); harness does not interpret it.
+   */
+  contextSourceWire?: ResolvedSourceWire;
+  /** Preferred: host-gathered LLM projection for this ingest. */
+  stepContext?: AgentStepContext;
 };
 
 function parseOwnerKey(raw: Record<string, unknown>): string {
@@ -58,6 +71,13 @@ function parseOwnerKey(raw: Record<string, unknown>): string {
     return raw.companyId.trim();
   }
   return "";
+}
+
+function parseOptionalObject(value: unknown): Record<string, unknown> | undefined {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    return undefined;
+  }
+  return value as Record<string, unknown>;
 }
 
 export function parseIntegrateMemoryEvent(body: unknown): IntegrateMemoryEvent {
@@ -95,6 +115,13 @@ export function parseIntegrateMemoryEvent(body: unknown): IntegrateMemoryEvent {
   }
   const text =
     typeof raw.text === "string" && raw.text.trim().length > 0 ? raw.text.trim() : undefined;
+  // Accept legacy `contextRefs` as memories-only refs when present.
+  const memoriesContextRefs = (parseOptionalObject(raw.memoriesContextRefs) ??
+    parseOptionalObject(raw.contextRefs)) as MemoriesContextRefs | undefined;
+  const contextSourceWire = parseOptionalObject(raw.contextSourceWire) as
+    | ResolvedSourceWire
+    | undefined;
+  const stepContext = parseOptionalObject(raw.stepContext) as AgentStepContext | undefined;
   return {
     kind,
     ownerKey,
@@ -105,5 +132,8 @@ export function parseIntegrateMemoryEvent(body: unknown): IntegrateMemoryEvent {
     occurredAtMs,
     payload: raw.payload as Record<string, unknown>,
     ...(text !== undefined ? { text } : {}),
+    ...(memoriesContextRefs !== undefined ? { memoriesContextRefs } : {}),
+    ...(contextSourceWire !== undefined ? { contextSourceWire } : {}),
+    ...(stepContext !== undefined ? { stepContext } : {}),
   };
 }
