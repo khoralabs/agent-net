@@ -21,7 +21,7 @@ describe("runStandardHybridMemorySearch", () => {
   test("requireEmbedding throws when embeddingModel is missing", async () => {
     await expect(
       runStandardHybridMemorySearch(mockClient(), {
-        namespace: "_root_",
+        namespace: "notes",
         query: "company products",
         requireEmbedding: true,
       }),
@@ -30,7 +30,7 @@ describe("runStandardHybridMemorySearch", () => {
 
   test("requireEmbedding succeeds when embeddingModel is set", async () => {
     const hits = await runStandardHybridMemorySearch(mockClient(), {
-      namespace: "_root_",
+      namespace: "notes",
       query: "company products",
       embeddingModel: createTestEmbeddingModel(),
       requireEmbedding: true,
@@ -40,7 +40,7 @@ describe("runStandardHybridMemorySearch", () => {
 
   test("without requireEmbedding, missing model soft-falls to lexical (no throw)", async () => {
     const hits = await runStandardHybridMemorySearch(mockClient(), {
-      namespace: "_root_",
+      namespace: "notes",
       query: "company products",
     });
     expect(hits).toEqual([]);
@@ -74,7 +74,7 @@ describe("runStandardHybridMemorySearch", () => {
     } as unknown as RemoteMemoriesClientAsync;
 
     await runStandardHybridMemorySearch(client, {
-      namespace: "_root_",
+      namespace: "notes",
       query: "company products",
     });
 

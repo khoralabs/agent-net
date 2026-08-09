@@ -10,7 +10,7 @@ import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/clie
 /** Namespace subtree search — default for `searchMemories` / graph UI search. */
 export const MEMORY_SEARCH_SCOPE_SUBTREE = "pathSubtree" as const;
 
-/** Exact namespace only — used for `_root_/_skills_` catalog search. */
+/** Exact namespace only — used for `_skills_` catalog search. */
 export const MEMORY_SEARCH_SCOPE_EXACT = "exactScope" as const;
 
 export type MemorySearchScopeMode =

@@ -202,7 +202,7 @@ describe("harness memory tools", () => {
     expect(merged).toHaveLength(0);
   });
 
-  test("writeSkill stores skill frontmatter in the _root_/_skills_ namespace", async () => {
+  test("writeSkill stores skill frontmatter in the _skills_ namespace", async () => {
     const writeSkill = await toolHandler("writeSkill");
     const result = (await writeSkill(
       { env, agentId: "agent", agentName: "Agent" },
@@ -320,12 +320,12 @@ describe("harness memory tools", () => {
     await expect(
       searchMemories(
         { env: bare, agentId: "agent", agentName: "Agent" },
-        { namespace: "_root_", query: "company products" },
+        { namespace: "notes", query: "company products" },
       ),
     ).rejects.toThrow(/AI_GATEWAY_API_KEY/);
   });
 
-  test("activateSkill resolves skill content from the _root_/_skills_ namespace", async () => {
+  test("activateSkill resolves skill content from the _skills_ namespace", async () => {
     const skillBody = `---
 name: summarize-thread
 description: Summarize a chat thread

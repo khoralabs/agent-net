@@ -51,7 +51,7 @@ describe("writeScopeNeighborSearchOptions", () => {
 });
 
 describe("writeScopeNamespaceCandidates", () => {
-  const all = ["ns/a", "ns/a/child", "ns/b", "_root_"];
+  const all = ["ns/a", "ns/a/child", "ns/b", "notes"];
 
   test("exact returns seed only", () => {
     expect(writeScopeNamespaceCandidates("exact", "ns/a", all)).toEqual(["ns/a"]);
@@ -65,7 +65,7 @@ describe("writeScopeNamespaceCandidates", () => {
 
   test("cross returns all namespaces sorted", () => {
     expect(writeScopeNamespaceCandidates("cross", "ns/a", all)).toEqual([
-      "_root_",
+      "notes",
       "ns/a",
       "ns/a/child",
       "ns/b",

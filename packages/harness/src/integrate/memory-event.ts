@@ -15,12 +15,6 @@ export type { IntegrateMemoryWriteScope } from "./write-scope.ts";
 export type IntegrateMemoryEventKind = "interaction" | "document" | "memory";
 
 /**
- * Base namespace path in each agent’s own memories DB.
- * Host-specific leaves (e.g. platform sync) live under `_root_/…`.
- */
-export const MEMORIES_NAMESPACE_ROOT = "_root_";
-
-/**
  * Abstract integrate-memory event port.
  * Serializable only — no binary/document bytes (documents land in a later task).
  *
@@ -32,7 +26,7 @@ export type IntegrateMemoryEvent = {
   kind: IntegrateMemoryEventKind;
   /** Memories DB owner key (`{ kind: "account", ownerKey }`), usually the agent DID. */
   ownerKey: string;
-  /** Namespace path, e.g. `_root_` or `_root_/platform/company`. */
+  /** Namespace path (caller-owned; e.g. `notes` or `team/docs`). */
   namespace: string;
   /**
    * Write target relative to `namespace`. Omit or `exact` keeps leaf writes.

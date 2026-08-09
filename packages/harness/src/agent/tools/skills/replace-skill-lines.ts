@@ -40,7 +40,7 @@ export const replaceSkillLinesTool = tool<
     key: z
       .string()
       .min(1)
-      .describe("Skill storage key in the _root_/_skills_ namespace, or matching skill name."),
+      .describe("Skill storage key in the _skills_ namespace, or matching skill name."),
     changes: z
       .array(zLineChange)
       .min(1)

@@ -17,11 +17,11 @@ describe("formatAgentStepContext", () => {
           name: "Acme",
           about: "Company memory DB.",
           baseUnderstanding: "Sells widgets.",
-          groundingNamespaces: ["_root_/acme"],
+          groundingNamespaces: ["team/acme"],
         },
         namespaces: [
-          { namespace: "_root_", description: "Root" },
-          { namespace: "_root_/skills", alias: "Skills" },
+          { namespace: "notes", description: "Notes" },
+          { namespace: "_skills_", alias: "Skills" },
         ],
         source: {
           sourceId: "conn-1",
@@ -36,10 +36,10 @@ describe("formatAgentStepContext", () => {
       "This memory database is for: Acme.",
       "Company memory DB.",
       "Base understanding:\nSells widgets.",
-      "Also provided: durable grounding under _root_/acme — search there when needed.",
+      "Also provided: durable grounding under team/acme — search there when needed.",
       "Namespaces:",
-      "- _root_: Root",
-      "- _root_/skills (Skills)",
+      "- notes: Notes",
+      "- _skills_ (Skills)",
       "External source (CRM):",
       "Salesforce sync",
       "Ingest directives:\nPrefer account names.",
@@ -50,7 +50,7 @@ describe("formatAgentStepContext", () => {
 
   test("notes truncated namespace catalog", () => {
     const namespaces = Array.from({ length: AGENT_STEP_NAMESPACE_CATALOG_CAP + 2 }, (_, i) => ({
-      namespace: `_root_/ns-${i}`,
+      namespace: `ns-${i}`,
     }));
     const lines = formatAgentStepContext({ namespaces });
     expect(lines[0]).toBe(

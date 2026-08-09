@@ -19,10 +19,8 @@ export const searchSkillsTool = tool<
 >({
   name: "searchSkills",
   description:
-    "Search skills stored in the _root_/_skills_ memory namespace. Provide a natural-language query; results use the same hybrid fulltext+vector search as searchMemories.",
-  instructions: [
-    "Recall relevant skills from the _root_/_skills_ namespace before activating one.",
-  ],
+    "Search skills stored in the _skills_ memory namespace. Provide a natural-language query; results use the same hybrid fulltext+vector search as searchMemories.",
+  instructions: ["Recall relevant skills from the _skills_ namespace before activating one."],
   inputSchema: z.object({
     query: z.string().min(1).describe("Natural language search query over skills."),
   }),

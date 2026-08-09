@@ -151,10 +151,10 @@ describe("agent-memory-source", () => {
         "searchSkills",
         { query: "summarize" },
         {
-          namespace: "_root_/_skills_",
+          namespace: "_skills_",
           hits: [
             {
-              namespace: "_root_/_skills_",
+              namespace: "_skills_",
               memory_key: "summarize-thread",
               kind: "node",
               source_key: "text:0",
@@ -171,14 +171,14 @@ describe("agent-memory-source", () => {
           memoryIds: ["mem-skill"],
           key: "draft",
           name: "Draft",
-          namespace: "_root_/_skills_",
+          namespace: "_skills_",
         },
       ),
       toolPart(
         "resolveSkills",
         { keys: ["draft"] },
         {
-          results: [{ key: "draft", namespace: "_root_/_skills_", text: "---" }],
+          results: [{ key: "draft", namespace: "_skills_", text: "---" }],
         },
       ),
     ] as UIMessage["parts"];
@@ -189,7 +189,7 @@ describe("agent-memory-source", () => {
       sources.some(
         (s) =>
           isAgentMemorySourceRef(s.sourceRef) &&
-          s.sourceRef.namespace === "_root_/_skills_" &&
+          s.sourceRef.namespace === "_skills_" &&
           s.sourceRef.memory_key === "summarize-thread",
       ),
     ).toBe(true);

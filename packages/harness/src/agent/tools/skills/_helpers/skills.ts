@@ -6,7 +6,7 @@ import {
 } from "../../memories/_helpers/memory-search.ts";
 import { loadMemoryTextByKey } from "../../memories/_helpers/memory-text.ts";
 
-export const SKILLS_NAMESPACE = "_root_/_skills_";
+export const SKILLS_NAMESPACE = "_skills_";
 
 /** Frontmatter-stable lexical/vector query — every skill doc includes `name:`. */
 const SKILL_DISCOVERY_QUERY = "name:";
@@ -129,7 +129,7 @@ export async function loadSkillByKey(
 }
 
 /**
- * Load skill catalog from `_root_/_skills_` via hybrid search (same pipeline as searchMemories).
+ * Load skill catalog from `_skills_` via hybrid search (same pipeline as searchMemories).
  * Query targets frontmatter (`name:`) present on every skill document.
  */
 export async function discoverSkillsFromMemories(

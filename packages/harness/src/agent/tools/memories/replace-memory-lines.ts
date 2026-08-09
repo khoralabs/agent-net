@@ -65,7 +65,7 @@ export const replaceMemoryLinesTool = tool<
       try {
         upsertSkillInEnv(ctx.env.skills, skillRecordFromText(SKILLS_NAMESPACE, key, updated));
       } catch {
-        // Non-skill content in the _root_/_skills_ namespace; skip catalog refresh.
+        // Non-skill content in the _skills_ namespace; skip catalog refresh.
       }
     }
 

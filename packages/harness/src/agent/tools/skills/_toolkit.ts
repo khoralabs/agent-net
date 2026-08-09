@@ -37,7 +37,7 @@ export const skillsToolkit = dynamicToolkit<"skills", HarnessToolkitEnv>({
         {
           name: "skills-core",
           instructions: [
-            "Author, search, refine, and activate specialized skills stored in the _root_/_skills_ memory namespace.",
+            "Author, search, refine, and activate specialized skills stored in the _skills_ memory namespace.",
           ],
         },
       ),

@@ -56,8 +56,8 @@ describe("ontology-tool-schema", () => {
 
   test("memoryLinkSchema allows default edge kind and rejects two edge kinds", () => {
     const schema = memoryLinkSchema(testOntology);
-    expect(schema.parse({ namespace: "_root_/platform/contacts", key: "zach" })).toMatchObject({
-      namespace: "_root_/platform/contacts",
+    expect(schema.parse({ namespace: "team/contacts", key: "zach" })).toMatchObject({
+      namespace: "team/contacts",
       key: "zach",
     });
     expect(() =>

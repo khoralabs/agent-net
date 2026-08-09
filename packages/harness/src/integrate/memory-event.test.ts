@@ -1,13 +1,13 @@
 import { describe, expect, test } from "bun:test";
 
-import { MEMORIES_NAMESPACE_ROOT, parseIntegrateMemoryEvent } from "./memory-event.ts";
+import { parseIntegrateMemoryEvent } from "./memory-event.ts";
 
 describe("parseIntegrateMemoryEvent", () => {
   test("parses interaction with writeScope under", () => {
     const event = parseIntegrateMemoryEvent({
       kind: "interaction",
       ownerKey: "did:key:abc",
-      namespace: MEMORIES_NAMESPACE_ROOT,
+      namespace: "notes",
       writeScope: "under",
       correlationId: "c1",
       occurredAtMs: 1,
@@ -16,7 +16,7 @@ describe("parseIntegrateMemoryEvent", () => {
     });
     expect(event.kind).toBe("interaction");
     expect(event.ownerKey).toBe("did:key:abc");
-    expect(event.namespace).toBe("_root_");
+    expect(event.namespace).toBe("notes");
     expect(event.writeScope).toBe("under");
     expect(event.text).toBe("x");
   });
@@ -25,7 +25,7 @@ describe("parseIntegrateMemoryEvent", () => {
     const event = parseIntegrateMemoryEvent({
       kind: "memory",
       ownerKey: "c",
-      namespace: "_root_/notes",
+      namespace: "notes",
       memoryKey: "gia-kim",
       writeScope: "under",
       correlationId: "c1",
@@ -84,7 +84,7 @@ describe("parseIntegrateMemoryEvent", () => {
     const event = parseIntegrateMemoryEvent({
       kind: "interaction",
       companyId: "did:key:legacy",
-      namespace: "_root_",
+      namespace: "notes",
       correlationId: "e1",
       occurredAtMs: 1,
       payload: {},

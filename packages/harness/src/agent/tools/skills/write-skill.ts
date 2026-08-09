@@ -44,9 +44,9 @@ export function createWriteSkillTool(ontology: HarnessMemoriesOntology) {
   >({
     name: "writeSkill",
     description:
-      "Write or update a skill in the _root_/_skills_ namespace. Alias for an embedded memory write with skill frontmatter; enqueues the same async graph integration as writeMemory. Links may target memories outside the skills namespace.",
+      "Write or update a skill in the _skills_ namespace. Alias for an embedded memory write with skill frontmatter; enqueues the same async graph integration as writeMemory. Links may target memories outside the skills namespace.",
     instructions: [
-      "Author skills in the _root_/_skills_ namespace (alias for a structured memory write).",
+      "Author skills in the _skills_ namespace (alias for a structured memory write).",
       "Peer links need namespace + key from search hits. Set at most one edge-kind field per link.",
       "For skill refinements, prefer resolveSkills (enumerateLines: true) + replaceSkillLines.",
     ],
@@ -58,7 +58,7 @@ export function createWriteSkillTool(ontology: HarnessMemoriesOntology) {
         .string()
         .min(1)
         .optional()
-        .describe("Storage key within the _root_/_skills_ namespace. Defaults to a slug of name."),
+        .describe("Storage key within the _skills_ namespace. Defaults to a slug of name."),
       links: z
         .array(zLink)
         .optional()
