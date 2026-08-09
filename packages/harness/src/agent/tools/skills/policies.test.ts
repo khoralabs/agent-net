@@ -27,10 +27,37 @@ function mockClient(namespaces: string[]): RemoteMemoriesClientAsync {
   } as unknown as RemoteMemoriesClientAsync;
 }
 
+function mockClientWithMeta(
+  rows: Array<{ namespace: string; suppressed?: boolean }>,
+): RemoteMemoriesClientAsync {
+  return {
+    persistence: {
+      listNamespacesWithMetadata: async () =>
+        rows.map((row) => ({
+          namespace: row.namespace,
+          alias: null,
+          description: "",
+          ...(row.suppressed === true ? { suppressed: true as const } : {}),
+        })),
+    },
+  } as unknown as RemoteMemoriesClientAsync;
+}
+
 describe("hasSkillsNamespace", () => {
   test("skillsNamespaceExists is true only when _skills_ is listed", async () => {
     await expect(skillsNamespaceExists(mockClient(["notes"]))).resolves.toBe(false);
     await expect(skillsNamespaceExists(mockClient([SKILLS_NAMESPACE]))).resolves.toBe(true);
+  });
+
+  test("skillsNamespaceExists is false when _skills_ is suppressed", async () => {
+    await expect(
+      skillsNamespaceExists(
+        mockClientWithMeta([{ namespace: SKILLS_NAMESPACE, suppressed: true }]),
+      ),
+    ).resolves.toBe(false);
+    await expect(
+      skillsNamespaceExists(mockClientWithMeta([{ namespace: SKILLS_NAMESPACE }])),
+    ).resolves.toBe(true);
   });
 
   test("policy fails without memories client", async () => {
@@ -45,6 +72,17 @@ describe("hasSkillsNamespace", () => {
     expect(typed.searchSkills).toBeUndefined();
     expect(typed.writeSkill).toBeUndefined();
     expect(typed.activateSkill).toBeUndefined();
+  });
+
+  test("skills tools are hidden when _skills_ is suppressed", async () => {
+    const { tools } = await evaluateComposable(harnessToolkit, {
+      env: createEnv({
+        memoriesClient: mockClientWithMeta([{ namespace: SKILLS_NAMESPACE, suppressed: true }]),
+      }),
+    });
+    const typed = tools as Record<string, unknown>;
+    expect(typed.searchSkills).toBeUndefined();
+    expect(typed.writeSkill).toBeUndefined();
   });
 
   test("skills tools are visible when _skills_ exists", async () => {
