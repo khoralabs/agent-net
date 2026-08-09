@@ -7,6 +7,7 @@ import { getInstalledMemoriesOntology } from "../memories/_helpers/memories-onto
 import { minimalHarnessMemoriesOntology } from "../memories/_helpers/minimal-ontology.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
 import { activateSkillTool } from "./activate-skill.ts";
+import { hasSkillsNamespace } from "./policies.ts";
 import { replaceSkillLinesTool } from "./replace-skill-lines.ts";
 import { resolveSkillsTool } from "./resolve-skills.ts";
 import { searchSkillsTool } from "./search-skills.ts";
@@ -22,7 +23,7 @@ function resolveToolkitOntology() {
 
 export const skillsToolkit = dynamicToolkit<"skills", HarnessToolkitEnv>({
   name: HARNESS_TOOLKIT.skills,
-  policies: [toolkitEnabled(HARNESS_TOOLKIT.skills)],
+  policies: [toolkitEnabled(HARNESS_TOOLKIT.skills), hasSkillsNamespace],
   create: async () => {
     const writeSkillTool = createWriteSkillTool(resolveToolkitOntology());
     return [

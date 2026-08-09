@@ -40,6 +40,7 @@ type MockSkillMemoriesClient = {
   persistence: {
     findMemoryIdByKey: (namespace: string, key: string) => Promise<string | undefined>;
     getSourceMapTextPreview: (sourceMapId: string, maxChars?: number) => Promise<string | null>;
+    listMemoryNamespaces: () => Promise<string[]>;
   };
 };
 
@@ -112,6 +113,8 @@ function createMockSkillClient(stored: StoredSkill[]): MockSkillMemoriesClient {
         }
         return null;
       },
+      listMemoryNamespaces: async () =>
+        [...new Set(stored.map((item) => item.namespace))].sort((a, b) => a.localeCompare(b)),
     },
   };
 }

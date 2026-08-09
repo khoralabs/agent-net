@@ -61,7 +61,11 @@ function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEn
   };
 }
 
-function createMockMemoriesClient(merged: MergedMemory[]): MockHarnessMemoriesClient {
+function createMockMemoriesClient(
+  merged: MergedMemory[],
+  /** Catalog paths present even before any memories (skills toolkit gate). */
+  seedNamespaces: readonly string[] = [SKILLS_NAMESPACE],
+): MockHarnessMemoriesClient {
   return {
     mergeMemory: async (params) => {
       const text = params.content
@@ -123,7 +127,9 @@ function createMockMemoriesClient(merged: MergedMemory[]): MockHarnessMemoriesCl
         return null;
       },
       listMemoryNamespaces: async () =>
-        [...new Set(merged.map((item) => item.namespace))].sort((a, b) => a.localeCompare(b)),
+        [...new Set([...seedNamespaces, ...merged.map((item) => item.namespace)])].sort((a, b) =>
+          a.localeCompare(b),
+        ),
     },
   };
 }
@@ -268,6 +274,9 @@ describe("harness memory tools", () => {
   });
 
   test("listNamespaces returns distinct namespaces from the memory db", async () => {
+    env = createEnv({
+      memoriesClient: createMockMemoriesClient(merged, []) as unknown as RemoteMemoriesClientAsync,
+    });
     const writeMemory = await toolHandler("writeMemory");
     const listNamespaces = await toolHandler("listNamespaces");
 
