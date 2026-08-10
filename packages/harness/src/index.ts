@@ -74,7 +74,9 @@ export {
   resolveMemoriesSearchAsOf,
   resolveMemoriesSearchAsOfTimestampMs,
   runStandardHybridMemorySearch,
+  runStandardNamespaceSearch,
   type StandardHybridMemorySearchInput,
+  type StandardNamespaceSearchInput,
 } from "./agent/tools/memories/_helpers/memory-search.ts";
 export { writeMemoryNode } from "./agent/tools/memories/_helpers/memory-write.ts";
 export {

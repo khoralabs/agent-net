@@ -15,6 +15,7 @@ import { listNamespacesTool } from "./list-namespaces.ts";
 import { replaceMemoryLinesTool } from "./replace-memory-lines.ts";
 import { resolveMemoriesTool } from "./resolve-memories.ts";
 import { searchMemoriesTool } from "./search-memories.ts";
+import { searchNamespacesTool } from "./search-namespaces.ts";
 import { createWriteMemoryTool } from "./write-memory.ts";
 
 function resolveToolkitOntology() {
@@ -41,6 +42,7 @@ export const memoriesToolkit = dynamicToolkit<"memories", HarnessToolkitEnv>({
       toolkit(
         [
           searchMemoriesTool,
+          searchNamespacesTool,
           writeMemoryTool,
           resolveMemoriesTool,
           replaceMemoryLinesTool,

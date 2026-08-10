@@ -25,7 +25,12 @@ import {
 import { activateSkillByName } from "./skills/activate-skill.ts";
 import { emptyDisabledToolSets, type HarnessToolkitEnv } from "./types.ts";
 
-type HarnessToolName = "writeMemory" | "writeSkill" | "searchMemories" | "listNamespaces";
+type HarnessToolName =
+  | "writeMemory"
+  | "writeSkill"
+  | "searchMemories"
+  | "searchNamespaces"
+  | "listNamespaces";
 
 type MergedMemory = {
   namespace: string;
@@ -46,6 +51,12 @@ type MockHarnessMemoriesClient = {
     findMemoryIdByKey: (namespace: string, key: string) => Promise<string | undefined>;
     getSourceMapTextPreview: (sourceMapId: string, maxChars?: number) => Promise<string | null>;
     listMemoryNamespaces: () => Promise<string[]>;
+    listNamespacesWithMetadata: () => Promise<
+      Array<{ namespace: string; alias: string | null; description: string; suppressed: boolean }>
+    >;
+    getNamespaceMetadata: (
+      namespace: string,
+    ) => Promise<{ alias: string | null; description: string; suppressed: boolean } | null>;
     namespaceExistsUnderPrefix: (prefix: string) => Promise<boolean>;
   };
 };
@@ -89,13 +100,19 @@ function createMockMemoriesClient(
     },
     search: async (params) => {
       const query = "text" in params.content ? params.content.text : "";
+      const unscoped = params.searchEntireDatabase === true;
       return {
         hits: merged
-          .filter(
-            (item) =>
-              item.namespace.startsWith(params.namespace) &&
-              (item.key.includes(query) || item.text.includes(query)),
-          )
+          .filter((item) => {
+            const inScope =
+              unscoped ||
+              item.namespace === params.namespace ||
+              item.namespace.startsWith(`${params.namespace}/`) ||
+              item.namespace.startsWith(params.namespace);
+            if (!inScope) return false;
+            if (query.length === 0) return true;
+            return item.key.includes(query) || item.text.includes(query);
+          })
           .map(
             (item, index) =>
               ({
@@ -131,6 +148,20 @@ function createMockMemoriesClient(
         [...new Set([...seedNamespaces, ...merged.map((item) => item.namespace)])].sort((a, b) =>
           a.localeCompare(b),
         ),
+      listNamespacesWithMetadata: async () =>
+        [...new Set([...seedNamespaces, ...merged.map((item) => item.namespace)])]
+          .sort((a, b) => a.localeCompare(b))
+          .map((namespace) => ({
+            namespace,
+            alias: null,
+            description: "",
+            suppressed: false,
+          })),
+      getNamespaceMetadata: async () => ({
+        alias: null,
+        description: "",
+        suppressed: false,
+      }),
       namespaceExistsUnderPrefix: async (prefix) => {
         const paths = new Set([...seedNamespaces, ...merged.map((item) => item.namespace)]);
         for (const path of paths) {
@@ -338,6 +369,50 @@ describe("harness memory tools", () => {
       searchMemories(
         { env: bare, agentId: "agent", agentName: "Agent" },
         { namespace: "notes", query: "company products" },
+      ),
+    ).rejects.toThrow(/AI_GATEWAY_API_KEY/);
+  });
+
+  test("searchNamespaces returns ranked namespaces from the memory db", async () => {
+    env = createEnv({
+      memoriesClient: createMockMemoriesClient(merged, []) as unknown as RemoteMemoriesClientAsync,
+    });
+    const writeMemory = await toolHandler("writeMemory");
+    const searchNamespaces = await toolHandler("searchNamespaces");
+
+    await writeMemory(
+      { env, agentId: "agent", agentName: "Agent" },
+      { namespace: "notes", key: "plan", text: "Ship the harness." },
+    );
+    await writeMemory(
+      { env, agentId: "agent", agentName: "Agent" },
+      { namespace: "inbox", key: "todo", text: "Unrelated mail." },
+    );
+
+    const result = (await searchNamespaces(
+      { env, agentId: "agent", agentName: "Agent" },
+      { query: "harness" },
+    )) as {
+      query: string;
+      under: string | null;
+      namespaces: Array<{ namespace: string }>;
+    };
+    expect(result.query).toBe("harness");
+    expect(result.under).toBeNull();
+    expect(result.namespaces.map((n) => n.namespace)).toContain("notes");
+    expect(env.recentNamespaces.top()).toContain("notes");
+  });
+
+  test("searchNamespaces fails loud when embeddingModel is missing", async () => {
+    const searchNamespaces = await toolHandler("searchNamespaces");
+    const bare = createEnv({
+      embeddingModel: undefined,
+      memoriesClient: env.memoriesClient,
+    });
+    await expect(
+      searchNamespaces(
+        { env: bare, agentId: "agent", agentName: "Agent" },
+        { query: "company products" },
       ),
     ).rejects.toThrow(/AI_GATEWAY_API_KEY/);
   });

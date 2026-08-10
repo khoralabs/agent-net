@@ -3,7 +3,9 @@ import {
   type EmbeddingModel,
   type HybridMemorySearchNeighborsOption,
   type MemorySearchHit,
+  type NamespaceSearchResult,
   runHybridMemorySearch,
+  searchNamespaces,
 } from "@khoralabs/memories-node/helpers";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 
@@ -117,6 +119,55 @@ export async function runStandardHybridMemorySearch(
           : {}),
         arms: input.arms ?? (embeddingModel !== undefined ? undefined : { lexical: 1, vector: 0 }),
       },
+    },
+  );
+}
+
+export type StandardNamespaceSearchInput = {
+  query: string;
+  /** Optional path filter after aggregation (inclusive subtree). */
+  under?: string;
+  embeddingModel?: EmbeddingModel;
+  embeddingCache?: Map<string, number[]>;
+  limit?: number;
+  /**
+   * When true, throw if `embeddingModel` is missing instead of soft-falling
+   * back to lexical-only arms.
+   */
+  requireEmbedding?: boolean;
+};
+
+/**
+ * Namespace discovery search with shared standards:
+ * - fresh provenance head snapshot on every call
+ * - library default arms (nodes + lexical + vector when embedding is set)
+ * - unscoped when `under` is omitted
+ */
+export async function runStandardNamespaceSearch(
+  client: RemoteMemoriesClientAsync,
+  input: StandardNamespaceSearchInput,
+): Promise<NamespaceSearchResult> {
+  const embeddingModel = input.embeddingModel;
+  if (input.requireEmbedding === true && embeddingModel === undefined) {
+    throw new Error(EMBEDDING_MODEL_REQUIRED_MESSAGE);
+  }
+
+  const under = input.under?.trim();
+  const namespace = under !== undefined && under.length > 0 ? under : "";
+  const memoriesSnapshotRootHex = await resolveMemoriesHeadRootHex(client);
+
+  return searchNamespaces(
+    client,
+    {
+      namespace,
+      embeddingModel,
+      embeddingCache: input.embeddingCache,
+      ...(memoriesSnapshotRootHex !== undefined ? { memoriesSnapshotRootHex } : {}),
+    },
+    {
+      content: { text: input.query },
+      ...(under !== undefined && under.length > 0 ? { under } : {}),
+      ...(input.limit !== undefined ? { limit: input.limit } : {}),
     },
   );
 }

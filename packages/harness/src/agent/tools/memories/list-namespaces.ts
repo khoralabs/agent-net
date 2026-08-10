@@ -32,8 +32,10 @@ export const listNamespacesTool = tool<
 >({
   name: "listNamespaces",
   description:
-    "List namespaces currently present in the agent's memory database (suppressed namespaces are omitted).",
-  instructions: ["Discover namespaces currently in use before searching or writing memories."],
+    "List all namespaces currently present in the agent's memory database (suppressed namespaces are omitted). Prefer searchNamespaces when looking for namespaces by topic or keyword.",
+  instructions: [
+    "Use for a full inventory; prefer searchNamespaces for query-based discovery before searchMemories.",
+  ],
   inputSchema: z.object({}),
   policies: [hasMemoriesClient, toolEnabled("listNamespaces")],
   handler: async (ctx) => {
