@@ -1,6 +1,11 @@
 import path from "node:path";
-import type { IdentitySecret } from "@khoralabs/did-key-identity";
+import type { IdentitySecret, PersistableSigner } from "@khoralabs/did-key-identity";
 import { RelayClient } from "@khoralabs/relay/client";
+import { VellumClient } from "@khoralabs/vellum-client";
+import {
+  openVellumAttachment,
+  type VellumAttachmentHandle,
+} from "@khoralabs/vellum-client/session";
 
 import type { AgentHandle, VellumHandle } from "../agents/index.ts";
 import { AgentStore } from "../agents/index.ts";
@@ -12,7 +17,7 @@ export type VellumPairOptions = {
   relayBaseUrl: string;
   /** Directory under which agent key files are stored (ManagedAgentPool convention). */
   agentsDataDir: string;
-  /** Root dir for vellum daemon data (channel sqlite, control files). */
+  /** Root dir for vellum session data (channel sqlite, control files). */
   vellumDataDir: string;
   /** Label used to namespace each agent's vellum dir, e.g. "alice" / "bob". */
   initiatorLabel: string;
@@ -21,9 +26,39 @@ export type VellumPairOptions = {
   identitySecret?: IdentitySecret;
 };
 
+function wrapAttachmentClient(c: VellumClient, att: VellumAttachmentHandle): VellumHandle {
+  return {
+    connect: async () => "already-running",
+    disconnect: () => {
+      att.close();
+    },
+    chainCreate: (i) => c.chainCreate(i),
+    chainRelease: (s) => c.chainRelease(s),
+    sendTurn: (s, b) => c.sendTurn(s, b),
+    getChainSnapshot: () => c.getChainSnapshot(),
+    listChains: () => c.listChainsFromStore(),
+  };
+}
+
+async function resolveAgentSigner(
+  agent: AgentHandle,
+  agentsDataDir: string,
+  identitySecret: IdentitySecret | undefined,
+): Promise<PersistableSigner> {
+  // Prefer the already-unlocked in-memory signer from the pool.
+  if (agent.signer !== undefined) return agent.signer;
+  const keyPath = AgentStore.keyPath(agentsDataDir, agent.did);
+  const loaded = await loadHarnessIdentity(keyPath, identitySecret);
+  if (!loaded) throw new Error(`failed to load agent signer for ${agent.did}`);
+  return loaded;
+}
+
 /**
  * Establish a Vellum channel between two agents and open an OBP chain.
  * Returns handles so callers can send turns or assert graph state.
+ *
+ * Uses in-process attachments (`openVellumAttachment`) with unlocked signers —
+ * no daemon spawn and no plaintext session key materialization.
  *
  * In production, an agent would evaluate the peer's intent against its own
  * mandate before creating a channel or accepting a chain.
@@ -38,13 +73,9 @@ export async function openVellumChain(
   channelId: string;
   sessionId: string;
 }> {
-  const initiatorKeyPath = AgentStore.keyPath(opts.agentsDataDir, initiator.did);
-  const responderKeyPath = AgentStore.keyPath(opts.agentsDataDir, responder.did);
   const identitySecret = opts.identitySecret ?? resolveIdentitySecretFromEnv();
-
-  const initiatorSigner = await loadHarnessIdentity(initiatorKeyPath, identitySecret);
-  const responderSigner = await loadHarnessIdentity(responderKeyPath, identitySecret);
-  if (!initiatorSigner || !responderSigner) throw new Error("failed to load agent signers");
+  const initiatorSigner = await resolveAgentSigner(initiator, opts.agentsDataDir, identitySecret);
+  const responderSigner = await resolveAgentSigner(responder, opts.agentsDataDir, identitySecret);
 
   const initiatorRelay = new RelayClient({
     relayBaseUrl: opts.relayBaseUrl,
@@ -58,19 +89,50 @@ export async function openVellumChain(
   const { channelId, inviteToken } = await initiatorRelay.createChannel({});
   if (inviteToken) await responderRelay.joinChannel({ inviteToken });
 
-  const initiatorVellum = initiator.vellum(channelId, {
+  const initiatorDataDir = path.join(opts.vellumDataDir, opts.initiatorLabel);
+  const responderDataDir = path.join(opts.vellumDataDir, opts.responderLabel);
+
+  const initiatorAtt = openVellumAttachment({
     relayBaseUrl: opts.relayBaseUrl,
-    dataDir: path.join(opts.vellumDataDir, opts.initiatorLabel),
+    signer: initiatorSigner,
+    channelId,
+    cfg: { dataDir: initiatorDataDir },
   });
-  const responderVellum = responder.vellum(channelId, {
+  const responderAtt = openVellumAttachment({
     relayBaseUrl: opts.relayBaseUrl,
-    dataDir: path.join(opts.vellumDataDir, opts.responderLabel),
+    signer: responderSigner,
+    channelId,
+    cfg: { dataDir: responderDataDir },
   });
 
-  await Promise.all([initiatorVellum.connect(), responderVellum.connect()]);
+  try {
+    await Promise.all([initiatorAtt.ready, responderAtt.ready]);
+  } catch (err) {
+    initiatorAtt.close();
+    responderAtt.close();
+    throw err;
+  }
 
-  // Allow daemons to publish KeyPackages and sync the roster before chain creation.
-  await Bun.sleep(3_000);
+  const initiatorVellum = wrapAttachmentClient(
+    new VellumClient({
+      channelId,
+      relayBaseUrl: opts.relayBaseUrl,
+      dataDir: initiatorDataDir,
+      signer: initiatorSigner,
+      controlTransport: initiatorAtt.controlTransport,
+    }),
+    initiatorAtt,
+  );
+  const responderVellum = wrapAttachmentClient(
+    new VellumClient({
+      channelId,
+      relayBaseUrl: opts.relayBaseUrl,
+      dataDir: responderDataDir,
+      signer: responderSigner,
+      controlTransport: responderAtt.controlTransport,
+    }),
+    responderAtt,
+  );
 
   const chainResp = await initiatorVellum.chainCreate({ counterpartyDid: responder.did });
   if (!chainResp.ok) throw new Error("chainCreate failed");

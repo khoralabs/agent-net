@@ -112,6 +112,7 @@ export type { AgentTurnParams, AgentTurnResult, AgentUIMessage } from "./agent-t
 export { runAgentTurn } from "./agent-turn.ts";
 export {
   AgentHandle,
+  type AgentHandleOptions,
   type AgentMemoriesFraming,
   type AgentRecord,
   AgentStore,
@@ -122,6 +123,7 @@ export {
   type PoolInboxEvent,
   type PoolInboxLifecycleHandler,
   type PoolInboxOptions,
+  type VellumHandle,
 } from "./agents/index.ts";
 export {
   type AgentChatClient,
@@ -178,6 +180,11 @@ export {
 } from "./lib/memories-base-url.ts";
 export { PerAgentInviteBank } from "./lib/per-agent-invite-bank.ts";
 export { requireRelayBaseUrl } from "./lib/relay-base-url.ts";
+export {
+  disconnectVellum,
+  openVellumChain,
+  type VellumPairOptions,
+} from "./lib/vellum.ts";
 export {
   emitNetworkEvent,
   installNetworkEventsPlugin,

@@ -6,6 +6,10 @@ import type {
   VellumChainRow,
 } from "@khoralabs/vellum-client";
 import { VellumClient, type VellumClientOptions } from "@khoralabs/vellum-client";
+import {
+  openVellumAttachment,
+  type VellumAttachmentHandle,
+} from "@khoralabs/vellum-client/session";
 
 import type { AgentChatClient } from "../chat.ts";
 import type { AgentMemoriesClient } from "./memories-types.ts";
@@ -27,7 +31,7 @@ export type VellumHandle = {
     webSocketUrl?: string;
     upgradeNonce?: string;
   }): Promise<"spawned" | "already-running">;
-  /** Stop the daemon subprocess for this channel. */
+  /** Tear down the in-process channel attachment (or spawned daemon, if used). */
   disconnect(): void;
   chainCreate(input: {
     counterpartyDid: string;
@@ -91,28 +95,61 @@ export class AgentHandle {
   }
 
   /**
-   * Create a `VellumHandle` for a specific relay channel. Provides typed
-   * access to connect, chainCreate, sendTurn, and read operations.
+   * Create a `VellumHandle` for a specific relay channel.
+   * Uses an in-process attachment with this agent's unlocked signer (no daemon spawn).
+   * Call {@link VellumHandle.connect} before ops; prefer {@link openVellumChain} for pairing.
    */
   vellum(
     channelId: string,
     opts: Pick<VellumClientOptions, "relayBaseUrl" | "dataDir">,
   ): VellumHandle {
-    const clientOpts: VellumClientOptions = {
-      channelId,
-      relayBaseUrl: opts.relayBaseUrl,
-      dataDir: opts.dataDir,
-      keyPath: this.#keyPath,
+    let att: VellumAttachmentHandle | undefined;
+    let client: VellumClient | undefined;
+
+    const requireClient = (): VellumClient => {
+      if (client === undefined) {
+        throw new Error(`VellumHandle for ${this.did} is not connected; call connect() first`);
+      }
+      return client;
     };
-    const c = new VellumClient(clientOpts);
+
     return {
-      connect: (o) => c.connect(o),
-      disconnect: () => c.disconnect(),
-      chainCreate: (i) => c.chainCreate(i),
-      chainRelease: (s) => c.chainRelease(s),
-      sendTurn: (s, b) => c.sendTurn(s, b),
-      getChainSnapshot: () => c.getChainSnapshot(),
-      listChains: () => c.listChainsFromStore(),
+      connect: async (o) => {
+        if (att !== undefined && client !== undefined) return "already-running";
+        const next = openVellumAttachment({
+          relayBaseUrl: opts.relayBaseUrl,
+          signer: this.signer,
+          channelId,
+          cfg: { dataDir: opts.dataDir },
+          webSocketUrl: o?.webSocketUrl,
+          webSocketNonce: o?.upgradeNonce,
+        });
+        try {
+          await next.ready;
+        } catch (err) {
+          next.close();
+          throw err;
+        }
+        att = next;
+        client = new VellumClient({
+          channelId,
+          relayBaseUrl: opts.relayBaseUrl,
+          dataDir: opts.dataDir,
+          signer: this.signer,
+          controlTransport: next.controlTransport,
+        });
+        return "spawned";
+      },
+      disconnect: () => {
+        att?.close();
+        att = undefined;
+        client = undefined;
+      },
+      chainCreate: (i) => requireClient().chainCreate(i),
+      chainRelease: (s) => requireClient().chainRelease(s),
+      sendTurn: (s, b) => requireClient().sendTurn(s, b),
+      getChainSnapshot: () => requireClient().getChainSnapshot(),
+      listChains: () => requireClient().listChainsFromStore(),
     };
   }
 }
