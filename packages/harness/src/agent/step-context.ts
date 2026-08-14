@@ -1,10 +1,5 @@
 import { formatMemoriesContextInstructions } from "./tools/memories/_helpers/memories-context-instructions.ts";
-import type {
-  AgentStepContext,
-  AgentStepNamespaceEntry,
-  AgentStepSourceContext,
-  MemoriesDatabaseContext,
-} from "./types.ts";
+import type { AgentStepContext, AgentStepSourceContext, MemoriesDatabaseContext } from "./types.ts";
 
 export type {
   AgentStepContext,
@@ -12,29 +7,10 @@ export type {
   AgentStepSourceContext,
 } from "./types.ts";
 
-/** Max namespace rows rendered into prompts (remainder noted as truncated). */
-export const AGENT_STEP_NAMESPACE_CATALOG_CAP = 40;
-
 function nonEmpty(value: string | null | undefined): string | undefined {
   if (typeof value !== "string") return undefined;
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;
-}
-
-function formatNamespaceCatalog(entries: readonly AgentStepNamespaceEntry[] | undefined): string[] {
-  if (entries === undefined || entries.length === 0) return [];
-  const capped = entries.slice(0, AGENT_STEP_NAMESPACE_CATALOG_CAP);
-  const lines = capped.map((entry) => {
-    const alias = nonEmpty(entry.alias ?? undefined);
-    const description = nonEmpty(entry.description);
-    const label = alias !== undefined ? `${entry.namespace} (${alias})` : entry.namespace;
-    return description !== undefined ? `- ${label}: ${description}` : `- ${label}`;
-  });
-  const header =
-    entries.length > AGENT_STEP_NAMESPACE_CATALOG_CAP
-      ? `Namespaces (showing ${AGENT_STEP_NAMESPACE_CATALOG_CAP} of ${entries.length}):`
-      : "Namespaces:";
-  return [header, ...lines];
 }
 
 function formatSourceFacet(source: AgentStepSourceContext | undefined): string[] {
@@ -82,6 +58,7 @@ export type FormatAgentStepContextOptions = {
 
 /**
  * Ordered instruction blocks for an LLM step. Empty facets are omitted.
+ * Namespace catalogs are not rendered — agents discover via searchNamespaces.
  * Database facet uses the same lines as the memories toolkit when present;
  * when absent, no generic DB blurb is emitted (toolkit adds that separately).
  */
@@ -96,7 +73,6 @@ export function formatAgentStepContext(
     blocks.push(...formatMemoriesContextInstructions(context.database));
   }
 
-  blocks.push(...formatNamespaceCatalog(context.namespaces));
   blocks.push(...formatSourceFacet(context.source));
 
   for (const instruction of context.turn?.instructions ?? []) {

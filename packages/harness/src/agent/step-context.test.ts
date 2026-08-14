@@ -1,23 +1,18 @@
 import { describe, expect, test } from "bun:test";
-import {
-  AGENT_STEP_NAMESPACE_CATALOG_CAP,
-  formatAgentStepContext,
-  resolveAgentStepContext,
-} from "./step-context.ts";
+import { formatAgentStepContext, resolveAgentStepContext } from "./step-context.ts";
 
 describe("formatAgentStepContext", () => {
   test("returns empty for undefined", () => {
     expect(formatAgentStepContext(undefined)).toEqual([]);
   });
 
-  test("renders database, namespaces, source, and turn", () => {
+  test("renders database, source, and turn — not namespace catalogs", () => {
     expect(
       formatAgentStepContext({
         database: {
           name: "Acme",
           about: "Company memory DB.",
           baseUnderstanding: "Sells widgets.",
-          groundingNamespaces: ["team/acme"],
         },
         namespaces: [
           { namespace: "notes", description: "Notes" },
@@ -36,10 +31,6 @@ describe("formatAgentStepContext", () => {
       "This memory database is for: Acme.",
       "Company memory DB.",
       "Base understanding:\nSells widgets.",
-      "Also provided: durable grounding under team/acme — search there when needed.",
-      "Namespaces:",
-      "- notes: Notes",
-      "- _skills_ (Skills)",
       "External source (CRM):",
       "Salesforce sync",
       "Ingest directives:\nPrefer account names.",
@@ -48,15 +39,11 @@ describe("formatAgentStepContext", () => {
     ]);
   });
 
-  test("notes truncated namespace catalog", () => {
-    const namespaces = Array.from({ length: AGENT_STEP_NAMESPACE_CATALOG_CAP + 2 }, (_, i) => ({
+  test("ignores namespace catalog facet", () => {
+    const namespaces = Array.from({ length: 42 }, (_, i) => ({
       namespace: `ns-${i}`,
     }));
-    const lines = formatAgentStepContext({ namespaces });
-    expect(lines[0]).toBe(
-      `Namespaces (showing ${AGENT_STEP_NAMESPACE_CATALOG_CAP} of ${namespaces.length}):`,
-    );
-    expect(lines.length).toBe(AGENT_STEP_NAMESPACE_CATALOG_CAP + 1);
+    expect(formatAgentStepContext({ namespaces })).toEqual([]);
   });
 });
 

@@ -15,11 +15,6 @@ export type MemoriesDatabaseContext = {
   about: string;
   /** Optional short grounding prose the agent should treat as known. */
   baseUnderstanding?: string;
-  /**
-   * Optional namespaces where durable grounding lives.
-   * Host-derived (project, org, personal, etc.) — harness only renders them.
-   */
-  groundingNamespaces?: string[];
 };
 
 /** One namespace catalog row projected into LLM step context. */

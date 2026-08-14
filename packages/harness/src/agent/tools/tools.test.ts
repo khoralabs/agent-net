@@ -25,12 +25,7 @@ import {
 import { activateSkillByName } from "./skills/activate-skill.ts";
 import { emptyDisabledToolSets, type HarnessToolkitEnv } from "./types.ts";
 
-type HarnessToolName =
-  | "writeMemory"
-  | "writeSkill"
-  | "searchMemories"
-  | "searchNamespaces"
-  | "listNamespaces";
+type HarnessToolName = "writeMemory" | "writeSkill" | "searchMemories" | "searchNamespaces";
 
 type MergedMemory = {
   namespace: string;
@@ -312,35 +307,6 @@ describe("harness memory tools", () => {
     expect(result.hits[0]?.memory_key).toBe("plan");
   });
 
-  test("listNamespaces returns distinct namespaces from the memory db", async () => {
-    env = createEnv({
-      memoriesClient: createMockMemoriesClient(merged, []) as unknown as RemoteMemoriesClientAsync,
-    });
-    const writeMemory = await toolHandler("writeMemory");
-    const listNamespaces = await toolHandler("listNamespaces");
-
-    await writeMemory(
-      { env, agentId: "agent", agentName: "Agent" },
-      { namespace: "notes", key: "a", text: "A" },
-    );
-    await writeMemory(
-      { env, agentId: "agent", agentName: "Agent" },
-      { namespace: "inbox", key: "b", text: "B" },
-    );
-
-    const before = [...env.recentNamespaces.top()];
-    const result = (await listNamespaces({ env, agentId: "agent", agentName: "Agent" }, {})) as {
-      namespaces: Array<{
-        namespace: string;
-        alias: string | null;
-        description: string;
-      }>;
-    };
-    expect(result.namespaces.map((n) => n.namespace)).toEqual(["inbox", "notes"]);
-    expect(result.namespaces.every((n) => n.alias === null && n.description === "")).toBe(true);
-    expect(env.recentNamespaces.top()).toEqual(before);
-  });
-
   test("writeMemory and searchMemories update recentNamespaces MRU", async () => {
     const writeMemory = await toolHandler("writeMemory");
     const searchMemories = await toolHandler("searchMemories");
@@ -373,7 +339,7 @@ describe("harness memory tools", () => {
     ).rejects.toThrow(/AI_GATEWAY_API_KEY/);
   });
 
-  test("searchNamespaces returns ranked namespaces from the memory db", async () => {
+  test("searchNamespaces returns ranked namespaces with alias/description", async () => {
     env = createEnv({
       memoriesClient: createMockMemoriesClient(merged, []) as unknown as RemoteMemoriesClientAsync,
     });
@@ -395,12 +361,65 @@ describe("harness memory tools", () => {
     )) as {
       query: string;
       under: string | null;
-      namespaces: Array<{ namespace: string }>;
+      namespaces: Array<{
+        namespace: string;
+        alias: string | null;
+        description: string;
+      }>;
     };
     expect(result.query).toBe("harness");
     expect(result.under).toBeNull();
     expect(result.namespaces.map((n) => n.namespace)).toContain("notes");
+    expect(result.namespaces.every((n) => "alias" in n && "description" in n)).toBe(true);
     expect(env.recentNamespaces.top()).toContain("notes");
+  });
+
+  test("searchNamespaces contentRanking=false works without embeddingModel", async () => {
+    env = createEnv({
+      embeddingModel: undefined,
+      memoriesClient: createMockMemoriesClient(merged, []) as unknown as RemoteMemoriesClientAsync,
+    });
+    // Seed metadata-only path via mock catalog (no memories needed for lexical-only).
+    const persistence = (
+      env.memoriesClient as unknown as {
+        persistence: {
+          listNamespacesWithMetadata: () => Promise<
+            Array<{
+              namespace: string;
+              alias: string | null;
+              description: string;
+              suppressed: boolean;
+            }>
+          >;
+        };
+      }
+    ).persistence;
+    persistence.listNamespacesWithMetadata = async () => [
+      {
+        namespace: "notes",
+        alias: "Notes",
+        description: "Ship plans and harness work",
+        suppressed: false,
+      },
+      {
+        namespace: "inbox",
+        alias: null,
+        description: "Mail",
+        suppressed: false,
+      },
+    ];
+
+    const searchNamespaces = await toolHandler("searchNamespaces");
+    const result = (await searchNamespaces(
+      { env, agentId: "agent", agentName: "Agent" },
+      { query: "harness", contentRanking: false },
+    )) as {
+      namespaces: Array<{ namespace: string; alias: string | null; description: string }>;
+    };
+    expect(result.namespaces.map((n) => n.namespace)).toContain("notes");
+    const notes = result.namespaces.find((n) => n.namespace === "notes");
+    expect(notes?.alias).toBe("Notes");
+    expect(notes?.description).toContain("harness");
   });
 
   test("searchNamespaces fails loud when embeddingModel is missing", async () => {

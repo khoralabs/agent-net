@@ -26,14 +26,5 @@ export function formatMemoriesContextInstructions(
     instructions.push(`Base understanding:\n${base}`);
   }
 
-  const namespaces = (context.groundingNamespaces ?? [])
-    .map((ns) => ns.trim())
-    .filter((ns) => ns.length > 0);
-  if (namespaces.length > 0) {
-    instructions.push(
-      `Also provided: durable grounding under ${namespaces.join(", ")} — search there when needed.`,
-    );
-  }
-
   return instructions;
 }

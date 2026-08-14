@@ -11,7 +11,6 @@ import {
   formatRecentNamespacesInstruction,
   RECENT_NAMESPACES_TOP_K,
 } from "./_helpers/recent-namespaces.ts";
-import { listNamespacesTool } from "./list-namespaces.ts";
 import { replaceMemoryLinesTool } from "./replace-memory-lines.ts";
 import { resolveMemoriesTool } from "./resolve-memories.ts";
 import { searchMemoriesTool } from "./search-memories.ts";
@@ -46,7 +45,6 @@ export const memoriesToolkit = dynamicToolkit<"memories", HarnessToolkitEnv>({
           writeMemoryTool,
           resolveMemoriesTool,
           replaceMemoryLinesTool,
-          listNamespacesTool,
         ],
         {
           name: "memories-core",

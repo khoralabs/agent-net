@@ -14,10 +14,7 @@ import {
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import type { IntegrateMemoryEvent } from "../../../../integrate/memory-event.ts";
 import type { IntegrateMemoryWriteScope } from "../../../../integrate/write-scope.ts";
-import {
-  agentDatabaseSourceRef,
-  namespaceCatalogSourceRef,
-} from "../../../step-context-sources.ts";
+import { agentDatabaseSourceRef } from "../../../step-context-sources.ts";
 import { HARNESS_MEMORY_EDGE_KIND, HARNESS_MEMORY_NODE_KIND } from "./minimal-ontology.ts";
 
 /**
@@ -137,7 +134,6 @@ async function enqueueMemoryIntegrate(
     text: args.text,
     memoriesContextRefs: {
       database: agentDatabaseSourceRef(integrate.ownerKey),
-      namespaces: namespaceCatalogSourceRef(integrate.ownerKey),
     },
   };
   try {

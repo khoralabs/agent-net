@@ -28,7 +28,6 @@ export {
 } from "./agent/prepare-harness-step.ts";
 export { runHarnessAgentStep } from "./agent/run-harness-agent-step.ts";
 export {
-  AGENT_STEP_NAMESPACE_CATALOG_CAP,
   formatAgentStepContext,
   resolveAgentStepContext,
 } from "./agent/step-context.ts";
@@ -67,9 +66,12 @@ export {
 export { installMemoriesOntology } from "./agent/tools/memories/_helpers/memories-ontology-install.ts";
 export {
   EMBEDDING_MODEL_REQUIRED_MESSAGE,
+  type EnrichedNamespaceSearchHit,
+  type EnrichedNamespaceSearchResult,
   MEMORY_SEARCH_SCOPE_EXACT,
   MEMORY_SEARCH_SCOPE_SUBTREE,
   type MemorySearchScopeMode,
+  type NamespaceSearchArms,
   resolveMemoriesHeadRootHex,
   resolveMemoriesSearchAsOf,
   resolveMemoriesSearchAsOfTimestampMs,

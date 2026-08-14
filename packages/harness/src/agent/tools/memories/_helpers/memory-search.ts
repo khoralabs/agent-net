@@ -123,6 +123,22 @@ export async function runStandardHybridMemorySearch(
   );
 }
 
+export type NamespaceSearchArms = {
+  nodes?: number;
+  lexical?: number;
+  vector?: number;
+};
+
+/** Namespace hit enriched with catalog alias/description for agent prompts. */
+export type EnrichedNamespaceSearchHit = NamespaceSearchResult["namespaces"][number] & {
+  alias: string | null;
+  description: string;
+};
+
+export type EnrichedNamespaceSearchResult = Omit<NamespaceSearchResult, "namespaces"> & {
+  namespaces: EnrichedNamespaceSearchHit[];
+};
+
 export type StandardNamespaceSearchInput = {
   query: string;
   /** Optional path filter after aggregation (inclusive subtree). */
@@ -131,22 +147,59 @@ export type StandardNamespaceSearchInput = {
   embeddingCache?: Map<string, number[]>;
   limit?: number;
   /**
+   * When true (default), use library default arms (nodes + lexical + vector).
+   * When false, lexical-only catalog ranking (`arms.nodes: 0`).
+   */
+  contentRanking?: boolean;
+  /** Explicit arm weights; overrides {@link contentRanking} when set. */
+  arms?: NamespaceSearchArms;
+  /**
    * When true, throw if `embeddingModel` is missing instead of soft-falling
    * back to lexical-only arms.
    */
   requireEmbedding?: boolean;
 };
 
+async function enrichNamespaceSearchHits(
+  client: RemoteMemoriesClientAsync,
+  result: NamespaceSearchResult,
+): Promise<EnrichedNamespaceSearchResult> {
+  const withMeta = client.persistence.listNamespacesWithMetadata;
+  const metaByNs = new Map<string, { alias: string | null; description: string }>();
+  if (withMeta !== undefined) {
+    const rows = await withMeta.call(client.persistence);
+    for (const row of rows) {
+      metaByNs.set(row.namespace, {
+        alias: row.alias ?? null,
+        description: row.description ?? "",
+      });
+    }
+  }
+
+  return {
+    ...result,
+    namespaces: result.namespaces.map((hit) => {
+      const meta = metaByNs.get(hit.namespace);
+      return {
+        ...hit,
+        alias: meta?.alias ?? null,
+        description: meta?.description ?? "",
+      };
+    }),
+  };
+}
+
 /**
  * Namespace discovery search with shared standards:
  * - fresh provenance head snapshot on every call
- * - library default arms (nodes + lexical + vector when embedding is set)
+ * - content ranking by default (nodes + lexical + vector when embedding is set)
  * - unscoped when `under` is omitted
+ * - hits enriched with alias/description from namespace metadata
  */
 export async function runStandardNamespaceSearch(
   client: RemoteMemoriesClientAsync,
   input: StandardNamespaceSearchInput,
-): Promise<NamespaceSearchResult> {
+): Promise<EnrichedNamespaceSearchResult> {
   const embeddingModel = input.embeddingModel;
   if (input.requireEmbedding === true && embeddingModel === undefined) {
     throw new Error(EMBEDDING_MODEL_REQUIRED_MESSAGE);
@@ -156,7 +209,10 @@ export async function runStandardNamespaceSearch(
   const namespace = under !== undefined && under.length > 0 ? under : "";
   const memoriesSnapshotRootHex = await resolveMemoriesHeadRootHex(client);
 
-  return searchNamespaces(
+  const arms: NamespaceSearchArms | undefined =
+    input.arms ?? (input.contentRanking === false ? { nodes: 0, lexical: 1 } : undefined);
+
+  const result = await searchNamespaces(
     client,
     {
       namespace,
@@ -168,6 +224,9 @@ export async function runStandardNamespaceSearch(
       content: { text: input.query },
       ...(under !== undefined && under.length > 0 ? { under } : {}),
       ...(input.limit !== undefined ? { limit: input.limit } : {}),
+      ...(arms !== undefined ? { arms } : {}),
     },
   );
+
+  return enrichNamespaceSearchHits(client, result);
 }

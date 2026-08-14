@@ -116,7 +116,7 @@ describe("memories toolkit instruction injection", () => {
 
     const evaluated = await evaluateComposable(memoriesToolkit, { env });
     expect(evaluated.instructions).toContain("Recently used namespaces: notes, inbox");
-    expect(evaluated.tools.listNamespaces).toBeDefined();
+    expect(evaluated.tools.listNamespaces).toBeUndefined();
     expect(evaluated.tools.searchNamespaces).toBeDefined();
   });
 });

@@ -89,7 +89,7 @@ describe("agent-memory-source", () => {
           results: [{ namespace: "agent/did", key: "a", text: "x" }],
         },
       ),
-      toolPart("listNamespaces", {}, { namespaces: ["agent/did"] }),
+      toolPart("searchNamespaces", { query: "x" }, { namespaces: [] }),
       toolPart(
         "searchMemories",
         { namespace: "agent/did", query: "pending" },

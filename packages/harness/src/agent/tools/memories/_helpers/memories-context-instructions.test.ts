@@ -8,19 +8,17 @@ describe("formatMemoriesContextInstructions", () => {
     ]);
   });
 
-  test("renders name, about, base understanding, and grounding namespaces", () => {
+  test("renders name, about, and base understanding", () => {
     expect(
       formatMemoriesContextInstructions({
         name: "Alpha workspace",
         about: "This database holds notes for the alpha research workspace.",
         baseUnderstanding: "Alpha tracks open questions and experiment logs.",
-        groundingNamespaces: ["workspace/overview", "workspace/notes"],
       }),
     ).toEqual([
       "This memory database is for: Alpha workspace.",
       "This database holds notes for the alpha research workspace.",
       "Base understanding:\nAlpha tracks open questions and experiment logs.",
-      "Also provided: durable grounding under workspace/overview, workspace/notes — search there when needed.",
     ]);
   });
 });
