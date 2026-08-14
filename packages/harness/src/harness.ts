@@ -4,6 +4,7 @@ import {
   MemoriesServiceClient,
 } from "@khoralabs/memories-service/client";
 import { AgentStore, HarnessPoolInbox, ManagedAgentPool } from "./agents/index.ts";
+import type { AgentRegistry } from "./agents/store.ts";
 import { createRemoteHarnessChat, type HarnessChat } from "./chat.ts";
 import {
   createHarnessAgentApi,
@@ -72,6 +73,11 @@ export type NetworkHarnessOptions = {
    * Falls back to `HARNESS_IDENTITY_WRAP_KEY` (32-byte base64/hex).
    */
   identitySecret?: IdentitySecret;
+  /**
+   * Optional injected agent registry (e.g. host SQLite-backed store).
+   * When omitted, opens the legacy file-backed AgentStore under agentsDataDir.
+   */
+  agentRegistry?: AgentRegistry;
 };
 
 export type NetworkHarnessHandle = NetworkHarnessCore & NetworkHarnessAgentApi;
@@ -123,6 +129,7 @@ export async function startNetworkHarness(
     inviteBank,
     onMemberAdded: (handle) => poolInbox.add(handle.signer),
     onMemberRemoving: (did) => poolInbox.remove(did),
+    ...(opts.agentRegistry !== undefined ? { agentRegistry: opts.agentRegistry } : {}),
     ...(khoraAdminToken !== undefined && khoraAdminToken.length > 0
       ? {
           mintInvite: async () => {

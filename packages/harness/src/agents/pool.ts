@@ -9,7 +9,7 @@ import { KhoraClient } from "@khoralabs/khora-client";
 import { loadHarnessIdentity, saveHarnessIdentity } from "../lib/identity-wrap-key.ts";
 import type { PerAgentInviteBank } from "../lib/per-agent-invite-bank.ts";
 import { AgentHandle } from "./handle.ts";
-import { type AgentMemoriesFraming, AgentStore } from "./store.ts";
+import { type AgentMemoriesFraming, type AgentRegistry, AgentStore } from "./store.ts";
 
 export type AgentCallback = (handle: AgentHandle) => Promise<void>;
 
@@ -39,10 +39,15 @@ export type ManagedAgentPoolOptions = {
   onMemberAdded?: (handle: AgentHandle) => Promise<void>;
   /** Fired before unregistering an agent (e.g. unbind inbox multiplex). */
   onMemberRemoving?: (did: string) => Promise<void>;
+  /**
+   * Optional injected agent registry (e.g. SQLite-backed).
+   * When omitted, opens the legacy file-backed {@link AgentStore}.
+   */
+  agentRegistry?: AgentRegistry;
 };
 
 export class ManagedAgentPool {
-  readonly #store: AgentStore;
+  readonly #store: AgentRegistry;
   readonly #baseUrl: string;
   readonly #dataDir: string;
   readonly #identitySecret: IdentitySecret | undefined;
@@ -52,7 +57,7 @@ export class ManagedAgentPool {
   readonly #onMemberRemoving: ((did: string) => Promise<void>) | undefined;
 
   private constructor(
-    store: AgentStore,
+    store: AgentRegistry,
     baseUrl: string,
     dataDir: string,
     identitySecret: IdentitySecret | undefined,
@@ -76,7 +81,7 @@ export class ManagedAgentPool {
    * the shortfall is spawned before returning.
    */
   static async create(opts: ManagedAgentPoolOptions): Promise<ManagedAgentPool> {
-    const store = await AgentStore.open(opts.dataDir);
+    const store = opts.agentRegistry ?? (await AgentStore.open(opts.dataDir));
     const pool = new ManagedAgentPool(
       store,
       opts.baseUrl,

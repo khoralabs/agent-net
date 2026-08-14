@@ -11,6 +11,14 @@ export {
   isAgentMemorySourceRef,
   sourcesFromMemoryToolParts,
 } from "./agent/agent-memory-source.ts";
+export {
+  captureHarnessCapabilities,
+  configureHarnessAgentRegistry,
+  configureHarnessCapabilityTurnHook,
+  getAgentRegistry,
+  type OnCapabilityTurn,
+  resetHarnessAgentRegistryForTests,
+} from "./agent/agent-runtime.ts";
 export { HARNESS_AGENT_ID } from "./agent/agents/index.ts";
 export {
   ensureThread,
@@ -117,6 +125,7 @@ export {
   type AgentHandleOptions,
   type AgentMemoriesFraming,
   type AgentRecord,
+  type AgentRegistry,
   AgentStore,
   connectPoolInbox,
   HarnessPoolInbox,

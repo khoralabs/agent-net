@@ -1,8 +1,13 @@
 import {
+  type AgentCapabilitiesPersistence,
   type AgentRegistry,
+  type CapabilityLink,
+  type CreateAgentRegistryOptions,
   captureAgentSnapshotEnvelope,
   createAgentRegistry,
+  defaultOpContext,
   type RegisteredAgent,
+  recordTurnAttribution,
   type ToolPipelineHooks,
 } from "@khoralabs/agent-capabilities";
 import { toolMapToAiTools } from "@khoralabs/agent-capabilities-ai-sdk";
@@ -17,11 +22,54 @@ export { createHarnessAgentTelemetry };
 
 type CaptureEnvelope = Awaited<ReturnType<typeof captureAgentSnapshotEnvelope>>;
 
+/**
+ * Host hook after a turn capability capture.
+ * Neutral payload only — no host storage types (SQLite/HTTP/snapshots).
+ */
+export type OnCapabilityTurn = (info: {
+  runId: string;
+  agent: RegisteredAgent;
+  link: CapabilityLink;
+  toolRefs: Array<{ toolKey: string; toolHash: string }>;
+}) => void | Promise<void>;
+
 let agentRegistry: AgentRegistry | undefined;
+let onCapabilityTurnHook: OnCapabilityTurn | undefined;
+
+/**
+ * Configure the process-local capability agent registry before first use.
+ * Pass a host {@link AgentCapabilitiesPersistence} implementation for turn hash attribution.
+ */
+export function configureHarnessAgentRegistry(
+  options?: CreateAgentRegistryOptions & { onCapabilityTurn?: OnCapabilityTurn },
+): AgentRegistry {
+  if (options?.onCapabilityTurn !== undefined) {
+    onCapabilityTurnHook = options.onCapabilityTurn;
+  }
+  if (agentRegistry !== undefined) {
+    return agentRegistry;
+  }
+  agentRegistry = createAgentRegistry(options);
+  return agentRegistry;
+}
+
+/**
+ * Register a host callback for post-capture durability (e.g. static snapshots).
+ * Does not replace an already-configured registry.
+ */
+export function configureHarnessCapabilityTurnHook(hook: OnCapabilityTurn | undefined): void {
+  onCapabilityTurnHook = hook;
+}
 
 export function getAgentRegistry(): AgentRegistry {
   if (agentRegistry === undefined) agentRegistry = createAgentRegistry();
   return agentRegistry;
+}
+
+/** Test helper: reset the module-local registry and turn hook. */
+export function resetHarnessAgentRegistryForTests(): void {
+  agentRegistry = undefined;
+  onCapabilityTurnHook = undefined;
 }
 
 export function resolveGatewayModel(modelId: string): string {
@@ -73,11 +121,29 @@ export async function resolveWorkflowAgent(
   return registerHarnessAgent(registry);
 }
 
+async function persistHarnessTurnLink(input: {
+  persistence: AgentCapabilitiesPersistence;
+  capture: CaptureEnvelope;
+  /** Session key: harness/workflow runId. */
+  sessionId: string;
+}): Promise<void> {
+  await recordTurnAttribution(input.persistence, {
+    op: defaultOpContext(),
+    sessionId: input.sessionId,
+    link: input.capture.link,
+    // Intentionally omit full affordance envelopes (PII / large tool context).
+  });
+}
+
 export async function captureHarnessCapabilities(input: {
   agent: RegisteredAgent;
   env: HarnessToolkitEnv;
   params: AgentWorkflowParams;
   pipelineHooks?: ToolPipelineHooks;
+  /** Defaults to {@link getAgentRegistry}.persistence */
+  capabilitiesPersistence?: AgentCapabilitiesPersistence;
+  /** Host durability hook (e.g. static agent snapshots). Defaults to process hook. */
+  onCapabilityTurn?: OnCapabilityTurn;
 }): Promise<{
   capture: CaptureEnvelope;
   aiTools: ToolSet;
@@ -104,6 +170,44 @@ export async function captureHarnessCapabilities(input: {
     },
   });
 
+  const toolRefs = capture.toolRefs.map(
+    (toolRef: { toolKey?: string; key?: string; toolHash: string }) => ({
+      toolKey: toolRef.toolKey ?? toolRef.key ?? "unknown",
+      toolHash: toolRef.toolHash,
+    }),
+  );
+
+  const persistence = input.capabilitiesPersistence ?? getAgentRegistry().persistence;
+  try {
+    await persistHarnessTurnLink({
+      persistence,
+      capture,
+      sessionId: input.params.runId,
+    });
+  } catch (err) {
+    console.warn(
+      `harness: failed to persist capability turn attribution: ${
+        err instanceof Error ? err.message : String(err)
+      }`,
+    );
+  }
+
+  const onTurn = input.onCapabilityTurn ?? onCapabilityTurnHook;
+  if (onTurn !== undefined) {
+    try {
+      await onTurn({
+        runId: input.params.runId,
+        agent: input.agent,
+        link: capture.link,
+        toolRefs,
+      });
+    } catch (err) {
+      console.warn(
+        `harness: onCapabilityTurn failed: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
   const aiTools = toolMapToAiTools(capture.evaluatedTools, {
     env: input.env,
     resolvedPolicies: new Map(),
@@ -117,12 +221,7 @@ export async function captureHarnessCapabilities(input: {
       staticHash: capture.link.staticHash,
       runtimeHash: capture.link.runtimeHash,
       invocationHash: capture.link.invocationHash,
-      toolRefs: capture.toolRefs.map(
-        (toolRef: { toolKey?: string; key?: string; toolHash: string }) => ({
-          toolKey: toolRef.toolKey ?? toolRef.key ?? "unknown",
-          toolHash: toolRef.toolHash,
-        }),
-      ),
+      toolRefs,
     },
   };
 }

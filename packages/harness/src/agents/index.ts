@@ -12,5 +12,9 @@ export type {
   PoolInboxOptions,
 } from "./pool-inbox.ts";
 export { connectPoolInbox, HarnessPoolInbox } from "./pool-inbox.ts";
-export type { AgentMemoriesFraming, AgentRecord } from "./store.ts";
-export { AgentStore } from "./store.ts";
+export {
+  type AgentMemoriesFraming,
+  type AgentRecord,
+  type AgentRegistry,
+  AgentStore,
+} from "./store.ts";

@@ -1,13 +1,14 @@
+import type { AgentCapabilitiesPersistence } from "@khoralabs/agent-capabilities";
 import type { KhoraClient } from "@khoralabs/khora-client";
 import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import type { ToolSet } from "ai";
-
 import type { AgentChatClient } from "../chat.ts";
 import {
   captureHarnessCapabilities,
   createHarnessAgentTelemetry,
   getAgentRegistry,
+  type OnCapabilityTurn,
   resolveWorkflowAgent,
 } from "./agent-runtime.ts";
 import { formatAgentStepContext, resolveAgentStepContext } from "./step-context.ts";
@@ -39,6 +40,10 @@ export type PrepareHarnessStepInput = {
     captureTools?: boolean;
     /** Full workflow params required when captureTools is true. */
     workflowParams?: AgentWorkflowParams;
+    /** Override process-local registry persistence for turn link attribution. */
+    capabilitiesPersistence?: AgentCapabilitiesPersistence;
+    /** Host durability hook after capture (e.g. static snapshots). */
+    onCapabilityTurn?: OnCapabilityTurn;
   };
 };
 
@@ -98,6 +103,12 @@ export async function prepareHarnessStepRuntime(
     env,
     params: runtime.workflowParams,
     pipelineHooks: telemetry.pipelineHooks,
+    ...(runtime.capabilitiesPersistence !== undefined
+      ? { capabilitiesPersistence: runtime.capabilitiesPersistence }
+      : {}),
+    ...(runtime.onCapabilityTurn !== undefined
+      ? { onCapabilityTurn: runtime.onCapabilityTurn }
+      : {}),
   });
   telemetry.linkCapture({
     link: capture.link,

@@ -21,6 +21,18 @@ export type AgentRecord = {
   memoriesFraming?: AgentMemoriesFraming;
 };
 
+/** Persistence-agnostic agent registry contract. */
+export type AgentRegistry = {
+  all(): readonly AgentRecord[];
+  get(did: string): AgentRecord | undefined;
+  getByExternalId(externalId: string): AgentRecord | undefined;
+  add(record: AgentRecord): Promise<void>;
+  setExternalId(did: string, externalId: string): Promise<void>;
+  clearExternalId(did: string): Promise<void>;
+  setMemoriesFraming(did: string, framing: AgentMemoriesFraming | undefined): Promise<void>;
+  remove(did: string): Promise<void>;
+};
+
 type StoreFile = {
   agents: AgentRecord[];
 };
@@ -68,7 +80,7 @@ function normalizeRecord(raw: AgentRecord & { platformCompanyId?: string }): Age
   };
 }
 
-export class AgentStore {
+export class AgentStore implements AgentRegistry {
   readonly #filePath: string;
   #agents: AgentRecord[];
 
