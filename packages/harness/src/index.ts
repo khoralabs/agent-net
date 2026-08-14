@@ -180,6 +180,11 @@ export {
   requireMemoriesAdminToken,
   requireMemoriesBaseUrl,
 } from "./lib/memories-base-url.ts";
+export {
+  type LoadNbcChainGraphInput,
+  loadNbcChainGraph,
+  type NbcChainGraph,
+} from "./lib/nbc-chain-graph.ts";
 export { PerAgentInviteBank } from "./lib/per-agent-invite-bank.ts";
 export { requireRelayBaseUrl } from "./lib/relay-base-url.ts";
 export {
@@ -187,6 +192,11 @@ export {
   openVellumChain,
   type VellumPairOptions,
 } from "./lib/vellum.ts";
+export {
+  createVellumChainSessionRegistry,
+  type VellumChainLiveSession,
+  type VellumChainSessionRegistry,
+} from "./lib/vellum-sessions.ts";
 export {
   emitNetworkEvent,
   installNetworkEventsPlugin,
