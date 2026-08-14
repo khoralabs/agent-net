@@ -16,34 +16,9 @@ function nonEmpty(value: string | null | undefined): string | undefined {
 function formatSourceFacet(source: AgentStepSourceContext | undefined): string[] {
   if (source === undefined) return [];
   const parts: string[] = [];
-  const label = nonEmpty(source.label);
-  const description = nonEmpty(source.description);
-  const about = nonEmpty(source.about);
-  const directives = nonEmpty(source.directives);
-  const pullDirective = nonEmpty(source.pullDirective);
-  if (
-    label === undefined &&
-    description === undefined &&
-    about === undefined &&
-    directives === undefined &&
-    pullDirective === undefined
-  ) {
-    return [];
-  }
-  const title =
-    label !== undefined
-      ? `External source (${label}):`
-      : source.sourceId !== undefined && source.sourceId.trim().length > 0
-        ? `External source (${source.sourceId.trim()}):`
-        : "External source:";
-  parts.push(title);
-  if (description !== undefined) parts.push(description);
-  if (about !== undefined) parts.push(about);
-  if (directives !== undefined) {
-    parts.push(`Ingest directives:\n${directives}`);
-  }
-  if (pullDirective !== undefined) {
-    parts.push(`Pull directive:\n${pullDirective}`);
+  for (const line of source.instructions ?? []) {
+    const trimmed = nonEmpty(line);
+    if (trimmed !== undefined) parts.push(trimmed);
   }
   return parts;
 }

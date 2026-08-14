@@ -24,16 +24,15 @@ export type AgentStepNamespaceEntry = {
   description?: string;
 };
 
-/** External ingest source facet (prose only; host maps domain ids into sourceId). */
+/**
+ * External source facet for an LLM step.
+ * Hosts format prose into `instructions`; harness only concatenates.
+ */
 export type AgentStepSourceContext = {
   /** Opaque host source id (e.g. connection id) for logs/UI — not a harness domain. */
   sourceId?: string;
-  label?: string;
-  description?: string;
-  about?: string;
-  directives?: string;
-  /** One-shot override from a pull request (ephemeral; not stored on the source). */
-  pullDirective?: string;
+  /** Host-preformatted instruction blocks (already labeled). */
+  instructions?: string[];
 };
 
 /**

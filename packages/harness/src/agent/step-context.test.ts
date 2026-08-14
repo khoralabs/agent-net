@@ -20,10 +20,12 @@ describe("formatAgentStepContext", () => {
         ],
         source: {
           sourceId: "conn-1",
-          label: "CRM",
-          about: "Salesforce sync",
-          directives: "Prefer account names.",
-          pullDirective: "Focus on open deals.",
+          instructions: [
+            "External source (CRM):",
+            "Salesforce sync",
+            "Ingest instructions:\nPrefer account names.",
+            "Pull instructions:\nFocus on open deals.",
+          ],
         },
         turn: { instructions: ["Respond concisely."] },
       }),
@@ -33,8 +35,8 @@ describe("formatAgentStepContext", () => {
       "Base understanding:\nSells widgets.",
       "External source (CRM):",
       "Salesforce sync",
-      "Ingest directives:\nPrefer account names.",
-      "Pull directive:\nFocus on open deals.",
+      "Ingest instructions:\nPrefer account names.",
+      "Pull instructions:\nFocus on open deals.",
       "Respond concisely.",
     ]);
   });
