@@ -131,6 +131,8 @@ async function enqueueMemoryIntegrate(
     correlationId,
     occurredAtMs: Date.now(),
     payload: { source: integrate.source ?? "writeMemory" },
+    features: { lexical: [args.text], vector: [] },
+    instructions: "",
     text: args.text,
     memoriesContextRefs: {
       database: agentDatabaseSourceRef(integrate.ownerKey),

@@ -1,6 +1,9 @@
 /**
  * Serializable integrate-memory event wire format.
  * Durable workflow steps stay in the host; this module owns the parse/types.
+ *
+ * Canonical content is always `features` + `instructions`. Producers (UI text,
+ * process-document, deepen) adapt into this shape at the edge.
  */
 
 import type { ResolvedSourceWire } from "@khoralabs/sourcemaps";
@@ -11,16 +14,25 @@ import { type IntegrateMemoryWriteScope, parseIntegrateMemoryWriteScope } from "
 
 export type { IntegrateMemoryWriteScope } from "./write-scope.ts";
 
-/** Serializable event kinds. `document` is reserved for a future task. */
+/**
+ * Provenance / adapter prompt kind. Content always comes from `features` +
+ * `instructions` — kinds are not a plaintext loading path.
+ */
 export type IntegrateMemoryEventKind = "interaction" | "document" | "memory";
 
+/** Lexical + vector features for the primary memory content. */
+export type IntegrateMemoryFeatures = {
+  lexical: string[];
+  vector: number[][];
+  /** Model id used to produce vectors (optional provenance). */
+  embeddingModel?: string;
+};
+
 /**
- * Abstract integrate-memory event port.
- * Serializable only — no binary/document bytes (documents land in a later task).
+ * Feature-centric integrate-memory event.
  *
- * - `interaction` / `document`: domain-event ingest (expand → extract → merge).
- * - `memory`: deepen an existing node at `namespace`/`memoryKey` (skip expand;
- *   extract + merge; caller-owned `writeScope`).
+ * - Domain ingest (`interaction` / `document`): expand → extract → merge.
+ * - Deepen (`memory`): skip expand; extract + merge onto `memoryKey`.
  */
 export type IntegrateMemoryEvent = {
   kind: IntegrateMemoryEventKind;
@@ -31,7 +43,6 @@ export type IntegrateMemoryEvent = {
   /**
    * Write target relative to `namespace`. Omit or `exact` keeps leaf writes.
    * `under` lets the workflow choose a child. `cross` allows any namespace in the DB.
-   * Always caller-owned for every kind (including `memory`).
    */
   writeScope?: IntegrateMemoryWriteScope;
   /**
@@ -41,9 +52,16 @@ export type IntegrateMemoryEvent = {
   /** Idempotency / provenance correlation id. */
   correlationId: string;
   occurredAtMs: number;
-  /** Serializable, kind-specific body. */
+  /** Serializable provenance / source metadata. */
   payload: Record<string, unknown>;
-  /** Pre-extracted plaintext when available (content only — not source prose). */
+  /** Required primary content features (producers embed before enqueue). */
+  features: IntegrateMemoryFeatures;
+  /** Guidance for expand/extract (not the sole stored content). */
+  instructions: string;
+  /**
+   * @deprecated Prefer `features.lexical` / `instructions`. Accepted on parse
+   * for in-flight events; ignored when `features` is present.
+   */
   text?: string;
   /** Memories-domain sourcemap addresses (database / namespace catalog). */
   memoriesContextRefs?: MemoriesContextRefs;
@@ -72,6 +90,60 @@ function parseOptionalObject(value: unknown): Record<string, unknown> | undefine
     return undefined;
   }
   return value as Record<string, unknown>;
+}
+
+function parseFeatures(raw: unknown, legacyText?: string): IntegrateMemoryFeatures {
+  if (raw !== null && typeof raw === "object" && !Array.isArray(raw)) {
+    const f = raw as Record<string, unknown>;
+    const lexical = Array.isArray(f.lexical)
+      ? f.lexical.filter((x): x is string => typeof x === "string")
+      : [];
+    const vector: number[][] = [];
+    if (Array.isArray(f.vector)) {
+      for (const row of f.vector) {
+        if (!Array.isArray(row)) {
+          throw new Error("features.vector rows must be arrays");
+        }
+        const nums: number[] = [];
+        for (const n of row) {
+          if (typeof n !== "number" || !Number.isFinite(n)) {
+            throw new Error("features.vector must contain finite numbers");
+          }
+          nums.push(n);
+        }
+        if (nums.length === 0) {
+          throw new Error("features.vector rows must be non-empty");
+        }
+        vector.push(nums);
+      }
+    }
+    if (lexical.length === 0 && vector.length === 0) {
+      throw new Error("features must include at least one lexical or vector row");
+    }
+    const embeddingModel =
+      typeof f.embeddingModel === "string" && f.embeddingModel.trim().length > 0
+        ? f.embeddingModel.trim()
+        : undefined;
+    return {
+      lexical,
+      vector,
+      ...(embeddingModel !== undefined ? { embeddingModel } : {}),
+    };
+  }
+
+  // Legacy: text-only events (pre-features). Vector empty — caller/workflow embeds.
+  if (legacyText !== undefined && legacyText.trim().length > 0) {
+    return { lexical: [legacyText.trim()], vector: [] };
+  }
+
+  throw new Error("features is required");
+}
+
+export function joinIntegrateLexical(features: IntegrateMemoryFeatures): string {
+  return features.lexical
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+    .join("\n\n");
 }
 
 export function parseIntegrateMemoryEvent(body: unknown): IntegrateMemoryEvent {
@@ -107,8 +179,10 @@ export function parseIntegrateMemoryEvent(body: unknown): IntegrateMemoryEvent {
   if (kind === "memory" && memoryKeyRaw.length === 0) {
     throw new Error('memoryKey is required when kind is "memory"');
   }
-  const text =
+  const legacyText =
     typeof raw.text === "string" && raw.text.trim().length > 0 ? raw.text.trim() : undefined;
+  const features = parseFeatures(raw.features, legacyText);
+  const instructions = typeof raw.instructions === "string" ? raw.instructions.trim() : "";
   // Accept legacy `contextRefs` as memories-only refs when present.
   const memoriesContextRefs = (parseOptionalObject(raw.memoriesContextRefs) ??
     parseOptionalObject(raw.contextRefs)) as MemoriesContextRefs | undefined;
@@ -125,7 +199,9 @@ export function parseIntegrateMemoryEvent(body: unknown): IntegrateMemoryEvent {
     correlationId,
     occurredAtMs,
     payload: raw.payload as Record<string, unknown>,
-    ...(text !== undefined ? { text } : {}),
+    features,
+    instructions,
+    ...(legacyText !== undefined ? { text: legacyText } : {}),
     ...(memoriesContextRefs !== undefined ? { memoriesContextRefs } : {}),
     ...(contextSourceWire !== undefined ? { contextSourceWire } : {}),
     ...(stepContext !== undefined ? { stepContext } : {}),
