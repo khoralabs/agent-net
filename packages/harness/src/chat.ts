@@ -37,6 +37,8 @@ export type SendAgentMessageInput = {
   text: string;
   messageId?: string;
   role?: UIMessage["role"];
+  /** Host-defined UIMessage.metadata (e.g. documents, sources). */
+  metadata?: JsonObject;
 };
 
 export type AgentChatClient = {
@@ -83,8 +85,18 @@ function agentScope(did: string): ScopeRef {
   return { type: "agent", id: did };
 }
 
-function textMessage(id: string, role: UIMessage["role"], text: string): UIMessage {
-  return { id, role, parts: [{ type: "text", text }] };
+function textMessage(
+  id: string,
+  role: UIMessage["role"],
+  text: string,
+  metadata?: JsonObject,
+): UIMessage {
+  return {
+    id,
+    role,
+    parts: [{ type: "text", text }],
+    ...(metadata !== undefined ? { metadata } : {}),
+  };
 }
 
 export function prepareAppendForSigningFromTip(
@@ -220,6 +232,7 @@ function createScopedChatClient(
           input.messageId ?? crypto.randomUUID(),
           input.role ?? "user",
           input.text,
+          input.metadata,
         );
         const appendInput = { threadId, author: scope, message };
         const tip = await client.getThreadTip(threadId);

@@ -109,4 +109,21 @@ describe("harness chat", () => {
     expect(aliceThreads.items.some((t) => t.id === aliceThread.id)).toBe(true);
     expect(aliceThreads.items.every((t) => t.id !== "missing")).toBe(true);
   });
+
+  test("sendMessage persists metadata.documents", async () => {
+    const aliceDid = await agentDid();
+    const alice = chat.forAgent(aliceDid);
+    const thread = await alice.createThread({ metadata: { title: "docs" } });
+    await alice.sendMessage(thread.id, {
+      text: "Attached document(s).",
+      metadata: {
+        documents: [{ id: "doc-1", fileName: "note.txt", mediaType: "text/plain" }],
+      },
+    });
+    const posts = await alice.listPosts(thread.id);
+    expect(posts.items).toHaveLength(1);
+    expect(posts.items[0]?.metadata).toEqual({
+      documents: [{ id: "doc-1", fileName: "note.txt", mediaType: "text/plain" }],
+    });
+  });
 });
