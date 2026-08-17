@@ -15,6 +15,10 @@ import type { ToolSet } from "ai";
 import { getNetworkSession } from "../network/session-registry.ts";
 import { createHarnessAgentTelemetry } from "../observability/harness-observability.ts";
 import { defineHarnessAgent } from "./agents/index.ts";
+import {
+  defineNegotiationAgent,
+  NETWORK_NEGOTIATION_AGENT_ID,
+} from "./agents/network-negotiation-agent.ts";
 import type { HarnessToolkitEnv } from "./tools/types.ts";
 import type { AgentWorkflowParams } from "./types.ts";
 
@@ -94,6 +98,21 @@ export async function registerHarnessAgent(
   return defined;
 }
 
+export async function registerNegotiationAgent(
+  registry: AgentRegistry,
+): Promise<{ staticHash: string; agent: RegisteredAgent }> {
+  const defined = await defineNegotiationAgent();
+  if (registry.has(defined.agent.agentId)) {
+    const entry = registry.get(defined.agent.agentId);
+    if (entry === undefined) {
+      throw new Error(`registry inconsistency for ${defined.agent.agentId}`);
+    }
+    return { staticHash: entry.agent.staticHash, agent: entry.agent };
+  }
+  await registry.register(defined.agent);
+  return defined;
+}
+
 export async function resolveWorkflowAgent(
   registry: AgentRegistry,
   agentId: string,
@@ -118,6 +137,10 @@ export async function resolveWorkflowAgent(
     }
   }
 
+  if (agentId === NETWORK_NEGOTIATION_AGENT_ID) {
+    return registerNegotiationAgent(registry);
+  }
+
   return registerHarnessAgent(registry);
 }
 
@@ -133,6 +156,18 @@ async function persistHarnessTurnLink(input: {
     link: input.capture.link,
     // Intentionally omit full affordance envelopes (PII / large tool context).
   });
+}
+
+function harnessSessionContext(params: AgentWorkflowParams): Record<string, unknown> {
+  const chainId = params.context.chainId?.trim();
+  const asDid = params.context.asDid?.trim();
+  const threadId = params.output?.chat?.threadId?.trim() || params.context.threadId?.trim();
+  return {
+    sessionId: params.context.sessionId ?? params.runId,
+    ...(threadId !== undefined && threadId.length > 0 ? { threadId } : {}),
+    ...(chainId !== undefined && chainId.length > 0 ? { chainId } : {}),
+    ...(asDid !== undefined && asDid.length > 0 ? { asDid } : {}),
+  };
 }
 
 export async function captureHarnessCapabilities(input: {
@@ -164,10 +199,7 @@ export async function captureHarnessCapabilities(input: {
       pipelineHooks: input.pipelineHooks,
     },
     invocationContext: { runId: input.params.runId },
-    sessionContext: {
-      sessionId: input.params.context.sessionId ?? input.params.runId,
-      threadId: input.params.output.chat.threadId,
-    },
+    sessionContext: harnessSessionContext(input.params),
   });
 
   const toolRefs = capture.toolRefs.map(

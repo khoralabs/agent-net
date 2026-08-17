@@ -1,0 +1,167 @@
+import { afterEach, describe, expect, test } from "bun:test";
+import type { NbcChainGraph } from "../../lib/nbc-chain-graph.ts";
+import type { NbcLoopChain } from "./loop-host.ts";
+import { createNbcWakeDispatcher, resetNbcWakeDispatcherForTests } from "./nbc-wake-dispatcher.ts";
+
+function emptyGraph(): NbcChainGraph {
+  return {
+    parties: [],
+    offers: [],
+    ports: [],
+    extends: [],
+    exposes: [],
+    binds: [],
+  };
+}
+
+function loopChain(patch: Partial<NbcLoopChain> & Pick<NbcLoopChain, "channelId">): NbcLoopChain {
+  return {
+    status: "open",
+    initiatorDid: "did:key:alice",
+    counterpartyDid: "did:key:bob",
+    turnsCompleted: 0,
+    maxTurns: 6,
+    ...patch,
+  };
+}
+
+afterEach(() => {
+  resetNbcWakeDispatcherForTests();
+});
+
+describe("nbc wake dispatcher", () => {
+  test("wakes only the local whoShouldAct DID and ignores extra opened/snapshot seqs", async () => {
+    const chain = loopChain({ channelId: "ch-1" });
+    let runId = "";
+    const starts: string[] = [];
+    const graphs = new Map<string, NbcChainGraph>([
+      ["did:key:alice", emptyGraph()],
+      ["did:key:bob", emptyGraph()],
+    ]);
+    const onChanged = createNbcWakeDispatcher({
+      sessions: {
+        get: () => ({
+          chainId: "c1",
+          channelId: "ch-1",
+          initiatorDid: "did:key:alice",
+          counterpartyDid: "did:key:bob",
+        }),
+        dataDirForDid: (_chainId: string, did: string) => `/tmp/${did}`,
+      } as never,
+      host: {
+        getChain: (id) => (id === "c1" ? chain : null),
+        onStatus: (_id, patch) => {
+          if (patch.runId !== undefined) runId = patch.runId;
+        },
+        localDids: () => ["did:key:alice", "did:key:bob"],
+        startTurn: async (input) => {
+          starts.push(input.asDid);
+          return { runId: `run-${input.asDid}` };
+        },
+      },
+      loadGraph: async ({ dataDir }) => {
+        const did = dataDir.replace("/tmp/", "");
+        return graphs.get(did) ?? emptyGraph();
+      },
+    });
+
+    await onChanged({ chainId: "c1", turnSeq: 0, cause: "opened" });
+    await onChanged({ chainId: "c1", turnSeq: 0, cause: "opened" });
+    await onChanged({ chainId: "c1", turnSeq: 1, cause: "snapshot" });
+
+    expect(starts).toEqual(["did:key:alice"]);
+    expect(runId).toBe("run-did:key:alice");
+  });
+
+  test("non-local actor records waiting-peer and starts nothing", async () => {
+    let status: string | undefined;
+    const chain = loopChain({ channelId: "ch-1", turnsCompleted: 1 });
+    const aliceGraph: NbcChainGraph = {
+      ...emptyGraph(),
+      offers: [
+        {
+          id: "o1",
+          type: "service.slot",
+          expires_turn: 10,
+          expires_at_ms: 0,
+          partyId: "did:key:alice",
+        },
+      ],
+    };
+    const starts: string[] = [];
+    const onChanged = createNbcWakeDispatcher({
+      sessions: {
+        get: () => ({
+          chainId: "c2",
+          channelId: "ch-1",
+          initiatorDid: "did:key:alice",
+          counterpartyDid: "did:key:bob",
+        }),
+        dataDirForDid: () => "/tmp/did:key:alice",
+      } as never,
+      host: {
+        getChain: (id) => (id === "c2" ? chain : null),
+        onStatus: (_id, patch) => {
+          status = patch.status;
+        },
+        localDids: () => ["did:key:alice"],
+        startTurn: async (input) => {
+          starts.push(input.asDid);
+          return { runId: "run" };
+        },
+      },
+      loadGraph: async () => aliceGraph,
+    });
+
+    await onChanged({ chainId: "c2", turnSeq: 1, cause: "turn" });
+    expect(starts).toEqual([]);
+    expect(status).toBe("waiting-peer");
+  });
+
+  test("passes initiator brief only when waking the initiator", async () => {
+    const chain = loopChain({
+      channelId: "ch-1",
+      objective: "secret goal",
+      constraints: "do not leak",
+    });
+    const bodies: Array<{
+      asDid: string;
+      objective?: string;
+      constraints?: string;
+    }> = [];
+    const onChanged = createNbcWakeDispatcher({
+      sessions: {
+        get: () => ({
+          chainId: "c3",
+          channelId: "ch-1",
+          initiatorDid: "did:key:alice",
+          counterpartyDid: "did:key:bob",
+        }),
+        dataDirForDid: () => "/tmp/did:key:alice",
+      } as never,
+      host: {
+        getChain: (id) => (id === "c3" ? chain : null),
+        onStatus: () => undefined,
+        localDids: () => ["did:key:alice"],
+        startTurn: async (input) => {
+          bodies.push({
+            asDid: input.asDid,
+            ...(input.objective !== undefined ? { objective: input.objective } : {}),
+            ...(input.constraints !== undefined ? { constraints: input.constraints } : {}),
+          });
+          return { runId: "run" };
+        },
+      },
+      loadGraph: async () => emptyGraph(),
+    });
+
+    await onChanged({ chainId: "c3", turnSeq: 0, cause: "opened" });
+    expect(bodies).toEqual([
+      {
+        asDid: "did:key:alice",
+        objective: "secret goal",
+        constraints: "do not leak",
+      },
+    ]);
+  });
+});

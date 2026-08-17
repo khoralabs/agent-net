@@ -30,6 +30,7 @@ export async function createHarnessToolkitEnv(input: {
   disableTools?: readonly string[];
   integrateMemories?: HarnessToolkitEnv["integrateMemories"];
   memoriesContext?: HarnessToolkitEnv["memoriesContext"];
+  nbc?: HarnessToolkitEnv["nbc"];
 }): Promise<HarnessToolkitEnv> {
   const agentDid = input.agentDid?.trim() || input.agentChat?.did;
   const recentNamespaces = await resolveRecentNamespacesTracker({
@@ -55,6 +56,7 @@ export async function createHarnessToolkitEnv(input: {
     disabledTools: new Set(input.disableTools ?? []),
     ...(integrateMemories !== undefined ? { integrateMemories } : {}),
     ...(input.memoriesContext !== undefined ? { memoriesContext: input.memoriesContext } : {}),
+    ...(input.nbc !== undefined ? { nbc: input.nbc } : {}),
   };
 
   if (input.memoriesClient === undefined) return env;

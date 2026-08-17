@@ -4,9 +4,21 @@ import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/clie
 
 import type { AgentChatClient } from "../../chat.ts";
 import type { IntegrateMemoryWriteScope } from "../../integrate/write-scope.ts";
+import type { NbcChainGraph } from "../../lib/nbc-chain-graph.ts";
 import type { MemoriesDatabaseContext } from "../types.ts";
 import type { RecentNamespacesTracker } from "./memories/_helpers/recent-namespaces.ts";
 import type { SkillRecord } from "./skills/_helpers/skills.ts";
+
+export type NbcToolkitContext = {
+  chainId: string;
+  asDid: string;
+  peerDid: string;
+  initiatorDid: string;
+  graph: NbcChainGraph;
+  remainingTurns: number;
+  submitTurn: (body: Record<string, unknown>) => Promise<void>;
+  leave: (reason?: string) => Promise<void>;
+};
 
 export type HarnessToolkitEnv = {
   memoriesClient?: RemoteMemoriesClientAsync;
@@ -37,6 +49,8 @@ export type HarnessToolkitEnv = {
   disabledToolkits: ReadonlySet<string>;
   /** Individual tool names excluded for this invocation (policy-gated). */
   disabledTools: ReadonlySet<string>;
+  /** NBC negotiation replica + submit hooks (negotiation agent only). */
+  nbc?: NbcToolkitContext;
 };
 
 export function emptyDisabledToolSets(): {

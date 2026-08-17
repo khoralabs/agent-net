@@ -160,7 +160,7 @@ export async function runClassifyResponsePlan(
     invocationContext: { runId: input.params.runId },
     sessionContext: {
       sessionId: input.params.context.sessionId ?? input.params.runId,
-      threadId: input.params.context.threadId,
+      threadId: input.params.context.threadId ?? input.params.runId,
     },
   });
 

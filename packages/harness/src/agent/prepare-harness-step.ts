@@ -36,6 +36,7 @@ export type PrepareHarnessStepInput = {
     agentChat?: AgentChatClient;
     disableToolkits?: readonly string[];
     disableTools?: readonly string[];
+    nbc?: import("./tools/types.ts").HarnessToolkitEnv["nbc"];
     /** Capture harness tools for chat / tool-loop modes. */
     captureTools?: boolean;
     /** Full workflow params required when captureTools is true. */
@@ -87,6 +88,7 @@ export async function prepareHarnessStepRuntime(
     disableToolkits: runtime.disableToolkits,
     disableTools: runtime.disableTools,
     ...(stepContext?.database !== undefined ? { memoriesContext: stepContext.database } : {}),
+    ...(runtime.nbc !== undefined ? { nbc: runtime.nbc } : {}),
   });
 
   if (runtime.captureTools !== true || runtime.workflowParams === undefined) {
@@ -116,7 +118,15 @@ export async function prepareHarnessStepRuntime(
     invocationContext: { runId: runtime.runId },
     sessionContext: {
       sessionId: runtime.sessionId ?? runtime.runId,
-      threadId: runtime.threadId ?? runtime.runId,
+      ...(runtime.threadId !== undefined && runtime.threadId.length > 0
+        ? { threadId: runtime.threadId }
+        : {}),
+      ...(runtime.workflowParams?.context.chainId !== undefined
+        ? { chainId: runtime.workflowParams.context.chainId }
+        : {}),
+      ...(runtime.workflowParams?.context.asDid !== undefined
+        ? { asDid: runtime.workflowParams.context.asDid }
+        : {}),
     },
   });
 

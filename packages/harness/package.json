@@ -79,6 +79,24 @@
       "import": "./src/agent/tools/memories/_helpers/memory-search.ts",
       "default": "./src/agent/tools/memories/_helpers/memory-search.ts"
     },
+    "./nbc-run-model-turn-run": {
+      "types": "./src/agent/workflows/nbc-run-model-turn-run.ts",
+      "bun": "./src/agent/workflows/nbc-run-model-turn-run.ts",
+      "import": "./src/agent/workflows/nbc-run-model-turn-run.ts",
+      "default": "./src/agent/workflows/nbc-run-model-turn-run.ts"
+    },
+    "./nbc-prepare-turn-run": {
+      "types": "./src/agent/workflows/nbc-prepare-turn-run.ts",
+      "bun": "./src/agent/workflows/nbc-prepare-turn-run.ts",
+      "import": "./src/agent/workflows/nbc-prepare-turn-run.ts",
+      "default": "./src/agent/workflows/nbc-prepare-turn-run.ts"
+    },
+    "./attribution-digest": {
+      "types": "./src/observability/attribution-digest.ts",
+      "bun": "./src/observability/attribution-digest.ts",
+      "import": "./src/observability/attribution-digest.ts",
+      "default": "./src/observability/attribution-digest.ts"
+    },
     "./structured-output": {
       "types": "./src/agent/structured-output.ts",
       "bun": "./src/agent/structured-output.ts",

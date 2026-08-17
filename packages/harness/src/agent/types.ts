@@ -64,7 +64,11 @@ export type AgentWorkflowParams = {
   };
   context: {
     sessionId?: string;
-    threadId: string;
+    threadId?: string;
+    /** NBC chain id when this run is a negotiation turn (not a chat thread). */
+    chainId?: string;
+    /** Acting DID for a negotiation turn. */
+    asDid?: string;
     messages: AgentUIMessage[];
     instructions?: string[];
     userTimeZone?: string;
@@ -76,8 +80,8 @@ export type AgentWorkflowParams = {
     /** Unified gather→provide bag for this LLM run. */
     stepContext?: AgentStepContext;
   };
-  output: {
-    chat: {
+  output?: {
+    chat?: {
       threadId: string;
       postId?: string;
       streamDeltas: boolean;

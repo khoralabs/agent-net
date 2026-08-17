@@ -66,10 +66,12 @@ function signableFromCompletePost(post: {
 
 export function createAgentChatWriter(options: CreateAgentChatWriterOptions): AgentChatWriter {
   const { client, params, signer } = options;
-  const threadId = params.output.chat.threadId;
+  const chat = params.output?.chat;
+  if (chat === undefined) throw new Error("output.chat is required");
+  const threadId = chat.threadId;
   const author = params.agent.actingFor as ScopeRef;
 
-  let postId = params.output.chat.postId ?? params.runId;
+  let postId = chat.postId ?? params.runId;
   let revision = 0;
 
   return {

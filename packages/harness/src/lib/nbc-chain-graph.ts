@@ -1,3 +1,10 @@
+/**
+ * Read an NBC chain graph from a local Vellum channel sqlite file.
+ *
+ * **Temporary** — direct sqlite + OBP collect replaces Vellum snapshot helpers
+ * used by the wake loop and internal GET state until replicas expose graph state
+ * without reading attachment files on disk.
+ */
 import { createObpSqlitePersistenceClient, openObpDatabase } from "@khoralabs/obp-core/sqlite";
 import { collectNbcChainGraph, type NbcChainGraph } from "@khoralabs/obp-nbc";
 import { channelSqlitePath } from "@khoralabs/vellum-client";

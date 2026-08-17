@@ -168,7 +168,8 @@ async function normalizeContext(params: AgentWorkflowParams): Promise<{
   if (params.runId.trim().length === 0) throw new Error("runId is required");
   if (params.agent.id.trim().length === 0) throw new Error("agent.id is required");
   if (params.model.id.trim().length === 0) throw new Error("model.id is required");
-  if (params.output.chat.threadId.trim().length === 0) {
+  const chat = params.output?.chat;
+  if (chat === undefined || chat.threadId.trim().length === 0) {
     throw new Error("output.chat.threadId is required");
   }
 
@@ -206,6 +207,10 @@ export async function runAgentWorkflow(
   params: AgentWorkflowParams,
   deps: RunAgentWorkflowDependencies = {},
 ): Promise<AgentWorkflowResult> {
+  const chat = params.output?.chat;
+  if (chat === undefined || chat.threadId.trim().length === 0) {
+    throw new Error("output.chat.threadId is required");
+  }
   const context = await normalizeContext(params);
   const prepared = await prepareHarnessStepRuntime({
     stepContext: params.context.stepContext,
@@ -216,7 +221,7 @@ export async function runAgentWorkflow(
       agentDid: params.agent.actingFor.id,
       runId: params.runId,
       sessionId: deps.sessionId ?? params.context.sessionId,
-      threadId: params.output.chat.threadId,
+      threadId: chat.threadId,
       networkDataDir: deps.networkDataDir,
       memoriesClient: deps.memoriesClient,
       khoraClient: deps.khoraClient,
@@ -267,7 +272,7 @@ export async function runAgentWorkflow(
     params,
     signer: deps.chatSigner,
   });
-  let latest: UIMessage = assistantMessage(params.output.chat.postId ?? params.runId, "");
+  let latest: UIMessage = assistantMessage(chat.postId ?? params.runId, "");
   let streamStarted = false;
   const modelId = resolveGatewayModel(params.model.id);
   const runStreamText = deps.streamTextFn ?? streamText;
@@ -341,7 +346,7 @@ export async function runAgentWorkflow(
           },
         })) {
           latest = { ...message, id: writer.postId, role: "assistant" };
-          if (params.output.chat.streamDeltas) {
+          if (chat.streamDeltas) {
             await writer.apply(latest);
           }
         }
@@ -402,7 +407,7 @@ export async function runAgentWorkflow(
       return {
         runId: params.runId,
         chat: {
-          threadId: params.output.chat.threadId,
+          threadId: chat.threadId,
           postId: writer.postId,
           status: "complete",
         },

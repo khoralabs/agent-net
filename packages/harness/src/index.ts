@@ -20,6 +20,7 @@ export {
   resetHarnessAgentRegistryForTests,
 } from "./agent/agent-runtime.ts";
 export { HARNESS_AGENT_ID } from "./agent/agents/index.ts";
+export { NETWORK_NEGOTIATION_AGENT_ID } from "./agent/agents/network-negotiation-agent.ts";
 export {
   ensureThread,
   getAgentChatClient,
@@ -29,6 +30,63 @@ export {
   installAgentChat,
   resolveAgentChatSigner,
 } from "./agent/chat-service.ts";
+export {
+  type NegotiationTurnWire,
+  negotiationOutputToWire,
+} from "./agent/nbc/action.ts";
+export type {
+  NbcLoopChain,
+  NbcLoopHost,
+  NbcLoopStartTurnInput,
+  NbcLoopStatusPatch,
+} from "./agent/nbc/loop-host.ts";
+export {
+  createNbcChainChangeBus,
+  type NbcChainChangeBus,
+  type NbcChainChanged,
+} from "./agent/nbc/nbc-chain-change-bus.ts";
+export {
+  type NbcInternalNegotiationChain,
+  type NbcInternalNegotiationHost,
+  type RegisterNbcInternalNegotiationRoutesInput,
+  registerNbcInternalNegotiationRoutes,
+} from "./agent/nbc/nbc-internal-routes.ts";
+export { type NbcLoopHandle, startNbcLoop } from "./agent/nbc/nbc-loop.ts";
+export {
+  createNbcMeshClient,
+  type NbcMeshClient,
+  type NbcNegotiationStateResponse,
+} from "./agent/nbc/nbc-mesh-client.ts";
+export { startNbcReplicaWatch } from "./agent/nbc/nbc-replica-watch.ts";
+export { nbcTurnContext } from "./agent/nbc/nbc-turn-context.ts";
+export {
+  createNbcWakeDispatcher,
+  resetNbcWakeDispatcherForTests,
+} from "./agent/nbc/nbc-wake-dispatcher.ts";
+export {
+  buildNegotiationInstructions,
+  buildNegotiationUserMessage,
+  type NegotiationBrief,
+  summarizeNbcGraph,
+} from "./agent/nbc/prompt.ts";
+export { type RunNbcModelTurnInput, runNbcModelTurn } from "./agent/nbc/run-nbc-model-turn.ts";
+export {
+  type NegotiationPortDefinition,
+  type NegotiationTurnEnvelope,
+  type NegotiationTurnEnvelopeContext,
+  negotiationTurnEnvelopeSchema,
+  parseNegotiationTurnEnvelope,
+} from "./agent/nbc/turn-output-schema.ts";
+export {
+  type AvailablePeerPort,
+  availablePeerPorts,
+  clampMaxTurns,
+  NBC_DEFAULT_MAX_TURNS,
+  NBC_MAX_TURNS_CAP,
+  type NegotiationChainView,
+  type WhoShouldActResult,
+  whoShouldAct,
+} from "./agent/nbc/who-should-act.ts";
 export {
   type PreparedHarnessStep,
   type PrepareHarnessStepInput,
@@ -71,7 +129,10 @@ export {
   createDeferredHarnessMemoriesClient,
   createHarnessMemoriesClient,
 } from "./agent/tools/memories/_helpers/memories-client.ts";
-export { installMemoriesOntology } from "./agent/tools/memories/_helpers/memories-ontology-install.ts";
+export {
+  getInstalledMemoriesOntology,
+  installMemoriesOntology,
+} from "./agent/tools/memories/_helpers/memories-ontology-install.ts";
 export {
   EMBEDDING_MODEL_REQUIRED_MESSAGE,
   type EnrichedNamespaceSearchHit,
@@ -95,6 +156,7 @@ export {
   MEMORY_TEXT_SOURCE_PREFIX,
   type SourceMapTextPreviewClient,
 } from "./agent/tools/memories/_helpers/source-map-content-store.ts";
+export type { NbcToolkitContext } from "./agent/tools/types.ts";
 export type {
   AgentStepContext,
   AgentStepNamespaceEntry,
@@ -197,12 +259,19 @@ export {
 export { PerAgentInviteBank } from "./lib/per-agent-invite-bank.ts";
 export { requireRelayBaseUrl } from "./lib/relay-base-url.ts";
 export {
+  createHarnessVellumPool,
   disconnectVellum,
+  type HarnessVellumPoolOptions,
   openVellumChain,
   type VellumPairOptions,
+  wrapPoolClient,
 } from "./lib/vellum.ts";
+export { vellumPoolAttachmentDataDir } from "./lib/vellum-pool-paths.ts";
 export {
+  type CommitTurnResult,
+  type CreateVellumChainSessionRegistryOptions,
   createVellumChainSessionRegistry,
+  NBC_GENESIS_NOT_INITIATOR,
   type VellumChainLiveSession,
   type VellumChainSessionRegistry,
 } from "./lib/vellum-sessions.ts";
