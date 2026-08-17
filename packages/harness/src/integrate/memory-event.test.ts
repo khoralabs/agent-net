@@ -80,16 +80,19 @@ describe("parseIntegrateMemoryEvent", () => {
     ).toThrow(/writeScope/);
   });
 
-  test("accepts legacy companyId wire alias as ownerKey", () => {
-    const event = parseIntegrateMemoryEvent({
-      kind: "interaction",
-      companyId: "did:key:legacy",
-      namespace: "notes",
-      correlationId: "e1",
-      occurredAtMs: 1,
-      payload: {},
-    });
-    expect(event.ownerKey).toBe("did:key:legacy");
+  test("rejects companyId wire alias", () => {
+    expect(() =>
+      parseIntegrateMemoryEvent({
+        kind: "interaction",
+        companyId: "did:key:legacy",
+        namespace: "notes",
+        correlationId: "e1",
+        occurredAtMs: 1,
+        payload: {},
+        features: { lexical: ["x"], vector: [] },
+        instructions: "",
+      }),
+    ).toThrow(/ownerKey/);
   });
 
   test("rejects non-object body", () => {

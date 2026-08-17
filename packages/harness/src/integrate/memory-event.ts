@@ -78,10 +78,6 @@ function parseOwnerKey(raw: Record<string, unknown>): string {
   if (typeof raw.ownerKey === "string" && raw.ownerKey.trim().length > 0) {
     return raw.ownerKey.trim();
   }
-  // Legacy wire alias from when the field was named `companyId`.
-  if (typeof raw.companyId === "string" && raw.companyId.trim().length > 0) {
-    return raw.companyId.trim();
-  }
   return "";
 }
 

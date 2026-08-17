@@ -63,14 +63,11 @@ function normalizeFraming(raw: AgentMemoriesFraming | undefined): AgentMemoriesF
   };
 }
 
-/** Coerce legacy `platformCompanyId` field into `externalId` if present. */
-function normalizeRecord(raw: AgentRecord & { platformCompanyId?: string }): AgentRecord {
+function normalizeRecord(raw: AgentRecord): AgentRecord {
   const externalId =
     typeof raw.externalId === "string" && raw.externalId.trim().length > 0
       ? normalizeExternalId(raw.externalId)
-      : typeof raw.platformCompanyId === "string" && raw.platformCompanyId.trim().length > 0
-        ? normalizeExternalId(raw.platformCompanyId)
-        : undefined;
+      : undefined;
   const memoriesFraming = normalizeFraming(raw.memoriesFraming);
   return {
     did: raw.did,
@@ -94,9 +91,7 @@ export class AgentStore implements AgentRegistry {
     const file = Bun.file(filePath);
     if (await file.exists()) {
       const data = (await file.json()) as StoreFile;
-      const agents = (data.agents ?? []).map((a) =>
-        normalizeRecord(a as AgentRecord & { platformCompanyId?: string }),
-      );
+      const agents = (data.agents ?? []).map((a) => normalizeRecord(a as AgentRecord));
       return new AgentStore(filePath, agents);
     }
     return new AgentStore(filePath, []);
