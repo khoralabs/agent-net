@@ -73,6 +73,12 @@
       "import": "./src/agent/run-harness-agent-step.ts",
       "default": "./src/agent/run-harness-agent-step.ts"
     },
+    "./memory-search": {
+      "types": "./src/agent/tools/memories/_helpers/memory-search.ts",
+      "bun": "./src/agent/tools/memories/_helpers/memory-search.ts",
+      "import": "./src/agent/tools/memories/_helpers/memory-search.ts",
+      "default": "./src/agent/tools/memories/_helpers/memory-search.ts"
+    },
     "./structured-output": {
       "types": "./src/agent/structured-output.ts",
       "bun": "./src/agent/structured-output.ts",
