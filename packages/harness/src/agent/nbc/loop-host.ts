@@ -32,7 +32,7 @@ export type NbcLoopStartTurnInput = {
   constraints?: string;
 };
 
-/** Host callbacks — no Bloom-specific types. */
+/** Host callbacks. */
 export type NbcLoopHost = {
   getChain(chainId: string): NbcLoopChain | null;
   onStatus(chainId: string, patch: NbcLoopStatusPatch): void;
