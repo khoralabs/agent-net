@@ -1,13 +1,10 @@
 /**
  * Harness helpers for {@link VellumPool} attachments and e2e chain open.
- *
- * **Temporary** — {@link openVellumChain} binds the responder before the initiator
- * so roster snapshots include the peer (TODO(vellum)). Remove ordering constraint
- * when vellum-client trusts `peer_identity_key` or refreshes roster on cache miss.
  */
 import type { IdentitySecret, PersistableSigner } from "@khoralabs/did-key-identity";
 import { RelayClient } from "@khoralabs/relay/client";
 import { VellumPool } from "@khoralabs/vellum-client/pool";
+import { createSharedUplinkChannelFabric } from "@khoralabs/vellum-client/session";
 
 import type { AgentHandle, VellumHandle } from "../agents/index.ts";
 import { AgentStore } from "../agents/index.ts";
@@ -41,9 +38,14 @@ export type HarnessVellumPoolOptions = {
 };
 
 export function createHarnessVellumPool(opts: HarnessVellumPoolOptions): VellumPool {
+  const isOnHost = opts.isOnHost ?? (() => true);
   return new VellumPool({
     relayBaseUrl: opts.relayBaseUrl,
     dataDirRoot: opts.dataDirRoot,
+    fabric: createSharedUplinkChannelFabric({
+      relayBaseUrl: opts.relayBaseUrl,
+      inclusion: { isOnHost },
+    }),
   });
 }
 
@@ -108,11 +110,8 @@ export async function openVellumChain(
   });
 
   try {
-    // TODO(vellum): workaround for one-shot roster sync on attach.
-    // Bind responder before initiator so the initiator's getRoster snapshot
-    // includes the peer. Remove this order constraint once @khoralabs/vellum-client
-    // remediates: /chain/init should trust init.peer_identity_key (already sent)
-    // or re-sync roster on a local cache miss. Off-host peers still need that fix.
+    await pool.bind({ signer: initiatorSigner, channelId });
+
     if (bindResponder) {
       const responderSigner = await resolveAgentSigner(
         responder,
@@ -126,8 +125,6 @@ export async function openVellumChain(
       if (inviteToken) await responderRelay.joinChannel({ inviteToken });
       await pool.bind({ signer: responderSigner, channelId });
     }
-
-    await pool.bind({ signer: initiatorSigner, channelId });
 
     const initiatorVellum = wrapPoolClient(pool, initiator.did, channelId);
     const chainResp = await initiatorVellum.chainCreate({ counterpartyDid: responder.did });

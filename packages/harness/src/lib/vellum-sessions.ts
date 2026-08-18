@@ -5,7 +5,6 @@
  * - `open` binds channel only (`sessionId: ""`); real genesis via {@link initChain}
  *   / {@link commitTurn} when the initiator has an expose — until Vellum supports
  *   optional genesis separate from channel create.
- * - Responder-before-initiator bind order on open (see inline TODO(vellum)).
  * - Post-`chainCreate` poll until responder replica sees the session id.
  */
 import type { PersistableSigner } from "@khoralabs/did-key-identity";
@@ -120,11 +119,8 @@ export function createVellumChainSessionRegistry(
       });
       const { channelId, inviteToken } = await initiatorRelay.createChannel({});
 
-      // TODO(vellum): workaround for one-shot roster sync on attach.
-      // Bind responder before initiator so the initiator's getRoster snapshot
-      // includes the peer. Remove this order constraint once @khoralabs/vellum-client
-      // remediates: /chain/init should trust init.peer_identity_key (already sent)
-      // or re-sync roster on a local cache miss. Off-host peers still need that fix.
+      await p.bind({ signer: initiatorSigner, channelId });
+
       if (bindResponder) {
         const responderSigner = input.responder.signer as PersistableSigner | undefined;
         if (responderSigner === undefined) {
@@ -137,8 +133,6 @@ export function createVellumChainSessionRegistry(
         if (inviteToken) await responderRelay.joinChannel({ inviteToken });
         await p.bind({ signer: responderSigner, channelId });
       }
-
-      await p.bind({ signer: initiatorSigner, channelId });
 
       const live: VellumChainLiveSession = {
         chainId: input.chainId,
