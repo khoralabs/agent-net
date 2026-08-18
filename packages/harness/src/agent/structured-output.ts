@@ -145,7 +145,7 @@ function retryHint(error: unknown): string {
 export async function generateStructured<T>(args: {
   label: string;
   model: LanguageModel;
-  schema: FlexibleSchema<unknown>;
+  schema: unknown;
   prompt: string;
   attempts?: number;
   timeoutMs?: number;
@@ -159,7 +159,7 @@ export async function generateStructured<T>(args: {
     try {
       const { object } = await generateObject({
         model: args.model,
-        schema: args.schema,
+        schema: args.schema as FlexibleSchema<T>,
         prompt: hint.length === 0 ? args.prompt : `${args.prompt}\n\n${hint}`,
         maxOutputTokens: args.maxOutputTokens ?? DEFAULT_MAX_OUTPUT_TOKENS,
         abortSignal: AbortSignal.timeout(args.timeoutMs ?? AI_STEP_TIMEOUT_MS),

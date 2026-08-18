@@ -1,4 +1,4 @@
-import type { FlexibleSchema, LanguageModel } from "ai";
+import type { LanguageModel } from "ai";
 
 import {
   type PreparedHarnessStep,
@@ -10,11 +10,12 @@ import { runAgentWorkflow } from "./run-agent-workflow.ts";
 import { generateStructured } from "./structured-output.ts";
 import type { AgentWorkflowParams, AgentWorkflowResult } from "./types.ts";
 
-export type RunHarnessStructuredStepArgs = {
+export type RunHarnessStructuredStepArgs<T = unknown> = {
   mode: "structured";
   label: string;
   model: LanguageModel;
-  schema: FlexibleSchema<unknown>;
+  /** JSON Schema or Zod schema for `generateObject` (loosely typed across `ai` copies). */
+  schema: unknown;
   /** Task-specific prompt body (step context is prepended automatically). */
   prompt: string;
   prepare: PrepareHarnessStepInput;
@@ -40,7 +41,7 @@ export type RunHarnessChatStepArgs = {
 };
 
 export type RunHarnessAgentStepArgs<T = unknown> =
-  | RunHarnessStructuredStepArgs
+  | RunHarnessStructuredStepArgs<T>
   | RunHarnessToolLoopObjectStepArgs<T>
   | RunHarnessChatStepArgs;
 
@@ -58,9 +59,8 @@ function withContextPrefix(contextInstructions: string[], prompt: string): strin
 export async function runHarnessAgentStep(
   args: RunHarnessChatStepArgs,
 ): Promise<AgentWorkflowResult>;
-export async function runHarnessAgentStep<T>(
-  args: RunHarnessStructuredStepArgs | RunHarnessToolLoopObjectStepArgs<T>,
-): Promise<T>;
+export async function runHarnessAgentStep<T>(args: RunHarnessStructuredStepArgs<T>): Promise<T>;
+export async function runHarnessAgentStep<T>(args: RunHarnessToolLoopObjectStepArgs<T>): Promise<T>;
 export async function runHarnessAgentStep<T>(
   args: RunHarnessAgentStepArgs<T>,
 ): Promise<T | AgentWorkflowResult> {
