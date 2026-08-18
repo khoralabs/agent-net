@@ -3,6 +3,7 @@
  */
 import type { IdentitySecret, PersistableSigner } from "@khoralabs/did-key-identity";
 import { RelayClient } from "@khoralabs/relay/client";
+import { VellumChain } from "@khoralabs/vellum-client";
 import { VellumPool } from "@khoralabs/vellum-client/pool";
 import { createSharedUplinkChannelFabric } from "@khoralabs/vellum-client/session";
 
@@ -127,9 +128,10 @@ export async function openVellumChain(
     }
 
     const initiatorVellum = wrapPoolClient(pool, initiator.did, channelId);
-    const chainResp = await initiatorVellum.chainCreate({ counterpartyDid: responder.did });
-    if (!chainResp.ok) throw new Error("chainCreate failed");
-    const sessionId = chainResp.session_id;
+    const chain = await VellumChain.open(pool.handle({ did: initiator.did, channelId }), {
+      peer: responder.did,
+    });
+    const sessionId = chain.sessionId;
 
     if (bindResponder) {
       const responderVellum = wrapPoolClient(pool, responder.did, channelId);

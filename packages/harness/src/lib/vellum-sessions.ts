@@ -1,14 +1,11 @@
 /**
  * Vellum channel/chain session registry for NBC (open channel, delayed genesis, turns).
  *
- * **Temporary workarounds in this module:**
- * - `open` binds channel only (`sessionId: ""`); real genesis via {@link initChain}
- *   / {@link commitTurn} when the initiator has an expose — until Vellum supports
- *   optional genesis separate from channel create.
- * - Post-`chainCreate` poll until responder replica sees the session id.
+ * **Temporary** — Post-open poll until the responder replica sees the session id.
  */
 import type { PersistableSigner } from "@khoralabs/did-key-identity";
 import { RelayClient } from "@khoralabs/relay/client";
+import { VellumChain } from "@khoralabs/vellum-client";
 import type { VellumPool } from "@khoralabs/vellum-client/pool";
 
 import type { AgentHandle, VellumHandle } from "../agents/index.ts";
@@ -23,6 +20,8 @@ export type VellumChainLiveSession = {
   initiatorDid: string;
   counterpartyDid: string;
   dataDirRoot: string;
+  /** False until the initiator posts the opening turn. */
+  genesisComplete: boolean;
 };
 
 export const NBC_GENESIS_NOT_INITIATOR = "Only the initiator can post genesis";
@@ -134,16 +133,32 @@ export function createVellumChainSessionRegistry(
         await p.bind({ signer: responderSigner, channelId });
       }
 
+      const chain = await VellumChain.open(p.handle({ did: input.initiator.did, channelId }), {
+        peer: input.responder.did,
+      });
       const live: VellumChainLiveSession = {
         chainId: input.chainId,
         channelId,
-        sessionId: "",
+        sessionId: chain.sessionId,
         initiatorDid: input.initiator.did,
         counterpartyDid: input.responder.did,
         dataDirRoot: dataDirRoot || input.options.vellumDataDir,
+        genesisComplete: false,
       };
       liveByChainId.set(input.chainId, live);
-      return { channelId, sessionId: "", live };
+
+      if (bindResponder) {
+        const responderHandle = wrapPoolClient(p, input.responder.did, channelId);
+        await waitFor(
+          async () => {
+            const snap = await responderHandle.getChainSnapshot().catch(() => null);
+            return snap?.chains.some((c) => c.session_id === chain.sessionId) ?? false;
+          },
+          { timeoutMs: 20_000, pollMs: 500, label: "responder sees chain" },
+        );
+      }
+
+      return { channelId, sessionId: chain.sessionId, live };
     },
 
     async initChain(chainId, genesisTurn) {
@@ -151,39 +166,32 @@ export function createVellumChainSessionRegistry(
       if (live === undefined) {
         throw new Error(`initChain: no live session for ${chainId}`);
       }
-      if (live.sessionId.length > 0) {
+      if (live.genesisComplete) {
         throw new Error(`initChain: chain ${chainId} already initialized`);
       }
-      const initiatorHandle =
-        testHandles.get(testHandleKey(chainId, live.initiatorDid)) ??
-        (pool !== null ? wrapPoolClient(pool, live.initiatorDid, live.channelId) : null);
-      if (initiatorHandle === null) {
+      if (live.sessionId.length === 0) {
+        throw new Error(`initChain: chain ${chainId} has no Vellum session`);
+      }
+      if (pool !== null) {
+        const chain = new VellumChain(
+          pool.handle({ did: live.initiatorDid, channelId: live.channelId }),
+          live.sessionId,
+          live.counterpartyDid,
+        );
+        await chain.init(genesisTurn);
+        live.genesisComplete = true;
+        if (isOnHost(live.counterpartyDid)) {
+          await chain.waitForGraph();
+        }
+        return { sessionId: live.sessionId };
+      }
+      const initiatorHandle = testHandles.get(testHandleKey(chainId, live.initiatorDid));
+      if (initiatorHandle === undefined) {
         throw new Error(`initChain: no initiator handle for ${chainId}`);
       }
-      const chainResp = await initiatorHandle.chainCreate({
-        counterpartyDid: live.counterpartyDid,
-        genesisTurn,
-      });
-      if (!chainResp.ok) throw new Error("chainCreate failed");
-      const sessionId = chainResp.session_id;
-      live.sessionId = sessionId;
-
-      if (isOnHost(live.counterpartyDid)) {
-        const responderHandle =
-          testHandles.get(testHandleKey(chainId, live.counterpartyDid)) ??
-          (pool !== null ? wrapPoolClient(pool, live.counterpartyDid, live.channelId) : null);
-        if (responderHandle !== null) {
-          await waitFor(
-            async () => {
-              const snap = await responderHandle.getChainSnapshot().catch(() => null);
-              return snap?.chains.some((c) => c.session_id === sessionId) ?? false;
-            },
-            { timeoutMs: 20_000, pollMs: 500, label: "responder sees chain" },
-          );
-        }
-      }
-
-      return { sessionId };
+      await initiatorHandle.sendTurn(live.sessionId, genesisTurn);
+      live.genesisComplete = true;
+      return { sessionId: live.sessionId };
     },
 
     async commitTurn(chainId, input) {
@@ -191,7 +199,7 @@ export function createVellumChainSessionRegistry(
       if (live === undefined) {
         throw new Error(`commitTurn: no live session for ${chainId}`);
       }
-      if (live.sessionId.length === 0) {
+      if (!live.genesisComplete) {
         if (input.asDid !== live.initiatorDid) {
           throw new Error(NBC_GENESIS_NOT_INITIATOR);
         }

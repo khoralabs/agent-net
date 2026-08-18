@@ -31,41 +31,38 @@ describe("createVellumChainSessionRegistry", () => {
     registry.clearForTests();
   });
 
-  test("initChain passes genesisTurn through chainCreate and does not default dummy genesis", async () => {
+  test("initChain posts genesis via sendTurn and does not chainCreate", async () => {
     const registry = createVellumChainSessionRegistry();
     const genesisTurn = {
       offer: { id: "", type: "service.slot", expires_turn: 10, expires_at_ms: 0 },
-      ports: [{ id: "", type: "slot", promise: "open" }],
+      ports: [{ id: "", kind: "slot", promise: "open" }],
       bind_port_id: "",
       bind_payload: null,
     };
-    const chainCreates: unknown[] = [];
+    const sendCalls: unknown[] = [];
     registry.seedLiveForTests(
       {
         chainId: "c1",
         channelId: "ch-1",
-        sessionId: "",
+        sessionId: "sess-open",
         initiatorDid: "did:key:alice",
         counterpartyDid: "did:key:bob",
         dataDirRoot: "/tmp",
+        genesisComplete: false,
       },
       {
         "did:key:alice": {
-          chainCreate: async (input: {
-            counterpartyDid: string;
-            genesisTurn?: Record<string, unknown>;
-          }) => {
-            chainCreates.push(input);
-            return { ok: true as const, session_id: "sess-genesis" };
+          sendTurn: async (sessionId: string, body: unknown) => {
+            sendCalls.push({ sessionId, body });
           },
         } as never,
       },
     );
 
     const result = await registry.initChain("c1", genesisTurn);
-    expect(result).toEqual({ sessionId: "sess-genesis" });
-    expect(chainCreates).toEqual([{ counterpartyDid: "did:key:bob", genesisTurn }]);
-    expect(registry.get("c1")?.sessionId).toBe("sess-genesis");
+    expect(result).toEqual({ sessionId: "sess-open" });
+    expect(sendCalls).toEqual([{ sessionId: "sess-open", body: genesisTurn }]);
+    expect(registry.get("c1")?.genesisComplete).toBe(true);
     await expect(registry.initChain("c1", genesisTurn)).rejects.toThrow("already initialized");
     registry.clearForTests();
   });
@@ -78,22 +75,19 @@ describe("createVellumChainSessionRegistry", () => {
       {
         chainId: "c1",
         channelId: "ch-1",
-        sessionId: "",
+        sessionId: "sess-1",
         initiatorDid: "did:key:alice",
         counterpartyDid: "did:key:bob",
         dataDirRoot: "/tmp",
+        genesisComplete: false,
       },
       {
         "did:key:alice": {
-          chainCreate: async () => ({ ok: true as const, session_id: "sess-1" }),
           sendTurn: async (_s: string, body: unknown) => {
             sendCalls.push(body);
           },
         } as never,
         "did:key:bob": {
-          getChainSnapshot: async () => ({
-            chains: [{ session_id: "sess-1" }],
-          }),
           sendTurn: async (_s: string, body: unknown) => {
             sendCalls.push(body);
           },
@@ -112,7 +106,7 @@ describe("createVellumChainSessionRegistry", () => {
       body: { bind_port_id: "p1" },
     });
     expect(second).toEqual({ sessionId: "sess-1", genesis: false });
-    expect(sendCalls).toEqual([{ bind_port_id: "p1" }]);
+    expect(sendCalls).toEqual([genesis, { bind_port_id: "p1" }]);
     registry.clearForTests();
   });
 
@@ -121,10 +115,11 @@ describe("createVellumChainSessionRegistry", () => {
     registry.seedLiveForTests({
       chainId: "c2",
       channelId: "ch-2",
-      sessionId: "",
+      sessionId: "sess-2",
       initiatorDid: "did:key:alice",
       counterpartyDid: "did:key:bob",
       dataDirRoot: "/tmp",
+      genesisComplete: false,
     });
     await expect(
       registry.commitTurn("c2", {
