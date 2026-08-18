@@ -210,6 +210,7 @@ export {
   createHarnessChatBackend,
   createRemoteHarnessChat,
   HARNESS_CHAT_CHANNEL_ID,
+  type HarnessChatFetch,
   harnessChatFetch,
   installHarnessChatFetch,
   type SignedChatBackend,
