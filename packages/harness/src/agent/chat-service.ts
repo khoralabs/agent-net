@@ -58,6 +58,7 @@ export type InstallAgentChatOptions = {
   token?: string;
   channelId?: string;
   resolveSigner?: CreateRemoteHarnessChatOptions["resolveSigner"];
+  fetchFn?: CreateRemoteHarnessChatOptions["fetchFn"];
 };
 
 /** Install remote chat-http client for the agent process singleton. */
@@ -71,6 +72,7 @@ export function installAgentChat(options: InstallAgentChatOptions = {}): SignedC
     token,
     resolveSigner,
     ...(options.channelId !== undefined ? { channelId: options.channelId } : {}),
+    ...(options.fetchFn !== undefined ? { fetchFn: options.fetchFn } : {}),
   });
   return backend;
 }

@@ -24,6 +24,18 @@ import { createHarnessChatCrypto, type ResolveHarnessChatSigner } from "./chat-c
 /** Soft default channel id when the host does not pass `channelId`. */
 export const HARNESS_CHAT_CHANNEL_ID = "harness-network";
 
+export type HarnessChatFetch = ChatServiceClientOptions["fetchFn"];
+
+let installedChatFetch: HarnessChatFetch | undefined;
+
+export function installHarnessChatFetch(fetchFn: HarnessChatFetch | undefined): void {
+  installedChatFetch = fetchFn;
+}
+
+export function harnessChatFetch(): HarnessChatFetch | undefined {
+  return installedChatFetch;
+}
+
 export type { ChatServiceClient };
 
 export type CreateAgentThreadInput = {
@@ -155,7 +167,7 @@ export function createRemoteHarnessChat(
   const client = createChatClient({
     baseUrl: options.baseUrl,
     token: options.token,
-    fetchFn: options.fetchFn,
+    fetchFn: options.fetchFn ?? harnessChatFetch(),
   });
   return createHarnessChatBackend({
     client,
