@@ -130,6 +130,7 @@ export {
   createHarnessMemoriesClient,
   harnessMemoriesFetch,
   installHarnessMemoriesFetch,
+  type MemoriesServiceFetch,
 } from "./agent/tools/memories/_helpers/memories-client.ts";
 export {
   getInstalledMemoriesOntology,

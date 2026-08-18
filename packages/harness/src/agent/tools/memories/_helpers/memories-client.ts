@@ -33,7 +33,7 @@ export function resolveHarnessMemoriesOntology(
 let installedFetch: MemoriesServiceFetch | undefined;
 
 /** Host-provided signed fetch (RFC 9421) */
-export function installHarnessMemoriesFetch(fetchFn: MemoriesServiceFetch): void {
+export function installHarnessMemoriesFetch(fetchFn: MemoriesServiceFetch | undefined): void {
   installedFetch = fetchFn;
 }
 

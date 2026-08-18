@@ -3,6 +3,7 @@ import {
   createDeferredHarnessMemoriesClient,
   harnessMemoriesFetch,
   installHarnessMemoriesFetch,
+  type MemoriesServiceFetch,
   resolveHarnessMemoriesOntology,
 } from "./memories-client.ts";
 
@@ -10,11 +11,11 @@ const database = { kind: "account", ownerKey: "did:key:test" } as const;
 
 describe("installHarnessMemoriesFetch", () => {
   afterEach(() => {
-    installHarnessMemoriesFetch(fetch);
+    installHarnessMemoriesFetch(undefined);
   });
 
   test("overrides the default fetch used by harness memories clients", () => {
-    const stub: typeof fetch = async () => new Response("ok");
+    const stub: MemoriesServiceFetch = async () => new Response("ok");
     installHarnessMemoriesFetch(stub);
     expect(harnessMemoriesFetch()).toBe(stub);
   });
