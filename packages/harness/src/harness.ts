@@ -3,6 +3,7 @@ import {
   createBearerTokenAuthProvider,
   MemoriesServiceClient,
 } from "@khoralabs/memories-service/client";
+import { harnessMemoriesFetch } from "./agent/tools/memories/_helpers/memories-client.ts";
 import { AgentStore, HarnessPoolInbox, ManagedAgentPool } from "./agents/index.ts";
 import type { AgentRegistry } from "./agents/store.ts";
 import { createRemoteHarnessChat, type HarnessChat } from "./chat.ts";
@@ -118,6 +119,7 @@ export async function startNetworkHarness(
   const memoriesClient = new MemoriesServiceClient({
     baseUrl: memoriesBaseUrl,
     auth: createBearerTokenAuthProvider(memoriesAdminToken),
+    fetch: harnessMemoriesFetch(),
   });
 
   const poolInbox = new HarnessPoolInbox({ khoraBaseUrl });

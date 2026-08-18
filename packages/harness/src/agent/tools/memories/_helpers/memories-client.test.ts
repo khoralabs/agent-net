@@ -1,10 +1,24 @@
-import { describe, expect, test } from "bun:test";
+import { afterEach, describe, expect, test } from "bun:test";
 import {
   createDeferredHarnessMemoriesClient,
+  harnessMemoriesFetch,
+  installHarnessMemoriesFetch,
   resolveHarnessMemoriesOntology,
 } from "./memories-client.ts";
 
 const database = { kind: "account", ownerKey: "did:key:test" } as const;
+
+describe("installHarnessMemoriesFetch", () => {
+  afterEach(() => {
+    installHarnessMemoriesFetch(fetch);
+  });
+
+  test("overrides the default fetch used by harness memories clients", () => {
+    const stub: typeof fetch = async () => new Response("ok");
+    installHarnessMemoriesFetch(stub);
+    expect(harnessMemoriesFetch()).toBe(stub);
+  });
+});
 
 describe("createDeferredHarnessMemoriesClient", () => {
   test("returns a sync handle that does not materialize until first use", () => {

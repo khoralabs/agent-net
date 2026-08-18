@@ -8,6 +8,7 @@ import {
   createBearerTokenAuthProvider,
   createDeferredRemoteMemoriesClientAsync,
   createRemoteMemoriesClientAsync,
+  type MemoriesServiceFetch,
   type RemoteMemoriesClientAsync,
 } from "@khoralabs/memories-service/client";
 
@@ -20,6 +21,7 @@ export {
   HARNESS_MEMORY_NODE_KIND,
   minimalHarnessMemoriesOntology,
 } from "./minimal-ontology.ts";
+export type { MemoriesServiceFetch };
 
 /** Merge app ontology onto the harness Memory/References baseline (app wins on key collision). */
 export function resolveHarnessMemoriesOntology(
@@ -28,17 +30,30 @@ export function resolveHarnessMemoriesOntology(
   return mergeOntologies(minimalHarnessMemoriesOntology, appOntology);
 }
 
+let installedFetch: MemoriesServiceFetch | undefined;
+
+/** Host-provided signed fetch (RFC 9421) */
+export function installHarnessMemoriesFetch(fetchFn: MemoriesServiceFetch): void {
+  installedFetch = fetchFn;
+}
+
+export function harnessMemoriesFetch(): MemoriesServiceFetch {
+  return installedFetch ?? fetch;
+}
+
 function remoteClientOptions(opts: {
   baseUrl: string;
   database: MemoriesDatabaseId;
   ontology: HarnessMemoriesOntology;
   adminToken: string;
+  fetch?: MemoriesServiceFetch;
 }) {
   return {
     baseUrl: opts.baseUrl.replace(/\/$/, ""),
     database: opts.database,
     ontology: resolveHarnessMemoriesOntology(opts.ontology),
     auth: createBearerTokenAuthProvider(opts.adminToken),
+    fetch: opts.fetch ?? harnessMemoriesFetch(),
   };
 }
 
@@ -47,6 +62,7 @@ export async function createHarnessMemoriesClient(opts: {
   database: MemoriesDatabaseId;
   ontology: HarnessMemoriesOntology;
   adminToken: string;
+  fetch?: MemoriesServiceFetch;
 }): Promise<RemoteMemoriesClientAsync> {
   return createRemoteMemoriesClientAsync(remoteClientOptions(opts));
 }
@@ -57,6 +73,7 @@ export function createDeferredHarnessMemoriesClient(opts: {
   database: MemoriesDatabaseId;
   ontology: HarnessMemoriesOntology;
   adminToken: string;
+  fetch?: MemoriesServiceFetch;
 }): RemoteMemoriesClientAsync {
   return createDeferredRemoteMemoriesClientAsync(remoteClientOptions(opts));
 }

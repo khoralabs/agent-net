@@ -128,6 +128,8 @@ export {
   agentMemoriesDatabase,
   createDeferredHarnessMemoriesClient,
   createHarnessMemoriesClient,
+  harnessMemoriesFetch,
+  installHarnessMemoriesFetch,
 } from "./agent/tools/memories/_helpers/memories-client.ts";
 export {
   getInstalledMemoriesOntology,
