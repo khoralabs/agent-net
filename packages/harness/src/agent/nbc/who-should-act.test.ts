@@ -89,7 +89,7 @@ describe("availablePeerPorts", () => {
       ports: [
         {
           id: "pa",
-          type: "slot",
+          kind: "slot",
           promise: "open",
           ref: "",
           expires_turn: 10,
@@ -99,7 +99,7 @@ describe("availablePeerPorts", () => {
         },
         {
           id: "pb",
-          type: "slot",
+          kind: "slot",
           promise: "open",
           ref: "",
           expires_turn: 10,

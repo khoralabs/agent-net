@@ -97,7 +97,7 @@ export function availablePeerPorts(graph: NbcChainGraph, asDid: string): Availab
     const partyId = graph.offers.find((o) => o.id === offerId)?.partyId ?? "";
     out.push({
       id: port.id,
-      type: port.type,
+      type: port.kind,
       promise: port.promise,
       partyId,
       bind_policy: jsonObjectOrNull(port.bind_policy),

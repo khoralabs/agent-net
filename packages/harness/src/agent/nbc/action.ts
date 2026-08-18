@@ -54,7 +54,7 @@ function toPortSpecs(
     validateBindPolicyAtExpose(bindPolicy);
     const spec: NbcPortSpec = {
       id: `port-${i + 1}-${now.toString(36)}`,
-      type: p.kind,
+      kind: p.kind,
       promise: p.promise,
       expires_turn: expiresTurn,
       expires_at_ms: expiresAtMs,
@@ -101,7 +101,7 @@ export function negotiationOutputToWire(input: {
     );
   }
 
-  const firstType = ports[0]?.type.trim() ?? "";
+  const firstType = ports[0]?.kind.trim() ?? "";
   const body: NbcTurnBody = {
     offer: {
       id: `offer-${now.toString(36)}`,

@@ -77,7 +77,7 @@ export function summarizeNbcGraph(graph: {
   offers: readonly { id: string; partyId: string; type: string }[];
   ports: readonly {
     id: string;
-    type: string;
+    kind: string;
     bindCount: number;
     bind_policy?: unknown;
   }[];
@@ -94,7 +94,7 @@ export function summarizeNbcGraph(graph: {
         Object.keys(p.bind_policy as object).length > 0
           ? " policy"
           : " no-policy";
-      return `${p.id} ${p.type} binds=${p.bindCount}${policy}`;
+      return `${p.id} ${p.kind} binds=${p.bindCount}${policy}`;
     })
     .join("; ");
   return `offers=[${offers}] ports=[${ports}] binds=${graph.binds.length}`;

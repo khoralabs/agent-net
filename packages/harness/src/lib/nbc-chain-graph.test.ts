@@ -34,7 +34,7 @@ describe("createVellumChainSessionRegistry", () => {
   test("initChain passes genesisTurn through chainCreate and does not default dummy genesis", async () => {
     const registry = createVellumChainSessionRegistry();
     const genesisTurn = {
-      offer: { id: "", type: "service.slot", expires_turn: 10, expires_at_relay_ms: 0 },
+      offer: { id: "", type: "service.slot", expires_turn: 10, expires_at_ms: 0 },
       ports: [{ id: "", type: "slot", promise: "open" }],
       bind_port_id: "",
       bind_payload: null,

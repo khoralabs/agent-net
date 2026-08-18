@@ -64,12 +64,12 @@ describe("negotiationOutputToWire", () => {
     expect((wired.body.offer as { expires_at_ms: number }).expires_at_ms).toBe(0);
     expect(Array.isArray(wired.body.ports)).toBe(true);
     const ports = wired.body.ports as Array<{
-      type: string;
+      kind: string;
       promise: string;
       expires_at_ms: number;
     }>;
     expect(ports.length).toBe(1);
-    expect(ports[0]?.type).toBe("slot");
+    expect(ports[0]?.kind).toBe("slot");
     expect(ports[0]?.promise).toBe("open");
     expect(ports[0]?.expires_at_ms).toBe(0);
   });
@@ -83,8 +83,8 @@ describe("negotiationOutputToWire", () => {
     });
     expect(wired.kind).toBe("offer");
     if (wired.kind !== "offer") return;
-    const ports = wired.body.ports as Array<{ type: string; promise: string }>;
-    expect(ports[0]?.type).toBe("slot");
+    const ports = wired.body.ports as Array<{ kind: string; promise: string }>;
+    expect(ports[0]?.kind).toBe("slot");
   });
 
   test("rejects missing kind and promise on expose ports", () => {

@@ -134,15 +134,15 @@ describeHarness("multi-agent OBP network", () => {
         id: "offer-1",
         type: "service.slot",
         expires_turn: 100,
-        expires_at_relay_ms: Date.now() + 60_000,
+        expires_at_ms: Date.now() + 60_000,
       },
       ports: [
         {
           id: "port-1",
-          type: "slot",
+          kind: "slot",
           promise: "open",
           expires_turn: 100,
-          expires_at_relay_ms: Date.now() + 60_000,
+          expires_at_ms: Date.now() + 60_000,
           bind_policy: null,
           ref: "",
         },
