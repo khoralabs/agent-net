@@ -45,11 +45,10 @@ describe("NBC prompt privacy", () => {
 });
 
 describe("negotiationOutputToWire", () => {
-  test("opening expose maps kind onto wire type", () => {
+  test("opening expose maps kind onto wire ports", () => {
     const wired = negotiationOutputToWire({
       raw: { expose: [{ kind: "slot", promise: "open" }] },
       opening: true,
-      remainingTurns: 4,
       peerPorts: [],
     });
     expect(wired.kind).toBe("offer");
@@ -74,25 +73,11 @@ describe("negotiationOutputToWire", () => {
     expect(ports[0]?.expires_at_ms).toBe(0);
   });
 
-  test("maps affordance type onto kind when it is not a JSON Schema keyword", () => {
-    const wired = negotiationOutputToWire({
-      raw: { expose: [{ type: "slot", promise: "open" }] },
-      opening: true,
-      remainingTurns: 4,
-      peerPorts: [],
-    });
-    expect(wired.kind).toBe("offer");
-    if (wired.kind !== "offer") return;
-    const ports = wired.body.ports as Array<{ kind: string; promise: string }>;
-    expect(ports[0]?.kind).toBe("slot");
-  });
-
   test("rejects missing kind and promise on expose ports", () => {
     expect(() =>
       negotiationOutputToWire({
         raw: { expose: [{}] },
         opening: true,
-        remainingTurns: 4,
         peerPorts: [],
       }),
     ).toThrow();
@@ -101,11 +86,10 @@ describe("negotiationOutputToWire", () => {
   test("bind+expose maps payload onto bind_port_id", () => {
     const wired = negotiationOutputToWire({
       raw: {
-        bind: { pb: { amount: 3 } },
+        bind: { portId: "pb", payload: { amount: 3 } },
         expose: [{ kind: "slot", promise: "next" }],
       },
       opening: false,
-      remainingTurns: 3,
       peerPorts: [peer],
     });
     expect(wired.kind).toBe("offer");
@@ -114,7 +98,7 @@ describe("negotiationOutputToWire", () => {
     expect(wired.body.bind_payload).toEqual({ amount: 3 });
   });
 
-  test("bind against a port with no bind_policy drops invented payload keys", () => {
+  test("bind against a port with no bind_policy rejects invented payload keys", () => {
     const openPeer: AvailablePeerPort = {
       id: "pa",
       type: "slot",
@@ -122,19 +106,16 @@ describe("negotiationOutputToWire", () => {
       partyId: "did:key:alice",
       bind_policy: null,
     };
-    const wired = negotiationOutputToWire({
-      raw: {
-        bind: { pa: { rate: 100, invented: true } },
-        expose: [{ kind: "slot", promise: "next" }],
-      },
-      opening: false,
-      remainingTurns: 3,
-      peerPorts: [openPeer],
-    });
-    expect(wired.kind).toBe("offer");
-    if (wired.kind !== "offer") return;
-    expect(wired.body.bind_port_id).toBe("pa");
-    expect(wired.body.bind_payload).toEqual({});
+    expect(() =>
+      negotiationOutputToWire({
+        raw: {
+          bind: { portId: "pa", payload: { rate: 100, invented: true } },
+          expose: [{ kind: "slot", promise: "next" }],
+        },
+        opening: false,
+        peerPorts: [openPeer],
+      }),
+    ).toThrow();
   });
 
   test("disconnect maps to leave", () => {
@@ -142,7 +123,6 @@ describe("negotiationOutputToWire", () => {
       negotiationOutputToWire({
         raw: { disconnect: true },
         opening: false,
-        remainingTurns: 3,
         peerPorts: [peer],
       }),
     ).toEqual({ kind: "disconnect" });
@@ -151,23 +131,11 @@ describe("negotiationOutputToWire", () => {
   test("rejects unknown bind port", () => {
     expect(() =>
       negotiationOutputToWire({
-        raw: { bind: { nope: {} }, expose: [] },
+        raw: { bind: { portId: "nope", payload: {} }, expose: [] },
         opening: false,
-        remainingTurns: 3,
         peerPorts: [peer],
       }),
-    ).toThrow(/not an available peer port/);
-  });
-
-  test("rejects extra bind keys", () => {
-    expect(() =>
-      negotiationOutputToWire({
-        raw: { bind: { pb: { amount: 1 }, pa: {} }, expose: [] },
-        opening: false,
-        remainingTurns: 3,
-        peerPorts: [peer],
-      }),
-    ).toThrow(/exactly one peer port/);
+    ).toThrow();
   });
 
   test("rejects opening disconnect", () => {
@@ -175,9 +143,8 @@ describe("negotiationOutputToWire", () => {
       negotiationOutputToWire({
         raw: { disconnect: true },
         opening: true,
-        remainingTurns: 6,
         peerPorts: [],
       }),
-    ).toThrow(/cannot disconnect/);
+    ).toThrow();
   });
 });

@@ -10,6 +10,12 @@ function port(id: string, bind_policy: Record<string, unknown> | null = null): A
   return { id, type: "slot", promise: "open", partyId: "did:key:bob", bind_policy };
 }
 
+function ok(schema: ReturnType<typeof negotiationTurnEnvelopeSchema>, value: unknown): boolean {
+  const result = schema["~standard"].validate(value);
+  if (result instanceof Promise) throw new Error("expected sync schema");
+  return result.issues === undefined;
+}
+
 const opening = { opening: true, peerPorts: [] as AvailablePeerPort[] };
 const amountPolicy = {
   type: "object",
@@ -25,33 +31,34 @@ const later = {
 describe("negotiationTurnEnvelopeSchema", () => {
   test("opening turn requires expose with kind and promise", () => {
     const schema = negotiationTurnEnvelopeSchema(opening);
-    expect(schema.safeParse({ expose: [{ kind: "slot", promise: "open" }] }).success).toBe(true);
-    expect(schema.safeParse({ expose: [{}] }).success).toBe(false);
-    expect(schema.safeParse({ expose: [{ type: "object", properties: {} }] }).success).toBe(false);
-    expect(schema.safeParse({ disconnect: true }).success).toBe(false);
+    expect(ok(schema, { expose: [{ kind: "slot", promise: "open" }] })).toBe(true);
+    expect(ok(schema, { expose: [{}] })).toBe(false);
+    expect(ok(schema, { expose: [{ type: "object", properties: {} }] })).toBe(false);
+    expect(ok(schema, { disconnect: true })).toBe(false);
   });
 
   test("later turn with peer ports is disconnect or bind+expose", () => {
     const schema = negotiationTurnEnvelopeSchema(later);
-    expect(schema.safeParse({ disconnect: true }).success).toBe(true);
+    expect(ok(schema, { disconnect: true })).toBe(true);
     expect(
-      schema.safeParse({
-        bind: { pb: { amount: 3 } },
+      ok(schema, {
+        bind: { portId: "pb", payload: { amount: 3 } },
         expose: [{ kind: "slot", promise: "next" }],
-      }).success,
+      }),
     ).toBe(true);
     expect(
-      schema.safeParse({
-        bind: { pb: {} },
+      ok(schema, {
+        bind: { portId: "pb", payload: {} },
         expose: [],
-      }).success,
+      }),
     ).toBe(false);
   });
 
   test("later turn with no bindable ports is disconnect or expose", () => {
     const schema = negotiationTurnEnvelopeSchema({ opening: false, peerPorts: [] });
-    expect(schema.safeParse({ disconnect: true }).success).toBe(true);
-    expect(schema.safeParse({ expose: [] }).success).toBe(true);
+    expect(ok(schema, { disconnect: true })).toBe(true);
+    expect(ok(schema, { expose: [{ kind: "slot", promise: "wait" }] })).toBe(true);
+    expect(ok(schema, { expose: [] })).toBe(false);
   });
 
   test("later turn against a port with no bind_policy requires empty payload", () => {
@@ -60,21 +67,17 @@ describe("negotiationTurnEnvelopeSchema", () => {
       peerPorts: [port("pa")],
     });
     expect(
-      schema.safeParse({
-        bind: { pa: {} },
+      ok(schema, {
+        bind: { portId: "pa", payload: {} },
         expose: [{ kind: "slot", promise: "next" }],
-      }).success,
+      }),
     ).toBe(true);
-    const coerced = schema.safeParse({
-      bind: { pa: { invented: true } },
-      expose: [{ kind: "slot", promise: "next" }],
-    });
-    expect(coerced.success).toBe(true);
-    if (!coerced.success) return;
-    expect(coerced.data).toEqual({
-      bind: { pa: {} },
-      expose: [{ kind: "slot", promise: "next" }],
-    });
+    expect(
+      ok(schema, {
+        bind: { portId: "pa", payload: { invented: true } },
+        expose: [{ kind: "slot", promise: "next" }],
+      }),
+    ).toBe(false);
   });
 });
 
@@ -89,22 +92,6 @@ describe("parseNegotiationTurnEnvelope", () => {
     expect(() => parseNegotiationTurnEnvelope({ expose: [{}] }, opening)).toThrow();
   });
 
-  test("maps affordance type onto kind when it is not a JSON Schema keyword", () => {
-    const parsed = parseNegotiationTurnEnvelope(
-      { expose: [{ type: "slot", promise: "open" }] },
-      opening,
-    );
-    expect(parsed).toEqual({ expose: [{ kind: "slot", promise: "open" }] });
-  });
-
-  test("maps ports alias onto expose", () => {
-    const parsed = parseNegotiationTurnEnvelope(
-      { ports: [{ kind: "slot", promise: "open" }] },
-      opening,
-    );
-    expect(parsed).toEqual({ expose: [{ kind: "slot", promise: "open" }] });
-  });
-
   test("rejects JSON Schema document as expose item", () => {
     expect(() =>
       parseNegotiationTurnEnvelope({ expose: [{ type: "object", properties: {} }] }, opening),
@@ -112,18 +99,19 @@ describe("parseNegotiationTurnEnvelope", () => {
   });
 
   test("rejects opening disconnect", () => {
-    expect(() => parseNegotiationTurnEnvelope({ disconnect: true }, opening)).toThrow(
-      /cannot disconnect/,
-    );
+    expect(() => parseNegotiationTurnEnvelope({ disconnect: true }, opening)).toThrow();
   });
 
   test("accepts later bind+expose", () => {
     const parsed = parseNegotiationTurnEnvelope(
-      { bind: { pb: { amount: 1 } }, expose: [{ kind: "slot", promise: "next" }] },
+      {
+        bind: { portId: "pb", payload: { amount: 1 } },
+        expose: [{ kind: "slot", promise: "next" }],
+      },
       later,
     );
     expect(parsed).toEqual({
-      bind: { pb: { amount: 1 } },
+      bind: { portId: "pb", payload: { amount: 1 } },
       expose: [{ kind: "slot", promise: "next" }],
     });
   });

@@ -55,7 +55,6 @@ export async function runNbcNegotiationModelTurn(
       await runNbcModelTurn({
         opening: input.prepared.opening,
         peerPorts: input.prepared.peerPorts,
-        remainingTurns: input.prepared.remainingTurns,
         generate: async () => {
           const result = await generateText({
             model: resolveModelId(input.params.modelId),

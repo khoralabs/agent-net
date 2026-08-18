@@ -4,7 +4,6 @@ import type { AvailablePeerPort } from "./who-should-act.ts";
 export type RunNbcModelTurnInput = {
   opening: boolean;
   peerPorts: readonly AvailablePeerPort[];
-  remainingTurns: number;
   generate: () => Promise<unknown>;
   postTurn: (body: Record<string, unknown>) => Promise<void>;
   postLeave: () => Promise<void>;
@@ -18,7 +17,6 @@ export async function runNbcModelTurn(
   const wired = negotiationOutputToWire({
     raw,
     opening: input.opening,
-    remainingTurns: input.remainingTurns,
     peerPorts: input.peerPorts,
   });
   if (wired.kind === "disconnect") {

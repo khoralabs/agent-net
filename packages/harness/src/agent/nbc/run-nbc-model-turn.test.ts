@@ -7,7 +7,6 @@ describe("runNbcModelTurn", () => {
     const result = await runNbcModelTurn({
       opening: true,
       peerPorts: [],
-      remainingTurns: 4,
       generate: async () => ({ expose: [{ kind: "slot", promise: "open" }] }),
       postTurn: async (body) => {
         posted.push(body);
@@ -25,7 +24,6 @@ describe("runNbcModelTurn", () => {
     const result = await runNbcModelTurn({
       opening: false,
       peerPorts: [],
-      remainingTurns: 3,
       generate: async () => ({ disconnect: true }),
       postTurn: async () => {
         throw new Error("turn not expected");

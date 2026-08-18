@@ -1,22 +1,10 @@
-/**
- * NBC negotiation prompts (system + user messages).
- *
- * **Temporary** — instructions refer to port `kind` instead of wire `type` so
- * models do not emit JSON Schema documents as ports. Drop alias language when
- * OBP/Vellum rename the affordance field.
- */
+/** NBC negotiation prompts (system + user messages). */
 export type NegotiationBrief = {
   objective?: string;
   constraints?: string;
 };
 
-/**
- * System instructions for one NBC model turn.
- *
- * TODO(nbc): Prompts name port `kind` (not wire `type`) so the model does not
- * emit a JSON Schema document as `expose[0]`. Map `kind` → `NbcPortSpec.type`
- * in `negotiationOutputToWire` until upstream renames the affordance field.
- */
+/** System instructions for one NBC model turn. */
 export function buildNegotiationInstructions(input: {
   asDid: string;
   peerDid: string;
@@ -33,7 +21,6 @@ export function buildNegotiationInstructions(input: {
     `Turn index ${input.turnIndex}; ${input.remainingTurns} protocol turns remain.`,
     "You may search memories first. The final output must match the turn schema — do not write prose.",
     "Do not impersonate the peer. Do not wait for another turn inside this run.",
-    // TODO(nbc): `kind` is the host alias for NBC wire `type` (JSON Schema collision).
     'Each exposed port must include kind (affordance such as "slot", not a JSON Schema type) and promise.',
   ];
   if (input.opening) {
@@ -42,7 +29,7 @@ export function buildNegotiationInstructions(input: {
     );
   } else if (input.availablePeerPortIds.length > 0) {
     lines.push(
-      `Bind exactly one peer port by returning { bind: { "<portId>": <payload> }, expose: [{ kind, promise, bind_policy? }] }, or { disconnect: true } to leave.`,
+      `Bind exactly one peer port by returning { bind: { portId: "<portId>", payload: <payload> }, expose?: [{ kind, promise, bind_policy? }] }, or { disconnect: true } to leave.`,
       "If the port has no bind_policy, payload must be {}. Otherwise payload must match that port's bind_policy.",
       `Available peer ports you may bind: ${input.availablePeerPortIds.join(", ")}.`,
     );
