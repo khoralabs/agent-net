@@ -152,7 +152,7 @@ function zBindPayload(policy: Record<string, unknown> | null) {
 function zBindObject(peerPorts: readonly AvailablePeerPort[]) {
   return zUnion(
     peerPorts.map((port) => z.strictObject({ [port.id]: zBindPayload(port.bind_policy) })),
-  );
+  ) as z.ZodType<Record<string, Record<string, unknown>>>;
 }
 
 function zDisconnect() {
@@ -174,7 +174,9 @@ function zExposeOffer(minItems: number) {
  * with the JSON Schema keyword `"type"`. Peer `bind_policy` documents become
  * Zod via `z.fromJSONSchema`; OBP still checks them at map time.
  */
-export function negotiationTurnEnvelopeSchema(input: NegotiationTurnEnvelopeContext) {
+export function negotiationTurnEnvelopeSchema(
+  input: NegotiationTurnEnvelopeContext,
+): z.ZodType<NegotiationTurnEnvelope> {
   const coerce = coerceEnvelope(input.peerPorts);
   if (input.opening) {
     return z.preprocess(coerce, zExposeOffer(1));

@@ -110,7 +110,7 @@ test("assembleTurnContext builds self-thread messages and instruction blocks", a
     inboxEntries,
   });
 
-  expect(params.output.chat.threadId).toBe(threadId);
+  expect(params.output?.chat?.threadId).toBe(threadId);
   expect(params.context.messages.length).toBeGreaterThan(0);
   expect(params.context.instructions?.some((block) => block.includes("<inbox_entries>"))).toBe(
     true,

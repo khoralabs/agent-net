@@ -112,7 +112,7 @@ export default async function handler(req: Request): Promise<Response> {
     };
 
     await start(agentResponse, [params]);
-    return json({ runId, threadId: params.output.chat.threadId, started: true });
+    return json({ runId, threadId: params.output?.chat?.threadId, started: true });
   }
 
   return json({ error: "Not found" }, { status: 404 });
