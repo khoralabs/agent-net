@@ -56,6 +56,42 @@ describe("createVellumChainSessionRegistry", () => {
     registry.clearForTests();
   });
 
+  test("commitTurn leave calls endOffers without sendTurn", async () => {
+    const registry = createVellumChainSessionRegistry();
+    const sendCalls: unknown[] = [];
+    const endCalls: string[] = [];
+    registry.seedLiveForTests(
+      {
+        chainId: "c-leave",
+        channelId: "ch-leave",
+        sessionId: "sess-leave",
+        initiatorDid: "did:key:alice",
+        counterpartyDid: "did:key:bob",
+        dataDirRoot: "/tmp",
+        genesisComplete: true,
+      },
+      {
+        "did:key:alice": {
+          sendTurn: async (_s: string, body: unknown) => {
+            sendCalls.push(body);
+          },
+          endOffers: async (sessionId: string) => {
+            endCalls.push(sessionId);
+          },
+        } as never,
+      },
+    );
+
+    const result = await registry.commitTurn("c-leave", {
+      asDid: "did:key:alice",
+      body: { disconnect: true },
+    });
+    expect(result).toEqual({ sessionId: "sess-leave", genesis: false });
+    expect(sendCalls).toEqual([]);
+    expect(endCalls).toEqual(["sess-leave"]);
+    registry.clearForTests();
+  });
+
   test("commitTurn uses initChain for genesis and sendTurn afterward", async () => {
     const registry = createVellumChainSessionRegistry();
     const genesis = { offer: {}, ports: [] };

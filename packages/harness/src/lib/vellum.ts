@@ -60,6 +60,7 @@ export function wrapPoolClient(pool: VellumPool, did: string, channelId: string)
     },
     chainCreate: (i) => client().chainCreate(i),
     chainRelease: (s) => client().chainRelease(s),
+    endOffers: (s) => client().endOffers(s),
     sendTurn: (s, b) => client().sendTurn(s, b),
     getChainSnapshot: () => client().getChainSnapshot(),
     getSessionSnapshot: (s) => client().getSessionSnapshot(s),

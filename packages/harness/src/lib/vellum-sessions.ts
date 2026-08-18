@@ -1,5 +1,5 @@
 /**
- * Vellum channel/chain session registry for NBC (open channel, delayed genesis, turns).
+ * Vellum channel/chain session registry for NBC (open channel, optional genesis, turns).
  *
  * **Temporary** — Post-open poll until the responder replica sees the session id.
  */
@@ -199,12 +199,23 @@ export function createVellumChainSessionRegistry(
       if (live === undefined) {
         throw new Error(`commitTurn: no live session for ${chainId}`);
       }
-      if (!live.genesisComplete) {
+      const leave = input.body.disconnect === true;
+      if (!live.genesisComplete && !leave) {
         if (input.asDid !== live.initiatorDid) {
           throw new Error(NBC_GENESIS_NOT_INITIATOR);
         }
         const inited = await this.initChain(chainId, input.body);
         return { sessionId: inited.sessionId, genesis: true };
+      }
+      const peerDid = input.asDid === live.initiatorDid ? live.counterpartyDid : live.initiatorDid;
+      if (pool !== null) {
+        const chain = new VellumChain(
+          pool.handle({ did: input.asDid, channelId: live.channelId }),
+          live.sessionId,
+          peerDid,
+        );
+        await chain.commit(input.body);
+        return { sessionId: live.sessionId, genesis: false };
       }
       const handle = this.handleForDid(
         chainId,
@@ -215,7 +226,11 @@ export function createVellumChainSessionRegistry(
       if (handle === null) {
         throw new Error(`commitTurn: no Vellum handle for ${input.asDid}`);
       }
-      await handle.sendTurn(live.sessionId, input.body);
+      if (leave) {
+        await handle.endOffers(live.sessionId);
+      } else {
+        await handle.sendTurn(live.sessionId, input.body);
+      }
       return { sessionId: live.sessionId, genesis: false };
     },
 

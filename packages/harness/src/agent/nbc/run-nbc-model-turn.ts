@@ -1,4 +1,4 @@
-import { negotiationOutputToWire } from "./action.ts";
+import { isDisconnectEnvelope, parseNegotiationTurnEnvelope } from "./turn-output-schema.ts";
 import type { AvailablePeerPort } from "./who-should-act.ts";
 
 export type RunNbcModelTurnInput = {
@@ -9,20 +9,19 @@ export type RunNbcModelTurnInput = {
   postLeave: () => Promise<void>;
 };
 
-/** Generate one NBC turn, map to wire, and commit via host IO. No workflow semantics. */
+/** Generate one NBC turn and post the host-profile body. No workflow semantics. */
 export async function runNbcModelTurn(
   input: RunNbcModelTurnInput,
 ): Promise<{ kind: "offer" | "disconnect" }> {
   const raw = await input.generate();
-  const wired = negotiationOutputToWire({
-    raw,
+  const parsed = parseNegotiationTurnEnvelope(raw, {
     opening: input.opening,
     peerPorts: input.peerPorts,
   });
-  if (wired.kind === "disconnect") {
+  if (isDisconnectEnvelope(parsed)) {
     await input.postLeave();
     return { kind: "disconnect" };
   }
-  await input.postTurn(wired.body);
+  await input.postTurn(parsed as Record<string, unknown>);
   return { kind: "offer" };
 }

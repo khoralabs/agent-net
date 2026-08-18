@@ -36,7 +36,7 @@ export type RunNbcNegotiationModelTurnInput = {
   onExhausted: (detail: string, attempts: number) => never;
 };
 
-/** Run generate → wire → mesh commit for one NBC turn. No workflow directive. */
+/** Run generate → host-profile → mesh commit for one NBC turn. No workflow directive. */
 export async function runNbcNegotiationModelTurn(
   input: RunNbcNegotiationModelTurnInput,
 ): Promise<{ ok: true }> {

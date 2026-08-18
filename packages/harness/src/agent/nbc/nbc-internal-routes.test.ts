@@ -275,4 +275,46 @@ describe("nbc internal negotiation routes", () => {
     expect(peerRes.status).toBe(409);
     expect(chains.get("c-peer")?.sessionId).toBe("");
   });
+
+  test("POST leave commits disconnect and closes the chain", async () => {
+    const { host, chains } = createMemoryHost([
+      {
+        id: "c1",
+        sessionId: "sess-1",
+        status: "open",
+        channelId: "ch-1",
+        initiatorDid: "did:key:alice",
+        counterpartyDid: "did:key:bob",
+        turnsCompleted: 1,
+        maxTurns: 6,
+      },
+    ]);
+    const commitCalls: Array<{ asDid: string; body: unknown }> = [];
+    const routes = registerNbcInternalNegotiationRoutes({
+      requireAuth,
+      host,
+      sessions: {
+        commitTurn: async (
+          _chainId: string,
+          input: { asDid: string; body: Record<string, unknown> },
+        ) => {
+          commitCalls.push({ asDid: input.asDid, body: input.body });
+          return { sessionId: "sess-1", genesis: false };
+        },
+      } as never,
+      notifyChainChanged: () => undefined,
+    });
+
+    const res = await routes["/api/internal/negotiations/:chainId/leave"].POST(
+      req("http://localhost/api/internal/negotiations/c1/leave", MESH_TOKEN, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ asDid: "did:key:alice", reason: "done" }),
+      }),
+    );
+    expect(res.status).toBe(200);
+    expect(commitCalls).toEqual([{ asDid: "did:key:alice", body: { disconnect: true } }]);
+    expect(chains.get("c1")?.status).toBe("closed");
+    expect(chains.get("c1")?.constraints).toBe("done");
+  });
 });

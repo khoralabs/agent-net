@@ -176,22 +176,18 @@ export function registerNbcInternalNegotiationRoutes(
         if (asDid !== chain.initiatorDid && asDid !== chain.counterpartyDid) {
           return json({ error: "asDid must be a party on this chain" }, 400);
         }
-        const handle = sessions.handleForDid(
-          chainId,
-          chain.initiatorDid,
-          chain.counterpartyDid,
-          asDid,
-        );
-        if (handle === null) {
-          return json({ error: "No Vellum handle for asDid" }, 409);
-        }
         const reason = sanitizeReason(body.reason);
         try {
-          if (chain.sessionId.length > 0) {
-            await handle.chainRelease(chain.sessionId);
+          await sessions.commitTurn(chainId, {
+            asDid,
+            body: { disconnect: true },
+          });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          if (message.includes("no Vellum handle")) {
+            return json({ error: "No Vellum handle for asDid" }, 409);
           }
-        } catch {
-          /* release best-effort */
+          return json({ error: message }, 502);
         }
         host.onLeft({
           chainId,

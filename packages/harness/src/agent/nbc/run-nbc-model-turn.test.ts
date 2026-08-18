@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { runNbcModelTurn } from "./run-nbc-model-turn.ts";
 
 describe("runNbcModelTurn", () => {
-  test("posts wire body on offer", async () => {
+  test("posts host-profile body on offer", async () => {
     const posted: unknown[] = [];
     const result = await runNbcModelTurn({
       opening: true,
@@ -16,7 +16,7 @@ describe("runNbcModelTurn", () => {
       },
     });
     expect(result).toEqual({ kind: "offer" });
-    expect(posted.length).toBe(1);
+    expect(posted).toEqual([{ expose: [{ kind: "slot", promise: "open" }] }]);
   });
 
   test("calls postLeave on disconnect", async () => {
