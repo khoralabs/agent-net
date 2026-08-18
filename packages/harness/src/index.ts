@@ -257,11 +257,6 @@ export {
   requireMemoriesAdminToken,
   requireMemoriesBaseUrl,
 } from "./lib/memories-base-url.ts";
-export {
-  type LoadNbcChainGraphInput,
-  loadNbcChainGraph,
-  type NbcChainGraph,
-} from "./lib/nbc-chain-graph.ts";
 export { PerAgentInviteBank } from "./lib/per-agent-invite-bank.ts";
 export { requireRelayBaseUrl } from "./lib/relay-base-url.ts";
 export {

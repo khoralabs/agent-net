@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { NbcChainGraph } from "../../lib/nbc-chain-graph.ts";
+import type { NbcChainGraph } from "@khoralabs/obp-nbc";
 import { NBC_GENESIS_NOT_INITIATOR } from "../../lib/vellum-sessions.ts";
 import {
   type NbcInternalNegotiationChain,

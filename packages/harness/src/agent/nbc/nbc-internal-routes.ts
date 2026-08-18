@@ -1,4 +1,4 @@
-import { loadNbcChainGraph, type NbcChainGraph } from "../../lib/nbc-chain-graph.ts";
+import type { NbcChainGraph } from "@khoralabs/obp-nbc";
 import {
   NBC_GENESIS_NOT_INITIATOR,
   type VellumChainSessionRegistry,
@@ -27,7 +27,7 @@ export type RegisterNbcInternalNegotiationRoutesInput = {
   host: NbcInternalNegotiationHost;
   sessions: VellumChainSessionRegistry;
   notifyChainChanged: (event: NbcChainChanged) => void;
-  loadGraph?: (input: { dataDir: string; channelId: string }) => Promise<NbcChainGraph>;
+  loadGraph?: () => Promise<NbcChainGraph>;
 };
 
 function json(data: unknown, status = 200): Response {
@@ -44,7 +44,6 @@ export function registerNbcInternalNegotiationRoutes(
   input: RegisterNbcInternalNegotiationRoutesInput,
 ) {
   const { requireAuth, host, sessions, notifyChainChanged } = input;
-  const loadGraph = input.loadGraph ?? loadNbcChainGraph;
 
   return {
     "/api/internal/negotiations/:chainId": {
@@ -61,15 +60,21 @@ export function registerNbcInternalNegotiationRoutes(
         if (chain.channelId.length === 0) {
           return json({ error: "Chain has no channel yet" }, 409);
         }
-        const dataDir = sessions.dataDirForDid(chainId, asDid);
-        if (dataDir === null) {
-          return json({ error: "Vellum attachment is not bound for asDid" }, 409);
+        if (chain.sessionId.length === 0) {
+          return json({ error: "Chain has no Vellum session yet" }, 409);
         }
         try {
-          const graph = await loadGraph({
-            dataDir,
-            channelId: chain.channelId,
-          });
+          const graph =
+            input.loadGraph !== undefined
+              ? await input.loadGraph()
+              : (
+                  await sessions
+                    .handleForDid(chainId, chain.initiatorDid, chain.counterpartyDid, asDid)
+                    ?.getSessionSnapshot(chain.sessionId)
+                )?.graph;
+          if (graph === undefined) {
+            return json({ error: "Vellum attachment is not bound for asDid" }, 409);
+          }
           const brief =
             asDid === chain.initiatorDid
               ? {

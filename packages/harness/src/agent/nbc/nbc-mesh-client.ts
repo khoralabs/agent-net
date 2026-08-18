@@ -1,4 +1,4 @@
-import type { NbcChainGraph } from "../../lib/nbc-chain-graph.ts";
+import type { NbcChainGraph } from "@khoralabs/obp-nbc";
 
 export type NbcNegotiationStateResponse = {
   chain: {

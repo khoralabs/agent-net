@@ -1,11 +1,6 @@
 /**
- * NBC control loop: change bus + {@link startNbcReplicaWatch} + wake dispatcher.
- *
- * **Temporary** — the replica-watch half of this module is deleted when Vellum
- * offers a subscription for graph/turn advances; keep the host callback surface
- * ({@link NbcLoopHost}) if product still needs workflow wake + status patches.
+ * NBC control loop: change bus + replica watch + wake dispatcher.
  */
-import type { NbcChainGraph } from "../../lib/nbc-chain-graph.ts";
 import type { VellumChainSessionRegistry } from "../../lib/vellum-sessions.ts";
 import type { NbcLoopHost } from "./loop-host.ts";
 import {
@@ -19,7 +14,6 @@ import { createNbcWakeDispatcher } from "./nbc-wake-dispatcher.ts";
 export type StartNbcLoopInput = {
   sessions: VellumChainSessionRegistry;
   host: NbcLoopHost;
-  loadGraph?: (input: { dataDir: string; channelId: string }) => Promise<NbcChainGraph>;
 };
 
 export type NbcLoopHandle = {
@@ -34,7 +28,6 @@ export function startNbcLoop(input: StartNbcLoopInput): NbcLoopHandle {
   const onChanged = createNbcWakeDispatcher({
     sessions: input.sessions,
     host: input.host,
-    loadGraph: input.loadGraph,
   });
   const unsub = bus.subscribe((event) => {
     void onChanged(event);

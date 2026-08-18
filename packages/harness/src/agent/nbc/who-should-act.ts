@@ -1,11 +1,12 @@
 /**
- * Pure turn-order and bindable-port helpers over a loaded {@link NbcChainGraph}.
- *
- * **Temporary** — {@link whoShouldAct} infers the next actor from last-offer
- * `partyId`; {@link availablePeerPorts} joins exposes/ports locally. Both are
- * superseded by Vellum/OBP snapshot APIs (`whoShouldAct`, `portsICanBind`).
+ * Host overlay on OBP {@link whoShouldAct} / {@link availablePortsFor}: turn-limit,
+ * left, terminal-bind, and not-open are product state, not graph ping-pong.
  */
-import type { NbcChainGraph } from "../../lib/nbc-chain-graph.ts";
+import {
+  availablePortsFor,
+  type NbcChainGraph,
+  whoShouldAct as obpWhoShouldAct,
+} from "@khoralabs/obp-nbc";
 
 export const NBC_DEFAULT_MAX_TURNS = 6;
 export const NBC_MAX_TURNS_CAP = 10;
@@ -31,11 +32,7 @@ export type WhoShouldActResult = {
     | "error";
 };
 
-function otherParty(chain: NegotiationChainView, did: string): string {
-  return did === chain.initiatorDid ? chain.counterpartyDid : chain.initiatorDid;
-}
-
-/** Pure: who should submit the next NBC action on this replica. */
+/** Host reasons first, then OBP acting-party. */
 export function whoShouldAct(
   graph: NbcChainGraph,
   chain: NegotiationChainView,
@@ -55,14 +52,14 @@ export function whoShouldAct(
   if (chain.negotiationOutcome === "turn-limit" || chain.turnsCompleted >= chain.maxTurns) {
     return { did: null, reason: "turn-limit" };
   }
-  if (graph.offers.length === 0) {
-    return { did: chain.initiatorDid, reason: "initiator-open" };
+  const did = obpWhoShouldAct(graph, { initiatorId: chain.initiatorDid });
+  if (did === null) {
+    return { did: null, reason: "terminal-bind" };
   }
-  const last = graph.offers[graph.offers.length - 1];
-  if (last === undefined) {
-    return { did: chain.initiatorDid, reason: "initiator-open" };
-  }
-  return { did: otherParty(chain, last.partyId), reason: "alternate" };
+  return {
+    did,
+    reason: graph.offers.length === 0 ? "initiator-open" : "alternate",
+  };
 }
 
 export type AvailablePeerPort = {
@@ -80,30 +77,19 @@ function jsonObjectOrNull(value: unknown): Record<string, unknown> | null {
   return value as Record<string, unknown>;
 }
 
-/** Peer ports this DID may bind on the current replica graph. */
+/** Peer ports this DID may bind, from OBP {@link availablePortsFor}. */
 export function availablePeerPorts(graph: NbcChainGraph, asDid: string): AvailablePeerPort[] {
-  const ownOfferIds = new Set(graph.offers.filter((o) => o.partyId === asDid).map((o) => o.id));
-  const peerPortIds = new Set<string>();
-  for (const edge of graph.exposes) {
-    if (!ownOfferIds.has(edge.offerId)) peerPortIds.add(edge.portId);
-  }
-  const out: AvailablePeerPort[] = [];
-  for (const port of graph.ports) {
-    if (!peerPortIds.has(port.id)) continue;
-    if (port.expired === true || port.terminal === true) continue;
-    const max = port.max_bindings ?? 1;
-    if (port.bindCount >= max) continue;
-    const offerId = graph.exposes.find((e) => e.portId === port.id)?.offerId;
+  return availablePortsFor(asDid, graph).map((port) => {
+    const offerId = port.exposedOnOfferIds[0];
     const partyId = graph.offers.find((o) => o.id === offerId)?.partyId ?? "";
-    out.push({
+    return {
       id: port.id,
       type: port.kind,
       promise: port.promise,
       partyId,
       bind_policy: jsonObjectOrNull(port.bind_policy),
-    });
-  }
-  return out;
+    };
+  });
 }
 
 export function clampMaxTurns(raw: unknown, fallback = NBC_DEFAULT_MAX_TURNS): number {

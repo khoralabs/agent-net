@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import type { NbcChainGraph } from "../../lib/nbc-chain-graph.ts";
+import type { NbcChainGraph } from "@khoralabs/obp-nbc";
 import { availablePeerPorts, whoShouldAct } from "./who-should-act.ts";
 
 function emptyGraph(): NbcChainGraph {
@@ -33,6 +33,10 @@ describe("whoShouldAct", () => {
   test("after genesis offer (initiator partyId) → counterparty", () => {
     const graph: NbcChainGraph = {
       ...emptyGraph(),
+      parties: [
+        { id: "did:key:alice", name: "alice" },
+        { id: "did:key:bob", name: "bob" },
+      ],
       offers: [
         {
           id: "o1",
@@ -40,6 +44,19 @@ describe("whoShouldAct", () => {
           expires_turn: 10,
           expires_at_ms: 0,
           partyId: "did:key:alice",
+        },
+      ],
+      exposes: [{ offerId: "o1", portId: "pa" }],
+      ports: [
+        {
+          id: "pa",
+          kind: "slot",
+          promise: "open",
+          ref: "",
+          expires_turn: 10,
+          expires_at_ms: 0,
+          exposedOnOfferIds: ["o1"],
+          bindCount: 0,
         },
       ],
     };

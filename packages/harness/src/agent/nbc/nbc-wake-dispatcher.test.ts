@@ -1,5 +1,8 @@
 import { afterEach, describe, expect, test } from "bun:test";
-import type { NbcChainGraph } from "../../lib/nbc-chain-graph.ts";
+import type { NbcChainGraph } from "@khoralabs/obp-nbc";
+import { openingTurnSchema } from "@khoralabs/obp-nbc";
+import type { ChainSnapshot } from "@khoralabs/vellum-client";
+
 import type { NbcLoopChain } from "./loop-host.ts";
 import { createNbcWakeDispatcher, resetNbcWakeDispatcherForTests } from "./nbc-wake-dispatcher.ts";
 
@@ -11,6 +14,17 @@ function emptyGraph(): NbcChainGraph {
     extends: [],
     exposes: [],
     binds: [],
+  };
+}
+
+function snap(graph: NbcChainGraph, whoShouldAct: string | null): ChainSnapshot {
+  return {
+    session_id: "sess",
+    graph,
+    whoShouldAct,
+    portsICanBind: [],
+    needsTurn: whoShouldAct !== null,
+    schema: openingTurnSchema,
   };
 }
 
@@ -34,19 +48,15 @@ describe("nbc wake dispatcher", () => {
     const chain = loopChain({ channelId: "ch-1" });
     let runId = "";
     const starts: string[] = [];
-    const graphs = new Map<string, NbcChainGraph>([
-      ["did:key:alice", emptyGraph()],
-      ["did:key:bob", emptyGraph()],
-    ]);
     const onChanged = createNbcWakeDispatcher({
       sessions: {
         get: () => ({
           chainId: "c1",
           channelId: "ch-1",
+          sessionId: "sess",
           initiatorDid: "did:key:alice",
           counterpartyDid: "did:key:bob",
         }),
-        dataDirForDid: (_chainId: string, did: string) => `/tmp/${did}`,
       } as never,
       host: {
         getChain: (id) => (id === "c1" ? chain : null),
@@ -59,10 +69,7 @@ describe("nbc wake dispatcher", () => {
           return { runId: `run-${input.asDid}` };
         },
       },
-      loadGraph: async ({ dataDir }) => {
-        const did = dataDir.replace("/tmp/", "");
-        return graphs.get(did) ?? emptyGraph();
-      },
+      getSnapshot: async () => snap(emptyGraph(), "did:key:alice"),
     });
 
     await onChanged({ chainId: "c1", turnSeq: 0, cause: "opened" });
@@ -78,6 +85,10 @@ describe("nbc wake dispatcher", () => {
     const chain = loopChain({ channelId: "ch-1", turnsCompleted: 1 });
     const aliceGraph: NbcChainGraph = {
       ...emptyGraph(),
+      parties: [
+        { id: "did:key:alice", name: "alice" },
+        { id: "did:key:bob", name: "bob" },
+      ],
       offers: [
         {
           id: "o1",
@@ -87,6 +98,19 @@ describe("nbc wake dispatcher", () => {
           partyId: "did:key:alice",
         },
       ],
+      exposes: [{ offerId: "o1", portId: "pa" }],
+      ports: [
+        {
+          id: "pa",
+          kind: "slot",
+          promise: "open",
+          ref: "",
+          expires_turn: 10,
+          expires_at_ms: 0,
+          exposedOnOfferIds: ["o1"],
+          bindCount: 0,
+        },
+      ],
     };
     const starts: string[] = [];
     const onChanged = createNbcWakeDispatcher({
@@ -94,10 +118,10 @@ describe("nbc wake dispatcher", () => {
         get: () => ({
           chainId: "c2",
           channelId: "ch-1",
+          sessionId: "sess",
           initiatorDid: "did:key:alice",
           counterpartyDid: "did:key:bob",
         }),
-        dataDirForDid: () => "/tmp/did:key:alice",
       } as never,
       host: {
         getChain: (id) => (id === "c2" ? chain : null),
@@ -110,7 +134,7 @@ describe("nbc wake dispatcher", () => {
           return { runId: "run" };
         },
       },
-      loadGraph: async () => aliceGraph,
+      getSnapshot: async () => snap(aliceGraph, "did:key:bob"),
     });
 
     await onChanged({ chainId: "c2", turnSeq: 1, cause: "turn" });
@@ -134,10 +158,10 @@ describe("nbc wake dispatcher", () => {
         get: () => ({
           chainId: "c3",
           channelId: "ch-1",
+          sessionId: "sess",
           initiatorDid: "did:key:alice",
           counterpartyDid: "did:key:bob",
         }),
-        dataDirForDid: () => "/tmp/did:key:alice",
       } as never,
       host: {
         getChain: (id) => (id === "c3" ? chain : null),
@@ -152,7 +176,7 @@ describe("nbc wake dispatcher", () => {
           return { runId: "run" };
         },
       },
-      loadGraph: async () => emptyGraph(),
+      getSnapshot: async () => snap(emptyGraph(), "did:key:alice"),
     });
 
     await onChanged({ chainId: "c3", turnSeq: 0, cause: "opened" });

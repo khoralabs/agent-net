@@ -4,7 +4,7 @@
  * **Temporary** — wraps {@link availablePeerPorts} and empty-graph opening detection
  * until snapshot APIs replace local graph joins.
  */
-import type { NbcChainGraph } from "../../lib/nbc-chain-graph.ts";
+import type { NbcChainGraph } from "@khoralabs/obp-nbc";
 import { availablePeerPorts } from "./who-should-act.ts";
 
 /** Derive opening flag, peer ports, and remaining turns from a replica graph. */

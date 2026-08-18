@@ -1,14 +1,8 @@
 /**
- * Wakes local model turns from chain-change events using a host chain index +
- * replica graph load + {@link whoShouldAct}.
- *
- * **Temporary** — shrink or remove when Vellum chain snapshots expose
- * `whoShouldAct(did)` and `portsICanBind(did)` so the dispatcher does not
- * poll sqlite or infer turn order from last-offer `partyId`. Dedupe of
- * `opened` + `snapshot` for the same turn goes away with a single `committed`
- * event from upstream.
+ * Wakes local model turns from Vellum session snapshots + host chain index.
  */
-import { loadNbcChainGraph, type NbcChainGraph } from "../../lib/nbc-chain-graph.ts";
+import type { ChainSnapshot } from "@khoralabs/vellum-client";
+
 import type { VellumChainSessionRegistry } from "../../lib/vellum-sessions.ts";
 import type { NbcLoopHost } from "./loop-host.ts";
 import type { NbcChainChanged } from "./nbc-chain-change-bus.ts";
@@ -17,7 +11,7 @@ import { whoShouldAct } from "./who-should-act.ts";
 export type NbcWakeDispatcherDeps = {
   sessions: VellumChainSessionRegistry;
   host: NbcLoopHost;
-  loadGraph?: (input: { dataDir: string; channelId: string }) => Promise<NbcChainGraph>;
+  getSnapshot?: (input: { chainId: string; asDid: string }) => Promise<ChainSnapshot>;
 };
 
 const inFlight = new Set<string>();
@@ -29,6 +23,26 @@ function dedupeKey(chainId: string, asDid: string, offers: number): string {
 }
 
 export function createNbcWakeDispatcher(deps: NbcWakeDispatcherDeps) {
+  async function snapshotFor(chainId: string, asDid: string): Promise<ChainSnapshot | null> {
+    if (deps.getSnapshot !== undefined) {
+      return deps.getSnapshot({ chainId, asDid });
+    }
+    const live = deps.sessions.get(chainId);
+    if (live === null || live.sessionId.length === 0) return null;
+    const handle = deps.sessions.handleForDid(
+      chainId,
+      live.initiatorDid,
+      live.counterpartyDid,
+      asDid,
+    );
+    if (handle === null) return null;
+    try {
+      return await handle.getSessionSnapshot(live.sessionId);
+    } catch {
+      return null;
+    }
+  }
+
   async function dispatch(event: NbcChainChanged): Promise<void> {
     const chain = deps.host.getChain(event.chainId);
     if (chain === null) return;
@@ -39,18 +53,9 @@ export function createNbcWakeDispatcher(deps: NbcWakeDispatcherDeps) {
     const candidates = [chain.initiatorDid, chain.counterpartyDid].filter((did) => local.has(did));
 
     for (const asDid of candidates) {
-      const dataDir = deps.sessions.dataDirForDid(event.chainId, asDid);
-      if (dataDir === null || chain.channelId.length === 0) continue;
-      let graph: NbcChainGraph;
-      try {
-        graph = await (deps.loadGraph ?? loadNbcChainGraph)({
-          dataDir,
-          channelId: chain.channelId,
-        });
-      } catch {
-        continue;
-      }
-      const act = whoShouldAct(graph, {
+      const snap = await snapshotFor(event.chainId, asDid);
+      if (snap === null) continue;
+      const act = whoShouldAct(snap.graph, {
         status: chain.status,
         initiatorDid: chain.initiatorDid,
         counterpartyDid: chain.counterpartyDid,
@@ -86,7 +91,7 @@ export function createNbcWakeDispatcher(deps: NbcWakeDispatcherDeps) {
       }
       if (act.did !== asDid) continue;
 
-      const turnIndex = graph.offers.length;
+      const turnIndex = snap.graph.offers.length;
       const key = dedupeKey(event.chainId, act.did, turnIndex);
       if (inFlight.has(key) || completed.has(key)) continue;
       inFlight.add(key);

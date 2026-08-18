@@ -2,6 +2,7 @@ import type { PersistableSigner } from "@khoralabs/did-key-identity";
 import { KhoraClient } from "@khoralabs/khora-client";
 import type {
   ChainInitResponse,
+  ChainSnapshot,
   ChainStateResponse,
   VellumChainRow,
 } from "@khoralabs/vellum-client";
@@ -42,6 +43,7 @@ export type VellumHandle = {
   chainRelease(sessionId: string): Promise<void>;
   sendTurn(sessionId: string, body: Record<string, unknown>): Promise<void>;
   getChainSnapshot(): Promise<ChainStateResponse>;
+  getSessionSnapshot(sessionId: string): Promise<ChainSnapshot>;
   listChains(): VellumChainRow[];
 };
 
@@ -149,6 +151,7 @@ export class AgentHandle {
       chainRelease: (s) => requireClient().chainRelease(s),
       sendTurn: (s, b) => requireClient().sendTurn(s, b),
       getChainSnapshot: () => requireClient().getChainSnapshot(),
+      getSessionSnapshot: (s) => requireClient().getSessionSnapshot(s),
       listChains: () => requireClient().listChainsFromStore(),
     };
   }
