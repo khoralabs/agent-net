@@ -10,7 +10,7 @@ import { runAgentWorkflow } from "./run-agent-workflow.ts";
 import { generateStructured } from "./structured-output.ts";
 import type { AgentWorkflowParams, AgentWorkflowResult } from "./types.ts";
 
-export type RunHarnessStructuredStepArgs<T = unknown> = {
+export type RunHarnessStructuredStepArgs<_T = unknown> = {
   mode: "structured";
   label: string;
   model: LanguageModel;

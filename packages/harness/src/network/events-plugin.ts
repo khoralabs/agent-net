@@ -2,6 +2,7 @@ import type { NetworkEvent } from "./types.ts";
 
 export type ListNetworkEventsOptions = {
   kind?: string;
+  source?: string;
   agentDid?: string;
   sinceSeq?: number;
   /** Exclusive upper bound on seq (for paging older history). */

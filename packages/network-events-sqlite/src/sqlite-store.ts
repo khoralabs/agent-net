@@ -93,6 +93,10 @@ export function createSqliteNetworkEventStore(
         conditions.push("kind = ?");
         args.push(listOpts.kind);
       }
+      if (listOpts.source !== undefined) {
+        conditions.push("source = ?");
+        args.push(listOpts.source);
+      }
       if (listOpts.agentDid !== undefined) {
         conditions.push("agent_did = ?");
         args.push(listOpts.agentDid);

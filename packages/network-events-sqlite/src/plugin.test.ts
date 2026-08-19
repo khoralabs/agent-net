@@ -124,5 +124,12 @@ test("turn completed events include attribution digest", async () => {
   expect(events[0]?.attribution?.attributionDigestHex).toHaveLength(64);
   expect(events[0]?.attribution?.threadHashes[0]?.threadId).toBe("thread-1");
 
+  const bySource = await plugin.listEvents(sessionId, { source: "agent" });
+  expect(bySource).toHaveLength(1);
+  const otherSource = await plugin.listEvents(sessionId, {
+    source: "agent-runtime",
+  });
+  expect(otherSource).toHaveLength(0);
+
   plugin.close?.();
 });

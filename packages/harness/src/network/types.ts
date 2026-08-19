@@ -4,7 +4,8 @@ export type ThreadHashSnapshot = {
   lastPostContentHash?: string;
 };
 
-export type NetworkEventSource = "harness" | "swarm" | "agent" | "inbox" | "chat" | "workflow";
+/** Process or category that emitted the event (registry id, or harness/agent/inbox/swarm). */
+export type NetworkEventSource = string;
 
 export type NetworkAttribution = {
   staticHash: string;
