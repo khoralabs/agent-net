@@ -123,8 +123,6 @@ describeHarness("multi-agent OBP network", () => {
       relayBaseUrl: harness.relayBaseUrl,
       agentsDataDir,
       vellumDataDir,
-      initiatorLabel: "alice",
-      responderLabel: "bob",
     });
     expect(sessionId).toBeTruthy();
 

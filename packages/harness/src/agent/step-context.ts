@@ -1,5 +1,5 @@
 import { formatMemoriesContextInstructions } from "./tools/memories/_helpers/memories-context-instructions.ts";
-import type { AgentStepContext, AgentStepSourceContext, MemoriesDatabaseContext } from "./types.ts";
+import type { AgentStepContext, AgentStepSourceContext } from "./types.ts";
 
 export type {
   AgentStepContext,
@@ -58,26 +58,25 @@ export function formatAgentStepContext(
   return blocks;
 }
 
-/** Merge legacy `memoriesDatabase` + optional `stepContext` into one bag. */
+/** Merge optional `stepContext` with turn instructions into one bag. */
 export function resolveAgentStepContext(input: {
   stepContext?: AgentStepContext;
-  memoriesDatabase?: MemoriesDatabaseContext;
   turnInstructions?: string[];
 }): AgentStepContext | undefined {
   const base = input.stepContext;
-  const database = base?.database ?? input.memoriesDatabase;
   const turnInstructions = [
     ...(base?.turn?.instructions ?? []),
     ...(input.turnInstructions ?? []),
   ].filter((line) => line.trim().length > 0);
+  const hasDatabase = base?.database !== undefined;
   const hasNamespaces = (base?.namespaces?.length ?? 0) > 0;
   const hasSource = base?.source !== undefined;
   const hasTurn = turnInstructions.length > 0;
-  if (database === undefined && !hasNamespaces && !hasSource && !hasTurn) {
+  if (!hasDatabase && !hasNamespaces && !hasSource && !hasTurn) {
     return undefined;
   }
   return {
-    ...(database !== undefined ? { database } : {}),
+    ...(hasDatabase ? { database: base?.database } : {}),
     ...(hasNamespaces ? { namespaces: base?.namespaces } : {}),
     ...(hasSource ? { source: base?.source } : {}),
     ...(hasTurn ? { turn: { instructions: turnInstructions } } : {}),

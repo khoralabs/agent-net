@@ -19,8 +19,6 @@ import type { AgentStepContext, AgentWorkflowParams } from "./types.ts";
 export type PrepareHarnessStepInput = {
   /** Explicit step context bag (preferred). */
   stepContext?: AgentStepContext;
-  /** Legacy framing; folded into stepContext.database when unset. */
-  memoriesDatabase?: AgentStepContext["database"];
   turnInstructions?: string[];
   /** When set, also build toolkit env (and optionally capture tools). */
   runtime?: {
@@ -67,7 +65,6 @@ export async function prepareHarnessStepRuntime(
 ): Promise<PreparedHarnessStep> {
   const stepContext = resolveAgentStepContext({
     stepContext: input.stepContext,
-    memoriesDatabase: input.memoriesDatabase,
     turnInstructions: input.turnInstructions,
   });
   const contextInstructions = formatAgentStepContext(stepContext);

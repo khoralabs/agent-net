@@ -119,8 +119,6 @@ describeHarness("inbox-based peer discovery", () => {
       relayBaseUrl: harness.relayBaseUrl,
       agentsDataDir,
       vellumDataDir,
-      initiatorLabel: "alice",
-      responderLabel: "bob",
     });
 
     expect(sessionId).toBeTruthy();

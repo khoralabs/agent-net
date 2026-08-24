@@ -58,11 +58,6 @@ export type IntegrateMemoryEvent = {
   features: IntegrateMemoryFeatures;
   /** Guidance for expand/extract (not the sole stored content). */
   instructions: string;
-  /**
-   * @deprecated Prefer `features.lexical` / `instructions`. Accepted on parse
-   * for in-flight events; ignored when `features` is present.
-   */
-  text?: string;
   /** Memories-domain sourcemap addresses (database / namespace catalog). */
   memoriesContextRefs?: MemoriesContextRefs;
   /**
@@ -197,7 +192,6 @@ export function parseIntegrateMemoryEvent(body: unknown): IntegrateMemoryEvent {
     payload: raw.payload as Record<string, unknown>,
     features,
     instructions,
-    ...(legacyText !== undefined ? { text: legacyText } : {}),
     ...(memoriesContextRefs !== undefined ? { memoriesContextRefs } : {}),
     ...(contextSourceWire !== undefined ? { contextSourceWire } : {}),
     ...(stepContext !== undefined ? { stepContext } : {}),

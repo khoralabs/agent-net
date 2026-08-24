@@ -52,16 +52,6 @@ export async function resolveMemoriesSearchAsOf(
   return typeof ts === "number" && Number.isFinite(ts) ? { lte: ts } : undefined;
 }
 
-/**
- * @deprecated Prefer {@link resolveMemoriesSearchAsOf}.
- */
-export async function resolveMemoriesSearchAsOfTimestampMs(
-  client: RemoteMemoriesClientAsync,
-): Promise<number | undefined> {
-  const asOf = await resolveMemoriesSearchAsOf(client);
-  return asOf?.lte;
-}
-
 export type StandardHybridMemorySearchInput = {
   namespace: string;
   query: string;

@@ -22,10 +22,6 @@ export type VellumPairOptions = {
    * `{vellumDataDir}/{encodeURIComponent(did)}/{encodeURIComponent(channelId)}`.
    */
   vellumDataDir: string;
-  /** @deprecated Labels are unused; pool dirs are keyed by DID. */
-  initiatorLabel?: string;
-  /** @deprecated Labels are unused; pool dirs are keyed by DID. */
-  responderLabel?: string;
   /** Optional wrap secret for sealed identity files. */
   identitySecret?: IdentitySecret;
   /** When set, skip binding the peer if they are not on this host. Default: both local. */

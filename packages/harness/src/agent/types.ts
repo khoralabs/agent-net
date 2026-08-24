@@ -72,11 +72,6 @@ export type AgentWorkflowParams = {
     messages: AgentUIMessage[];
     instructions?: string[];
     userTimeZone?: string;
-    /**
-     * @deprecated Prefer `stepContext.database`. Mapped into stepContext when
-     * stepContext.database is unset.
-     */
-    memoriesDatabase?: MemoriesDatabaseContext;
     /** Unified gather→provide bag for this LLM run. */
     stepContext?: AgentStepContext;
   };

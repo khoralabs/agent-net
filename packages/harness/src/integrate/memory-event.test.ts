@@ -18,7 +18,7 @@ describe("parseIntegrateMemoryEvent", () => {
     expect(event.ownerKey).toBe("did:key:abc");
     expect(event.namespace).toBe("notes");
     expect(event.writeScope).toBe("under");
-    expect(event.text).toBe("x");
+    expect(event.features.lexical).toEqual(["x"]);
   });
 
   test("parses kind memory with memoryKey and caller writeScope", () => {
@@ -36,6 +36,7 @@ describe("parseIntegrateMemoryEvent", () => {
     expect(event.kind).toBe("memory");
     expect(event.memoryKey).toBe("gia-kim");
     expect(event.writeScope).toBe("under");
+    expect(event.features.lexical).toEqual(["Name: Gia"]);
   });
 
   test("parses writeScope cross", () => {
@@ -51,6 +52,7 @@ describe("parseIntegrateMemoryEvent", () => {
       text: "About Acme",
     });
     expect(event.writeScope).toBe("cross");
+    expect(event.features.lexical).toEqual(["About Acme"]);
   });
 
   test("requires memoryKey when kind is memory", () => {

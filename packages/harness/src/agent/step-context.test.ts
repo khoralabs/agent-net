@@ -50,13 +50,13 @@ describe("formatAgentStepContext", () => {
 });
 
 describe("resolveAgentStepContext", () => {
-  test("maps legacy memoriesDatabase into stepContext.database", () => {
+  test("merges turnInstructions into stepContext.turn", () => {
     const resolved = resolveAgentStepContext({
-      memoriesDatabase: { about: "Legacy about" },
+      stepContext: { database: { about: "Company DB" } },
       turnInstructions: ["Be brief."],
     });
     expect(resolved).toEqual({
-      database: { about: "Legacy about" },
+      database: { about: "Company DB" },
       turn: { instructions: ["Be brief."] },
     });
   });

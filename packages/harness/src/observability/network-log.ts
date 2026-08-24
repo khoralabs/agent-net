@@ -38,24 +38,6 @@ export async function runWithAttributionAsync<T>(
   return attributionStorage.run(attribution, fn);
 }
 
-/** @deprecated Use bindNetworkSessionContext / getNetworkSessionContext. */
-export type InitNetworkLogOptions = NetworkSessionContext & { dataDir?: string };
-
-/** @deprecated Use bindNetworkSessionContext. */
-export function initNetworkLog(opts: { sessionId: string; dataDir?: string }): void {
-  bindNetworkSessionContext({ sessionId: opts.sessionId });
-}
-
-/** @deprecated Use getNetworkSessionContext. */
-export function getNetworkLogContext(): NetworkSessionContext | undefined {
-  return getNetworkSessionContext();
-}
-
-/** @deprecated Use clearNetworkSessionContext. */
-export function closeNetworkLog(): void {
-  clearNetworkSessionContext();
-}
-
 export function resetNetworkLogForTests(): void {
   clearNetworkSessionContext();
 }

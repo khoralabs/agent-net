@@ -214,7 +214,6 @@ export async function runAgentWorkflow(
   const context = await normalizeContext(params);
   const prepared = await prepareHarnessStepRuntime({
     stepContext: params.context.stepContext,
-    memoriesDatabase: params.context.memoriesDatabase,
     turnInstructions: context.instructions,
     runtime: {
       agentId: params.agent.id,

@@ -146,7 +146,6 @@ export {
   type NamespaceSearchArms,
   resolveMemoriesHeadRootHex,
   resolveMemoriesSearchAsOf,
-  resolveMemoriesSearchAsOfTimestampMs,
   runStandardHybridMemorySearch,
   runStandardNamespaceSearch,
   type StandardHybridMemorySearchInput,
