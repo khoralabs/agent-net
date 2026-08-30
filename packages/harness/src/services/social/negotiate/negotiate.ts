@@ -7,6 +7,8 @@ import {
   type VellumPairOptions,
 } from "./vellum.ts";
 
+export type { VellumHandle } from "./vellum.ts";
+
 export type NegotiateStartResult = {
   sessionId: string;
   channelId: string;

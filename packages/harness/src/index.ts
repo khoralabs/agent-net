@@ -298,13 +298,13 @@ export {
 export {
   AgentSocialNegotiate,
   type NegotiateStartResult,
+  type VellumHandle,
 } from "./services/social/negotiate/negotiate.ts";
 export {
   createHarnessVellumPool,
   disconnectVellum,
   type HarnessVellumPoolOptions,
   openVellumChain,
-  type VellumHandle,
   type VellumPairOptions,
   wrapPoolClient,
 } from "./services/social/negotiate/vellum.ts";
