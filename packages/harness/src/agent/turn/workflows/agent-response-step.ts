@@ -1,4 +1,4 @@
-import { requireNetworkSession } from "../../../network/session-registry.ts";
+import { requireNetworkSession } from "../../../pool/network/session-registry.ts";
 import { runAgentWorkflow } from "../run-agent-workflow.ts";
 import type { AgentWorkflowParams, AgentWorkflowResult } from "../types.ts";
 import { AI_STEP_MAX_RETRIES } from "../workflow-resilience.ts";

@@ -9,13 +9,13 @@ export {
 } from "./events-plugin.ts";
 export {
   getNetworkSession,
+  type NetworkAgentWorkflowDeps,
   type NetworkRuntimeSession,
   registerNetworkSession,
   removeNetworkSession,
   requireNetworkSession,
   resetNetworkSessionRegistryForTests,
 } from "./session-registry.ts";
-export { collectThreadHashSnapshots } from "./thread-provenance.ts";
 export type {
   NetworkAttribution,
   NetworkEvent,

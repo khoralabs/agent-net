@@ -104,10 +104,10 @@
       "default": "./src/agent/turn/workflows/nbc-prepare-turn-run.ts"
     },
     "./attribution-digest": {
-      "types": "./src/observability/attribution-digest.ts",
-      "bun": "./src/observability/attribution-digest.ts",
-      "import": "./src/observability/attribution-digest.ts",
-      "default": "./src/observability/attribution-digest.ts"
+      "types": "./src/pool/observability/attribution-digest.ts",
+      "bun": "./src/pool/observability/attribution-digest.ts",
+      "import": "./src/pool/observability/attribution-digest.ts",
+      "default": "./src/pool/observability/attribution-digest.ts"
     },
     "./structured-output": {
       "types": "./src/agent/turn/structured-output.ts",

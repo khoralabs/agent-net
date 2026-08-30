@@ -10,8 +10,8 @@ import {
   installNetworkEventsPlugin,
   type NetworkEventsPlugin,
   networkEventId,
-} from "../network/index.ts";
-import { getNetworkSessionContext } from "../observability/network-log.ts";
+} from "../pool/network/index.ts";
+import { getNetworkSessionContext } from "../pool/observability/network-log.ts";
 import { loadHarnessIdentity, resolveIdentitySecretFromEnv } from "../pool/identity-wrap-key.ts";
 import { AgentStore, HarnessPoolInbox, ManagedAgentPool } from "../pool/index.ts";
 import {

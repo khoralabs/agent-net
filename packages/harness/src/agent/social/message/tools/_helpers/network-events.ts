@@ -1,5 +1,5 @@
-import { emitNetworkEvent, networkEventId } from "../../../../../network/index.ts";
-import { getCurrentAttribution } from "../../../../../observability/network-log.ts";
+import { emitNetworkEvent, networkEventId } from "../../../../../pool/network/index.ts";
+import { getCurrentAttribution } from "../../../../../pool/observability/network-log.ts";
 import type { HarnessToolkitEnv } from "../../../../turn/tools/types.ts";
 
 export async function emitChatNetworkEvent(input: {

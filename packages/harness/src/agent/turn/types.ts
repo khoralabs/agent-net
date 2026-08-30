@@ -1,4 +1,4 @@
-import type { ThreadHashSnapshot } from "../../network/types.ts";
+import type { ThreadHashSnapshot } from "../../pool/network/types.ts";
 
 export type AgentUIMessage = {
   id: string;

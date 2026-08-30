@@ -33,30 +33,30 @@ export {
   listNetworkEvents,
   type NetworkEventsPlugin,
   networkEventId,
-} from "./network/index.ts";
+} from "./pool/network/index.ts";
 export type {
   NetworkAttribution,
   NetworkEvent,
   ThreadHashSnapshot,
-} from "./network/types.ts";
-export { buildNetworkAttribution } from "./observability/attribution-digest.ts";
+} from "./pool/network/types.ts";
+export { buildNetworkAttribution } from "./pool/observability/attribution-digest.ts";
 export type {
   CreateHarnessLoggerOptions,
   HarnessObservability,
-} from "./observability/harness-observability.ts";
+} from "./pool/observability/harness-observability.ts";
 export {
   createHarnessAgentTelemetry,
   getHarnessMemoriesTelemetry,
   getHarnessObservability,
   installHarnessObservability,
   resetHarnessObservabilityForTests,
-} from "./observability/harness-observability.ts";
+} from "./pool/observability/harness-observability.ts";
 export {
   bindNetworkSessionContext,
   clearNetworkSessionContext,
   getCurrentAttribution,
   getNetworkSessionContext,
-} from "./observability/network-log.ts";
+} from "./pool/observability/network-log.ts";
 export {
   type AgentMemoriesFraming,
   type AgentRecord,

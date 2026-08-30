@@ -14,7 +14,7 @@ import {
 } from "@khoralabs/memories-service/client";
 import { createBoundAgentMemoriesClient } from "../agent/memories-types.ts";
 import type { AgentHandle } from "../agent/handle.ts";
-import { registerNetworkSession, removeNetworkSession } from "../network/session-registry.ts";
+import { registerNetworkSession, removeNetworkSession } from "../pool/network/session-registry.ts";
 import { loadHarnessIdentity } from "../pool/identity-wrap-key.ts";
 import {
   AgentStore,

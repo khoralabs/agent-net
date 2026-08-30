@@ -13,9 +13,9 @@ import {
   type UIMessage,
 } from "ai";
 import { FatalError } from "workflow";
-import { collectThreadHashSnapshots } from "../../network/thread-provenance.ts";
-import { buildNetworkAttribution } from "../../observability/attribution-digest.ts";
-import { runWithAttributionAsync } from "../../observability/network-log.ts";
+import { collectThreadHashSnapshots } from "./thread-provenance.ts";
+import { buildNetworkAttribution } from "../../pool/observability/attribution-digest.ts";
+import { runWithAttributionAsync } from "../../pool/observability/network-log.ts";
 import { formatSkillCatalog } from "../memories/skills/_helpers/skills.ts";
 import { activateSkillByName } from "../memories/skills/activate-skill.ts";
 import type { AgentChatClient, ChatServiceClient } from "../social/message/chat.ts";

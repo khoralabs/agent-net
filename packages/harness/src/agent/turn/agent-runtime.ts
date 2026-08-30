@@ -12,8 +12,8 @@ import {
 } from "@khoralabs/agent-capabilities";
 import { toolMapToAiTools } from "@khoralabs/agent-capabilities-ai-sdk";
 import type { ToolSet } from "ai";
-import { getNetworkSession } from "../../network/session-registry.ts";
-import { createHarnessAgentTelemetry } from "../../observability/harness-observability.ts";
+import { getNetworkSession } from "../../pool/network/session-registry.ts";
+import { createHarnessAgentTelemetry } from "../../pool/observability/harness-observability.ts";
 import { defineHarnessAgent } from "./capability-agents/index.ts";
 import {
   defineNegotiationAgent,
