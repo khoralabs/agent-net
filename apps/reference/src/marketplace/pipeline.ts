@@ -1,8 +1,20 @@
-import type { AgentHandle, NetworkHarnessHandle } from "@khoralabs/agent-net-harness";
+import path from "node:path";
 
-import { createInboxReactor } from "../patterns/inbox/index.ts";
+import {
+  type AgentHandle,
+  harnessAgentsDataDir,
+  type NetworkHarnessHandle,
+} from "@khoralabs/agent-net-harness";
+
+import { createInboxReactor, type InboxReactor } from "../patterns/inbox/index.ts";
+import {
+  createNegotiatePairRegistry,
+  type NegotiatePairRegistry,
+  type OpenedPair,
+} from "../patterns/negotiate/index.ts";
 import type { MarketplaceConfig } from "./config.ts";
 import { topicsFor } from "./config.ts";
+import { evaluateSellersOnInbox, type SellerEvaluateResult } from "./evaluate-on-inbox.ts";
 import { reportLine } from "./report.ts";
 import { partitionBySide, type SeededAgent, seedAllAgents, spawnMarketplacePool } from "./seed.ts";
 
@@ -11,10 +23,28 @@ export type MarketplacePipelineResult = {
   buyer: SeededAgent;
   sellers: SeededAgent[];
   needPostId: string;
-  /** Sell DIDs that received the need post via percolator. */
   recipientDids: string[];
+  evaluations: SellerEvaluateResult[];
+  pairs: readonly OpenedPair[];
   stopInbox: () => void;
+  stopPairs: () => void;
+  reactor: InboxReactor;
 };
+
+/** On failure after inbox start: stop pairs then inbox before rethrow. */
+export async function withInboxPairCleanup<T>(
+  phase: { stopInbox: () => void },
+  pairs: { stopAll: () => void },
+  fn: () => Promise<T>,
+): Promise<T> {
+  try {
+    return await fn();
+  } catch (err) {
+    pairs.stopAll();
+    phase.stopInbox();
+    throw err;
+  }
+}
 
 /**
  * Steps 1–4: spawn, seed, start inbox reactor, post buyer need, wait for sell receipts.
@@ -22,7 +52,15 @@ export type MarketplacePipelineResult = {
 export async function runMarketplaceThroughInbox(
   harness: NetworkHarnessHandle,
   config: MarketplaceConfig,
-): Promise<MarketplacePipelineResult> {
+): Promise<{
+  seeded: SeededAgent[];
+  buyer: SeededAgent;
+  sellers: SeededAgent[];
+  needPostId: string;
+  recipientDids: string[];
+  stopInbox: () => void;
+  reactor: InboxReactor;
+}> {
   reportLine("pool.spawn.start", { buyers: config.buyers, sellers: config.sellers });
   const seeded = await spawnMarketplacePool(harness, config);
   reportLine("pool.spawn.done", {
@@ -96,7 +134,68 @@ export async function runMarketplaceThroughInbox(
     needPostId: needPost.id,
     recipientDids,
     stopInbox,
+    reactor,
   };
+}
+
+/**
+ * Full pipeline steps 1–6 (inbox → evaluate → Vellum for engagers).
+ * On failure after inbox start, stops pairs + inbox before rethrowing.
+ */
+export async function runMarketplacePipeline(
+  harness: NetworkHarnessHandle,
+  config: MarketplaceConfig,
+): Promise<MarketplacePipelineResult> {
+  const phase = await runMarketplaceThroughInbox(harness, config);
+  const pairs: NegotiatePairRegistry = createNegotiatePairRegistry();
+
+  return withInboxPairCleanup(phase, pairs, async () => {
+    const evaluations = await evaluateSellersOnInbox({
+      config,
+      sellers: phase.sellers,
+      recipientDids: phase.recipientDids,
+      needPostId: phase.needPostId,
+      needBody: config.needBody,
+      reactor: phase.reactor,
+    });
+
+    const engagers = evaluations.filter((e) => e.decision.decision === "engage");
+    reportLine("vellum.open.start", { count: engagers.length });
+
+    for (const { seller } of engagers) {
+      try {
+        const pair = await pairs.open(seller.agent, phase.buyer.agent, {
+          relayBaseUrl: harness.relayBaseUrl,
+          agentsDataDir: harnessAgentsDataDir(config.dataDir),
+          vellumDataDir: path.join(config.dataDir, "vellum"),
+        });
+        reportLine("vellum.open.done", {
+          sellerDid: seller.agent.did,
+          buyerDid: phase.buyer.agent.did,
+          sessionId: pair.sessionId,
+          channelId: pair.channelId,
+        });
+      } catch (err) {
+        reportLine("vellum.open.error", {
+          sellerDid: seller.agent.did,
+          error: err instanceof Error ? err.message : String(err),
+        });
+      }
+    }
+
+    reportLine("marketplace.complete", {
+      recipients: phase.recipientDids.length,
+      engagers: engagers.length,
+      pairs: pairs.list().length,
+    });
+
+    return {
+      ...phase,
+      evaluations,
+      pairs: pairs.list(),
+      stopPairs: () => pairs.stopAll(),
+    };
+  });
 }
 
 export type { AgentHandle };

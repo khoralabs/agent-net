@@ -16,7 +16,7 @@ import {
 import { createNetworkEventPersistencePlugin } from "@khoralabs/network-events-sqlite";
 
 import { buildMarketplaceConfig } from "./marketplace/config.ts";
-import { runMarketplaceThroughInbox } from "./marketplace/pipeline.ts";
+import { runMarketplacePipeline } from "./marketplace/pipeline.ts";
 import { reportLine } from "./marketplace/report.ts";
 import { referenceMemoriesOntology } from "./memories/ontology.ts";
 import { installReferenceObservability } from "./observability/install.ts";
@@ -83,7 +83,8 @@ function parseArgs(argv: string[]): {
 }
 
 /**
- * Reference marketplace CLI (steps 1–4 in this commit; 5–6 follow).
+ * Reference marketplace CLI: spawn buy/sell pool, seed, percolator inbox,
+ * LLM evaluate, Vellum connect (stop before negotiation).
  */
 async function main(): Promise<void> {
   const parsed = parseArgs(process.argv.slice(2));
@@ -133,15 +134,26 @@ async function main(): Promise<void> {
   });
 
   let stopInbox: (() => void) | undefined;
+  let stopPairs: (() => void) | undefined;
   try {
-    const result = await runMarketplaceThroughInbox(harness, config);
+    const result = await runMarketplacePipeline(harness, config);
     stopInbox = result.stopInbox;
-    reportLine("marketplace.inbox.phase.done", {
+    stopPairs = result.stopPairs;
+    reportLine("marketplace.done", {
       needPostId: result.needPostId,
       recipientDids: result.recipientDids,
-      note: "evaluate + vellum phases land in a follow-up commit",
+      engagers: result.evaluations
+        .filter((e) => e.decision.decision === "engage")
+        .map((e) => e.seller.profile.externalId),
+      pairs: result.pairs.map((p) => ({
+        sellerDid: p.initiatorDid,
+        buyerDid: p.responderDid,
+        sessionId: p.sessionId,
+        channelId: p.channelId,
+      })),
     });
   } finally {
+    stopPairs?.();
     stopInbox?.();
     clearNetworkSessionContext();
     harness.stop();
