@@ -1,6 +1,7 @@
 import type { PersistableSigner } from "@khoralabs/did-key-identity";
 import { KhoraClient } from "@khoralabs/khora-client";
 
+import type { AgentActor } from "../agent/actor.ts";
 import type { AgentChatClient } from "../services/social/message/chat.ts";
 import { AgentSocial } from "../services/social/social.ts";
 import type { AgentMemoriesClient } from "./memories-types.ts";
@@ -28,13 +29,15 @@ export type BindAgentServicesOptions = {
  * Integration-layer handle for one harness agent: Khora client,
  * social relationship tree, and (after {@link bindServices}) memories.
  *
+ * Satisfies {@link AgentActor} for capability modules that must not depend on this facade.
+ *
  * Inbox traffic goes through the harness multiplex ({@link HarnessPoolInbox} /
  * `harness.subscribeInbox`), not a per-agent WebSocket on this handle.
  *
  * Vellum/NBC channel ops live under {@link AgentSocial.negotiate}
  * (`services/social/negotiate`), not on this type.
  */
-export class AgentHandle {
+export class AgentHandle implements AgentActor {
   readonly did: string;
   readonly signer: PersistableSigner;
   readonly baseUrl: string;

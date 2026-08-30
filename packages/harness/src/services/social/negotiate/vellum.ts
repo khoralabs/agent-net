@@ -13,7 +13,7 @@ import { VellumChain } from "@khoralabs/vellum-client";
 import { VellumPool } from "@khoralabs/vellum-client/pool";
 import { createSharedUplinkChannelFabric } from "@khoralabs/vellum-client/session";
 import { waitFor } from "../../../lib/wait-for.ts";
-import type { AgentHandle } from "../../../handle/handle.ts";
+import type { AgentActor } from "../../../agent/actor.ts";
 import {
   loadHarnessIdentity,
   resolveIdentitySecretFromEnv,
@@ -95,7 +95,7 @@ export function wrapPoolClient(pool: VellumPool, did: string, channelId: string)
 }
 
 async function resolveAgentSigner(
-  agent: AgentHandle,
+  agent: AgentActor,
   agentsDataDir: string,
   identitySecret: IdentitySecret | undefined,
 ): Promise<PersistableSigner> {
@@ -111,8 +111,8 @@ async function resolveAgentSigner(
  * Binds each local party on a {@link VellumPool} (own sqlite per DID).
  */
 export async function openVellumChain(
-  initiator: AgentHandle,
-  responder: AgentHandle,
+  initiator: AgentActor,
+  responder: AgentActor,
   opts: VellumPairOptions,
 ): Promise<{
   initiatorVellum: VellumHandle;

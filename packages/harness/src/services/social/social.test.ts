@@ -1,6 +1,6 @@
 import { describe, expect, mock, test } from "bun:test";
 
-import type { AgentHandle } from "../../handle/handle.ts";
+import type { AgentActor } from "../../agent/actor.ts";
 import { createBoundAgentMemoriesClient } from "../../handle/memories-types.ts";
 import type { AgentChatClient } from "./message/chat.ts";
 import { AgentSocial } from "./social.ts";
@@ -38,7 +38,7 @@ describe("AgentSocial", () => {
     const handle = {
       did: "did:key:self",
       client,
-    } as unknown as AgentHandle;
+    } as unknown as AgentActor;
     const listInvites = mock(async () => ["tok-a", "tok-b"]);
     const social = new AgentSocial({
       handle,
@@ -65,7 +65,7 @@ describe("AgentSocial", () => {
     const handle = {
       did: "did:key:self",
       client: { did: "did:key:self" },
-    } as unknown as AgentHandle;
+    } as unknown as AgentActor;
     const social = new AgentSocial({ handle, chat: fakeChat("did:key:self") });
     await expect(social.connect("  ")).rejects.toThrow(/peerDid/);
   });
@@ -75,7 +75,7 @@ describe("AgentSocial", () => {
     const handle = {
       did: "did:key:self",
       client: { did: "did:key:self" },
-    } as unknown as AgentHandle;
+    } as unknown as AgentActor;
     const social = new AgentSocial({ handle, chat });
     await social.message.thread({ id: "custom" });
     expect(chat.createThread).toHaveBeenCalledWith({ id: "custom" });

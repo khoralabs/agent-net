@@ -1,4 +1,4 @@
-import type { AgentHandle } from "../../../handle/handle.ts";
+import type { AgentActor } from "../../../agent/actor.ts";
 import { type NbcLoopHandle, type StartNbcLoopInput, startNbcLoop } from "./nbc/nbc-loop.ts";
 import {
   disconnectVellum,
@@ -21,10 +21,10 @@ export type NegotiateStartResult = {
  * Thin wrap over existing Vellum/NBC host helpers.
  */
 export class AgentSocialNegotiate {
-  readonly #self: AgentHandle;
+  readonly #self: AgentActor;
   #last: NegotiateStartResult | undefined;
 
-  constructor(self: AgentHandle) {
+  constructor(self: AgentActor) {
     this.#self = self;
   }
 
@@ -35,7 +35,7 @@ export class AgentSocialNegotiate {
   /**
    * Open a Vellum chain with `peer` (this agent as initiator).
    */
-  async start(peer: AgentHandle, options: VellumPairOptions): Promise<NegotiateStartResult> {
+  async start(peer: AgentActor, options: VellumPairOptions): Promise<NegotiateStartResult> {
     const opened = await openVellumChain(this.#self, peer, options);
     const result: NegotiateStartResult = {
       sessionId: opened.sessionId,

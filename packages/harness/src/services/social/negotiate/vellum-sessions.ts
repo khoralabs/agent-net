@@ -8,7 +8,7 @@ import { RelayClient } from "@khoralabs/relay/client";
 import { VellumChain } from "@khoralabs/vellum-client";
 import type { VellumPool } from "@khoralabs/vellum-client/pool";
 import { waitFor } from "../../../lib/wait-for.ts";
-import type { AgentHandle } from "../../../handle/handle.ts";
+import type { AgentActor } from "../../../agent/actor.ts";
 import { createHarnessVellumPool, type VellumPairOptions, type VellumHandle, wrapPoolClient } from "./vellum.ts";
 import { vellumPoolAttachmentDataDir } from "./vellum-pool-paths.ts";
 
@@ -40,8 +40,8 @@ export type CreateVellumChainSessionRegistryOptions = {
 export type VellumChainSessionRegistry = {
   open(input: {
     chainId: string;
-    initiator: AgentHandle;
-    responder: AgentHandle;
+    initiator: AgentActor;
+    responder: AgentActor;
     options: VellumPairOptions;
   }): Promise<{
     channelId: string;
