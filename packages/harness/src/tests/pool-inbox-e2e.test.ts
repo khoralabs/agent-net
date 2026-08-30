@@ -11,7 +11,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import os from "node:os";
 import path from "node:path";
 import type { KhoraClientEvent } from "@khoralabs/khora-client";
-import { type NetworkHarnessHandle, startNetworkHarness } from "../harness.ts";
+import { type NetworkHarnessHandle, startNetworkHarness } from "../host/harness.ts";
 import { inboxHasPost } from "../lib/inbox.ts";
 import { resolveKhoraBaseUrlFromEnv } from "../lib/khora-base-url.ts";
 import { resolveMemoriesBaseUrlFromEnv } from "../lib/memories-base-url.ts";

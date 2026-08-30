@@ -2,8 +2,8 @@ import type { ChatSigner, SignedEnvelope } from "@khoralabs/chat";
 import { generateIdentity } from "@khoralabs/did-key-identity";
 import type { RelaySigner } from "@khoralabs/relay/crypto";
 
-import type { ChatServiceClient, SignedChatBackend } from "../chat.ts";
-import { createHarnessChatCrypto } from "../chat-crypto.ts";
+import type { ChatServiceClient, SignedChatBackend } from "../services/social/message/chat.ts";
+import { createHarnessChatCrypto } from "../services/social/message/chat-crypto.ts";
 import {
   createTestHarnessChatBackend,
   startTestChatHttp,

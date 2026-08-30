@@ -1,14 +1,8 @@
-# @khoralabs/agent-net
+# @khoralabs/agent-net-harness
 
-Network harness library: agent pool, remote Khora/relay/memories clients, signed chat, agent tools, and durable turn workflows.
+Custodial network harness: agent pool, per-agent social fabric + memories, signed chat, tools, and durable turn workflows.
 
-## Workflow world
-
-Harness workflows use the abstract [Workflow SDK](https://useworkflow.dev) APIs (`"use workflow"`, `"use step"`, `start`). They do **not** select a world backend.
-
-The process that hosts the workflow worker must configure the world **before** running workflows — for example set `WORKFLOW_TARGET_WORLD` / `WORKFLOW_TURSO_DATABASE_URL` and call `getWorld().start()`. The reference app (`apps/reference`) does this for Turso and also starts optional local memories/relay servers.
-
-## Usage
+## Target DX
 
 ```ts
 import { startNetworkHarness } from "@khoralabs/agent-net-harness";
@@ -21,14 +15,23 @@ const harness = await startNetworkHarness({
   memoriesAdminToken,
   chatBaseUrl,
   chatToken,
-  // Optional: mint invites on every spawn (also reads KHORA_ADMIN_TOKEN / ADMIN_ROOT_TOKEN)
-  khoraAdminToken,
-  // Optional: seal agent identity files (also reads HARNESS_IDENTITY_WRAP_KEY)
-  identitySecret,
+  khoraAdminToken, // optional
+  identitySecret, // optional
 });
-// Apps must supply an ontology — e.g. referenceMemoriesOntology from the reference app.
+
 const agent = await harness.spawn({ ontology });
-// Registration-issued invites (encrypted per agent): await harness.listInvitesForAgent(agent.did)
+// or: await harness.get(did, { ontology })
+
+await agent.social.post({ kind: "post", /* … */ });
+await agent.social.post({ kind: "subscription", search: { /* … */ } });
+await agent.social.search({ /* … */ });
+const invitation = await agent.social.connect(peerDid);
+
+await agent.social.message.thread();
+await agent.social.negotiate.start(peerHandle, vellumOptions);
+
+await agent.memories.search({ namespace: "notes", query: "…" });
+await agent.memories.integrate(integrateEvent);
 
 // Inbox: one multiplex WebSocket for the whole pool — demux by event.did
 const unsub = harness.subscribeInbox((event) => {
@@ -36,8 +39,24 @@ const unsub = harness.subscribeInbox((event) => {
 });
 ```
 
-Spawning (`harness.spawn` or `harness.pool.spawn`) binds the agent DID on that shared socket;
-`harness.removeAgent` / `pool.remove` unbinds it. Do not open per-agent inbox WebSockets.
+Spawning binds the agent DID on the shared inbox socket; `harness.removeAgent` unbinds it. Prefer `harness.get` / `spawn` over raw `pool.focus` when you need memories + `social`.
+
+## Layout
+
+| Module | Role |
+|--------|------|
+| `pool/` | Managed agent identities + registry |
+| `handle/` | `AgentHandle` |
+| `services/social/` | Fabric + nested `message` / `negotiate` |
+| `services/memories/` | Bound DB helpers, tools, integrate wire |
+| `runtime/` | Capability agents, toolkits, workflows |
+| `host/` | `startNetworkHarness` |
+
+## Workflow world
+
+Harness workflows use the abstract [Workflow SDK](https://useworkflow.dev) APIs (`"use workflow"`, `"use step"`, `start`). They do **not** select a world backend.
+
+The process that hosts the workflow worker must configure the world **before** running workflows — for example set `WORKFLOW_TARGET_WORLD` / `WORKFLOW_TURSO_DATABASE_URL` and call `getWorld().start()`. The reference app (`apps/reference`) does this for Turso and also starts optional local memories/relay servers.
 
 ## Telemetry
 

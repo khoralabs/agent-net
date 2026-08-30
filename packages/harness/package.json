@@ -14,82 +14,82 @@
       "default": "./src/index.ts"
     },
     "./agent-workflow-types": {
-      "types": "./src/agent/types.ts",
-      "bun": "./src/agent/types.ts",
-      "import": "./src/agent/types.ts",
-      "default": "./src/agent/types.ts"
+      "types": "./src/runtime/types.ts",
+      "bun": "./src/runtime/types.ts",
+      "import": "./src/runtime/types.ts",
+      "default": "./src/runtime/types.ts"
     },
     "./agent-response-run": {
-      "types": "./src/agent/workflows/agent-response-run.ts",
-      "bun": "./src/agent/workflows/agent-response-run.ts",
-      "import": "./src/agent/workflows/agent-response-run.ts",
-      "default": "./src/agent/workflows/agent-response-run.ts"
+      "types": "./src/runtime/workflows/agent-response-run.ts",
+      "bun": "./src/runtime/workflows/agent-response-run.ts",
+      "import": "./src/runtime/workflows/agent-response-run.ts",
+      "default": "./src/runtime/workflows/agent-response-run.ts"
     },
     "./classify-response-plan-run": {
-      "types": "./src/agent/workflows/classify-response-plan-run.ts",
-      "bun": "./src/agent/workflows/classify-response-plan-run.ts",
-      "import": "./src/agent/workflows/classify-response-plan-run.ts",
-      "default": "./src/agent/workflows/classify-response-plan-run.ts"
+      "types": "./src/runtime/workflows/classify-response-plan-run.ts",
+      "bun": "./src/runtime/workflows/classify-response-plan-run.ts",
+      "import": "./src/runtime/workflows/classify-response-plan-run.ts",
+      "default": "./src/runtime/workflows/classify-response-plan-run.ts"
     },
     "./response-plan": {
-      "types": "./src/agent/response-plan.ts",
-      "bun": "./src/agent/response-plan.ts",
-      "import": "./src/agent/response-plan.ts",
-      "default": "./src/agent/response-plan.ts"
+      "types": "./src/runtime/response-plan.ts",
+      "bun": "./src/runtime/response-plan.ts",
+      "import": "./src/runtime/response-plan.ts",
+      "default": "./src/runtime/response-plan.ts"
     },
     "./gateway-model-capabilities": {
-      "types": "./src/agent/gateway-model-capabilities.ts",
-      "bun": "./src/agent/gateway-model-capabilities.ts",
-      "import": "./src/agent/gateway-model-capabilities.ts",
-      "default": "./src/agent/gateway-model-capabilities.ts"
+      "types": "./src/runtime/gateway-model-capabilities.ts",
+      "bun": "./src/runtime/gateway-model-capabilities.ts",
+      "import": "./src/runtime/gateway-model-capabilities.ts",
+      "default": "./src/runtime/gateway-model-capabilities.ts"
     },
     "./workflow-resilience": {
-      "types": "./src/agent/workflow-resilience.ts",
-      "bun": "./src/agent/workflow-resilience.ts",
-      "import": "./src/agent/workflow-resilience.ts",
-      "default": "./src/agent/workflow-resilience.ts"
+      "types": "./src/runtime/workflow-resilience.ts",
+      "bun": "./src/runtime/workflow-resilience.ts",
+      "import": "./src/runtime/workflow-resilience.ts",
+      "default": "./src/runtime/workflow-resilience.ts"
     },
     "./integrate/write-scope": {
-      "types": "./src/integrate/write-scope.ts",
-      "bun": "./src/integrate/write-scope.ts",
-      "import": "./src/integrate/write-scope.ts",
-      "default": "./src/integrate/write-scope.ts"
+      "types": "./src/services/memories/integrate/write-scope.ts",
+      "bun": "./src/services/memories/integrate/write-scope.ts",
+      "import": "./src/services/memories/integrate/write-scope.ts",
+      "default": "./src/services/memories/integrate/write-scope.ts"
     },
     "./integrate/memory-event": {
-      "types": "./src/integrate/memory-event.ts",
-      "bun": "./src/integrate/memory-event.ts",
-      "import": "./src/integrate/memory-event.ts",
-      "default": "./src/integrate/memory-event.ts"
+      "types": "./src/services/memories/integrate/memory-event.ts",
+      "bun": "./src/services/memories/integrate/memory-event.ts",
+      "import": "./src/services/memories/integrate/memory-event.ts",
+      "default": "./src/services/memories/integrate/memory-event.ts"
     },
     "./step-context": {
-      "types": "./src/agent/step-context.ts",
-      "bun": "./src/agent/step-context.ts",
-      "import": "./src/agent/step-context.ts",
-      "default": "./src/agent/step-context.ts"
+      "types": "./src/runtime/step-context.ts",
+      "bun": "./src/runtime/step-context.ts",
+      "import": "./src/runtime/step-context.ts",
+      "default": "./src/runtime/step-context.ts"
     },
     "./run-harness-agent-step": {
-      "types": "./src/agent/run-harness-agent-step.ts",
-      "bun": "./src/agent/run-harness-agent-step.ts",
-      "import": "./src/agent/run-harness-agent-step.ts",
-      "default": "./src/agent/run-harness-agent-step.ts"
+      "types": "./src/runtime/run-harness-agent-step.ts",
+      "bun": "./src/runtime/run-harness-agent-step.ts",
+      "import": "./src/runtime/run-harness-agent-step.ts",
+      "default": "./src/runtime/run-harness-agent-step.ts"
     },
     "./memory-search": {
-      "types": "./src/agent/tools/memories/_helpers/memory-search.ts",
-      "bun": "./src/agent/tools/memories/_helpers/memory-search.ts",
-      "import": "./src/agent/tools/memories/_helpers/memory-search.ts",
-      "default": "./src/agent/tools/memories/_helpers/memory-search.ts"
+      "types": "./src/services/memories/tools/_helpers/memory-search.ts",
+      "bun": "./src/services/memories/tools/_helpers/memory-search.ts",
+      "import": "./src/services/memories/tools/_helpers/memory-search.ts",
+      "default": "./src/services/memories/tools/_helpers/memory-search.ts"
     },
     "./nbc-run-model-turn-run": {
-      "types": "./src/agent/workflows/nbc-run-model-turn-run.ts",
-      "bun": "./src/agent/workflows/nbc-run-model-turn-run.ts",
-      "import": "./src/agent/workflows/nbc-run-model-turn-run.ts",
-      "default": "./src/agent/workflows/nbc-run-model-turn-run.ts"
+      "types": "./src/runtime/workflows/nbc-run-model-turn-run.ts",
+      "bun": "./src/runtime/workflows/nbc-run-model-turn-run.ts",
+      "import": "./src/runtime/workflows/nbc-run-model-turn-run.ts",
+      "default": "./src/runtime/workflows/nbc-run-model-turn-run.ts"
     },
     "./nbc-prepare-turn-run": {
-      "types": "./src/agent/workflows/nbc-prepare-turn-run.ts",
-      "bun": "./src/agent/workflows/nbc-prepare-turn-run.ts",
-      "import": "./src/agent/workflows/nbc-prepare-turn-run.ts",
-      "default": "./src/agent/workflows/nbc-prepare-turn-run.ts"
+      "types": "./src/runtime/workflows/nbc-prepare-turn-run.ts",
+      "bun": "./src/runtime/workflows/nbc-prepare-turn-run.ts",
+      "import": "./src/runtime/workflows/nbc-prepare-turn-run.ts",
+      "default": "./src/runtime/workflows/nbc-prepare-turn-run.ts"
     },
     "./attribution-digest": {
       "types": "./src/observability/attribution-digest.ts",
@@ -98,12 +98,11 @@
       "default": "./src/observability/attribution-digest.ts"
     },
     "./structured-output": {
-      "types": "./src/agent/structured-output.ts",
-      "bun": "./src/agent/structured-output.ts",
-      "import": "./src/agent/structured-output.ts",
-      "default": "./src/agent/structured-output.ts"
+      "types": "./src/runtime/structured-output.ts",
+      "bun": "./src/runtime/structured-output.ts",
+      "import": "./src/runtime/structured-output.ts",
+      "default": "./src/runtime/structured-output.ts"
     },
-
     "./dist": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
