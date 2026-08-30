@@ -11,7 +11,7 @@ import type {
   PublicProfileResult,
 } from "@khoralabs/khora-client";
 
-import type { AgentActor } from "../../agent/actor.ts";
+import type { AgentActor } from "../actor.ts";
 import type { AgentChatClient } from "./message/chat.ts";
 import { AgentSocialMessage } from "./message/message.ts";
 import { AgentSocialNegotiate } from "./negotiate/negotiate.ts";

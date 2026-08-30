@@ -1,19 +1,19 @@
 import type { ToolSet } from "ai";
 import { jsonSchema, tool } from "ai";
-import { resolveHarnessEmbeddingModel } from "../../services/memories/tools/_helpers/embedding-model.ts";
+import { resolveHarnessEmbeddingModel } from "../../agent/memories/tools/_helpers/embedding-model.ts";
 import {
   agentMemoriesDatabase,
   createHarnessMemoriesClient,
-} from "../../services/memories/tools/_helpers/memories-client.ts";
-import { getInstalledMemoriesOntology } from "../../services/memories/tools/_helpers/memories-ontology-install.ts";
-import { createNbcMeshClient } from "../../services/social/negotiate/nbc/nbc-mesh-client.ts";
-import { nbcTurnContext } from "../../services/social/negotiate/nbc/nbc-turn-context.ts";
+} from "../../agent/memories/tools/_helpers/memories-client.ts";
+import { getInstalledMemoriesOntology } from "../../agent/memories/tools/_helpers/memories-ontology-install.ts";
+import { createNbcMeshClient } from "../../agent/social/negotiate/nbc/nbc-mesh-client.ts";
+import { nbcTurnContext } from "../../agent/social/negotiate/nbc/nbc-turn-context.ts";
 import {
   buildNegotiationInstructions,
   buildNegotiationUserMessage,
   summarizeNbcGraph,
-} from "../../services/social/negotiate/nbc/prompt.ts";
-import type { AvailablePeerPort } from "../../services/social/negotiate/nbc/who-should-act.ts";
+} from "../../agent/social/negotiate/nbc/prompt.ts";
+import type { AvailablePeerPort } from "../../agent/social/negotiate/nbc/who-should-act.ts";
 import { NETWORK_NEGOTIATION_AGENT_ID } from "../capability-agents/network-negotiation-agent.ts";
 import { prepareHarnessStepRuntime } from "../prepare-harness-step.ts";
 import { HARNESS_TOOLKIT } from "../tools/ids.ts";

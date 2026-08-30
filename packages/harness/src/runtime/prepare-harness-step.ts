@@ -3,7 +3,7 @@ import type { KhoraClient } from "@khoralabs/khora-client";
 import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import type { ToolSet } from "ai";
-import type { AgentChatClient } from "../services/social/message/chat.ts";
+import type { AgentChatClient } from "../agent/social/message/chat.ts";
 import {
   captureHarnessCapabilities,
   createHarnessAgentTelemetry,

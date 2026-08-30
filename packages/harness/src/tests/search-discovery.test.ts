@@ -21,7 +21,7 @@ import { resolveKhoraBaseUrlFromEnv } from "../lib/khora-base-url.ts";
 import { resolveMemoriesBaseUrlFromEnv } from "../lib/memories-base-url.ts";
 import { resolveRelayBaseUrlFromEnv } from "../lib/relay-base-url.ts";
 import { waitFor } from "../lib/wait-for.ts";
-import { disconnectVellum, openVellumChain } from "../services/social/negotiate/vellum.ts";
+import { disconnectVellum, openVellumChain } from "../agent/social/negotiate/vellum.ts";
 import { startTestChatHttp, type TestChatHttpHandle } from "./test-chat-http.ts";
 
 const khoraBaseUrl = resolveKhoraBaseUrlFromEnv();

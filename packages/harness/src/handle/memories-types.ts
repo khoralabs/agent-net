@@ -6,13 +6,13 @@ import type {
   RemoteMemoriesClientAsync,
 } from "@khoralabs/memories-service/client";
 
-import type { IntegrateMemoryEvent } from "../services/memories/integrate/memory-event.ts";
-import { resolveHarnessEmbeddingModel } from "../services/memories/tools/_helpers/embedding-model.ts";
+import type { IntegrateMemoryEvent } from "../agent/memories/integrate/memory-event.ts";
+import { resolveHarnessEmbeddingModel } from "../agent/memories/tools/_helpers/embedding-model.ts";
 import {
   runStandardHybridMemorySearch,
   type StandardHybridMemorySearchInput,
-} from "../services/memories/tools/_helpers/memory-search.ts";
-import { writeMemoryNode } from "../services/memories/tools/_helpers/memory-write.ts";
+} from "../agent/memories/tools/_helpers/memory-search.ts";
+import { writeMemoryNode } from "../agent/memories/tools/_helpers/memory-write.ts";
 
 /** A bound memories client scoped to a single agent's database. */
 export type AgentMemoriesClient = {

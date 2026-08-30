@@ -20,8 +20,8 @@ import {
 } from "../pool/khora-admin-invites.ts";
 import { PerAgentInviteBank } from "../pool/per-agent-invite-bank.ts";
 import type { PoolAgentRegistry } from "../pool/store.ts";
-import { harnessMemoriesFetch } from "../services/memories/tools/_helpers/memories-client.ts";
-import { createRemoteHarnessChat, type HarnessChat } from "../services/social/message/chat.ts";
+import { harnessMemoriesFetch } from "../agent/memories/tools/_helpers/memories-client.ts";
+import { createRemoteHarnessChat, type HarnessChat } from "../agent/social/message/chat.ts";
 import {
   createHarnessAgentApi,
   harnessAgentsDataDir,

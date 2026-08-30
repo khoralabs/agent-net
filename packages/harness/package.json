@@ -50,16 +50,16 @@
       "default": "./src/runtime/workflow-resilience.ts"
     },
     "./integrate/write-scope": {
-      "types": "./src/services/memories/integrate/write-scope.ts",
-      "bun": "./src/services/memories/integrate/write-scope.ts",
-      "import": "./src/services/memories/integrate/write-scope.ts",
-      "default": "./src/services/memories/integrate/write-scope.ts"
+      "types": "./src/agent/memories/integrate/write-scope.ts",
+      "bun": "./src/agent/memories/integrate/write-scope.ts",
+      "import": "./src/agent/memories/integrate/write-scope.ts",
+      "default": "./src/agent/memories/integrate/write-scope.ts"
     },
     "./integrate/memory-event": {
-      "types": "./src/services/memories/integrate/memory-event.ts",
-      "bun": "./src/services/memories/integrate/memory-event.ts",
-      "import": "./src/services/memories/integrate/memory-event.ts",
-      "default": "./src/services/memories/integrate/memory-event.ts"
+      "types": "./src/agent/memories/integrate/memory-event.ts",
+      "bun": "./src/agent/memories/integrate/memory-event.ts",
+      "import": "./src/agent/memories/integrate/memory-event.ts",
+      "default": "./src/agent/memories/integrate/memory-event.ts"
     },
     "./step-context": {
       "types": "./src/runtime/step-context.ts",
@@ -74,10 +74,10 @@
       "default": "./src/runtime/run-harness-agent-step.ts"
     },
     "./memory-search": {
-      "types": "./src/services/memories/tools/_helpers/memory-search.ts",
-      "bun": "./src/services/memories/tools/_helpers/memory-search.ts",
-      "import": "./src/services/memories/tools/_helpers/memory-search.ts",
-      "default": "./src/services/memories/tools/_helpers/memory-search.ts"
+      "types": "./src/agent/memories/tools/_helpers/memory-search.ts",
+      "bun": "./src/agent/memories/tools/_helpers/memory-search.ts",
+      "import": "./src/agent/memories/tools/_helpers/memory-search.ts",
+      "default": "./src/agent/memories/tools/_helpers/memory-search.ts"
     },
     "./nbc-run-model-turn-run": {
       "types": "./src/runtime/workflows/nbc-run-model-turn-run.ts",

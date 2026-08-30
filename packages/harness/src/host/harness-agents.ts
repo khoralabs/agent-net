@@ -32,15 +32,15 @@ import {
   createHarnessMemoriesClient,
   type HarnessMemoriesOntology,
   resolveHarnessMemoriesOntology,
-} from "../services/memories/tools/_helpers/memories-client.ts";
+} from "../agent/memories/tools/_helpers/memories-client.ts";
 import type {
   AgentChatClient,
   ChatServiceClient,
   HarnessChat,
   SignedChatBackend,
-} from "../services/social/message/chat.ts";
-import { createHarnessChatCrypto } from "../services/social/message/chat-crypto.ts";
-import { createHarnessKhoraClientForAgent } from "../services/social/tools/_helpers/khora-client-factory.ts";
+} from "../agent/social/message/chat.ts";
+import { createHarnessChatCrypto } from "../agent/social/message/chat-crypto.ts";
+import { createHarnessKhoraClientForAgent } from "../agent/social/tools/_helpers/khora-client-factory.ts";
 
 export type SpawnWithMemoriesOptions = {
   ontology: OntologyDefinition<LabelSchemaMap, LabelSchemaMap>;

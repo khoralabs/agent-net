@@ -14,14 +14,14 @@ import {
   formatSkillDocument,
   SKILLS_NAMESPACE,
   skillRecordFromText,
-} from "../../services/memories/skills/_helpers/skills.ts";
-import { activateSkillByName } from "../../services/memories/skills/activate-skill.ts";
-import { createEphemeralRecentNamespacesTracker } from "../../services/memories/tools/_helpers/recent-namespaces.ts";
+} from "../../agent/memories/skills/_helpers/skills.ts";
+import { activateSkillByName } from "../../agent/memories/skills/activate-skill.ts";
+import { createEphemeralRecentNamespacesTracker } from "../../agent/memories/tools/_helpers/recent-namespaces.ts";
 import {
   createTestEmbeddingModel,
   installTestMemoriesOntology,
   resetTestMemoriesOntology,
-} from "../../services/memories/tools/_helpers/test-embedding.ts";
+} from "../../agent/memories/tools/_helpers/test-embedding.ts";
 import { harnessToolkit } from "./_toolkit.ts";
 import { emptyDisabledToolSets, type HarnessToolkitEnv } from "./types.ts";
 

@@ -175,8 +175,8 @@ export {
   writeScopeNamespaceCandidates,
   writeScopeNeedsNamespaceChoice,
   writeScopeNeighborSearchOptions,
-} from "./services/memories/integrate/write-scope.ts";
-export { resolveHarnessEmbeddingModel } from "./services/memories/tools/_helpers/embedding-model.ts";
+} from "./agent/memories/integrate/write-scope.ts";
+export { resolveHarnessEmbeddingModel } from "./agent/memories/tools/_helpers/embedding-model.ts";
 export {
   agentMemoriesDatabase,
   createDeferredHarnessMemoriesClient,
@@ -184,11 +184,11 @@ export {
   harnessMemoriesFetch,
   installHarnessMemoriesFetch,
   type MemoriesServiceFetch,
-} from "./services/memories/tools/_helpers/memories-client.ts";
+} from "./agent/memories/tools/_helpers/memories-client.ts";
 export {
   getInstalledMemoriesOntology,
   installMemoriesOntology,
-} from "./services/memories/tools/_helpers/memories-ontology-install.ts";
+} from "./agent/memories/tools/_helpers/memories-ontology-install.ts";
 export {
   EMBEDDING_MODEL_REQUIRED_MESSAGE,
   type EnrichedNamespaceSearchHit,
@@ -203,14 +203,14 @@ export {
   runStandardNamespaceSearch,
   type StandardHybridMemorySearchInput,
   type StandardNamespaceSearchInput,
-} from "./services/memories/tools/_helpers/memory-search.ts";
-export { writeMemoryNode } from "./services/memories/tools/_helpers/memory-write.ts";
+} from "./agent/memories/tools/_helpers/memory-search.ts";
+export { writeMemoryNode } from "./agent/memories/tools/_helpers/memory-write.ts";
 export {
   createRemoteSourceMapContentStore,
   DEFAULT_MEMORY_SOURCE_KEY,
   MEMORY_TEXT_SOURCE_PREFIX,
   type SourceMapTextPreviewClient,
-} from "./services/memories/tools/_helpers/source-map-content-store.ts";
+} from "./agent/memories/tools/_helpers/source-map-content-store.ts";
 export {
   type AgentChatClient,
   type ChatServiceClient,
@@ -224,7 +224,7 @@ export {
   harnessChatFetch,
   installHarnessChatFetch,
   type SignedChatBackend,
-} from "./services/social/message/chat.ts";
+} from "./agent/social/message/chat.ts";
 export {
   ensureThread,
   getAgentChatClient,
@@ -233,58 +233,58 @@ export {
   getDevAgentDid,
   installAgentChat,
   resolveAgentChatSigner,
-} from "./services/social/message/chat-service.ts";
-export { AgentSocialMessage } from "./services/social/message/message.ts";
+} from "./agent/social/message/chat-service.ts";
+export { AgentSocialMessage } from "./agent/social/message/message.ts";
 export {
   type NegotiationTurnWire,
   negotiationOutputToWire,
-} from "./services/social/negotiate/nbc/action.ts";
+} from "./agent/social/negotiate/nbc/action.ts";
 export type {
   NbcLoopChain,
   NbcLoopHost,
   NbcLoopStartTurnInput,
   NbcLoopStatusPatch,
-} from "./services/social/negotiate/nbc/loop-host.ts";
+} from "./agent/social/negotiate/nbc/loop-host.ts";
 export {
   createNbcChainChangeBus,
   type NbcChainChangeBus,
   type NbcChainChanged,
-} from "./services/social/negotiate/nbc/nbc-chain-change-bus.ts";
+} from "./agent/social/negotiate/nbc/nbc-chain-change-bus.ts";
 export {
   type NbcInternalNegotiationChain,
   type NbcInternalNegotiationHost,
   type RegisterNbcInternalNegotiationRoutesInput,
   registerNbcInternalNegotiationRoutes,
-} from "./services/social/negotiate/nbc/nbc-internal-routes.ts";
-export { type NbcLoopHandle, startNbcLoop } from "./services/social/negotiate/nbc/nbc-loop.ts";
+} from "./agent/social/negotiate/nbc/nbc-internal-routes.ts";
+export { type NbcLoopHandle, startNbcLoop } from "./agent/social/negotiate/nbc/nbc-loop.ts";
 export {
   createNbcMeshClient,
   type NbcMeshClient,
   type NbcNegotiationStateResponse,
-} from "./services/social/negotiate/nbc/nbc-mesh-client.ts";
-export { startNbcReplicaWatch } from "./services/social/negotiate/nbc/nbc-replica-watch.ts";
-export { nbcTurnContext } from "./services/social/negotiate/nbc/nbc-turn-context.ts";
+} from "./agent/social/negotiate/nbc/nbc-mesh-client.ts";
+export { startNbcReplicaWatch } from "./agent/social/negotiate/nbc/nbc-replica-watch.ts";
+export { nbcTurnContext } from "./agent/social/negotiate/nbc/nbc-turn-context.ts";
 export {
   createNbcWakeDispatcher,
   resetNbcWakeDispatcherForTests,
-} from "./services/social/negotiate/nbc/nbc-wake-dispatcher.ts";
+} from "./agent/social/negotiate/nbc/nbc-wake-dispatcher.ts";
 export {
   buildNegotiationInstructions,
   buildNegotiationUserMessage,
   type NegotiationBrief,
   summarizeNbcGraph,
-} from "./services/social/negotiate/nbc/prompt.ts";
+} from "./agent/social/negotiate/nbc/prompt.ts";
 export {
   type RunNbcModelTurnInput,
   runNbcModelTurn,
-} from "./services/social/negotiate/nbc/run-nbc-model-turn.ts";
+} from "./agent/social/negotiate/nbc/run-nbc-model-turn.ts";
 export {
   type NegotiationPortDefinition,
   type NegotiationTurnEnvelope,
   type NegotiationTurnEnvelopeContext,
   negotiationTurnEnvelopeSchema,
   parseNegotiationTurnEnvelope,
-} from "./services/social/negotiate/nbc/turn-output-schema.ts";
+} from "./agent/social/negotiate/nbc/turn-output-schema.ts";
 export {
   type AvailablePeerPort,
   availablePeerPorts,
@@ -294,12 +294,12 @@ export {
   type NegotiationChainView,
   type WhoShouldActResult,
   whoShouldAct,
-} from "./services/social/negotiate/nbc/who-should-act.ts";
+} from "./agent/social/negotiate/nbc/who-should-act.ts";
 export {
   AgentSocialNegotiate,
   type NegotiateStartResult,
   type VellumHandle,
-} from "./services/social/negotiate/negotiate.ts";
+} from "./agent/social/negotiate/negotiate.ts";
 export {
   createHarnessVellumPool,
   disconnectVellum,
@@ -307,8 +307,8 @@ export {
   openVellumChain,
   type VellumPairOptions,
   wrapPoolClient,
-} from "./services/social/negotiate/vellum.ts";
-export { vellumPoolAttachmentDataDir } from "./services/social/negotiate/vellum-pool-paths.ts";
+} from "./agent/social/negotiate/vellum.ts";
+export { vellumPoolAttachmentDataDir } from "./agent/social/negotiate/vellum-pool-paths.ts";
 export {
   type CommitTurnResult,
   type CreateVellumChainSessionRegistryOptions,
@@ -316,6 +316,6 @@ export {
   NBC_GENESIS_NOT_INITIATOR,
   type VellumChainLiveSession,
   type VellumChainSessionRegistry,
-} from "./services/social/negotiate/vellum-sessions.ts";
-export { AgentSocial, type SocialInvitation } from "./services/social/social.ts";
-export { resolveAgentsDataDir } from "./services/social/tools/_helpers/khora-client-factory.ts";
+} from "./agent/social/negotiate/vellum-sessions.ts";
+export { AgentSocial, type SocialInvitation } from "./agent/social/social.ts";
+export { resolveAgentsDataDir } from "./agent/social/tools/_helpers/khora-client-factory.ts";

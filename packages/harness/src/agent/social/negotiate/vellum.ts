@@ -13,7 +13,7 @@ import { VellumChain } from "@khoralabs/vellum-client";
 import { VellumPool } from "@khoralabs/vellum-client/pool";
 import { createSharedUplinkChannelFabric } from "@khoralabs/vellum-client/session";
 import { waitFor } from "../../../lib/wait-for.ts";
-import type { AgentActor } from "../../../agent/actor.ts";
+import type { AgentActor } from "../../actor.ts";
 import {
   loadHarnessIdentity,
   resolveIdentitySecretFromEnv,

@@ -30,7 +30,7 @@ export async function runAgentResponseStep(
 
   const session = requireNetworkSession(sessionId);
   const { resolveHarnessEmbeddingModel } = await import(
-    "../../services/memories/tools/_helpers/embedding-model.ts"
+    "../../agent/memories/tools/_helpers/embedding-model.ts"
   );
   const networkDeps = await session.resolveAgentWorkflowDeps(params.agent.actingFor.id);
   const embeddingModel = resolveHarnessEmbeddingModel();

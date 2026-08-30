@@ -2,10 +2,10 @@ import type { KhoraClient } from "@khoralabs/khora-client";
 import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import type { NbcChainGraph } from "@khoralabs/obp-nbc";
-import type { IntegrateMemoryWriteScope } from "../../services/memories/integrate/write-scope.ts";
-import type { SkillRecord } from "../../services/memories/skills/_helpers/skills.ts";
-import type { RecentNamespacesTracker } from "../../services/memories/tools/_helpers/recent-namespaces.ts";
-import type { AgentChatClient } from "../../services/social/message/chat.ts";
+import type { IntegrateMemoryWriteScope } from "../../agent/memories/integrate/write-scope.ts";
+import type { SkillRecord } from "../../agent/memories/skills/_helpers/skills.ts";
+import type { RecentNamespacesTracker } from "../../agent/memories/tools/_helpers/recent-namespaces.ts";
+import type { AgentChatClient } from "../../agent/social/message/chat.ts";
 import type { MemoriesDatabaseContext } from "../types.ts";
 
 export type NbcToolkitContext = {

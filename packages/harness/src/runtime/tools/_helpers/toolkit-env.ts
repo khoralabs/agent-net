@@ -5,15 +5,15 @@ import {
   resolveMemoriesAdminTokenFromEnv,
   resolveMemoriesBaseUrlFromEnv,
 } from "../../../lib/memories-base-url.ts";
-import { discoverSkillsFromMemories } from "../../../services/memories/skills/_helpers/skills.ts";
+import { discoverSkillsFromMemories } from "../../../agent/memories/skills/_helpers/skills.ts";
 import {
   agentMemoriesDatabase,
   createHarnessMemoriesClient,
   type HarnessMemoriesOntology,
-} from "../../../services/memories/tools/_helpers/memories-client.ts";
-import { resolveMemoriesHeadRootHex } from "../../../services/memories/tools/_helpers/memory-search.ts";
-import { resolveRecentNamespacesTracker } from "../../../services/memories/tools/_helpers/recent-namespaces.ts";
-import type { AgentChatClient } from "../../../services/social/message/chat.ts";
+} from "../../../agent/memories/tools/_helpers/memories-client.ts";
+import { resolveMemoriesHeadRootHex } from "../../../agent/memories/tools/_helpers/memory-search.ts";
+import { resolveRecentNamespacesTracker } from "../../../agent/memories/tools/_helpers/recent-namespaces.ts";
+import type { AgentChatClient } from "../../../agent/social/message/chat.ts";
 import type { RunAgentWorkflowDependencies } from "../../run-agent-workflow.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
 

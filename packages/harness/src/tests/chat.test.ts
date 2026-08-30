@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { generateIdentity } from "@khoralabs/did-key-identity";
 import type { RelaySigner } from "@khoralabs/relay/crypto";
 
-import type { HarnessChat, SignedChatBackend } from "../services/social/message/chat.ts";
+import type { HarnessChat, SignedChatBackend } from "../agent/social/message/chat.ts";
 import {
   createTestHarnessChatBackend,
   startTestChatHttp,

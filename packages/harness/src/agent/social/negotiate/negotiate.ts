@@ -1,4 +1,4 @@
-import type { AgentActor } from "../../../agent/actor.ts";
+import type { AgentActor } from "../../actor.ts";
 import { type NbcLoopHandle, type StartNbcLoopInput, startNbcLoop } from "./nbc/nbc-loop.ts";
 import {
   disconnectVellum,

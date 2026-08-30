@@ -2,8 +2,8 @@ import type { PersistableSigner } from "@khoralabs/did-key-identity";
 import { KhoraClient } from "@khoralabs/khora-client";
 
 import type { AgentActor } from "../agent/actor.ts";
-import type { AgentChatClient } from "../services/social/message/chat.ts";
-import { AgentSocial } from "../services/social/social.ts";
+import type { AgentChatClient } from "../agent/social/message/chat.ts";
+import { AgentSocial } from "../agent/social/social.ts";
 import type { AgentMemoriesClient } from "./memories-types.ts";
 
 export type AgentHandleOptions = {
@@ -35,7 +35,7 @@ export type BindAgentServicesOptions = {
  * `harness.subscribeInbox`), not a per-agent WebSocket on this handle.
  *
  * Vellum/NBC channel ops live under {@link AgentSocial.negotiate}
- * (`services/social/negotiate`), not on this type.
+ * (`agent/social/negotiate`), not on this type.
  */
 export class AgentHandle implements AgentActor {
   readonly did: string;

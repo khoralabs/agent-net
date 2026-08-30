@@ -11,8 +11,8 @@ import type { ServerWebSocket } from "bun";
 import {
   createHarnessChatBackend,
   type SignedChatBackend,
-} from "../services/social/message/chat.ts";
-import type { ResolveHarnessChatSigner } from "../services/social/message/chat-crypto.ts";
+} from "../agent/social/message/chat.ts";
+import type { ResolveHarnessChatSigner } from "../agent/social/message/chat-crypto.ts";
 
 export type TestChatHttpHandle = {
   readonly baseUrl: string;
