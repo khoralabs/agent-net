@@ -5,9 +5,9 @@ export type {
   PoolInboxEvent,
   PoolInboxLifecycleHandler,
   PoolInboxOptions,
-} from "../inbox/pool-inbox.ts";
+} from "./inbox/pool-inbox.ts";
 /** @deprecated Prefer {@link HarnessPoolInbox} / harness.subscribeInbox. */
-export { connectPoolInbox, HarnessPoolInbox } from "../inbox/pool-inbox.ts";
+export { connectPoolInbox, HarnessPoolInbox } from "./inbox/pool-inbox.ts";
 export {
   HARNESS_IDENTITY_WRAP_KEY_ENV,
   loadHarnessIdentity,
