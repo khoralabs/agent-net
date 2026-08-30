@@ -1,5 +1,5 @@
-import type { AgentChatClient, ChatServiceClient } from "../social/message/chat.ts";
 import type { ThreadHashSnapshot } from "../../pool/network/types.ts";
+import type { AgentChatClient, ChatServiceClient } from "../social/message/chat.ts";
 
 export async function collectThreadHashSnapshots(
   chatService: ChatServiceClient,

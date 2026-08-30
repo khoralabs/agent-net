@@ -11,12 +11,12 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import os from "node:os";
 import path from "node:path";
 import type { KhoraClientEvent } from "@khoralabs/khora-client";
-import { type NetworkHarnessHandle, startNetworkHarness } from "../pool/host/harness.ts";
 import { inboxHasPost } from "../lib/inbox.ts";
 import { resolveKhoraBaseUrlFromEnv } from "../lib/khora-base-url.ts";
 import { resolveMemoriesBaseUrlFromEnv } from "../lib/memories-base-url.ts";
 import { resolveRelayBaseUrlFromEnv } from "../lib/relay-base-url.ts";
 import { waitFor } from "../lib/wait-for.ts";
+import { type NetworkHarnessHandle, startNetworkHarness } from "../pool/host/harness.ts";
 import { startTestChatHttp, type TestChatHttpHandle } from "./test-chat-http.ts";
 
 const khoraBaseUrl = resolveKhoraBaseUrlFromEnv();

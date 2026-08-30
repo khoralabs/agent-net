@@ -12,17 +12,7 @@ import {
   type RemoteMemoriesClientAsync,
   storedOntologyFromDefinition,
 } from "@khoralabs/memories-service/client";
-import { createBoundAgentMemoriesClient } from "../../agent/memories-types.ts";
 import type { AgentHandle } from "../../agent/handle.ts";
-import { loadHarnessIdentity } from "../identity-wrap-key.ts";
-import type { HarnessPoolInbox, PoolInboxEvent } from "../inbox/pool-inbox.ts";
-import { registerNetworkSession, removeNetworkSession } from "../network/session-registry.ts";
-import type { ManagedAgentPool } from "../pool.ts";
-import type { PerAgentInviteBank } from "../per-agent-invite-bank.ts";
-import { AgentStore } from "../store.ts";
-import { getCapabilityRegistry } from "../../agent/turn/agent-runtime.ts";
-import type { RunAgentWorkflowDependencies } from "../../agent/turn/run-agent-workflow.ts";
-import { harnessToolkit } from "../../agent/turn/tools/index.ts";
 import {
   agentMemoriesDatabase,
   createDeferredHarnessMemoriesClient,
@@ -30,6 +20,7 @@ import {
   type HarnessMemoriesOntology,
   resolveHarnessMemoriesOntology,
 } from "../../agent/memories/tools/_helpers/memories-client.ts";
+import { createBoundAgentMemoriesClient } from "../../agent/memories-types.ts";
 import type {
   AgentChatClient,
   ChatServiceClient,
@@ -38,6 +29,15 @@ import type {
 } from "../../agent/social/message/chat.ts";
 import { createHarnessChatCrypto } from "../../agent/social/message/chat-crypto.ts";
 import { createHarnessKhoraClientForAgent } from "../../agent/social/tools/_helpers/khora-client-factory.ts";
+import { getCapabilityRegistry } from "../../agent/turn/agent-runtime.ts";
+import type { RunAgentWorkflowDependencies } from "../../agent/turn/run-agent-workflow.ts";
+import { harnessToolkit } from "../../agent/turn/tools/index.ts";
+import { loadHarnessIdentity } from "../identity-wrap-key.ts";
+import type { HarnessPoolInbox, PoolInboxEvent } from "../inbox/pool-inbox.ts";
+import { registerNetworkSession, removeNetworkSession } from "../network/session-registry.ts";
+import type { PerAgentInviteBank } from "../per-agent-invite-bank.ts";
+import type { ManagedAgentPool } from "../pool.ts";
+import { AgentStore } from "../store.ts";
 
 export type SpawnWithMemoriesOptions = {
   ontology: OntologyDefinition<LabelSchemaMap, LabelSchemaMap>;

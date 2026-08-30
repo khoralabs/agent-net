@@ -8,10 +8,7 @@ import { createChatHttpRuntime } from "@khoralabs/chat/http/service";
 import { createMemoryChatPersistence } from "@khoralabs/chat/persistence";
 import type { ServerWebSocket } from "bun";
 
-import {
-  createHarnessChatBackend,
-  type SignedChatBackend,
-} from "../agent/social/message/chat.ts";
+import { createHarnessChatBackend, type SignedChatBackend } from "../agent/social/message/chat.ts";
 import type { ResolveHarnessChatSigner } from "../agent/social/message/chat-crypto.ts";
 
 export type TestChatHttpHandle = {

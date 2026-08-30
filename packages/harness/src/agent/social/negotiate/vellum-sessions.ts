@@ -9,7 +9,12 @@ import { VellumChain } from "@khoralabs/vellum-client";
 import type { VellumPool } from "@khoralabs/vellum-client/pool";
 import { waitFor } from "../../../lib/wait-for.ts";
 import type { AgentActor } from "../../actor.ts";
-import { createHarnessVellumPool, type VellumPairOptions, type VellumHandle, wrapPoolClient } from "./vellum.ts";
+import {
+  createHarnessVellumPool,
+  type VellumHandle,
+  type VellumPairOptions,
+  wrapPoolClient,
+} from "./vellum.ts";
 import { vellumPoolAttachmentDataDir } from "./vellum-pool-paths.ts";
 
 export type VellumChainLiveSession = {

@@ -2,9 +2,9 @@ import type { PersistableSigner } from "@khoralabs/did-key-identity";
 import { KhoraClient } from "@khoralabs/khora-client";
 
 import type { AgentActor } from "./actor.ts";
+import type { AgentMemoriesClient } from "./memories-types.ts";
 import type { AgentChatClient } from "./social/message/chat.ts";
 import { AgentSocial } from "./social/social.ts";
-import type { AgentMemoriesClient } from "./memories-types.ts";
 
 export type AgentHandleOptions = {
   signer: PersistableSigner;
@@ -98,8 +98,11 @@ export class AgentHandle implements AgentActor {
       this.#chat = memoriesOrOpts.chat;
       this.#listInvites = memoriesOrOpts.listInvites;
     } else {
+      if (chat === undefined) {
+        throw new Error(`Agent ${this.did}: bindServices requires a chat client`);
+      }
       this.#memories = memoriesOrOpts;
-      this.#chat = chat!;
+      this.#chat = chat;
     }
     this.#social = new AgentSocial({
       handle: this,

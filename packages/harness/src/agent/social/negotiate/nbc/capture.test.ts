@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { evaluateComposable } from "@khoralabs/agent-capabilities";
-
+import { createEphemeralRecentNamespacesTracker } from "../../../memories/tools/_helpers/recent-namespaces.ts";
 import {
   captureHarnessCapabilities,
   resetHarnessAgentRegistryForTests,
@@ -9,7 +9,6 @@ import { defineNegotiationAgent } from "../../../turn/capability-agents/network-
 import { HARNESS_TOOLKIT } from "../../../turn/tools/ids.ts";
 import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../../../turn/tools/types.ts";
 import type { AgentWorkflowParams } from "../../../turn/types.ts";
-import { createEphemeralRecentNamespacesTracker } from "../../../memories/tools/_helpers/recent-namespaces.ts";
 
 function env(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEnv {
   return {

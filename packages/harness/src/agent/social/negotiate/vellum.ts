@@ -13,12 +13,12 @@ import { VellumChain } from "@khoralabs/vellum-client";
 import { VellumPool } from "@khoralabs/vellum-client/pool";
 import { createSharedUplinkChannelFabric } from "@khoralabs/vellum-client/session";
 import { waitFor } from "../../../lib/wait-for.ts";
-import type { AgentActor } from "../../actor.ts";
 import {
   loadHarnessIdentity,
   resolveIdentitySecretFromEnv,
 } from "../../../pool/identity-wrap-key.ts";
 import { AgentStore } from "../../../pool/index.ts";
+import type { AgentActor } from "../../actor.ts";
 
 /** Per-DID Vellum channel ops returned by {@link wrapPoolClient}. */
 export type VellumHandle = {

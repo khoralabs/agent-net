@@ -13,7 +13,6 @@ import {
   type UIMessage,
 } from "ai";
 import { FatalError } from "workflow";
-import { collectThreadHashSnapshots } from "./thread-provenance.ts";
 import { buildNetworkAttribution } from "../../pool/observability/attribution-digest.ts";
 import { runWithAttributionAsync } from "../../pool/observability/network-log.ts";
 import { formatSkillCatalog } from "../memories/skills/_helpers/skills.ts";
@@ -24,6 +23,7 @@ import { sourcesFromMemoryToolParts } from "./agent-memory-source.ts";
 import { resolveGatewayModel } from "./agent-runtime.ts";
 import { prepareHarnessStepRuntime } from "./prepare-harness-step.ts";
 import { formatAgentStepContext } from "./step-context.ts";
+import { collectThreadHashSnapshots } from "./thread-provenance.ts";
 import type { AgentWorkflowParams, AgentWorkflowResult } from "./types.ts";
 import {
   buildUserLocalDateTimeContext,

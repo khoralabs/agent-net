@@ -1,3 +1,12 @@
+export {
+  HARNESS_IDENTITY_WRAP_KEY_ENV,
+  loadHarnessIdentity,
+  parseIdentityWrapKey,
+  requireIdentitySecret,
+  resolveIdentitySecretFromEnv,
+  saveHarnessIdentity,
+  wrapKeySecretFromBytes,
+} from "./identity-wrap-key.ts";
 export type {
   HarnessPoolInboxOptions,
   InboxConnection,
@@ -9,15 +18,6 @@ export type {
 /** @deprecated Prefer {@link HarnessPoolInbox} / harness.subscribeInbox. */
 export { connectPoolInbox, HarnessPoolInbox } from "./inbox/pool-inbox.ts";
 export {
-  HARNESS_IDENTITY_WRAP_KEY_ENV,
-  loadHarnessIdentity,
-  parseIdentityWrapKey,
-  requireIdentitySecret,
-  resolveIdentitySecretFromEnv,
-  saveHarnessIdentity,
-  wrapKeySecretFromBytes,
-} from "./identity-wrap-key.ts";
-export {
   emitNetworkEvent,
   getInstalledNetworkEventsPlugin,
   getNetworkSession,
@@ -25,6 +25,9 @@ export {
   type ListNetworkEventsOptions,
   listNetworkEvents,
   type NetworkAgentWorkflowDeps,
+  type NetworkAttribution,
+  type NetworkEvent,
+  type NetworkEventSource,
   type NetworkEventsPlugin,
   type NetworkRuntimeSession,
   networkEventId,
@@ -32,12 +35,12 @@ export {
   removeNetworkSession,
   requireNetworkSession,
   resetNetworkSessionRegistryForTests,
-  type NetworkAttribution,
-  type NetworkEvent,
-  type NetworkEventSource,
   type ThreadHashSnapshot,
 } from "./network/index.ts";
-export { buildNetworkAttribution, type AttributionCapabilities } from "./observability/attribution-digest.ts";
+export {
+  type AttributionCapabilities,
+  buildNetworkAttribution,
+} from "./observability/attribution-digest.ts";
 export type {
   CreateHarnessLoggerOptions,
   HarnessObservability,

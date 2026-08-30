@@ -5,12 +5,12 @@ export {
   type BindAgentServicesOptions,
 } from "./handle.ts";
 export {
-  createBoundAgentMemoriesClient,
   type AgentMemoriesClient,
+  createBoundAgentMemoriesClient,
 } from "./memories-types.ts";
-export { AgentSocial, type SocialInvitation } from "./social/social.ts";
 export { AgentSocialMessage } from "./social/message/message.ts";
 export {
   AgentSocialNegotiate,
   type NegotiateStartResult,
 } from "./social/negotiate/negotiate.ts";
+export { AgentSocial, type SocialInvitation } from "./social/social.ts";

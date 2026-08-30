@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
 import type { ToolRuntimeContext, ToolSpec } from "@khoralabs/agent-capabilities";
 import { evaluateComposable } from "@khoralabs/agent-capabilities";
+import { createEphemeralRecentNamespacesTracker } from "../../../memories/tools/_helpers/recent-namespaces.ts";
 import { harnessToolkit } from "../../../turn/tools/_toolkit.ts";
 import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../../../turn/tools/types.ts";
-import { createEphemeralRecentNamespacesTracker } from "../../../memories/tools/_helpers/recent-namespaces.ts";
 import type { AgentChatClient } from "../chat.ts";
 
 function createEnv(agentChat: AgentChatClient): HarnessToolkitEnv {
