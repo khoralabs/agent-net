@@ -1,9 +1,24 @@
-import type { RunAgentWorkflowDependencies } from "../agent/turn/run-agent-workflow.ts";
+/**
+ * Workflow deps resolved per agent for an active network session.
+ * Owned by the control plane so session-registry does not import agent/turn.
+ * Host registration supplies a value compatible with turn's RunAgentWorkflowDependencies.
+ */
+export type NetworkAgentWorkflowDeps = {
+  chatService?: unknown;
+  chatSigner?: unknown;
+  agentChat?: unknown;
+  sessionId?: string;
+  networkDataDir?: string;
+  streamTextFn?: unknown;
+  memoriesClient?: unknown;
+  khoraClient?: unknown;
+  embeddingModel?: unknown;
+};
 
 export type NetworkRuntimeSession = {
   sessionId: string;
   dataDir: string;
-  resolveAgentWorkflowDeps(agentDid: string): Promise<RunAgentWorkflowDependencies>;
+  resolveAgentWorkflowDeps(agentDid: string): Promise<NetworkAgentWorkflowDeps>;
   ensureAgentRegistered?(agentDid: string): Promise<void>;
 };
 

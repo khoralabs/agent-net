@@ -40,7 +40,7 @@ export async function runAgentResponseStep(
     );
   }
   return runAgentWorkflow(params, {
-    ...networkDeps,
+    ...(networkDeps as AgentResponseDeps),
     embeddingModel,
   });
 }

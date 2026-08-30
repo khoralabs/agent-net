@@ -1,6 +1,13 @@
 import { createHash } from "node:crypto";
 import type { NetworkAttribution, ThreadHashSnapshot } from "../network/types.ts";
-import type { AgentWorkflowResult } from "../agent/turn/types.ts";
+
+/** Capability hashes used for network attribution (no agent/turn import). */
+export type AttributionCapabilities = {
+  staticHash: string;
+  runtimeHash: string;
+  invocationHash?: string;
+  toolRefs: Array<{ toolKey: string; toolHash: string }>;
+};
 
 export type AttributionInput = {
   staticHash: string;
@@ -28,7 +35,7 @@ export function computeAttributionDigest(input: AttributionInput): string {
 }
 
 export function buildNetworkAttribution(input: {
-  capabilities: AgentWorkflowResult["capabilities"];
+  capabilities: AttributionCapabilities;
   memoriesProvenanceRootHex: string;
   threadHashes: ThreadHashSnapshot[];
 }): NetworkAttribution {
