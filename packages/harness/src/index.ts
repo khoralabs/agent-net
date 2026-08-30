@@ -13,7 +13,7 @@ export {
   harnessAgentsDataDir,
   type NetworkHarnessHandle,
   startNetworkHarness,
-} from "./host/harness.ts";
+} from "./pool/host/harness.ts";
 export {
   requireChatBaseUrl,
   requireChatToken,

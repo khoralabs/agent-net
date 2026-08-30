@@ -16,7 +16,7 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import os from "node:os";
 import path from "node:path";
-import { type NetworkHarnessHandle, startNetworkHarness } from "../host/harness.ts";
+import { type NetworkHarnessHandle, startNetworkHarness } from "../pool/host/harness.ts";
 import { resolveKhoraBaseUrlFromEnv } from "../lib/khora-base-url.ts";
 import { resolveMemoriesBaseUrlFromEnv } from "../lib/memories-base-url.ts";
 import { resolveRelayBaseUrlFromEnv } from "../lib/relay-base-url.ts";

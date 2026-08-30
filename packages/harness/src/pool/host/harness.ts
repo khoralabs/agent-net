@@ -3,25 +3,24 @@ import {
   createBearerTokenAuthProvider,
   MemoriesServiceClient,
 } from "@khoralabs/memories-service/client";
-import { requireChatBaseUrl, requireChatToken } from "../lib/chat-base-url.ts";
-import { requireMemoriesAdminToken } from "../lib/memories-base-url.ts";
+import { requireChatBaseUrl, requireChatToken } from "../../lib/chat-base-url.ts";
+import { requireMemoriesAdminToken } from "../../lib/memories-base-url.ts";
 import {
   emitNetworkEvent,
   installNetworkEventsPlugin,
   type NetworkEventsPlugin,
   networkEventId,
-} from "../pool/network/index.ts";
-import { getNetworkSessionContext } from "../pool/observability/network-log.ts";
-import { loadHarnessIdentity, resolveIdentitySecretFromEnv } from "../pool/identity-wrap-key.ts";
-import { AgentStore, HarnessPoolInbox, ManagedAgentPool } from "../pool/index.ts";
-import {
-  mintKhoraInviteTokens,
-  resolveKhoraAdminTokenFromEnv,
-} from "../pool/khora-admin-invites.ts";
-import { PerAgentInviteBank } from "../pool/per-agent-invite-bank.ts";
-import type { PoolAgentRegistry } from "../pool/store.ts";
-import { harnessMemoriesFetch } from "../agent/memories/tools/_helpers/memories-client.ts";
-import { createRemoteHarnessChat, type HarnessChat } from "../agent/social/message/chat.ts";
+} from "../network/index.ts";
+import { getNetworkSessionContext } from "../observability/network-log.ts";
+import { loadHarnessIdentity, resolveIdentitySecretFromEnv } from "../identity-wrap-key.ts";
+import { HarnessPoolInbox } from "../inbox/pool-inbox.ts";
+import { mintKhoraInviteTokens, resolveKhoraAdminTokenFromEnv } from "../khora-admin-invites.ts";
+import { PerAgentInviteBank } from "../per-agent-invite-bank.ts";
+import { ManagedAgentPool } from "../pool.ts";
+import type { PoolAgentRegistry } from "../store.ts";
+import { AgentStore } from "../store.ts";
+import { harnessMemoriesFetch } from "../../agent/memories/tools/_helpers/memories-client.ts";
+import { createRemoteHarnessChat, type HarnessChat } from "../../agent/social/message/chat.ts";
 import {
   createHarnessAgentApi,
   harnessAgentsDataDir,
@@ -29,7 +28,7 @@ import {
   type NetworkHarnessCore,
 } from "./harness-agents.ts";
 
-export type { AgentMemoriesClient } from "../agent/memories-types.ts";
+export type { AgentMemoriesClient } from "../../agent/memories-types.ts";
 export type {
   BindNetworkSessionInput,
   EnsureHarnessAgentRegisteredInput,

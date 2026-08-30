@@ -46,11 +46,14 @@ Spawning binds the agent DID on the shared inbox socket; `harness.removeAgent` u
 | Module | Role |
 |--------|------|
 | `pool/` | Control plane: identities, registry, invite bank |
+| `pool/inbox/` | Multiplex Khora inbox for the pool |
+| `pool/network/` | Session registry, network events |
+| `pool/observability/` | Telemetry install + attribution ALS |
+| `pool/host/` | `startNetworkHarness` (wires pool + agent) |
 | `agent/` | One network actor: handle, social, memories, turn |
 | `agent/social/` | Fabric + nested `message` / `negotiate` |
 | `agent/memories/` | Bound DB helpers, tools, integrate wire |
 | `agent/turn/` | Capability agents, toolkits, workflows |
-| `host/` | `startNetworkHarness` |
 
 ## Workflow world
 
