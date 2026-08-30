@@ -6,7 +6,7 @@ Monorepo for the Khora multi-agent network harness.
 | --- | --- | --- |
 | `@khoralabs/agent-net` | [`packages/harness`](packages/harness) | Abstract harness library |
 | `@khoralabs/agent-net-swarm` | [`packages/swarm`](packages/swarm) | Budgeted multi-agent orchestration |
-| `@khoralabs/agent-net-reference` | [`apps/reference`](apps/reference) | Turso world, local memories/relay, nitro agent, orchestrator + swarm CLI |
+| `@khoralabs/agent-net-reference` | [`apps/reference`](apps/reference) | Turso world, local memories/relay, orchestrator + marketplace (primary) / swarm CLIs |
 
 ## Setup
 
@@ -23,15 +23,18 @@ bun install
 bun run reference:start -- --data-dir ./.harness-data
 ```
 
-2. Point a harness or swarm at those URLs plus a running Khora host:
+2. Run the marketplace demo (primary) against those URLs plus a running Khora host:
 
 ```bash
 export KHORA_BASE_URL=http://127.0.0.1:8788
 export RELAY_BASE_URL=…       # from orchestrator output
 export MEMORIES_BASE_URL=…    # from orchestrator output
+export AI_GATEWAY_API_KEY=…
 
-bun run swarm -- --agents 2
+bun run marketplace
 ```
+
+Optional secondary demo: `bun run swarm -- --agents 2`.
 
 ## Workflow world
 
@@ -42,8 +45,8 @@ Harness and swarm workflows use the abstract [Workflow SDK](https://useworkflow.
 | Script | Description |
 | --- | --- |
 | `bun run reference:start` | Start memories + relay + Turso world |
-| `bun run agent:dev` | Nitro agent HTTP (reference) |
-| `bun run swarm` | Swarm CLI (reference app) |
+| `bun run marketplace` | Marketplace CLI (primary reference demo) |
+| `bun run swarm` | Swarm CLI (secondary) |
 | `bun run typecheck` | Typecheck all workspace packages |
 | `bun run swarm:test` | Swarm + harness unit tests |
 
