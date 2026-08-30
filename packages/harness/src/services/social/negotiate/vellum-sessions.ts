@@ -8,8 +8,8 @@ import { RelayClient } from "@khoralabs/relay/client";
 import { VellumChain } from "@khoralabs/vellum-client";
 import type { VellumPool } from "@khoralabs/vellum-client/pool";
 import { waitFor } from "../../../lib/wait-for.ts";
-import type { AgentHandle, VellumHandle } from "../../../pool/index.ts";
-import { createHarnessVellumPool, type VellumPairOptions, wrapPoolClient } from "./vellum.ts";
+import type { AgentHandle } from "../../../handle/handle.ts";
+import { createHarnessVellumPool, type VellumPairOptions, type VellumHandle, wrapPoolClient } from "./vellum.ts";
 import { vellumPoolAttachmentDataDir } from "./vellum-pool-paths.ts";
 
 export type VellumChainLiveSession = {

@@ -1,8 +1,4 @@
-export type {
-  AgentHandleOptions,
-  BindAgentServicesOptions,
-  VellumHandle,
-} from "../handle/handle.ts";
+export type { AgentHandleOptions, BindAgentServicesOptions } from "../handle/handle.ts";
 export { AgentHandle } from "../handle/handle.ts";
 export type { AgentMemoriesClient } from "../handle/memories-types.ts";
 export { createBoundAgentMemoriesClient } from "../handle/memories-types.ts";

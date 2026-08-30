@@ -73,7 +73,6 @@ export {
   type PoolInboxEvent,
   type PoolInboxLifecycleHandler,
   type PoolInboxOptions,
-  type VellumHandle,
 } from "./pool/index.ts";
 export {
   mintKhoraInviteTokens,
@@ -305,6 +304,7 @@ export {
   disconnectVellum,
   type HarnessVellumPoolOptions,
   openVellumChain,
+  type VellumHandle,
   type VellumPairOptions,
   wrapPoolClient,
 } from "./services/social/negotiate/vellum.ts";

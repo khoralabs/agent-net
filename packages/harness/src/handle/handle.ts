@@ -1,11 +1,5 @@
 import type { PersistableSigner } from "@khoralabs/did-key-identity";
 import { KhoraClient } from "@khoralabs/khora-client";
-import type {
-  ChainInitResponse,
-  ChainSnapshot,
-  ChainStateResponse,
-  VellumChainRow,
-} from "@khoralabs/vellum-client";
 
 import type { AgentChatClient } from "../services/social/message/chat.ts";
 import { AgentSocial } from "../services/social/social.ts";
@@ -14,34 +8,13 @@ import type { AgentMemoriesClient } from "./memories-types.ts";
 export type AgentHandleOptions = {
   signer: PersistableSigner;
   baseUrl: string;
-  /** Path to the agent's persisted Ed25519 key file (for vellum operations). */
+  /** Path to the agent's persisted Ed25519 key file when known by the pool. */
   keyPath?: string;
   /**
    * Optional caller-defined id linking this agent to an external system.
    * Opaque to the harness.
    */
   externalId?: string;
-};
-
-export type VellumHandle = {
-  connect(options?: {
-    webSocketUrl?: string;
-    upgradeNonce?: string;
-  }): Promise<"spawned" | "already-running">;
-  /** Tear down the in-process channel attachment (or spawned daemon, if used). */
-  disconnect(): void;
-  chainCreate(input: {
-    counterpartyDid: string;
-    sessionId?: string;
-    genesisHash?: string;
-    genesisTurn?: Record<string, unknown>;
-  }): Promise<ChainInitResponse>;
-  chainRelease(sessionId: string): Promise<void>;
-  endOffers(sessionId: string): Promise<void>;
-  sendTurn(sessionId: string, body: Record<string, unknown>): Promise<void>;
-  getChainSnapshot(): Promise<ChainStateResponse>;
-  getSessionSnapshot(sessionId: string): Promise<ChainSnapshot>;
-  listChains(): VellumChainRow[];
 };
 
 export type BindAgentServicesOptions = {
@@ -57,6 +30,9 @@ export type BindAgentServicesOptions = {
  *
  * Inbox traffic goes through the harness multiplex ({@link HarnessPoolInbox} /
  * `harness.subscribeInbox`), not a per-agent WebSocket on this handle.
+ *
+ * Vellum/NBC channel ops live under {@link AgentSocial.negotiate}
+ * (`services/social/negotiate`), not on this type.
  */
 export class AgentHandle {
   readonly did: string;

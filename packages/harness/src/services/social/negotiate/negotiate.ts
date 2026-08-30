@@ -1,6 +1,11 @@
-import type { AgentHandle, VellumHandle } from "../../../handle/handle.ts";
+import type { AgentHandle } from "../../../handle/handle.ts";
 import { type NbcLoopHandle, type StartNbcLoopInput, startNbcLoop } from "./nbc/nbc-loop.ts";
-import { disconnectVellum, openVellumChain, type VellumPairOptions } from "./vellum.ts";
+import {
+  disconnectVellum,
+  openVellumChain,
+  type VellumHandle,
+  type VellumPairOptions,
+} from "./vellum.ts";
 
 export type NegotiateStartResult = {
   sessionId: string;

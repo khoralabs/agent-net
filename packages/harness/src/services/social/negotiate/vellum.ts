@@ -3,16 +3,44 @@
  */
 import type { IdentitySecret, PersistableSigner } from "@khoralabs/did-key-identity";
 import { RelayClient } from "@khoralabs/relay/client";
+import type {
+  ChainInitResponse,
+  ChainSnapshot,
+  ChainStateResponse,
+  VellumChainRow,
+} from "@khoralabs/vellum-client";
 import { VellumChain } from "@khoralabs/vellum-client";
 import { VellumPool } from "@khoralabs/vellum-client/pool";
 import { createSharedUplinkChannelFabric } from "@khoralabs/vellum-client/session";
 import { waitFor } from "../../../lib/wait-for.ts";
+import type { AgentHandle } from "../../../handle/handle.ts";
 import {
   loadHarnessIdentity,
   resolveIdentitySecretFromEnv,
 } from "../../../pool/identity-wrap-key.ts";
-import type { AgentHandle, VellumHandle } from "../../../pool/index.ts";
 import { AgentStore } from "../../../pool/index.ts";
+
+/** Per-DID Vellum channel ops returned by {@link wrapPoolClient}. */
+export type VellumHandle = {
+  connect(options?: {
+    webSocketUrl?: string;
+    upgradeNonce?: string;
+  }): Promise<"spawned" | "already-running">;
+  /** Tear down the in-process channel attachment (or spawned daemon, if used). */
+  disconnect(): void;
+  chainCreate(input: {
+    counterpartyDid: string;
+    sessionId?: string;
+    genesisHash?: string;
+    genesisTurn?: Record<string, unknown>;
+  }): Promise<ChainInitResponse>;
+  chainRelease(sessionId: string): Promise<void>;
+  endOffers(sessionId: string): Promise<void>;
+  sendTurn(sessionId: string, body: Record<string, unknown>): Promise<void>;
+  getChainSnapshot(): Promise<ChainStateResponse>;
+  getSessionSnapshot(sessionId: string): Promise<ChainSnapshot>;
+  listChains(): VellumChainRow[];
+};
 
 export type VellumPairOptions = {
   /** Base URL of the relay server. */
