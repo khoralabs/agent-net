@@ -1,5 +1,13 @@
+export type { AgentActor } from "./agent/actor.ts";
 export type { BindAgentServicesOptions } from "./agent/handle.ts";
-export { createBoundAgentMemoriesClient } from "./agent/memories-types.ts";
+export {
+  AgentHandle,
+  type AgentHandleOptions,
+} from "./agent/handle.ts";
+export {
+  createBoundAgentMemoriesClient,
+  type AgentMemoriesClient,
+} from "./agent/memories-types.ts";
 export {
   type HarnessAgentWorkflowDeps,
   harnessAgentsDataDir,
@@ -50,29 +58,24 @@ export {
   getNetworkSessionContext,
 } from "./observability/network-log.ts";
 export {
-  HARNESS_IDENTITY_WRAP_KEY_ENV,
-  loadHarnessIdentity,
-  parseIdentityWrapKey,
-  requireIdentitySecret,
-  resolveIdentitySecretFromEnv,
-  saveHarnessIdentity,
-  wrapKeySecretFromBytes,
-} from "./pool/identity-wrap-key.ts";
-export {
-  AgentHandle,
-  type AgentHandleOptions,
-  type AgentMemoriesClient,
   type AgentMemoriesFraming,
   type AgentRecord,
   AgentStore,
+  HARNESS_IDENTITY_WRAP_KEY_ENV,
   HarnessPoolInbox,
   type InboxConnection,
   type InboxConnectionHandle,
+  loadHarnessIdentity,
   ManagedAgentPool,
+  parseIdentityWrapKey,
   type PoolAgentRegistry,
   type PoolInboxEvent,
   type PoolInboxLifecycleHandler,
   type PoolInboxOptions,
+  requireIdentitySecret,
+  resolveIdentitySecretFromEnv,
+  saveHarnessIdentity,
+  wrapKeySecretFromBytes,
 } from "./pool/index.ts";
 export {
   mintKhoraInviteTokens,

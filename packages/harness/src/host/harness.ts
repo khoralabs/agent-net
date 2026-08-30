@@ -29,7 +29,7 @@ import {
   type NetworkHarnessCore,
 } from "./harness-agents.ts";
 
-export type { AgentMemoriesClient } from "../pool/index.ts";
+export type { AgentMemoriesClient } from "../agent/memories-types.ts";
 export type {
   BindNetworkSessionInput,
   EnsureHarnessAgentRegisteredInput,

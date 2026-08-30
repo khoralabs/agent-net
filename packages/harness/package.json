@@ -13,6 +13,18 @@
       "import": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./agent": {
+      "types": "./src/agent/index.ts",
+      "bun": "./src/agent/index.ts",
+      "import": "./src/agent/index.ts",
+      "default": "./src/agent/index.ts"
+    },
+    "./pool": {
+      "types": "./src/pool/index.ts",
+      "bun": "./src/pool/index.ts",
+      "import": "./src/pool/index.ts",
+      "default": "./src/pool/index.ts"
+    },
     "./agent-workflow-types": {
       "types": "./src/agent/turn/types.ts",
       "bun": "./src/agent/turn/types.ts",
