@@ -1,5 +1,5 @@
-export type { BindAgentServicesOptions } from "./handle/handle.ts";
-export { createBoundAgentMemoriesClient } from "./handle/memories-types.ts";
+export type { BindAgentServicesOptions } from "./agent/handle.ts";
+export { createBoundAgentMemoriesClient } from "./agent/memories-types.ts";
 export {
   type HarnessAgentWorkflowDeps,
   harnessAgentsDataDir,
@@ -92,7 +92,7 @@ export {
   createAgentMemoryStore,
   isAgentMemorySourceRef,
   sourcesFromMemoryToolParts,
-} from "./runtime/agent-memory-source.ts";
+} from "./agent/turn/agent-memory-source.ts";
 export {
   captureHarnessCapabilities,
   configureHarnessAgentRegistry,
@@ -101,21 +101,21 @@ export {
   getCapabilityRegistry,
   type OnCapabilityTurn,
   resetHarnessAgentRegistryForTests,
-} from "./runtime/agent-runtime.ts";
-export type { AgentTurnParams, AgentTurnResult, AgentUIMessage } from "./runtime/agent-turn.ts";
-export { runAgentTurn } from "./runtime/agent-turn.ts";
-export { HARNESS_AGENT_ID } from "./runtime/capability-agents/index.ts";
-export { NETWORK_NEGOTIATION_AGENT_ID } from "./runtime/capability-agents/network-negotiation-agent.ts";
+} from "./agent/turn/agent-runtime.ts";
+export type { AgentTurnParams, AgentTurnResult, AgentUIMessage } from "./agent/turn/agent-turn.ts";
+export { runAgentTurn } from "./agent/turn/agent-turn.ts";
+export { HARNESS_AGENT_ID } from "./agent/turn/capability-agents/index.ts";
+export { NETWORK_NEGOTIATION_AGENT_ID } from "./agent/turn/capability-agents/network-negotiation-agent.ts";
 export {
   type PreparedHarnessStep,
   type PrepareHarnessStepInput,
   prepareHarnessStepRuntime,
-} from "./runtime/prepare-harness-step.ts";
-export { runHarnessAgentStep } from "./runtime/run-harness-agent-step.ts";
+} from "./agent/turn/prepare-harness-step.ts";
+export { runHarnessAgentStep } from "./agent/turn/run-harness-agent-step.ts";
 export {
   formatAgentStepContext,
   resolveAgentStepContext,
-} from "./runtime/step-context.ts";
+} from "./agent/turn/step-context.ts";
 export {
   AGENT_DATABASE_DOMAIN,
   type AgentDatabaseEntity,
@@ -134,14 +134,14 @@ export {
   type NamespaceCatalogStore,
   namespaceCatalogSourceRef,
   resolveMemoriesStepContextFacets,
-} from "./runtime/step-context-sources.ts";
+} from "./agent/turn/step-context-sources.ts";
 export {
   describeGenerationFailure,
   generateStructured,
   repairTruncatedJson,
-} from "./runtime/structured-output.ts";
-export { HARNESS_TOOLKIT, type HarnessToolkitId } from "./runtime/tools/ids.ts";
-export type { NbcToolkitContext } from "./runtime/tools/types.ts";
+} from "./agent/turn/structured-output.ts";
+export { HARNESS_TOOLKIT, type HarnessToolkitId } from "./agent/turn/tools/ids.ts";
+export type { NbcToolkitContext } from "./agent/turn/tools/types.ts";
 export type {
   AgentStepContext,
   AgentStepNamespaceEntry,
@@ -149,22 +149,22 @@ export type {
   AgentWorkflowParams,
   AgentWorkflowResult,
   MemoriesDatabaseContext,
-} from "./runtime/types.ts";
+} from "./agent/turn/types.ts";
 export {
   AI_STEP_MAX_RETRIES,
   AI_STEP_TIMEOUT_MS,
   isAbortError,
   rethrowAsRetryableTimeout,
-} from "./runtime/workflow-resilience.ts";
-export { agentResponse } from "./runtime/workflows/agent-response.ts";
+} from "./agent/turn/workflow-resilience.ts";
+export { agentResponse } from "./agent/turn/workflows/agent-response.ts";
 export {
   type AgentResponseDeps,
   runExecuteAgentResponse,
-} from "./runtime/workflows/agent-response-run.ts";
+} from "./agent/turn/workflows/agent-response-run.ts";
 export {
   executeAgentResponse,
   runAgentResponseStep,
-} from "./runtime/workflows/agent-response-step.ts";
+} from "./agent/turn/workflows/agent-response-step.ts";
 export {
   type IntegrateMemoryWriteScope,
   isIntegrateMemoryWriteScope,

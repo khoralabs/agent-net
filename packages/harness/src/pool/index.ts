@@ -1,7 +1,7 @@
-export type { AgentHandleOptions, BindAgentServicesOptions } from "../handle/handle.ts";
-export { AgentHandle } from "../handle/handle.ts";
-export type { AgentMemoriesClient } from "../handle/memories-types.ts";
-export { createBoundAgentMemoriesClient } from "../handle/memories-types.ts";
+export type { AgentHandleOptions, BindAgentServicesOptions } from "../agent/handle.ts";
+export { AgentHandle } from "../agent/handle.ts";
+export type { AgentMemoriesClient } from "../agent/memories-types.ts";
+export { createBoundAgentMemoriesClient } from "../agent/memories-types.ts";
 export type {
   HarnessPoolInboxOptions,
   InboxConnection,

@@ -7,7 +7,7 @@ import {
   type KhoraClientEvent,
 } from "@khoralabs/khora-client";
 
-import type { AgentHandle } from "../handle/handle.ts";
+import type { AgentHandle } from "../agent/handle.ts";
 
 const MIN_BACKOFF_MS = 1_000;
 const MAX_BACKOFF_MS = 30_000;

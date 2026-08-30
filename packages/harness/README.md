@@ -45,11 +45,11 @@ Spawning binds the agent DID on the shared inbox socket; `harness.removeAgent` u
 
 | Module | Role |
 |--------|------|
-| `pool/` | Managed agent identities + registry |
-| `handle/` | `AgentHandle` |
+| `pool/` | Control plane: identities, registry, invite bank |
+| `agent/` | One network actor: handle, social, memories, turn |
 | `agent/social/` | Fabric + nested `message` / `negotiate` |
 | `agent/memories/` | Bound DB helpers, tools, integrate wire |
-| `runtime/` | Capability agents, toolkits, workflows |
+| `agent/turn/` | Capability agents, toolkits, workflows |
 | `host/` | `startNetworkHarness` |
 
 ## Workflow world

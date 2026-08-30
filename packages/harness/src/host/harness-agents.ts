@@ -12,7 +12,7 @@ import {
   type RemoteMemoriesClientAsync,
   storedOntologyFromDefinition,
 } from "@khoralabs/memories-service/client";
-import { createBoundAgentMemoriesClient } from "../handle/memories-types.ts";
+import { createBoundAgentMemoriesClient } from "../agent/memories-types.ts";
 import { registerNetworkSession, removeNetworkSession } from "../network/session-registry.ts";
 import { loadHarnessIdentity } from "../pool/identity-wrap-key.ts";
 import {
@@ -23,9 +23,9 @@ import {
   type PoolInboxEvent,
 } from "../pool/index.ts";
 import type { PerAgentInviteBank } from "../pool/per-agent-invite-bank.ts";
-import { getCapabilityRegistry } from "../runtime/agent-runtime.ts";
-import type { RunAgentWorkflowDependencies } from "../runtime/run-agent-workflow.ts";
-import { harnessToolkit } from "../runtime/tools/index.ts";
+import { getCapabilityRegistry } from "../agent/turn/agent-runtime.ts";
+import type { RunAgentWorkflowDependencies } from "../agent/turn/run-agent-workflow.ts";
+import { harnessToolkit } from "../agent/turn/tools/index.ts";
 import {
   agentMemoriesDatabase,
   createDeferredHarnessMemoriesClient,

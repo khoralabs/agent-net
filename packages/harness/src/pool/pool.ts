@@ -5,7 +5,7 @@ import {
   type PersistableSigner,
 } from "@khoralabs/did-key-identity";
 import { KhoraClient } from "@khoralabs/khora-client";
-import { AgentHandle } from "../handle/handle.ts";
+import { AgentHandle } from "../agent/handle.ts";
 import { loadHarnessIdentity, saveHarnessIdentity } from "./identity-wrap-key.ts";
 import type { PerAgentInviteBank } from "./per-agent-invite-bank.ts";
 import { type AgentMemoriesFraming, AgentStore, type PoolAgentRegistry } from "./store.ts";

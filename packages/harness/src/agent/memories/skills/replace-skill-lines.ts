@@ -1,14 +1,14 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import { z } from "zod";
-import { toolEnabled } from "../../../runtime/tools/_helpers/disable-policies.ts";
+import { toolEnabled } from "../../turn/tools/_helpers/disable-policies.ts";
 
 import {
   applyLineChanges,
   type LineTuple,
   readLines,
-} from "../../../runtime/tools/_helpers/line-editing.ts";
-import { hasMemoriesClient } from "../../../runtime/tools/policies.ts";
-import type { HarnessToolkitEnv } from "../../../runtime/tools/types.ts";
+} from "../../turn/tools/_helpers/line-editing.ts";
+import { hasMemoriesClient } from "../../turn/tools/policies.ts";
+import type { HarnessToolkitEnv } from "../../turn/tools/types.ts";
 import { writeMemoryNode } from "../tools/_helpers/memory-write.ts";
 import { touchRecentNamespaces } from "../tools/_helpers/recent-namespaces.ts";
 import { resolveWriteMemoryOptions } from "../tools/_helpers/write-memory-options.ts";

@@ -1,7 +1,7 @@
 import { policy } from "@khoralabs/agent-capabilities";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 
-import type { HarnessToolkitEnv } from "../../../runtime/tools/types.ts";
+import type { HarnessToolkitEnv } from "../../turn/tools/types.ts";
 import { SKILLS_NAMESPACE } from "./_helpers/skills.ts";
 
 /**

@@ -2,8 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { evaluateComposable } from "@khoralabs/agent-capabilities";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 
-import { harnessToolkit } from "../../../runtime/tools/_toolkit.ts";
-import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../../../runtime/tools/types.ts";
+import { harnessToolkit } from "../../turn/tools/_toolkit.ts";
+import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../../turn/tools/types.ts";
 import { createEphemeralRecentNamespacesTracker } from "../tools/_helpers/recent-namespaces.ts";
 import { hasSkillsNamespace, skillsNamespaceExists } from "./policies.ts";
 

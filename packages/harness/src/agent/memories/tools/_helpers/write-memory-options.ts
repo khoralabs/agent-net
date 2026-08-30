@@ -1,4 +1,4 @@
-import type { HarnessToolkitEnv } from "../../../../runtime/tools/types.ts";
+import type { HarnessToolkitEnv } from "../../../turn/tools/types.ts";
 import { requireInstalledMemoriesOntology } from "./memories-ontology-install.ts";
 import type { WriteMemoryNodeOptions } from "./memory-write.ts";
 

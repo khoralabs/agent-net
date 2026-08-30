@@ -13,13 +13,13 @@ import {
   type UIMessage,
 } from "ai";
 import { FatalError } from "workflow";
-import { collectThreadHashSnapshots } from "../network/thread-provenance.ts";
-import { buildNetworkAttribution } from "../observability/attribution-digest.ts";
-import { runWithAttributionAsync } from "../observability/network-log.ts";
-import { formatSkillCatalog } from "../agent/memories/skills/_helpers/skills.ts";
-import { activateSkillByName } from "../agent/memories/skills/activate-skill.ts";
-import type { AgentChatClient, ChatServiceClient } from "../agent/social/message/chat.ts";
-import { createAgentChatWriter } from "../agent/social/message/chat-writer.ts";
+import { collectThreadHashSnapshots } from "../../network/thread-provenance.ts";
+import { buildNetworkAttribution } from "../../observability/attribution-digest.ts";
+import { runWithAttributionAsync } from "../../observability/network-log.ts";
+import { formatSkillCatalog } from "../memories/skills/_helpers/skills.ts";
+import { activateSkillByName } from "../memories/skills/activate-skill.ts";
+import type { AgentChatClient, ChatServiceClient } from "../social/message/chat.ts";
+import { createAgentChatWriter } from "../social/message/chat-writer.ts";
 import { sourcesFromMemoryToolParts } from "./agent-memory-source.ts";
 import { resolveGatewayModel } from "./agent-runtime.ts";
 import { prepareHarnessStepRuntime } from "./prepare-harness-step.ts";

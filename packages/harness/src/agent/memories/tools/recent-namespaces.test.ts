@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { evaluateComposable } from "@khoralabs/agent-capabilities";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 
-import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../../../runtime/tools/types.ts";
+import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../../turn/tools/types.ts";
 import {
   clearRecentNamespacesProcessCache,
   createEphemeralRecentNamespacesTracker,

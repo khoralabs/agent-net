@@ -9,8 +9,8 @@ import {
 } from "@khoralabs/memories-node";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 
-import { harnessToolkit } from "../../../runtime/tools/_toolkit.ts";
-import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../../../runtime/tools/types.ts";
+import { harnessToolkit } from "../../turn/tools/_toolkit.ts";
+import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../../turn/tools/types.ts";
 import { createEphemeralRecentNamespacesTracker } from "./_helpers/recent-namespaces.ts";
 import {
   createTestEmbeddingModel,

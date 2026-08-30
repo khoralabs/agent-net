@@ -12,7 +12,7 @@ import {
   validateNodeLabel,
 } from "@khoralabs/memories-node/ontology";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
-import { agentDatabaseSourceRef } from "../../../../runtime/step-context-sources.ts";
+import { agentDatabaseSourceRef } from "../../../turn/step-context-sources.ts";
 import type { IntegrateMemoryEvent } from "../../integrate/memory-event.ts";
 import type { IntegrateMemoryWriteScope } from "../../integrate/write-scope.ts";
 import { HARNESS_MEMORY_EDGE_KIND, HARNESS_MEMORY_NODE_KIND } from "./minimal-ontology.ts";

@@ -1,4 +1,4 @@
-import type { RunAgentWorkflowDependencies } from "../runtime/run-agent-workflow.ts";
+import type { RunAgentWorkflowDependencies } from "../agent/turn/run-agent-workflow.ts";
 
 export type NetworkRuntimeSession = {
   sessionId: string;

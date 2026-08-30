@@ -1,4 +1,4 @@
-import type { MemoriesDatabaseContext } from "../../../../runtime/types.ts";
+import type { MemoriesDatabaseContext } from "../../../turn/types.ts";
 
 const GENERIC_MEMORIES_INSTRUCTION =
   "Persistent memory database for recalling and storing notes, observations, and context across turns.";

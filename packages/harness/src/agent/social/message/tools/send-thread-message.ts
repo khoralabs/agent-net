@@ -1,7 +1,7 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import { z } from "zod";
-import { toolEnabled } from "../../../../runtime/tools/_helpers/disable-policies.ts";
-import type { HarnessToolkitEnv } from "../../../../runtime/tools/types.ts";
+import { toolEnabled } from "../../../turn/tools/_helpers/disable-policies.ts";
+import type { HarnessToolkitEnv } from "../../../turn/tools/types.ts";
 import { emitChatNetworkEvent } from "./_helpers/network-events.ts";
 import { hasAgentChat } from "./policies.ts";
 

@@ -1,4 +1,4 @@
-import { requireNetworkSession } from "../../network/session-registry.ts";
+import { requireNetworkSession } from "../../../network/session-registry.ts";
 import { runAgentWorkflow } from "../run-agent-workflow.ts";
 import type { AgentWorkflowParams, AgentWorkflowResult } from "../types.ts";
 import { AI_STEP_MAX_RETRIES } from "../workflow-resilience.ts";
@@ -30,7 +30,7 @@ export async function runAgentResponseStep(
 
   const session = requireNetworkSession(sessionId);
   const { resolveHarnessEmbeddingModel } = await import(
-    "../../agent/memories/tools/_helpers/embedding-model.ts"
+    "../../memories/tools/_helpers/embedding-model.ts"
   );
   const networkDeps = await session.resolveAgentWorkflowDeps(params.agent.actingFor.id);
   const embeddingModel = resolveHarnessEmbeddingModel();

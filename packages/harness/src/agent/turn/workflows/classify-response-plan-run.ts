@@ -1,9 +1,9 @@
 import { captureAgentSnapshotEnvelope } from "@khoralabs/agent-capabilities";
 import { generateText, Output } from "ai";
-import { discoverSkillsFromMemories } from "../../agent/memories/skills/_helpers/skills.ts";
-import { resolveHarnessEmbeddingModel } from "../../agent/memories/tools/_helpers/embedding-model.ts";
-import { getInstalledMemoriesOntology } from "../../agent/memories/tools/_helpers/memories-ontology-install.ts";
-import { minimalHarnessMemoriesOntology } from "../../agent/memories/tools/_helpers/minimal-ontology.ts";
+import { discoverSkillsFromMemories } from "../../memories/skills/_helpers/skills.ts";
+import { resolveHarnessEmbeddingModel } from "../../memories/tools/_helpers/embedding-model.ts";
+import { getInstalledMemoriesOntology } from "../../memories/tools/_helpers/memories-ontology-install.ts";
+import { minimalHarnessMemoriesOntology } from "../../memories/tools/_helpers/minimal-ontology.ts";
 import { getCapabilityRegistry, resolveGatewayModel } from "../agent-runtime.ts";
 import { defineResponsePlannerAgent } from "../capability-agents/response-planner.ts";
 import type { ResponseModelCapabilities } from "../gateway-model-capabilities.ts";

@@ -1,4 +1,4 @@
-import { formatMemoriesContextInstructions } from "../agent/memories/tools/_helpers/memories-context-instructions.ts";
+import { formatMemoriesContextInstructions } from "../memories/tools/_helpers/memories-context-instructions.ts";
 import type { AgentStepContext, AgentStepSourceContext } from "./types.ts";
 
 export type {

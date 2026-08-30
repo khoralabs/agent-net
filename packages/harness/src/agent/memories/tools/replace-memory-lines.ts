@@ -1,14 +1,14 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import { z } from "zod";
-import { toolEnabled } from "../../../runtime/tools/_helpers/disable-policies.ts";
+import { toolEnabled } from "../../turn/tools/_helpers/disable-policies.ts";
 
 import {
   applyLineChanges,
   type LineTuple,
   readLines,
-} from "../../../runtime/tools/_helpers/line-editing.ts";
-import { hasMemoriesClient } from "../../../runtime/tools/policies.ts";
-import type { HarnessToolkitEnv } from "../../../runtime/tools/types.ts";
+} from "../../turn/tools/_helpers/line-editing.ts";
+import { hasMemoriesClient } from "../../turn/tools/policies.ts";
+import type { HarnessToolkitEnv } from "../../turn/tools/types.ts";
 import {
   SKILLS_NAMESPACE,
   skillRecordFromText,

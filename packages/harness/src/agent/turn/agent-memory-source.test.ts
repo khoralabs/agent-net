@@ -5,7 +5,7 @@ import type { UIMessage } from "ai";
 import {
   createRemoteSourceMapContentStore,
   DEFAULT_MEMORY_SOURCE_KEY,
-} from "../agent/memories/tools/_helpers/source-map-content-store.ts";
+} from "../memories/tools/_helpers/source-map-content-store.ts";
 import {
   AGENT_MEMORY_DOMAIN,
   agentMemorySourceRef,

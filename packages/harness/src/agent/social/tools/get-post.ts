@@ -1,9 +1,9 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import type { KhoraPost } from "@khoralabs/khora-client";
 import { z } from "zod";
-import { toolEnabled } from "../../../runtime/tools/_helpers/disable-policies.ts";
+import { toolEnabled } from "../../turn/tools/_helpers/disable-policies.ts";
 
-import type { HarnessToolkitEnv } from "../../../runtime/tools/types.ts";
+import type { HarnessToolkitEnv } from "../../turn/tools/types.ts";
 import { hasKhoraClient } from "./policies.ts";
 
 export const getPostTool = tool<"getPost", { id: string }, { post: KhoraPost }, HarnessToolkitEnv>({

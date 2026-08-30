@@ -8,8 +8,8 @@
 
 import type { ResolvedSourceWire } from "@khoralabs/sourcemaps";
 
-import type { MemoriesContextRefs } from "../../../runtime/step-context-sources.ts";
-import type { AgentStepContext } from "../../../runtime/types.ts";
+import type { MemoriesContextRefs } from "../../turn/step-context-sources.ts";
+import type { AgentStepContext } from "../../turn/types.ts";
 import { type IntegrateMemoryWriteScope, parseIntegrateMemoryWriteScope } from "./write-scope.ts";
 
 export type { IntegrateMemoryWriteScope } from "./write-scope.ts";

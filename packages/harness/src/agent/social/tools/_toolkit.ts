@@ -1,8 +1,8 @@
 import { dynamicToolkit, toolkit } from "@khoralabs/agent-capabilities";
 
-import { toolkitEnabled } from "../../../runtime/tools/_helpers/disable-policies.ts";
-import { HARNESS_TOOLKIT } from "../../../runtime/tools/ids.ts";
-import type { HarnessToolkitEnv } from "../../../runtime/tools/types.ts";
+import { toolkitEnabled } from "../../turn/tools/_helpers/disable-policies.ts";
+import { HARNESS_TOOLKIT } from "../../turn/tools/ids.ts";
+import type { HarnessToolkitEnv } from "../../turn/tools/types.ts";
 import { createPostTool } from "./create-post.ts";
 import { createSubscriptionTool } from "./create-subscription.ts";
 import { deletePostTool } from "./delete-post.ts";

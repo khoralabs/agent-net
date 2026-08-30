@@ -1,7 +1,7 @@
 import { describe, expect, mock, test } from "bun:test";
 
 import type { AgentActor } from "../actor.ts";
-import { createBoundAgentMemoriesClient } from "../../handle/memories-types.ts";
+import { createBoundAgentMemoriesClient } from "../memories-types.ts";
 import type { AgentChatClient } from "./message/chat.ts";
 import { AgentSocial } from "./social.ts";
 

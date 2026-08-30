@@ -4,7 +4,7 @@ import {
   createSignedTestChat,
   readPostSignatures,
   type SignedTestChat,
-} from "../tests/signed-chat.ts";
+} from "../../tests/signed-chat.ts";
 import { HARNESS_AGENT_ID } from "./capability-agents/index.ts";
 import { runAgentWorkflow, withAssistantText } from "./run-agent-workflow.ts";
 import type { AgentWorkflowParams } from "./types.ts";

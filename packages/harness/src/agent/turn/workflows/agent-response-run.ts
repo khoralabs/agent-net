@@ -1,15 +1,15 @@
-import { resolveHarnessEmbeddingModel } from "../../agent/memories/tools/_helpers/embedding-model.ts";
-import { minimalHarnessMemoriesOntology } from "../../agent/memories/tools/_helpers/minimal-ontology.ts";
+import { resolveHarnessEmbeddingModel } from "../../memories/tools/_helpers/embedding-model.ts";
+import { minimalHarnessMemoriesOntology } from "../../memories/tools/_helpers/minimal-ontology.ts";
 import {
   ensureDevAgentIdentity,
   getAgentChatClientForDid,
   getAgentChatService,
   getAgentChatSigner,
-} from "../../agent/social/message/chat-service.ts";
+} from "../../social/message/chat-service.ts";
 import {
   createHarnessKhoraClientForAgent,
   resolveKhoraServerBaseUrl,
-} from "../../agent/social/tools/_helpers/khora-client-factory.ts";
+} from "../../social/tools/_helpers/khora-client-factory.ts";
 import { type RunAgentWorkflowDependencies, runAgentWorkflow } from "../run-agent-workflow.ts";
 import {
   createHarnessMemoriesClientForAgent,
@@ -36,7 +36,7 @@ export async function runExecuteAgentResponse(
   }
 
   const { getInstalledMemoriesOntology } = await import(
-    "../../agent/memories/tools/_helpers/memories-ontology-install.ts"
+    "../../memories/tools/_helpers/memories-ontology-install.ts"
   );
 
   const memoriesBaseUrl = resolveMemoriesServiceBaseUrl();

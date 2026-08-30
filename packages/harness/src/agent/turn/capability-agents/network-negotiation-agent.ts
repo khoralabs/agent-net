@@ -3,8 +3,8 @@ import {
   type RegisteredAgent,
   toolkit,
 } from "@khoralabs/agent-capabilities";
-import { skillsToolkit } from "../../agent/memories/skills/_toolkit.ts";
-import { memoriesToolkit } from "../../agent/memories/tools/_toolkit.ts";
+import { skillsToolkit } from "../../memories/skills/_toolkit.ts";
+import { memoriesToolkit } from "../../memories/tools/_toolkit.ts";
 
 export const NETWORK_NEGOTIATION_AGENT_ID = "network-negotiation-agent";
 

@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { evaluateComposable } from "@khoralabs/agent-capabilities";
 import type { KhoraClient } from "@khoralabs/khora-client";
-import { createEphemeralRecentNamespacesTracker } from "../../agent/memories/tools/_helpers/recent-namespaces.ts";
-import type { AgentChatClient } from "../../agent/social/message/chat.ts";
+import { createEphemeralRecentNamespacesTracker } from "../../memories/tools/_helpers/recent-namespaces.ts";
+import type { AgentChatClient } from "../../social/message/chat.ts";
 import { harnessToolkit } from "./_toolkit.ts";
 import { HARNESS_TOOLKIT } from "./ids.ts";
 import { emptyDisabledToolSets, type HarnessToolkitEnv } from "./types.ts";

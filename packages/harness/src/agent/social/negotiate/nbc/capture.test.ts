@@ -4,11 +4,11 @@ import { evaluateComposable } from "@khoralabs/agent-capabilities";
 import {
   captureHarnessCapabilities,
   resetHarnessAgentRegistryForTests,
-} from "../../../../runtime/agent-runtime.ts";
-import { defineNegotiationAgent } from "../../../../runtime/capability-agents/network-negotiation-agent.ts";
-import { HARNESS_TOOLKIT } from "../../../../runtime/tools/ids.ts";
-import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../../../../runtime/tools/types.ts";
-import type { AgentWorkflowParams } from "../../../../runtime/types.ts";
+} from "../../../turn/agent-runtime.ts";
+import { defineNegotiationAgent } from "../../../turn/capability-agents/network-negotiation-agent.ts";
+import { HARNESS_TOOLKIT } from "../../../turn/tools/ids.ts";
+import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../../../turn/tools/types.ts";
+import type { AgentWorkflowParams } from "../../../turn/types.ts";
 import { createEphemeralRecentNamespacesTracker } from "../../../memories/tools/_helpers/recent-namespaces.ts";
 
 function env(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEnv {

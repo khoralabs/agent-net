@@ -10,8 +10,8 @@ import type {
   PublicProfileResult,
 } from "@khoralabs/khora-client";
 
-import { harnessToolkit } from "../../../runtime/tools/_toolkit.ts";
-import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../../../runtime/tools/types.ts";
+import { harnessToolkit } from "../../turn/tools/_toolkit.ts";
+import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../../turn/tools/types.ts";
 import { createEphemeralRecentNamespacesTracker } from "../../memories/tools/_helpers/recent-namespaces.ts";
 
 type KhoraToolName = "searchNetwork" | "createPost" | "lookupProfile" | "updateProfile";

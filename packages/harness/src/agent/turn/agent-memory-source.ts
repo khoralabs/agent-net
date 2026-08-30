@@ -4,9 +4,9 @@ import { ids } from "@khoralabs/memories-node";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import type { ResolvedSource, Store as SourcemapsStore, SourceRef } from "@khoralabs/sourcemaps";
 import type { UIMessage } from "ai";
-import { SKILLS_NAMESPACE } from "../agent/memories/skills/_helpers/skills.ts";
-import { loadMemoryTextByKey } from "../agent/memories/tools/_helpers/memory-text.ts";
-import { createRemoteSourceMapContentStore } from "../agent/memories/tools/_helpers/source-map-content-store.ts";
+import { SKILLS_NAMESPACE } from "../memories/skills/_helpers/skills.ts";
+import { loadMemoryTextByKey } from "../memories/tools/_helpers/memory-text.ts";
+import { createRemoteSourceMapContentStore } from "../memories/tools/_helpers/source-map-content-store.ts";
 
 /** Domain tag for memory citations on chat posts (`ChatSourceWire.sourceRef`). */
 export const AGENT_MEMORY_DOMAIN = "agent-memory" as const;

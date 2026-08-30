@@ -9,7 +9,7 @@ import { canonicalSignedPostVersionPayload, signedPayloadBytes } from "@khoralab
 import type { ChatServiceClient } from "@khoralabs/chat/http/client";
 import type { UIMessage } from "ai";
 
-import type { AgentWorkflowParams } from "../../../runtime/types.ts";
+import type { AgentWorkflowParams } from "../../turn/types.ts";
 
 export type AgentChatWriter = {
   postId: string;
