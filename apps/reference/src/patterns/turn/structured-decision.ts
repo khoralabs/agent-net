@@ -9,6 +9,13 @@ export const engageDecisionSchema = z.object({
 
 export type EngageDecision = z.infer<typeof engageDecisionSchema>;
 
+export const inviteDecisionSchema = z.object({
+  decision: z.enum(["accept", "decline"]),
+  reason: z.string().min(1),
+});
+
+export type InviteDecision = z.infer<typeof inviteDecisionSchema>;
+
 /**
  * Resolve a gateway model id (mirrors harness resolveGatewayModel; not yet on public barrel).
  */
@@ -48,6 +55,18 @@ export async function runEngageDecision(input: {
     label: "marketplace-engage-decision",
     modelId: input.modelId,
     schema: engageDecisionSchema,
+    prompt: input.prompt,
+  });
+}
+
+export async function runInviteDecision(input: {
+  modelId: string;
+  prompt: string;
+}): Promise<InviteDecision> {
+  return runStructuredDecision({
+    label: "marketplace-invite-decision",
+    modelId: input.modelId,
+    schema: inviteDecisionSchema,
     prompt: input.prompt,
   });
 }

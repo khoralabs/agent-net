@@ -5,7 +5,7 @@ Concrete stack for local development and demos:
 - Turso Workflow world bootstrap
 - Optional in-process memories + relay servers
 - Orchestrator process that starts those services
-- **Marketplace CLI** (`marketplace`) — primary demo: buy/sell pool, percolator inbox, LLM evaluate, Vellum connect
+- **Marketplace CLI** (`marketplace`) — primary demo: buy/sell pool, percolator inbox, seller evaluate, Vellum connect, buyer invite accept/decline (mutual interest; stop before NBC)
 - Swarm CLI (`swarm`) — secondary; budgeted multi-agent orchestration
 
 ## Layout
@@ -18,7 +18,7 @@ src/
     turn/                     # structured LLM decisions
     negotiate/                # Vellum pair open + cleanup
   marketplace/                # MRO surplus demo domain (not promote-as-is)
-    config.ts seed.ts pipeline.ts evaluate-on-inbox.ts GAPS.md
+    config.ts seed.ts pipeline.ts evaluate-on-inbox.ts evaluate-on-invite.ts GAPS.md
   run-swarm.ts                # secondary swarm demo
   orchestrator.ts             # local memories + relay + Turso
 ```
@@ -47,6 +47,8 @@ bun run swarm -- --agents 2
 ```
 
 Marketplace needs **three** long-running processes: Khora, reference orchestrator (`start`), then the CLI. Orchestrator ports are fixed at relay `8790`, memories `8791`, chat `8792` (matching `.env`). Do not stop orchestrator with ^C while marketplace is running.
+
+The marketplace demo ends at **mutual interest**: sellers engage/skip on the RFQ, engagers open Vellum, then the buyer accepts or declines each invite (declines disconnect immediately). Negotiation turns / NBC are out of scope.
 
 ## Observability
 

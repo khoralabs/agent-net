@@ -85,7 +85,7 @@ function parseArgs(argv: string[]): {
 
 /**
  * Reference marketplace CLI: spawn buy/sell pool, seed, percolator inbox,
- * LLM evaluate, Vellum connect (stop before negotiation).
+ * seller evaluate, Vellum connect, buyer invite accept/decline (stop before NBC).
  */
 async function main(): Promise<void> {
   const parsed = parseArgs(process.argv.slice(2));
@@ -159,6 +159,17 @@ async function main(): Promise<void> {
       engagers: result.evaluations
         .filter((e) => e.decision.decision === "engage")
         .map((e) => e.seller.profile.externalId),
+      invites: result.inviteEvaluations.map((i) => ({
+        sellerExternalId: i.seller.profile.externalId,
+        sellerDid: i.seller.agent.did,
+        decision: i.decision.decision,
+        reason: i.decision.reason,
+        sessionId: i.pair.sessionId,
+        channelId: i.pair.channelId,
+      })),
+      accepted: result.inviteEvaluations
+        .filter((i) => i.decision.decision === "accept")
+        .map((i) => i.seller.profile.externalId),
       pairs: result.pairs.map((p) => ({
         sellerDid: p.initiatorDid,
         buyerDid: p.responderDid,

@@ -74,7 +74,7 @@ export async function seedMarketplaceAgent(
       profile.memoryBlurb,
       profile.side === "sell"
         ? "When a matching buy RFQ arrives in your inbox, decide engage or skip based on inventory and commercial fit."
-        : "Post clear RFQs with buy/product/service topics when you have a need.",
+        : "Post clear RFQs with buy/product/service topics when you have a need. When a seller opens a private Vellum negotiation invite, decide accept or decline from mandate and commercial fit — do not auto-accept.",
     ],
     context: {
       side: profile.side,

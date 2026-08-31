@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, test } from "bun:test";
 
-import { engageDecisionSchema, requireGatewayModelId } from "./structured-decision.ts";
+import {
+  engageDecisionSchema,
+  inviteDecisionSchema,
+  requireGatewayModelId,
+} from "./structured-decision.ts";
 
 describe("requireGatewayModelId", () => {
   const prevKey = process.env.AI_GATEWAY_API_KEY;
@@ -52,5 +56,22 @@ describe("engageDecisionSchema", () => {
   test("rejects empty reason and unknown decision", () => {
     expect(() => engageDecisionSchema.parse({ decision: "engage", reason: "" })).toThrow();
     expect(() => engageDecisionSchema.parse({ decision: "maybe", reason: "x" })).toThrow();
+  });
+});
+
+describe("inviteDecisionSchema", () => {
+  test("accepts accept and decline", () => {
+    expect(inviteDecisionSchema.parse({ decision: "accept", reason: "fit" })).toEqual({
+      decision: "accept",
+      reason: "fit",
+    });
+    expect(inviteDecisionSchema.parse({ decision: "decline", reason: "no fit" }).decision).toBe(
+      "decline",
+    );
+  });
+
+  test("rejects empty reason and unknown decision", () => {
+    expect(() => inviteDecisionSchema.parse({ decision: "accept", reason: "" })).toThrow();
+    expect(() => inviteDecisionSchema.parse({ decision: "engage", reason: "x" })).toThrow();
   });
 });

@@ -46,4 +46,46 @@ describe("createNegotiatePairRegistry", () => {
     registry.stopAll();
     expect(disconnect).toHaveBeenCalledTimes(1);
   });
+
+  test("stop disconnects one pair and leaves others", async () => {
+    const disconnect = mock((..._handles: VellumHandle[]) => {});
+    let n = 0;
+    const registry = createNegotiatePairRegistry({
+      disconnect,
+      start: async () => {
+        n += 1;
+        return {
+          sessionId: `sess-${n}`,
+          channelId: `chan-${n}`,
+          initiatorVellum: fakeHandle(`init-${n}`),
+          responderVellum: fakeHandle(`resp-${n}`),
+        };
+      },
+    });
+
+    const opts = {
+      relayBaseUrl: "http://relay",
+      agentsDataDir: "/tmp/agents",
+      vellumDataDir: "/tmp/vellum",
+    };
+    const a = await registry.open(
+      { did: "did:key:s1" } as AgentHandle,
+      { did: "did:key:b" } as AgentActor,
+      opts,
+    );
+    const b = await registry.open(
+      { did: "did:key:s2" } as AgentHandle,
+      { did: "did:key:b" } as AgentActor,
+      opts,
+    );
+    expect(registry.list()).toHaveLength(2);
+
+    registry.stop(a);
+    expect(disconnect).toHaveBeenCalledTimes(1);
+    expect(disconnect.mock.calls[0]).toEqual([a.initiatorVellum, a.responderVellum]);
+    expect(registry.list()).toEqual([b]);
+
+    registry.stop(a);
+    expect(disconnect).toHaveBeenCalledTimes(1);
+  });
 });

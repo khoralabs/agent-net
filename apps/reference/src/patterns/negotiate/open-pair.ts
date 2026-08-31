@@ -66,6 +66,21 @@ export function createNegotiatePairRegistry(deps: NegotiatePairRegistryDeps = {}
       return opened;
     },
 
+    /** Disconnect one pair and remove it from the registry. */
+    stop(pair: OpenedPair): void {
+      const idx = opened.findIndex(
+        (p) =>
+          p.sessionId === pair.sessionId &&
+          p.channelId === pair.channelId &&
+          p.initiatorDid === pair.initiatorDid &&
+          p.responderDid === pair.responderDid,
+      );
+      if (idx < 0) return;
+      const [removed] = opened.splice(idx, 1);
+      if (removed === undefined) return;
+      disconnect(removed.initiatorVellum, removed.responderVellum);
+    },
+
     stopAll(): void {
       if (opened.length === 0) return;
       const handles = opened.flatMap((p) => [p.initiatorVellum, p.responderVellum]);

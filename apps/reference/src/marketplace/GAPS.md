@@ -8,6 +8,7 @@ Observed while building the reference marketplace (promote `patterns/` later; fi
 | No first-class “inbox reactor” | `patterns/inbox/reactor.ts` | Hosts reinvent subscribe demux / wait / dedupe |
 | `inboxHasPost` / `inboxPostAuthorDid` not on barrel | `patterns/inbox/match.ts` | Copied from harness `lib/inbox.ts` |
 | Structured engage turn without agent registry | evaluate-on-inbox | Used `generateStructured` directly; no agent-capabilities capture for mandate |
+| Buyer invite evaluate is pair-list driven | evaluate-on-invite | No Khora inbox kind for negotiation invites; host orchestrates from opened Vellum pairs |
 | `social.negotiate.start` needs both parties on host | open-pair | Fine for reference; multi-host `isOnHost` path untested |
 | Seed integrate requires full `IntegrateMemoryEvent` wire | `marketplace/seed.ts` | Verbose for “write a memory blurb” host DX |
 | Subscription match vs topics | config / seed | Topics are coarse; hosts must keep semantic search text aligned with post bodies manually |

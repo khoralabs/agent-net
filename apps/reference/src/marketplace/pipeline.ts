@@ -15,6 +15,7 @@ import {
 import type { MarketplaceConfig } from "./config.ts";
 import { topicsFor } from "./config.ts";
 import { evaluateSellersOnInbox, type SellerEvaluateResult } from "./evaluate-on-inbox.ts";
+import { type BuyerInviteEvaluateResult, evaluateBuyerOnInvites } from "./evaluate-on-invite.ts";
 import { reportLine } from "./report.ts";
 import { partitionBySide, type SeededAgent, seedAllAgents, spawnMarketplacePool } from "./seed.ts";
 
@@ -25,6 +26,8 @@ export type MarketplacePipelineResult = {
   needPostId: string;
   recipientDids: string[];
   evaluations: SellerEvaluateResult[];
+  inviteEvaluations: BuyerInviteEvaluateResult[];
+  /** Remaining open pairs after buyer declines are disconnected. */
   pairs: readonly OpenedPair[];
   stopInbox: () => void;
   stopPairs: () => void;
@@ -139,8 +142,8 @@ export async function runMarketplaceThroughInbox(
 }
 
 /**
- * Full pipeline steps 1–6 (inbox → evaluate → Vellum for engagers).
- * On failure after inbox start, stops pairs + inbox before rethrowing.
+ * Full pipeline steps 1–7 (inbox → seller evaluate → Vellum → buyer invite evaluate).
+ * Declined invites are disconnected immediately; accepted pairs remain until process exit.
  */
 export async function runMarketplacePipeline(
   harness: NetworkHarnessHandle,
@@ -183,15 +186,48 @@ export async function runMarketplacePipeline(
       }
     }
 
+    const inviteEvaluations = await evaluateBuyerOnInvites({
+      config,
+      buyer: phase.buyer,
+      needBody: config.needBody,
+      pairs: pairs.list(),
+      evaluations,
+    });
+
+    for (const invite of inviteEvaluations) {
+      if (invite.decision.decision === "decline") {
+        pairs.stop(invite.pair);
+        reportLine("invite.decline", {
+          sellerDid: invite.seller.agent.did,
+          sellerExternalId: invite.seller.profile.externalId,
+          sessionId: invite.pair.sessionId,
+          channelId: invite.pair.channelId,
+          reason: invite.decision.reason,
+        });
+      } else {
+        reportLine("invite.accept", {
+          sellerDid: invite.seller.agent.did,
+          sellerExternalId: invite.seller.profile.externalId,
+          sessionId: invite.pair.sessionId,
+          channelId: invite.pair.channelId,
+          reason: invite.decision.reason,
+        });
+      }
+    }
+
+    const accepted = inviteEvaluations.filter((i) => i.decision.decision === "accept");
     reportLine("marketplace.complete", {
       recipients: phase.recipientDids.length,
       engagers: engagers.length,
+      invites: inviteEvaluations.length,
+      accepted: accepted.length,
       pairs: pairs.list().length,
     });
 
     return {
       ...phase,
       evaluations,
+      inviteEvaluations,
       pairs: pairs.list(),
       stopPairs: () => pairs.stopAll(),
     };
