@@ -29,6 +29,7 @@ report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
 *.tsbuildinfo
 .nitro
 .harness-agent-data
+.harness-data
 .data
 
 # IntelliJ based IDEs

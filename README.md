@@ -17,18 +17,22 @@ bun install
 
 ## Quick start
 
-1. Start the reference stack (local memories + relay + Turso world):
+Use **two terminals**. Keep the orchestrator running in the first.
+
+1. Start the reference stack (local memories + relay + chat + Turso world; data under `apps/reference/.data`):
 
 ```bash
-bun run reference:start -- --data-dir ./.harness-data
+bun run reference:start
 ```
 
-2. Run the marketplace demo (primary) against those URLs plus a running Khora host:
+2. In a **second** terminal, export the printed URLs (and a running Khora host), then run marketplace:
 
 ```bash
 export KHORA_BASE_URL=http://127.0.0.1:8788
 export RELAY_BASE_URL=…       # from orchestrator output
 export MEMORIES_BASE_URL=…    # from orchestrator output
+export CHAT_BASE_URL=…        # from orchestrator output
+export CHAT_INTERNAL_TOKEN=reference-chat-token
 export AI_GATEWAY_API_KEY=…
 
 bun run marketplace

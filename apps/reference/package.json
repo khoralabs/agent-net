@@ -8,11 +8,11 @@
     "./world/turso": "./src/world/turso.ts"
   },
   "scripts": {
-    "start": "bun run src/orchestrator.ts",
-    "marketplace": "bun run src/run-marketplace.ts",
-    "swarm": "bun run src/run-swarm.ts",
-    "events": "bun run src/events-cli.ts",
-    "agent:setup": "workflow-turso-setup",
+    "start": "bun run src/orchestrator.ts -- --data-dir .data",
+    "marketplace": "bun run src/run-marketplace.ts -- --data-dir .data",
+    "swarm": "bun run src/run-swarm.ts -- --data-dir .data",
+    "events": "bun run src/events-cli.ts -- --data-dir .data",
+    "agent:setup": "bun -e \"import { mkdirSync } from 'node:fs'; mkdirSync('.data', { recursive: true })\" && WORKFLOW_TURSO_DATABASE_URL=file:.data/workflow.db workflow-turso-setup",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {

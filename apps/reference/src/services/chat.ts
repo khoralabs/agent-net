@@ -1,6 +1,6 @@
 import { mkdirSync } from "node:fs";
 import path from "node:path";
-import { startChatHttpServer } from "@khoralabs/chat/http/server";
+import { startChatHttpServer } from "@khoralabs/chat/http";
 
 export type ChatServiceOptions = {
   dataDir: string;

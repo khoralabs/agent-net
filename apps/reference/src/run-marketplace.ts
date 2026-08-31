@@ -20,6 +20,7 @@ import { runMarketplacePipeline } from "./marketplace/pipeline.ts";
 import { reportLine } from "./marketplace/report.ts";
 import { referenceMemoriesOntology } from "./memories/ontology.ts";
 import { installReferenceObservability } from "./observability/install.ts";
+import { requireKhoraReachable, requireReferenceStackReachable } from "./services/stack-health.ts";
 import { resolveHarnessDataDir } from "./world/paths.ts";
 import { configureTursoWorldEnv, startTursoWorldWorker } from "./world/turso.ts";
 
@@ -114,14 +115,27 @@ async function main(): Promise<void> {
     source: "marketplace",
   });
 
+  const memoriesBaseUrl = requireMemoriesBaseUrl(parsed.memoriesBaseUrl);
+  const relayBaseUrl = requireRelayBaseUrl(parsed.relayBaseUrl);
+  const chatBaseUrl = requireChatBaseUrl(parsed.chatBaseUrl);
+  const chatToken = requireChatToken(parsed.chatToken);
+  const khoraBaseUrl = requireKhoraBaseUrl(parsed.khoraBaseUrl);
+
+  await requireKhoraReachable(khoraBaseUrl);
+  await requireReferenceStackReachable({
+    memoriesBaseUrl,
+    relayBaseUrl,
+    chatBaseUrl,
+  });
+
   const harness = await startNetworkHarness({
     dataDir: config.dataDir,
-    chatBaseUrl: requireChatBaseUrl(parsed.chatBaseUrl),
-    chatToken: requireChatToken(parsed.chatToken),
+    chatBaseUrl,
+    chatToken,
     networkEvents,
-    khoraBaseUrl: requireKhoraBaseUrl(parsed.khoraBaseUrl),
-    relayBaseUrl: requireRelayBaseUrl(parsed.relayBaseUrl),
-    memoriesBaseUrl: requireMemoriesBaseUrl(parsed.memoriesBaseUrl),
+    khoraBaseUrl,
+    relayBaseUrl,
+    memoriesBaseUrl,
     memoriesAdminToken: requireMemoriesAdminToken(undefined),
   });
 

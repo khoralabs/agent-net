@@ -10,6 +10,11 @@ import { resolveHarnessDataDir } from "./world/paths.ts";
 import { configureTursoWorldEnv, startTursoWorldWorker } from "./world/turso.ts";
 
 const DEFAULT_CHAT_TOKEN = "reference-chat-token";
+const DEFAULT_MEMORIES_ADMIN_TOKEN = "reference-memories-admin-token";
+/** Fixed local ports — must match apps/reference/.env defaults. */
+const DEFAULT_RELAY_PORT = 8790;
+const DEFAULT_MEMORIES_PORT = 8791;
+const DEFAULT_CHAT_PORT = 8792;
 
 function parseArgs(argv: string[]): {
   dataDir: string;
@@ -41,11 +46,10 @@ function parseArgs(argv: string[]): {
       args.get("chat-token")?.trim() ||
       process.env.CHAT_INTERNAL_TOKEN?.trim() ||
       DEFAULT_CHAT_TOKEN,
-    ...(memoriesPortRaw !== undefined
-      ? { memoriesPort: Number.parseInt(memoriesPortRaw, 10) }
-      : {}),
-    ...(relayPortRaw !== undefined ? { relayPort: Number.parseInt(relayPortRaw, 10) } : {}),
-    ...(chatPortRaw !== undefined ? { chatPort: Number.parseInt(chatPortRaw, 10) } : {}),
+    memoriesPort:
+      memoriesPortRaw !== undefined ? Number.parseInt(memoriesPortRaw, 10) : DEFAULT_MEMORIES_PORT,
+    relayPort: relayPortRaw !== undefined ? Number.parseInt(relayPortRaw, 10) : DEFAULT_RELAY_PORT,
+    chatPort: chatPortRaw !== undefined ? Number.parseInt(chatPortRaw, 10) : DEFAULT_CHAT_PORT,
   };
 }
 
@@ -77,6 +81,8 @@ async function main(): Promise<void> {
   process.env.RELAY_BASE_URL = relay.baseUrl;
   process.env.CHAT_BASE_URL = chat.baseUrl;
   process.env.CHAT_INTERNAL_TOKEN = chat.token;
+  process.env.MEMORIES_SERVICE_ADMIN_TOKEN =
+    process.env.MEMORIES_SERVICE_ADMIN_TOKEN?.trim() || DEFAULT_MEMORIES_ADMIN_TOKEN;
 
   process.stdout.write(
     `${JSON.stringify(
@@ -86,6 +92,7 @@ async function main(): Promise<void> {
         memoriesBaseUrl: memories.baseUrl,
         relayBaseUrl: relay.baseUrl,
         chatBaseUrl: chat.baseUrl,
+        memoriesAdminToken: process.env.MEMORIES_SERVICE_ADMIN_TOKEN,
         workflowTargetWorld: process.env.WORKFLOW_TARGET_WORLD,
         workflowTursoDatabaseUrl: process.env.WORKFLOW_TURSO_DATABASE_URL,
       },
@@ -94,7 +101,7 @@ async function main(): Promise<void> {
     )}\n`,
   );
   process.stdout.write(
-    "Reference stack is running. Set KHORA_BASE_URL and use these URLs with the harness/swarm.\n",
+    "Reference stack is running. Also start khora-server (KHORA_BASE_URL, default :8788), then run marketplace/swarm.\n",
   );
 
   const shutdown = () => {

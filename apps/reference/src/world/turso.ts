@@ -1,3 +1,6 @@
+import { mkdirSync } from "node:fs";
+import path from "node:path";
+
 import { getWorld } from "workflow/runtime";
 
 import { resolveHarnessDataDir, workflowDbPath } from "./paths.ts";
@@ -6,7 +9,8 @@ const startedForDataDir = new Set<string>();
 
 /** Configure Workflow SDK to use the Turso world for this process. */
 export function configureTursoWorldEnv(opts?: { dataDir?: string }): string {
-  const dataDir = resolveHarnessDataDir(opts?.dataDir);
+  const dataDir = path.resolve(resolveHarnessDataDir(opts?.dataDir));
+  mkdirSync(dataDir, { recursive: true });
   process.env.WORKFLOW_TARGET_WORLD ??= "@workflow-worlds/turso";
   process.env.WORKFLOW_TURSO_DATABASE_URL ??= `file:${workflowDbPath(dataDir)}`;
   process.env.WORKFLOW_SERVICE_URL ??= `http://localhost:${process.env.PORT ?? "3000"}`;

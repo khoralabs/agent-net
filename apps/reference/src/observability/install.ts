@@ -1,4 +1,5 @@
-import { openSync } from "node:fs";
+import { mkdirSync, openSync } from "node:fs";
+import path from "node:path";
 import { createAgentTelemetry } from "@khoralabs/agent-capabilities-otel";
 import {
   type CreateHarnessLoggerOptions,
@@ -50,6 +51,7 @@ function ensureRootLogger(): Logger {
   const streams: pino.StreamEntry[] = [{ stream: pino.destination(2) }];
 
   if (pendingJsonlPath !== undefined) {
+    mkdirSync(path.dirname(pendingJsonlPath), { recursive: true });
     pinoJsonlFd = openSync(pendingJsonlPath, "a");
     streams.unshift({ stream: pino.destination({ dest: pinoJsonlFd, sync: true }) });
   }
