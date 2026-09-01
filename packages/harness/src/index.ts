@@ -106,6 +106,7 @@ export {
   type NegotiationChainView,
   type WhoShouldActResult,
   whoShouldAct,
+  whoShouldActWithChainState,
 } from "./agent/social/negotiate/nbc/who-should-act.ts";
 export {
   AgentSocialNegotiate,

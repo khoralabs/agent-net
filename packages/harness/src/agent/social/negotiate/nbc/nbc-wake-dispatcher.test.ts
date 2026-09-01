@@ -188,4 +188,70 @@ describe("nbc wake dispatcher", () => {
       },
     ]);
   });
+
+  test("exhausted ports without binds marks failed/error", async () => {
+    const chain = loopChain({ channelId: "ch-1", turnsCompleted: 1 });
+    const exhausted: NbcChainGraph = {
+      ...emptyGraph(),
+      parties: [
+        { id: "did:key:alice", name: "alice" },
+        { id: "did:key:bob", name: "bob" },
+      ],
+      offers: [
+        {
+          id: "o1",
+          type: "service.slot",
+          expires_turn: 10,
+          expires_at_ms: 0,
+          partyId: "did:key:alice",
+        },
+      ],
+      exposes: [{ offerId: "o1", portId: "pa" }],
+      ports: [
+        {
+          id: "pa",
+          kind: "slot",
+          promise: "open",
+          ref: "",
+          expires_turn: 10,
+          expires_at_ms: 0,
+          exposedOnOfferIds: ["o1"],
+          bindCount: 1,
+          max_bindings: 1,
+        },
+      ],
+    };
+    let status: string | undefined;
+    let outcome: string | undefined;
+    const starts: string[] = [];
+    const onChanged = createNbcWakeDispatcher({
+      sessions: {
+        get: () => ({
+          chainId: "c4",
+          channelId: "ch-1",
+          sessionId: "sess",
+          initiatorDid: "did:key:alice",
+          counterpartyDid: "did:key:bob",
+        }),
+      } as never,
+      host: {
+        getChain: (id) => (id === "c4" ? chain : null),
+        onStatus: (_id, patch) => {
+          if (patch.status !== undefined) status = patch.status;
+          if (patch.outcome !== undefined) outcome = patch.outcome;
+        },
+        localDids: () => ["did:key:alice", "did:key:bob"],
+        startTurn: async (input) => {
+          starts.push(input.asDid);
+          return { runId: "run" };
+        },
+      },
+      getSnapshot: async () => snap(exhausted, null),
+    });
+
+    await onChanged({ chainId: "c4", turnSeq: 1, cause: "snapshot" });
+    expect(starts).toEqual([]);
+    expect(status).toBe("failed");
+    expect(outcome).toBe("error");
+  });
 });

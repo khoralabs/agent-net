@@ -82,6 +82,12 @@ export function createNbcWakeDispatcher(deps: NbcWakeDispatcherDeps) {
             status: "completed",
             ...(outcome !== undefined ? { outcome } : {}),
           });
+        } else if (act.reason === "error") {
+          // Upstream host: null acting party without binds is "error", not terminal-bind.
+          deps.host.onStatus(event.chainId, {
+            status: "failed",
+            outcome: "error",
+          });
         }
         continue;
       }

@@ -138,13 +138,13 @@ describe("negotiationOutputToWire", () => {
     ).toThrow();
   });
 
-  test("rejects opening disconnect", () => {
-    expect(() =>
+  test("opening disconnect maps to leave", () => {
+    expect(
       negotiationOutputToWire({
         raw: { disconnect: true },
         opening: true,
         peerPorts: [],
       }),
-    ).toThrow();
+    ).toEqual({ kind: "disconnect" });
   });
 });

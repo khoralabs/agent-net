@@ -29,15 +29,15 @@ const later = {
 };
 
 describe("negotiationTurnEnvelopeSchema", () => {
-  test("opening turn requires expose with kind and promise", () => {
+  test("opening turn requires expose with kind and promise (or disconnect)", () => {
     const schema = negotiationTurnEnvelopeSchema(opening);
     expect(ok(schema, { expose: [{ kind: "slot", promise: "open" }] })).toBe(true);
+    expect(ok(schema, { disconnect: true })).toBe(true);
     expect(ok(schema, { expose: [{}] })).toBe(false);
     expect(ok(schema, { expose: [{ type: "object", properties: {} }] })).toBe(false);
-    expect(ok(schema, { disconnect: true })).toBe(false);
   });
 
-  test("later turn with peer ports is disconnect or bind+expose", () => {
+  test("later turn with peer ports is disconnect or bind (+ optional expose)", () => {
     const schema = negotiationTurnEnvelopeSchema(later);
     expect(ok(schema, { disconnect: true })).toBe(true);
     expect(
@@ -54,11 +54,11 @@ describe("negotiationTurnEnvelopeSchema", () => {
     ).toBe(false);
   });
 
-  test("later turn with no bindable ports is disconnect or expose", () => {
+  test("later turn with no bindable ports requires bind (or disconnect), not expose-only", () => {
     const schema = negotiationTurnEnvelopeSchema({ opening: false, peerPorts: [] });
     expect(ok(schema, { disconnect: true })).toBe(true);
-    expect(ok(schema, { expose: [{ kind: "slot", promise: "wait" }] })).toBe(true);
-    expect(ok(schema, { expose: [] })).toBe(false);
+    expect(ok(schema, { bind: { portId: "any", payload: {} } })).toBe(true);
+    expect(ok(schema, { expose: [{ kind: "slot", promise: "wait" }] })).toBe(false);
   });
 
   test("later turn against a port with no bind_policy requires empty payload", () => {
@@ -98,8 +98,10 @@ describe("parseNegotiationTurnEnvelope", () => {
     ).toThrow();
   });
 
-  test("rejects opening disconnect", () => {
-    expect(() => parseNegotiationTurnEnvelope({ disconnect: true }, opening)).toThrow();
+  test("accepts opening disconnect (leave ∪ opening)", () => {
+    expect(parseNegotiationTurnEnvelope({ disconnect: true }, opening)).toEqual({
+      disconnect: true,
+    });
   });
 
   test("accepts later bind+expose", () => {
