@@ -39,4 +39,4 @@ bun run swarm:test
 
 ## Observability
 
-Swarm does not host memories. Agent turn OTEL comes from `installHarnessObservability` in the swarm process (see the reference `installReferenceObservability`). Memory op and database lifecycle spans (`memories.op.*`, `memories.database.*`) appear in OTLP when the **memories host** is instrumented — e.g. the reference orchestrator installs memories OTEL before `startMemoriesService`. Point `--memories-url` at that host and set `OTEL_EXPORTER_OTLP_ENDPOINT` on both processes if you want agent and memory signals in the same backend.
+Swarm does not host memories. Agent turn telemetry comes from `installHarnessObservability` in the swarm process (the reference app’s `installReferenceObservability` wires pino logging and noop agent/memories sinks). Memory op and database lifecycle spans (`memories.op.*`, `memories.database.*`) appear in OTLP only when the **memories host** installs real memories telemetry (for example `@khoralabs/memories-otel`) and an OTLP exporter.

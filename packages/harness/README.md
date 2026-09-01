@@ -99,4 +99,4 @@ const stack = createLocalSqliteServiceStack({
 });
 ```
 
-Memory merge/search/delete and database open/close/delete/evict spans emit in the **memories-service process**. Pointing the harness at a remote `memoriesBaseUrl` only surfaces those spans if that host is instrumented (the reference orchestrator does this). Agent tool OTEL remains separate via `createAgentTelemetry`.
+Memory merge/search/delete and database open/close/delete/evict spans emit in the **memories-service process**. Pointing the harness at a remote `memoriesBaseUrl` only surfaces those spans if that host installs real memories telemetry (for example via `@khoralabs/memories-otel`). The reference app uses harness noop memories telemetry. Agent tool OTEL remains separate via `createAgentTelemetry`.
