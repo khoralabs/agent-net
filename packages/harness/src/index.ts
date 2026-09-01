@@ -222,7 +222,13 @@ export {
   resolveChatBaseUrlFromEnv,
   resolveChatTokenFromEnv,
 } from "./lib/chat-base-url.ts";
-export { requireKhoraBaseUrl } from "./lib/khora-base-url.ts";
+export {
+  inboxEventPostId,
+  inboxEventPostIds,
+  inboxHasPost,
+  inboxPostAuthorDid,
+} from "./lib/inbox.ts";
+export { requireKhoraBaseUrl, resolveKhoraBaseUrlFromEnv } from "./lib/khora-base-url.ts";
 export {
   requireMemoriesAdminToken,
   requireMemoriesBaseUrl,
