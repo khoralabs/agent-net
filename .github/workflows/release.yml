@@ -97,28 +97,18 @@ jobs:
             git push origin "$TAG"
           fi
 
-      # Bun on ubuntu-latest often ignores env-only tokens (XDG_CONFIG_HOME).
-      # Write ~/.npmrc (+ XDG) and export NPM_CONFIG_TOKEN for bun publish.
-      - name: Configure npm auth
+      - name: Publish package
         if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
+        working-directory: packages/harness
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN || secrets.NPM_CONFIG_TOKEN }}
+          # bun publish reads NPM_CONFIG_TOKEN (not NPM_TOKEN / NODE_AUTH_TOKEN)
+          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN || secrets.NPM_CONFIG_TOKEN }}
         run: |
-          if [ -z "${NPM_TOKEN:-}" ]; then
+          if [ -z "$NPM_CONFIG_TOKEN" ]; then
             echo "::error::Set repository secret NPM_TOKEN (or NPM_CONFIG_TOKEN)."
             exit 1
           fi
-          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > "$HOME/.npmrc"
-          if [ -n "${XDG_CONFIG_HOME:-}" ]; then
-            mkdir -p "$XDG_CONFIG_HOME"
-            echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > "$XDG_CONFIG_HOME/.npmrc"
-          fi
-          echo "NPM_CONFIG_TOKEN=${NPM_TOKEN}" >> "$GITHUB_ENV"
-
-      - name: Publish package
-        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
-        run: bun publish --access public
-        working-directory: packages/harness
+          bun publish --access public
 
       - name: Dry-run publish preview
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
