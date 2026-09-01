@@ -1,4 +1,5 @@
 import type {
+  BuildSubscriptionSearchInput,
   KhoraClient,
   KhoraPost,
   KhoraPostCreateContent,
@@ -8,8 +9,11 @@ import type {
   KhoraSearchQuery,
   KhoraSearchRequest,
   KhoraSearchResponse,
+  KhoraStandingSearchRequest,
+  KhoraSubscriptionCreate,
   PublicProfileResult,
 } from "@khoralabs/khora-client";
+import { buildSubscriptionSearch } from "@khoralabs/khora-client";
 
 import type { AgentActor } from "../actor.ts";
 import type { AgentChatClient } from "./message/chat.ts";
@@ -19,12 +23,17 @@ import { AgentSocialNegotiate } from "./negotiate/negotiate.ts";
 export type SocialInvitation = {
   /** Peer DID the invitation targets. */
   peerDid: string;
-  /**
-   * Invite token when available from the agent's invite bank / registration flow.
-   * Full `connection_request` wire typing remains a khora follow-up.
-   */
+  /** Invite token when available from the invite bank. */
   token?: string;
   kind: "invitation";
+};
+
+export type AgentSocialSubscribeInput = Omit<
+  KhoraSubscriptionCreate,
+  "kind" | "authorSignature" | "search"
+> & {
+  search?: KhoraStandingSearchRequest;
+  buildSearch?: BuildSubscriptionSearchInput;
 };
 
 /**
@@ -56,6 +65,18 @@ export class AgentSocial {
     return this.#client.createPost(body);
   }
 
+  /** Create a standing-search subscription using khora search builders when `buildSearch` is set. */
+  subscribe(input: AgentSocialSubscribeInput): Promise<KhoraPost> {
+    const search =
+      input.search ??
+      (input.buildSearch !== undefined ? buildSubscriptionSearch(input.buildSearch) : undefined);
+    if (search === undefined) {
+      throw new Error("social.subscribe: pass search or buildSearch");
+    }
+    const { buildSearch: _buildSearch, search: _search, ...rest } = input;
+    return this.#client.createSubscription({ ...rest, search });
+  }
+
   getPost(id: string): Promise<KhoraPost> {
     return this.#client.getPost(id);
   }
@@ -78,7 +99,7 @@ export class AgentSocial {
 
   /**
    * Begin a relationship invite toward `peerDid`.
-   * Returns a typed invitation; token comes from the invite bank when available.
+   * Token comes from the invite bank; validated via `previewInvite` when present.
    */
   async connect(peerDid: string): Promise<SocialInvitation> {
     const did = peerDid.trim();
@@ -89,6 +110,9 @@ export class AgentSocial {
     if (this.#listInvites !== undefined) {
       const tokens = await this.#listInvites();
       token = tokens[0];
+    }
+    if (token !== undefined) {
+      await this.#client.previewInvite(token);
     }
     return {
       peerDid: did,

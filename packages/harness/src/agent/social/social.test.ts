@@ -22,8 +22,10 @@ describe("AgentSocial", () => {
   test("post/search/connect delegate to khora client; connect uses invite bank", async () => {
     const createPost = mock(async (body: unknown) => ({ id: "p1", body }));
     const search = mock(async () => ({ hits: [] }));
+    const previewInvite = mock(async () => ({ inviter: null, source: "seed" }));
     const client = {
       createPost,
+      createSubscription: mock(async (body: unknown) => ({ id: "sub-1", body })),
       search,
       searchAdvanced: mock(async () => ({ hits: [] })),
       getPost: mock(async () => ({})),
@@ -33,6 +35,7 @@ describe("AgentSocial", () => {
       lookupProfileByDid: mock(async () => null),
       lookupProfileByUsername: mock(async () => null),
       listAuthorSubscriptions: mock(async () => ({ subscriptions: [] })),
+      previewInvite,
       did: "did:key:self",
     };
     const handle = {
@@ -59,6 +62,40 @@ describe("AgentSocial", () => {
       token: "tok-a",
     });
     expect(listInvites).toHaveBeenCalled();
+    expect(previewInvite).toHaveBeenCalledWith("tok-a");
+  });
+
+  test("subscribe uses buildSubscriptionSearch via createSubscription", async () => {
+    const createSubscription = mock(async (body: unknown) => ({ id: "sub-1", body }));
+    const client = {
+      createPost: mock(async () => ({})),
+      createSubscription,
+      search: mock(async () => ({ hits: [] })),
+      searchAdvanced: mock(async () => ({ hits: [] })),
+      getPost: mock(async () => ({})),
+      updatePost: mock(async () => ({})),
+      deletePost: mock(async () => {}),
+      updateProfile: mock(async () => ({})),
+      lookupProfileByDid: mock(async () => null),
+      lookupProfileByUsername: mock(async () => null),
+      listAuthorSubscriptions: mock(async () => ({ subscriptions: [] })),
+      previewInvite: mock(async () => ({ inviter: null, source: "seed" })),
+      did: "did:key:self",
+    };
+    const handle = { did: "did:key:self", client } as unknown as AgentActor;
+    const social = new AgentSocial({ handle, chat: fakeChat("did:key:self") });
+
+    await social.subscribe({
+      visibility: "public",
+      buildSearch: { topicSlug: "buy", queryText: "bearing surplus" },
+    });
+
+    expect(createSubscription).toHaveBeenCalled();
+    const body = createSubscription.mock.calls[0]?.[0] as {
+      search: { content: { text?: string }; options?: { labels?: { some?: string[] } } };
+    };
+    expect(body.search.content.text).toBe("bearing surplus");
+    expect(body.search.options?.labels?.some).toContain("khora_topic:buy");
   });
 
   test("connect rejects empty peerDid", async () => {

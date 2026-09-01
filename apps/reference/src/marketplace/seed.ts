@@ -47,12 +47,11 @@ export async function seedMarketplaceAgent(
         : `Inventory for sale: ${profile.memoryBlurb}`,
   });
 
-  // Standing subscription: tags use shared vocab; search text is semantic.
-  await agent.social.post({
-    kind: "subscription",
+  // Standing subscription: topic label + semantic query via khora search builder.
+  await agent.social.subscribe({
     visibility: "public",
     topics: [watchSide, ...profile.products, ...profile.services],
-    search: { content: { text: profile.standingQuery } },
+    buildSearch: { topicSlug: watchSide, queryText: profile.standingQuery },
   });
 
   await agent.memories.integrate({
