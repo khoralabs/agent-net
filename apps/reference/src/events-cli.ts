@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { createSqliteNetworkEventStore } from "@khoralabs/network-events-sqlite";
+import { createSqliteNetworkEventStore } from "@khoralabs/agent-net-harness/network-events/sqlite";
 
 import { resolveHarnessDataDir } from "./world/paths.ts";
 

@@ -13,13 +13,13 @@ import {
   requireRelayBaseUrl,
   startNetworkHarness,
 } from "@khoralabs/agent-net-harness";
+import { createSqliteNetworkEventPersistencePlugin } from "@khoralabs/agent-net-harness/network-events/sqlite";
 import {
   provideHarnessForSession,
   provideOntologyForSession,
   type SwarmConfig,
   swarmOrchestrator,
 } from "@khoralabs/agent-net-swarm";
-import { createNetworkEventPersistencePlugin } from "@khoralabs/network-events-sqlite";
 import { start } from "workflow/api";
 
 import { referenceMemoriesOntology } from "./memories/ontology.ts";
@@ -94,7 +94,7 @@ async function main(): Promise<void> {
   configureTursoWorldEnv({ dataDir: config.dataDir });
   await startTursoWorldWorker({ dataDir: config.dataDir });
 
-  const networkEvents = createNetworkEventPersistencePlugin({ dataDir: config.dataDir });
+  const networkEvents = createSqliteNetworkEventPersistencePlugin({ dataDir: config.dataDir });
   bindNetworkSessionContext({ sessionId: config.sessionId });
   installReferenceObservability({
     serviceName: "network-harness-swarm",

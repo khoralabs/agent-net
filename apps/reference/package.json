@@ -23,7 +23,6 @@
     "@khoralabs/memories-node": "^0.8.0",
     "@khoralabs/memories-otel": "^0.8.0",
     "@khoralabs/memories-service": "^0.8.0",
-    "@khoralabs/network-events-sqlite": "workspace:*",
     "@khoralabs/observability": "workspace:*",
     "@khoralabs/relay": "^0.1.1",
     "@khoralabs/sqlite-crypto": "^0.1.0",

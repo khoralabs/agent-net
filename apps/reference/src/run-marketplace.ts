@@ -13,7 +13,7 @@ import {
   requireRelayBaseUrl,
   startNetworkHarness,
 } from "@khoralabs/agent-net-harness";
-import { createNetworkEventPersistencePlugin } from "@khoralabs/network-events-sqlite";
+import { createSqliteNetworkEventPersistencePlugin } from "@khoralabs/agent-net-harness/network-events/sqlite";
 
 import { buildMarketplaceConfig } from "./marketplace/config.ts";
 import { runMarketplacePipeline } from "./marketplace/pipeline.ts";
@@ -103,7 +103,7 @@ async function main(): Promise<void> {
   configureTursoWorldEnv({ dataDir: config.dataDir });
   await startTursoWorldWorker({ dataDir: config.dataDir });
 
-  const networkEvents = createNetworkEventPersistencePlugin({ dataDir: config.dataDir });
+  const networkEvents = createSqliteNetworkEventPersistencePlugin({ dataDir: config.dataDir });
   bindNetworkSessionContext({ sessionId: config.sessionId });
   installReferenceObservability({
     serviceName: "network-harness-marketplace",

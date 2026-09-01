@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 
 import { installNetworkEventsPlugin } from "@khoralabs/agent-net-harness";
-import { createNetworkEventPersistencePlugin } from "@khoralabs/network-events-sqlite";
+import { createSqliteNetworkEventPersistencePlugin } from "@khoralabs/agent-net-harness/network-events/sqlite";
 
 import {
   appendInboxEntry,
@@ -20,7 +20,7 @@ import {
 import type { AgentLoopState, SwarmConfig } from "./types.ts";
 
 const dataDir = path.join(os.tmpdir(), `swarm-state-${process.pid}-${crypto.randomUUID()}`);
-installNetworkEventsPlugin(createNetworkEventPersistencePlugin({ dataDir }));
+installNetworkEventsPlugin(createSqliteNetworkEventPersistencePlugin({ dataDir }));
 
 const config: SwarmConfig = {
   sessionId: "session-budget",
