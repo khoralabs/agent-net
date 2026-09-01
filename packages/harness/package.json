@@ -25,6 +25,12 @@
       "import": "./src/pool/index.ts",
       "default": "./src/pool/index.ts"
     },
+    "./swarm": {
+      "types": "./src/swarm/index.ts",
+      "bun": "./src/swarm/index.ts",
+      "import": "./src/swarm/index.ts",
+      "default": "./src/swarm/index.ts"
+    },
     "./agent-workflow-types": {
       "types": "./src/agent/turn/types.ts",
       "bun": "./src/agent/turn/types.ts",

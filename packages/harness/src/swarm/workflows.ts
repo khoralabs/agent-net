@@ -1,10 +1,5 @@
-import {
-  type AgentTurnParams,
-  emitNetworkEvent,
-  networkEventId,
-  runAgentTurn,
-} from "@khoralabs/agent-net-harness";
 import { getRun, start } from "workflow/api";
+import { type AgentTurnParams, emitNetworkEvent, networkEventId, runAgentTurn } from "../index.ts";
 
 import { assembleTurnContext } from "./assemble-turn-context.ts";
 import { takeHarnessForSession } from "./pending-harness.ts";

@@ -1,4 +1,8 @@
-export { provideHarnessForSession } from "./pending-harness.ts";
-export { provideOntologyForSession } from "./pending-ontology.ts";
-export type { SwarmConfig } from "./types.ts";
-export { swarmOrchestrator } from "./workflows.ts";
+/** @deprecated Use `@khoralabs/agent-net-harness/swarm`. Removed in the next commit. */
+
+export type { SwarmConfig } from "@khoralabs/agent-net-harness/swarm";
+export {
+  provideHarnessForSession,
+  provideOntologyForSession,
+  swarmOrchestrator,
+} from "@khoralabs/agent-net-harness/swarm";

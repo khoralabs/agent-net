@@ -1,13 +1,13 @@
 import { mkdirSync } from "node:fs";
 import path from "node:path";
+import type { KhoraClientEvent } from "@khoralabs/khora-client";
+import { type Client, createClient } from "@libsql/client";
 import {
   buildNetworkAttribution,
   emitNetworkEvent,
   listNetworkEvents,
   networkEventId,
-} from "@khoralabs/agent-net-harness";
-import type { KhoraClientEvent } from "@khoralabs/khora-client";
-import { type Client, createClient } from "@libsql/client";
+} from "../index.ts";
 import type { AgentLoopState, SwarmConfig, SwarmState, TurnTelemetry } from "./types.ts";
 
 function workflowDbPath(dataDir: string): string {

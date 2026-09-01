@@ -1,4 +1,4 @@
-import type { NetworkHarnessHandle } from "@khoralabs/agent-net-harness";
+import type { NetworkHarnessHandle } from "../index.ts";
 
 import { loadSwarmStateBySessionId } from "./swarm-state.ts";
 

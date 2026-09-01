@@ -2,8 +2,8 @@ import { expect, test } from "bun:test";
 import os from "node:os";
 import path from "node:path";
 
-import { installNetworkEventsPlugin } from "@khoralabs/agent-net-harness";
-import { createSqliteNetworkEventPersistencePlugin } from "@khoralabs/agent-net-harness/network-events/sqlite";
+import { installNetworkEventsPlugin } from "../index.ts";
+import { createSqliteNetworkEventPersistencePlugin } from "../pool/network/persistence/sqlite/index.ts";
 
 import {
   appendInboxEntry,

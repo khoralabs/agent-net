@@ -1,10 +1,10 @@
+import type { PostUsage } from "@khoralabs/chat";
 import type {
   AgentTurnResult,
   NetworkAttribution,
   NetworkEvent,
   ThreadHashSnapshot,
-} from "@khoralabs/agent-net-harness";
-import type { PostUsage } from "@khoralabs/chat";
+} from "../index.ts";
 
 export type { NetworkAttribution, NetworkEvent, ThreadHashSnapshot };
 
