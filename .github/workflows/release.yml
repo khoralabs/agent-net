@@ -112,7 +112,7 @@ jobs:
 
       - name: Dry-run publish preview
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
-        run: bun publish --access public --dry-run
+        run: bun pm pack --quiet
         working-directory: packages/harness
 
       - name: GitHub Release
