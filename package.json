@@ -51,7 +51,7 @@
     "@libsql/client": "catalog:"
   },
   "scripts": {
-    "typecheck": "bun run --filter '@khoralabs/agent-net-harness' typecheck && bun run --filter '@khoralabs/agent-net-swarm' typecheck && bun run --filter '@khoralabs/agent-net-reference' typecheck",
+    "typecheck": "bun run --filter '@khoralabs/agent-net-harness' typecheck && bun run --filter '@khoralabs/agent-net-reference' typecheck",
     "format": "biome check --write .",
     "format:check": "biome check --error-on-warnings .",
     "agent:setup": "bun run --filter @khoralabs/agent-net-reference agent:setup",
@@ -62,7 +62,7 @@
     "swarm": "bun run --filter @khoralabs/agent-net-reference swarm",
     "swarm:setup": "bun run --filter @khoralabs/agent-net-reference agent:setup",
     "swarm:events": "bun run --filter @khoralabs/agent-net-reference events",
-    "swarm:test": "bash scripts/test-with-homebrew-sqlite.sh packages/swarm/src packages/harness/src",
+    "swarm:test": "bash scripts/test-with-homebrew-sqlite.sh packages/harness/src/swarm packages/harness/src",
     "submodules:init": "git submodule update --init --recursive",
     "submodules:update": "git submodule update --remote --merge vendor/libs && bun install",
     "prepare": "husky",

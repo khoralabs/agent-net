@@ -4,8 +4,7 @@ Monorepo for the Khora multi-agent network harness.
 
 | Package | Path | Role |
 | --- | --- | --- |
-| `@khoralabs/agent-net` | [`packages/harness`](packages/harness) | Abstract harness library |
-| `@khoralabs/agent-net-swarm` | [`packages/swarm`](packages/swarm) | Budgeted multi-agent orchestration |
+| `@khoralabs/agent-net-harness` | [`packages/harness`](packages/harness) | Abstract harness library (`./swarm` = budgeted multi-agent orchestration) |
 | `@khoralabs/agent-net-reference` | [`apps/reference`](apps/reference) | Turso world, local memories/relay, orchestrator + marketplace (primary) / swarm CLIs |
 
 ## Setup

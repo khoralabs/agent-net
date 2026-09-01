@@ -21,7 +21,6 @@
       "dependencies": {
         "@khoralabs/agent-capabilities-otel": "catalog:",
         "@khoralabs/agent-net-harness": "workspace:*",
-        "@khoralabs/agent-net-swarm": "workspace:*",
         "@khoralabs/chat": "catalog:",
         "@khoralabs/memories-node": "catalog:",
         "@khoralabs/memories-otel": "catalog:",
@@ -72,29 +71,6 @@
         "unstorage": "^1.17.5",
         "workflow": "catalog:",
         "zod": "catalog:",
-      },
-      "devDependencies": {
-        "@types/bun": "catalog:",
-        "typescript": "catalog:",
-      },
-      "peerDependencies": {
-        "typescript": "catalog:",
-      },
-    },
-    "packages/swarm": {
-      "name": "@khoralabs/agent-net-swarm",
-      "version": "0.0.0",
-      "dependencies": {
-        "@khoralabs/agent-net-harness": "workspace:*",
-        "@khoralabs/chat": "catalog:",
-        "@khoralabs/did-key-identity": "catalog:",
-        "@khoralabs/khora-client": "catalog:",
-        "@khoralabs/memories-node": "catalog:",
-        "@khoralabs/sqlite-crypto": "catalog:",
-        "@libsql/client": "catalog:",
-        "@tursodatabase/serverless": "^1.3.2",
-        "ai": "catalog:",
-        "workflow": "catalog:",
       },
       "devDependencies": {
         "@types/bun": "catalog:",
@@ -334,8 +310,6 @@
     "@khoralabs/agent-net-harness": ["@khoralabs/agent-net-harness@workspace:packages/harness"],
 
     "@khoralabs/agent-net-reference": ["@khoralabs/agent-net-reference@workspace:apps/reference"],
-
-    "@khoralabs/agent-net-swarm": ["@khoralabs/agent-net-swarm@workspace:packages/swarm"],
 
     "@khoralabs/agent-review": ["@khoralabs/agent-review@0.2.2", "", { "dependencies": { "@khoralabs/agent-capabilities": "^0.2.0", "@khoralabs/agent-capabilities-ai-sdk": "^0.2.0", "@khoralabs/agent-capabilities-otel": "^0.2.0", "@opentelemetry/api": "^1.9.1", "ai": "^7.0.9", "just-bash": "^3.2.0", "pino": "^9", "yaml": "^2.8.0", "zod": "^4.4.3" }, "bin": { "agent-review": "bin/agent-review" } }, "sha512-bjNh7fvxLxSEKIjK2kSVwhpGlPv+236dX7rPzoXL/yY+b9HeeU3hLopibWo1jdx1DU0qvS6gXNzOPbH/BOR+gA=="],
 

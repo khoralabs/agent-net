@@ -19,7 +19,7 @@ import {
   provideOntologyForSession,
   type SwarmConfig,
   swarmOrchestrator,
-} from "@khoralabs/agent-net-swarm";
+} from "@khoralabs/agent-net-harness/swarm";
 import { start } from "workflow/api";
 
 import { referenceMemoriesOntology } from "./memories/ontology.ts";
