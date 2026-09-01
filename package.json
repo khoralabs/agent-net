@@ -16,6 +16,9 @@
     "@khoralabs/memories-agents": "0.8.0",
     "@khoralabs/memories-react-graph": "0.8.0",
     "@khoralabs/memories-spec": "0.8.0",
+    "@khoralabs/obp-core": "0.2.1",
+    "@khoralabs/obp-nbc": "0.2.1",
+    "@khoralabs/vellum-client": "0.3.3",
     "@libsql/client": "0.17.4"
   },
   "scripts": {
