@@ -38,6 +38,12 @@ bun run marketplace
 
 Optional secondary demo: `bun run swarm -- --agents 2`.
 
+## Release
+
+Publishable package: `@khoralabs/agent-net` ([`packages/harness`](packages/harness)).
+
+GitHub Actions: [`.github/workflows/release.yml`](.github/workflows/release.yml) (`workflow_dispatch` with a semver, or push a `v*` tag). Requires repository secret `NPM_TOKEN` (or `NPM_CONFIG_TOKEN`).
+
 ## Workflow world
 
 Harness and swarm workflows use the abstract [Workflow SDK](https://useworkflow.dev) only. The **hosting app** must configure and start a world before running workflows. The reference app selects Turso (`configureTursoWorldEnv` / `startTursoWorldWorker`).
