@@ -1,5 +1,5 @@
-import type { AgentActor, AgentHandle } from "@khoralabs/agent-net-harness";
-import { disconnectVellum, type VellumHandle } from "@khoralabs/agent-net-harness";
+import type { AgentActor, AgentHandle } from "@khoralabs/agent-net";
+import { disconnectVellum, type VellumHandle } from "@khoralabs/agent-net";
 
 export type OpenPairOptions = {
   relayBaseUrl: string;

@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import { getHarnessMemoriesTelemetry } from "@khoralabs/agent-net-harness";
+import { getHarnessMemoriesTelemetry } from "@khoralabs/agent-net";
 
 import { installReferenceObservability } from "./observability/install.ts";
 import { startChatHttpService } from "./services/chat.ts";

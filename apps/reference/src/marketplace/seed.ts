@@ -1,4 +1,4 @@
-import type { AgentHandle, NetworkHarnessHandle } from "@khoralabs/agent-net-harness";
+import type { AgentHandle, NetworkHarnessHandle } from "@khoralabs/agent-net";
 
 import { referenceMemoriesOntology } from "../memories/ontology.ts";
 import {

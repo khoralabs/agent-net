@@ -3,4 +3,4 @@ export {
   inboxEventPostIds,
   inboxHasPost,
   inboxPostAuthorDid,
-} from "@khoralabs/agent-net-harness";
+} from "@khoralabs/agent-net";

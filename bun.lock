@@ -20,7 +20,7 @@
       "version": "0.0.0",
       "dependencies": {
         "@khoralabs/agent-capabilities-otel": "catalog:",
-        "@khoralabs/agent-net-harness": "workspace:*",
+        "@khoralabs/agent-net": "workspace:*",
         "@khoralabs/chat": "catalog:",
         "@khoralabs/memories-node": "catalog:",
         "@khoralabs/memories-otel": "catalog:",
@@ -48,7 +48,7 @@
       },
     },
     "packages/harness": {
-      "name": "@khoralabs/agent-net-harness",
+      "name": "@khoralabs/agent-net",
       "version": "0.0.0",
       "dependencies": {
         "@khoralabs/agent-capabilities": "catalog:",
@@ -307,7 +307,7 @@
 
     "@khoralabs/agent-capabilities-otel": ["@khoralabs/agent-capabilities-otel@0.2.0", "", { "dependencies": { "@khoralabs/agent-capabilities": "^0.1.1", "@opentelemetry/api": "^1.9.0", "pino": "^9.6.0" }, "peerDependencies": { "typescript": "^5" } }, "sha512-hv1SDJhLel/iR3WEfkkzC9/hDc+hbxFWuwMmiW89kk1G8USeeJuESMYPx5pM7vHoYz90DSJqYfolwxyngiXFGA=="],
 
-    "@khoralabs/agent-net-harness": ["@khoralabs/agent-net-harness@workspace:packages/harness"],
+    "@khoralabs/agent-net": ["@khoralabs/agent-net@workspace:packages/harness"],
 
     "@khoralabs/agent-net-reference": ["@khoralabs/agent-net-reference@workspace:apps/reference"],
 

@@ -1,6 +1,6 @@
 import { describe, expect, mock, test } from "bun:test";
 
-import type { AgentActor, AgentHandle, VellumHandle } from "@khoralabs/agent-net-harness";
+import type { AgentActor, AgentHandle, VellumHandle } from "@khoralabs/agent-net";
 
 import { createNegotiatePairRegistry } from "./open-pair.ts";
 

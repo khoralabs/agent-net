@@ -1,17 +1,17 @@
-# `@khoralabs/agent-net-harness/swarm`
+# `@khoralabs/agent-net/swarm`
 
 Budgeted multi-agent orchestration on top of the harness control plane.
 
 Exports `swarmOrchestrator`, `provideHarnessForSession`, `provideOntologyForSession`, and `SwarmConfig`. It does **not** select a Workflow world or host memories/relay.
 
 ```ts
-import { startNetworkHarness } from "@khoralabs/agent-net-harness";
+import { startNetworkHarness } from "@khoralabs/agent-net";
 import {
   provideHarnessForSession,
   provideOntologyForSession,
   swarmOrchestrator,
   type SwarmConfig,
-} from "@khoralabs/agent-net-harness/swarm";
+} from "@khoralabs/agent-net/swarm";
 import { start } from "workflow/api";
 
 const harness = await startNetworkHarness({ /* … */ });

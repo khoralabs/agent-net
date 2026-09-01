@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@khoralabs/agent-capabilities-otel": "catalog:",
-    "@khoralabs/agent-net-harness": "workspace:*",
+    "@khoralabs/agent-net": "workspace:*",
     "@khoralabs/chat": "catalog:",
     "@khoralabs/memories-node": "catalog:",
     "@khoralabs/memories-otel": "catalog:",

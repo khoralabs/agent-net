@@ -4,7 +4,7 @@ import {
   type AgentHandle,
   harnessAgentsDataDir,
   type NetworkHarnessHandle,
-} from "@khoralabs/agent-net-harness";
+} from "@khoralabs/agent-net";
 
 import { createInboxReactor, type InboxReactor } from "../patterns/inbox/index.ts";
 import {

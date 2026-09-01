@@ -1,4 +1,4 @@
-import { generateStructured } from "@khoralabs/agent-net-harness";
+import { generateStructured } from "@khoralabs/agent-net";
 import { gateway } from "ai";
 import { z } from "zod";
 

@@ -12,14 +12,14 @@ import {
   requireMemoriesBaseUrl,
   requireRelayBaseUrl,
   startNetworkHarness,
-} from "@khoralabs/agent-net-harness";
-import { createSqliteNetworkEventPersistencePlugin } from "@khoralabs/agent-net-harness/network-events/sqlite";
+} from "@khoralabs/agent-net";
+import { createSqliteNetworkEventPersistencePlugin } from "@khoralabs/agent-net/network-events/sqlite";
 import {
   provideHarnessForSession,
   provideOntologyForSession,
   type SwarmConfig,
   swarmOrchestrator,
-} from "@khoralabs/agent-net-harness/swarm";
+} from "@khoralabs/agent-net/swarm";
 import { start } from "workflow/api";
 
 import { referenceMemoriesOntology } from "./memories/ontology.ts";

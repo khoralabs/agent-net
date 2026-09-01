@@ -1,4 +1,4 @@
-# @khoralabs/agent-net-harness
+# @khoralabs/agent-net
 
 Custodial network harness: agent pool, per-agent social fabric + memories, signed chat, tools, and durable turn workflows.
 
@@ -6,17 +6,17 @@ Custodial network harness: agent pool, per-agent social fabric + memories, signe
 
 | Import | Role |
 |--------|------|
-| `@khoralabs/agent-net-harness` | Control plane: `startNetworkHarness`, agents, pool, turns, network events |
-| `@khoralabs/agent-net-harness/agent` | Slim agent surface |
-| `@khoralabs/agent-net-harness/pool` | Pool / inbox / network / observability |
-| `@khoralabs/agent-net-harness/swarm` | Budgeted multi-agent orchestration — see [`src/swarm/README.md`](src/swarm/README.md) |
+| `@khoralabs/agent-net` | Control plane: `startNetworkHarness`, agents, pool, turns, network events |
+| `@khoralabs/agent-net/agent` | Slim agent surface |
+| `@khoralabs/agent-net/pool` | Pool / inbox / network / observability |
+| `@khoralabs/agent-net/swarm` | Budgeted multi-agent orchestration — see [`src/swarm/README.md`](src/swarm/README.md) |
 
 Swarm is **not** re-exported from the root entrypoint. Agent rules for the import boundary live in [`AGENTS.md`](AGENTS.md).
 
 ## Target DX
 
 ```ts
-import { startNetworkHarness } from "@khoralabs/agent-net-harness";
+import { startNetworkHarness } from "@khoralabs/agent-net";
 
 const harness = await startNetworkHarness({
   dataDir,
@@ -78,7 +78,7 @@ The process that hosts the workflow worker must configure the world **before** r
 Install host observability with `installHarnessObservability`. Besides agent OTEL (`createAgentTelemetry`), provide `createMemoriesTelemetry` when **this process hosts** a memories stack:
 
 ```ts
-import { installHarnessObservability, getHarnessMemoriesTelemetry } from "@khoralabs/agent-net-harness";
+import { installHarnessObservability, getHarnessMemoriesTelemetry } from "@khoralabs/agent-net";
 import { createMemoriesOtelTelemetry } from "@khoralabs/memories-otel";
 import { createLocalSqliteServiceStack } from "@khoralabs/memories-service/storage/sqlite";
 import { trace, metrics } from "@opentelemetry/api";

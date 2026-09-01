@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import type { PoolInboxEvent } from "@khoralabs/agent-net-harness";
+import type { PoolInboxEvent } from "@khoralabs/agent-net";
 import { inboxHasPost } from "./match.ts";
 import { createInboxReactor } from "./reactor.ts";
 

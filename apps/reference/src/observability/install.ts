@@ -6,7 +6,7 @@ import {
   getCurrentAttribution,
   getNetworkSessionContext,
   installHarnessObservability,
-} from "@khoralabs/agent-net-harness";
+} from "@khoralabs/agent-net";
 import { createMemoriesOtelTelemetry } from "@khoralabs/memories-otel";
 import { metrics, trace } from "@opentelemetry/api";
 import type { Logger } from "pino";

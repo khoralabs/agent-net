@@ -1,4 +1,4 @@
-# AGENTS.md — `@khoralabs/agent-net-harness`
+# AGENTS.md — `@khoralabs/agent-net`
 
 Guidance for coding agents working in this package. Closest [`AGENTS.md`](https://agents.md) wins for nested paths; user chat overrides everything.
 
@@ -11,10 +11,10 @@ Guidance for coding agents working in this package. Closest [`AGENTS.md`](https:
 
 | Consumer import | Source |
 |-----------------|--------|
-| `@khoralabs/agent-net-harness` | `src/index.ts` |
-| `@khoralabs/agent-net-harness/agent` | `src/agent/index.ts` |
-| `@khoralabs/agent-net-harness/pool` | `src/pool/index.ts` |
-| `@khoralabs/agent-net-harness/swarm` | `src/swarm/index.ts` |
+| `@khoralabs/agent-net` | `src/index.ts` |
+| `@khoralabs/agent-net/agent` | `src/agent/index.ts` |
+| `@khoralabs/agent-net/pool` | `src/pool/index.ts` |
+| `@khoralabs/agent-net/swarm` | `src/swarm/index.ts` |
 
 **Do not** re-export swarm symbols from `src/index.ts` or other non-swarm entrypoints.
 
@@ -48,6 +48,6 @@ Leave setup/teardown, agent loops, and step helpers unexported unless intentiona
 ## Verify after structural edits
 
 ```bash
-bun run --filter @khoralabs/agent-net-harness typecheck
+bun run --filter @khoralabs/agent-net typecheck
 bun run swarm:test   # from agent-net repo root
 ```

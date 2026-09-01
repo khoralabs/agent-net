@@ -1,5 +1,5 @@
 /**
- * Build @khoralabs/agent-net-harness for Node consumers (Nitro workflows):
+ * Build @khoralabs/agent-net for Node consumers (Nitro workflows):
  * - JS: bun bundler (packages external — chat/relay/memories already ship dist)
  * - types: tsc --emitDeclarationOnly
  */

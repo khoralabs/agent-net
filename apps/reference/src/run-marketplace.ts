@@ -12,8 +12,8 @@ import {
   requireMemoriesBaseUrl,
   requireRelayBaseUrl,
   startNetworkHarness,
-} from "@khoralabs/agent-net-harness";
-import { createSqliteNetworkEventPersistencePlugin } from "@khoralabs/agent-net-harness/network-events/sqlite";
+} from "@khoralabs/agent-net";
+import { createSqliteNetworkEventPersistencePlugin } from "@khoralabs/agent-net/network-events/sqlite";
 
 import { buildMarketplaceConfig } from "./marketplace/config.ts";
 import { runMarketplacePipeline } from "./marketplace/pipeline.ts";

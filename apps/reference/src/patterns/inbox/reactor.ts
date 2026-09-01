@@ -1,4 +1,4 @@
-import type { PoolInboxEvent } from "@khoralabs/agent-net-harness";
+import type { PoolInboxEvent } from "@khoralabs/agent-net";
 
 import { inboxEventPostIds, inboxHasPost } from "./match.ts";
 

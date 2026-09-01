@@ -51,11 +51,11 @@
     "@libsql/client": "catalog:"
   },
   "scripts": {
-    "typecheck": "bun run --filter '@khoralabs/agent-net-harness' typecheck && bun run --filter '@khoralabs/agent-net-reference' typecheck",
+    "typecheck": "bun run --filter '@khoralabs/agent-net' typecheck && bun run --filter '@khoralabs/agent-net-reference' typecheck",
     "format": "biome check --write .",
     "format:check": "biome check --error-on-warnings .",
     "agent:setup": "bun run --filter @khoralabs/agent-net-reference agent:setup",
-    "agent:test": "bun run --filter @khoralabs/agent-net-harness test",
+    "agent:test": "bun run --filter @khoralabs/agent-net test",
     "test:with-sqlite": "bash scripts/test-with-homebrew-sqlite.sh",
     "reference:start": "bun run --filter @khoralabs/agent-net-reference start",
     "marketplace": "bun run --filter @khoralabs/agent-net-reference marketplace",
