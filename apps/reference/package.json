@@ -16,32 +16,32 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@khoralabs/agent-capabilities-otel": "^0.2.0",
+    "@khoralabs/agent-capabilities-otel": "catalog:",
     "@khoralabs/agent-net-harness": "workspace:*",
     "@khoralabs/agent-net-swarm": "workspace:*",
-    "@khoralabs/chat": "^0.1.11",
-    "@khoralabs/memories-node": "^0.8.0",
-    "@khoralabs/memories-otel": "^0.8.0",
-    "@khoralabs/memories-service": "^0.8.0",
+    "@khoralabs/chat": "catalog:",
+    "@khoralabs/memories-node": "catalog:",
+    "@khoralabs/memories-otel": "catalog:",
+    "@khoralabs/memories-service": "catalog:",
     "@khoralabs/observability": "workspace:*",
-    "@khoralabs/relay": "^0.1.1",
-    "@khoralabs/sqlite-crypto": "^0.1.0",
-    "@khoralabs/sqlite-migrate": "^0.1.0",
+    "@khoralabs/relay": "catalog:",
+    "@khoralabs/sqlite-crypto": "catalog:",
+    "@khoralabs/sqlite-migrate": "catalog:",
     "@opentelemetry/api": "^1.9.1",
     "@tursodatabase/serverless": "^0.2.0",
     "@workflow-worlds/turso": "^0.2.2",
-    "ai": "^7",
+    "ai": "catalog:",
     "ajv": "^8",
     "pino": "^9.6.0",
     "sqlite-vec": "^0.1.10-alpha.4",
-    "workflow": "^4.5.0",
-    "zod": "^4"
+    "workflow": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "typescript": "^5"
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "catalog:"
   }
 }

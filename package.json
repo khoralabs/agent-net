@@ -3,23 +3,52 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "packages/*",
-    "apps/*",
-    "vendor/libs/packages/*/**"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/*",
+      "apps/*",
+      "vendor/libs/packages/*/**"
+    ],
+    "catalog": {
+      "@khoralabs/agent-capabilities": "^0.2.0",
+      "@khoralabs/agent-capabilities-ai-sdk": "^0.2.0",
+      "@khoralabs/agent-capabilities-otel": "^0.2.0",
+      "@khoralabs/chat": "^0.1.11",
+      "@khoralabs/did-key-identity": "^0.1.0",
+      "@khoralabs/khora-client": "0.1.7",
+      "@khoralabs/memories-node": "0.8.0",
+      "@khoralabs/memories-service": "0.8.0",
+      "@khoralabs/memories-otel": "0.8.0",
+      "@khoralabs/memories-agents": "0.8.0",
+      "@khoralabs/memories-react-graph": "0.8.0",
+      "@khoralabs/memories-spec": "0.8.0",
+      "@khoralabs/obp-core": "0.2.1",
+      "@khoralabs/obp-nbc": "0.2.1",
+      "@khoralabs/relay": "^0.1.1",
+      "@khoralabs/sourcemaps": "^0.1.0",
+      "@khoralabs/sqlite-crypto": "^0.1.0",
+      "@khoralabs/sqlite-migrate": "^0.1.0",
+      "@khoralabs/vellum-client": "0.3.3",
+      "@libsql/client": "0.17.4",
+      "@types/bun": "latest",
+      "ai": "^7.0.9",
+      "typescript": "^5",
+      "workflow": "^4.5.0",
+      "zod": "^4"
+    }
+  },
   "overrides": {
-    "@khoralabs/khora-client": "0.1.7",
-    "@khoralabs/memories-node": "0.8.0",
-    "@khoralabs/memories-service": "0.8.0",
-    "@khoralabs/memories-otel": "0.8.0",
-    "@khoralabs/memories-agents": "0.8.0",
-    "@khoralabs/memories-react-graph": "0.8.0",
-    "@khoralabs/memories-spec": "0.8.0",
-    "@khoralabs/obp-core": "0.2.1",
-    "@khoralabs/obp-nbc": "0.2.1",
-    "@khoralabs/vellum-client": "0.3.3",
-    "@libsql/client": "0.17.4"
+    "@khoralabs/khora-client": "catalog:",
+    "@khoralabs/memories-node": "catalog:",
+    "@khoralabs/memories-service": "catalog:",
+    "@khoralabs/memories-otel": "catalog:",
+    "@khoralabs/memories-agents": "catalog:",
+    "@khoralabs/memories-react-graph": "catalog:",
+    "@khoralabs/memories-spec": "catalog:",
+    "@khoralabs/obp-core": "catalog:",
+    "@khoralabs/obp-nbc": "catalog:",
+    "@khoralabs/vellum-client": "catalog:",
+    "@libsql/client": "catalog:"
   },
   "scripts": {
     "typecheck": "bun run --filter '@khoralabs/agent-net-harness' typecheck && bun run --filter '@khoralabs/agent-net-swarm' typecheck && bun run --filter '@khoralabs/agent-net-reference' typecheck",
@@ -41,13 +70,13 @@
     "review": "agent-review run --scope staged --include-workstream"
   },
   "dependencies": {
-    "@khoralabs/memories-node": "^0.8.0"
+    "@khoralabs/memories-node": "catalog:"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.5",
     "@khoralabs/agent-review": "0.2.2",
-    "@types/bun": "latest",
+    "@types/bun": "catalog:",
     "husky": "^9.1.7",
-    "typescript": "^5.9.3"
+    "typescript": "catalog:"
   }
 }

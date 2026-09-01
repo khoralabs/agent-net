@@ -138,32 +138,32 @@
     "test": "bun test src"
   },
   "dependencies": {
-    "@khoralabs/agent-capabilities": "^0.2.0",
-    "@khoralabs/agent-capabilities-ai-sdk": "^0.2.0",
-    "@khoralabs/chat": "^0.1.11",
-    "@khoralabs/did-key-identity": "^0.1.0",
-    "@khoralabs/khora-client": "^0.1.7",
-    "@khoralabs/memories-node": "^0.8.0",
-    "@khoralabs/memories-service": "^0.8.0",
-    "@khoralabs/obp-core": "^0.2.1",
-    "@khoralabs/obp-nbc": "^0.2.1",
-    "@khoralabs/relay": "^0.1.1",
-    "@khoralabs/sourcemaps": "^0.1.0",
-    "@khoralabs/sqlite-crypto": "^0.1.0",
-    "@khoralabs/vellum-client": "^0.3.3",
-    "@libsql/client": "^0.17.4",
+    "@khoralabs/agent-capabilities": "catalog:",
+    "@khoralabs/agent-capabilities-ai-sdk": "catalog:",
+    "@khoralabs/chat": "catalog:",
+    "@khoralabs/did-key-identity": "catalog:",
+    "@khoralabs/khora-client": "catalog:",
+    "@khoralabs/memories-node": "catalog:",
+    "@khoralabs/memories-service": "catalog:",
+    "@khoralabs/obp-core": "catalog:",
+    "@khoralabs/obp-nbc": "catalog:",
+    "@khoralabs/relay": "catalog:",
+    "@khoralabs/sourcemaps": "catalog:",
+    "@khoralabs/sqlite-crypto": "catalog:",
+    "@khoralabs/vellum-client": "catalog:",
+    "@libsql/client": "catalog:",
     "@noble/ed25519": "^3.1.0",
     "@tursodatabase/serverless": "^1.3.2",
-    "ai": "^7.0.9",
+    "ai": "catalog:",
     "unstorage": "^1.17.5",
-    "workflow": "^4.5.0",
-    "zod": "^4"
+    "workflow": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "typescript": "^5"
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "catalog:"
   }
 }
