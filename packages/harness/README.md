@@ -2,6 +2,17 @@
 
 Custodial network harness: agent pool, per-agent social fabric + memories, signed chat, tools, and durable turn workflows.
 
+## Entrypoints
+
+| Import | Role |
+|--------|------|
+| `@khoralabs/agent-net-harness` | Control plane: `startNetworkHarness`, agents, pool, turns, network events |
+| `@khoralabs/agent-net-harness/agent` | Slim agent surface |
+| `@khoralabs/agent-net-harness/pool` | Pool / inbox / network / observability |
+| `@khoralabs/agent-net-harness/swarm` | Budgeted multi-agent orchestration — see [`src/swarm/README.md`](src/swarm/README.md) |
+
+Swarm is **not** re-exported from the root entrypoint. Agent rules for the import boundary live in [`AGENTS.md`](AGENTS.md).
+
 ## Target DX
 
 ```ts
@@ -54,6 +65,7 @@ Spawning binds the agent DID on the shared inbox socket; `harness.removeAgent` u
 | `agent/social/` | Fabric + nested `message` / `negotiate` |
 | `agent/memories/` | Bound DB helpers, tools, integrate wire |
 | `agent/turn/` | Capability agents, toolkits, workflows |
+| `swarm/` | Budgeted orchestration on top of the control plane |
 
 ## Workflow world
 
