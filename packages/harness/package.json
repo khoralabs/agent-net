@@ -15,125 +15,125 @@
     "access": "public"
   },
   "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.ts",
   "module": "./dist/index.js",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
       "bun": "./src/index.ts",
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./agent": {
-      "types": "./dist/agent/index.d.ts",
+      "types": "./src/agent/index.ts",
       "bun": "./src/agent/index.ts",
       "import": "./dist/agent/index.js",
       "default": "./dist/agent/index.js"
     },
     "./pool": {
-      "types": "./dist/pool/index.d.ts",
+      "types": "./src/pool/index.ts",
       "bun": "./src/pool/index.ts",
       "import": "./dist/pool/index.js",
       "default": "./dist/pool/index.js"
     },
     "./swarm": {
-      "types": "./dist/swarm/index.d.ts",
+      "types": "./src/swarm/index.ts",
       "bun": "./src/swarm/index.ts",
       "import": "./dist/swarm/index.js",
       "default": "./dist/swarm/index.js"
     },
     "./agent-workflow-types": {
-      "types": "./dist/agent/turn/types.d.ts",
+      "types": "./src/agent/turn/types.ts",
       "bun": "./src/agent/turn/types.ts",
       "import": "./dist/agent/turn/types.js",
       "default": "./dist/agent/turn/types.js"
     },
     "./agent-response-run": {
-      "types": "./dist/agent/turn/workflows/agent-response-run.d.ts",
+      "types": "./src/agent/turn/workflows/agent-response-run.ts",
       "bun": "./src/agent/turn/workflows/agent-response-run.ts",
       "import": "./dist/agent/turn/workflows/agent-response-run.js",
       "default": "./dist/agent/turn/workflows/agent-response-run.js"
     },
     "./classify-response-plan-run": {
-      "types": "./dist/agent/turn/workflows/classify-response-plan-run.d.ts",
+      "types": "./src/agent/turn/workflows/classify-response-plan-run.ts",
       "bun": "./src/agent/turn/workflows/classify-response-plan-run.ts",
       "import": "./dist/agent/turn/workflows/classify-response-plan-run.js",
       "default": "./dist/agent/turn/workflows/classify-response-plan-run.js"
     },
     "./response-plan": {
-      "types": "./dist/agent/turn/response-plan.d.ts",
+      "types": "./src/agent/turn/response-plan.ts",
       "bun": "./src/agent/turn/response-plan.ts",
       "import": "./dist/agent/turn/response-plan.js",
       "default": "./dist/agent/turn/response-plan.js"
     },
     "./gateway-model-capabilities": {
-      "types": "./dist/agent/turn/gateway-model-capabilities.d.ts",
+      "types": "./src/agent/turn/gateway-model-capabilities.ts",
       "bun": "./src/agent/turn/gateway-model-capabilities.ts",
       "import": "./dist/agent/turn/gateway-model-capabilities.js",
       "default": "./dist/agent/turn/gateway-model-capabilities.js"
     },
     "./workflow-resilience": {
-      "types": "./dist/agent/turn/workflow-resilience.d.ts",
+      "types": "./src/agent/turn/workflow-resilience.ts",
       "bun": "./src/agent/turn/workflow-resilience.ts",
       "import": "./dist/agent/turn/workflow-resilience.js",
       "default": "./dist/agent/turn/workflow-resilience.js"
     },
     "./integrate/write-scope": {
-      "types": "./dist/agent/memories/integrate/write-scope.d.ts",
+      "types": "./src/agent/memories/integrate/write-scope.ts",
       "bun": "./src/agent/memories/integrate/write-scope.ts",
       "import": "./dist/agent/memories/integrate/write-scope.js",
       "default": "./dist/agent/memories/integrate/write-scope.js"
     },
     "./integrate/memory-event": {
-      "types": "./dist/agent/memories/integrate/memory-event.d.ts",
+      "types": "./src/agent/memories/integrate/memory-event.ts",
       "bun": "./src/agent/memories/integrate/memory-event.ts",
       "import": "./dist/agent/memories/integrate/memory-event.js",
       "default": "./dist/agent/memories/integrate/memory-event.js"
     },
     "./step-context": {
-      "types": "./dist/agent/turn/step-context.d.ts",
+      "types": "./src/agent/turn/step-context.ts",
       "bun": "./src/agent/turn/step-context.ts",
       "import": "./dist/agent/turn/step-context.js",
       "default": "./dist/agent/turn/step-context.js"
     },
     "./run-harness-agent-step": {
-      "types": "./dist/agent/turn/run-harness-agent-step.d.ts",
+      "types": "./src/agent/turn/run-harness-agent-step.ts",
       "bun": "./src/agent/turn/run-harness-agent-step.ts",
       "import": "./dist/agent/turn/run-harness-agent-step.js",
       "default": "./dist/agent/turn/run-harness-agent-step.js"
     },
     "./nbc-run-model-turn-run": {
-      "types": "./dist/agent/turn/workflows/nbc-run-model-turn-run.d.ts",
+      "types": "./src/agent/turn/workflows/nbc-run-model-turn-run.ts",
       "bun": "./src/agent/turn/workflows/nbc-run-model-turn-run.ts",
       "import": "./dist/agent/turn/workflows/nbc-run-model-turn-run.js",
       "default": "./dist/agent/turn/workflows/nbc-run-model-turn-run.js"
     },
     "./nbc-prepare-turn-run": {
-      "types": "./dist/agent/turn/workflows/nbc-prepare-turn-run.d.ts",
+      "types": "./src/agent/turn/workflows/nbc-prepare-turn-run.ts",
       "bun": "./src/agent/turn/workflows/nbc-prepare-turn-run.ts",
       "import": "./dist/agent/turn/workflows/nbc-prepare-turn-run.js",
       "default": "./dist/agent/turn/workflows/nbc-prepare-turn-run.js"
     },
     "./attribution-digest": {
-      "types": "./dist/pool/observability/attribution-digest.d.ts",
+      "types": "./src/pool/observability/attribution-digest.ts",
       "bun": "./src/pool/observability/attribution-digest.ts",
       "import": "./dist/pool/observability/attribution-digest.js",
       "default": "./dist/pool/observability/attribution-digest.js"
     },
     "./network-events": {
-      "types": "./dist/pool/network/persistence/core/index.d.ts",
+      "types": "./src/pool/network/persistence/core/index.ts",
       "bun": "./src/pool/network/persistence/core/index.ts",
       "import": "./dist/pool/network/persistence/core/index.js",
       "default": "./dist/pool/network/persistence/core/index.js"
     },
     "./network-events/sqlite": {
-      "types": "./dist/pool/network/persistence/sqlite/index.d.ts",
+      "types": "./src/pool/network/persistence/sqlite/index.ts",
       "bun": "./src/pool/network/persistence/sqlite/index.ts",
       "import": "./dist/pool/network/persistence/sqlite/index.js",
       "default": "./dist/pool/network/persistence/sqlite/index.js"
     },
     "./structured-output": {
-      "types": "./dist/agent/turn/structured-output.d.ts",
+      "types": "./src/agent/turn/structured-output.ts",
       "bun": "./src/agent/turn/structured-output.ts",
       "import": "./dist/agent/turn/structured-output.js",
       "default": "./dist/agent/turn/structured-output.js"
