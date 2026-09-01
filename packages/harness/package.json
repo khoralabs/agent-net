@@ -103,6 +103,18 @@
       "import": "./src/pool/observability/attribution-digest.ts",
       "default": "./src/pool/observability/attribution-digest.ts"
     },
+    "./network-events": {
+      "types": "./src/pool/network/persistence/core/index.ts",
+      "bun": "./src/pool/network/persistence/core/index.ts",
+      "import": "./src/pool/network/persistence/core/index.ts",
+      "default": "./src/pool/network/persistence/core/index.ts"
+    },
+    "./network-events/sqlite": {
+      "types": "./src/pool/network/persistence/sqlite/index.ts",
+      "bun": "./src/pool/network/persistence/sqlite/index.ts",
+      "import": "./src/pool/network/persistence/sqlite/index.ts",
+      "default": "./src/pool/network/persistence/sqlite/index.ts"
+    },
     "./structured-output": {
       "types": "./src/agent/turn/structured-output.ts",
       "bun": "./src/agent/turn/structured-output.ts",
@@ -139,6 +151,7 @@
     "@khoralabs/sourcemaps": "^0.1.0",
     "@khoralabs/sqlite-crypto": "^0.1.0",
     "@khoralabs/vellum-client": "^0.3.1",
+    "@libsql/client": "^0.17.4",
     "@noble/ed25519": "^3.1.0",
     "@tursodatabase/serverless": "^1.3.2",
     "ai": "^7.0.9",
