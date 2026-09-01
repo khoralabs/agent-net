@@ -52,11 +52,4 @@ The marketplace demo ends at **mutual interest**: sellers engage/skip on the RFQ
 
 ## Observability
 
-Set `OTEL_EXPORTER_OTLP_ENDPOINT` (and optional `LOG_LEVEL`) to export traces/metrics.
-
-| Process | What emits |
-|---------|------------|
-| Orchestrator (`reference:start`) | Memories database lifecycle + merge/search/delete via `@khoralabs/memories-otel` on the local SQLite stack |
-| Marketplace / swarm | Agent session/tool OTEL via `installReferenceObservability` |
-
-The orchestrator calls `installReferenceObservability` then passes `getHarnessMemoriesTelemetry()` into `startMemoriesService`. CLIs against `--memories-url` observe memory systems through that host’s OTLP export, not through client-side HTTP wrappers.
+`installReferenceObservability` wires pino (optional `LOG_LEVEL`, optional session JSONL dual-write) into the harness host surface. Agent and memories telemetry use harness noops — the reference app does not export OTLP.

@@ -16,17 +16,13 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@khoralabs/agent-capabilities-otel": "catalog:",
     "@khoralabs/agent-net": "workspace:*",
     "@khoralabs/chat": "catalog:",
     "@khoralabs/memories-node": "catalog:",
-    "@khoralabs/memories-otel": "catalog:",
     "@khoralabs/memories-service": "catalog:",
-    "@khoralabs/observability": "workspace:*",
     "@khoralabs/relay": "catalog:",
     "@khoralabs/sqlite-crypto": "catalog:",
     "@khoralabs/sqlite-migrate": "catalog:",
-    "@opentelemetry/api": "^1.9.1",
     "@tursodatabase/serverless": "^0.2.0",
     "@workflow-worlds/turso": "^0.2.2",
     "ai": "catalog:",

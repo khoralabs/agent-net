@@ -98,7 +98,6 @@ async function main(): Promise<void> {
   bindNetworkSessionContext({ sessionId: config.sessionId });
   installReferenceObservability({
     serviceName: "network-harness-swarm",
-    sessionId: config.sessionId,
     sessionJsonlPath: networkEvents.sessionJsonlPath(config.sessionId),
   });
   const logger = getHarnessObservability().createLogger({

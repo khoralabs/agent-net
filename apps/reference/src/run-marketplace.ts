@@ -107,7 +107,6 @@ async function main(): Promise<void> {
   bindNetworkSessionContext({ sessionId: config.sessionId });
   installReferenceObservability({
     serviceName: "network-harness-marketplace",
-    sessionId: config.sessionId,
     sessionJsonlPath: networkEvents.sessionJsonlPath(config.sessionId),
   });
   getHarnessObservability().createLogger({
