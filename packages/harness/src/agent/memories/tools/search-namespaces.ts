@@ -1,12 +1,12 @@
 import { tool } from "@khoralabs/agent-capabilities";
+import {
+  type EnrichedNamespaceSearchResult,
+  runStandardNamespaceSearch,
+} from "@khoralabs/memories-node/helpers/agent";
 import { z } from "zod";
 import { toolEnabled } from "../../turn/tools/_helpers/disable-policies.ts";
 import { hasMemoriesClient } from "../../turn/tools/policies.ts";
 import type { HarnessToolkitEnv } from "../../turn/tools/types.ts";
-import {
-  type EnrichedNamespaceSearchResult,
-  runStandardNamespaceSearch,
-} from "./_helpers/memory-search.ts";
 import { touchRecentNamespaces } from "./_helpers/recent-namespaces.ts";
 
 export const searchNamespacesTool = tool<

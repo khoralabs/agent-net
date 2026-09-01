@@ -1,10 +1,10 @@
-import type { ToolSet } from "ai";
-import { jsonSchema, tool } from "ai";
-import { resolveHarnessEmbeddingModel } from "../../memories/tools/_helpers/embedding-model.ts";
+import { resolveAgentEmbeddingModel } from "@khoralabs/memories-node/helpers/agent";
 import {
   agentMemoriesDatabase,
-  createHarnessMemoriesClient,
-} from "../../memories/tools/_helpers/memories-client.ts";
+  createAgentMemoriesClient,
+} from "@khoralabs/memories-service/client/agent";
+import type { ToolSet } from "ai";
+import { jsonSchema, tool } from "ai";
 import { getInstalledMemoriesOntology } from "../../memories/tools/_helpers/memories-ontology-install.ts";
 import { createNbcMeshClient } from "../../social/negotiate/nbc/nbc-mesh-client.ts";
 import { nbcTurnContext } from "../../social/negotiate/nbc/nbc-turn-context.ts";
@@ -144,7 +144,7 @@ export async function runPrepareNbcTurn(
   if (memoriesAdminToken === undefined || memoriesAdminToken.length === 0) {
     throw new Error("MEMORIES_SERVICE_ADMIN_TOKEN is required");
   }
-  const memoriesClient = await createHarnessMemoriesClient({
+  const memoriesClient = await createAgentMemoriesClient({
     baseUrl: memoriesBaseUrl,
     database: agentMemoriesDatabase(params.asDid),
     ontology,
@@ -188,7 +188,7 @@ export async function runPrepareNbcTurn(
       runId,
       sessionId: runId,
       memoriesClient,
-      embeddingModel: resolveHarnessEmbeddingModel(),
+      embeddingModel: resolveAgentEmbeddingModel(),
       disableToolkits: [...DISABLED_TOOLKITS],
       captureTools: true,
       workflowParams,
@@ -277,7 +277,7 @@ export async function executeNbcTool(input: NbcToolExecuteCtx): Promise<unknown>
   if (memoriesAdminToken === undefined || memoriesAdminToken.length === 0) {
     throw new Error("MEMORIES_SERVICE_ADMIN_TOKEN is required");
   }
-  const memoriesClient = await createHarnessMemoriesClient({
+  const memoriesClient = await createAgentMemoriesClient({
     baseUrl: memoriesBaseUrl,
     database: agentMemoriesDatabase(input.asDid),
     ontology,
@@ -312,7 +312,7 @@ export async function executeNbcTool(input: NbcToolExecuteCtx): Promise<unknown>
       runId: input.runId,
       sessionId: input.runId,
       memoriesClient,
-      embeddingModel: resolveHarnessEmbeddingModel(),
+      embeddingModel: resolveAgentEmbeddingModel(),
       disableToolkits: [...DISABLED_TOOLKITS],
       captureTools: true,
       workflowParams,

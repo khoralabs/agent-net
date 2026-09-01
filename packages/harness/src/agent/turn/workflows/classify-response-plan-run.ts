@@ -1,9 +1,9 @@
 import { captureAgentSnapshotEnvelope } from "@khoralabs/agent-capabilities";
+import { resolveAgentEmbeddingModel } from "@khoralabs/memories-node/helpers/agent";
+import { minimalAgentMemoriesOntology } from "@khoralabs/memories-service/client/agent";
 import { generateText, Output } from "ai";
 import { discoverSkillsFromMemories } from "../../memories/skills/_helpers/skills.ts";
-import { resolveHarnessEmbeddingModel } from "../../memories/tools/_helpers/embedding-model.ts";
 import { getInstalledMemoriesOntology } from "../../memories/tools/_helpers/memories-ontology-install.ts";
-import { minimalHarnessMemoriesOntology } from "../../memories/tools/_helpers/minimal-ontology.ts";
 import { getCapabilityRegistry, resolveGatewayModel } from "../agent-runtime.ts";
 import { defineResponsePlannerAgent } from "../capability-agents/response-planner.ts";
 import type { ResponseModelCapabilities } from "../gateway-model-capabilities.ts";
@@ -20,7 +20,7 @@ import {
   responsePlanOptionsFromEnv,
 } from "../response-plan.ts";
 import {
-  createHarnessMemoriesClientForAgent,
+  createAgentMemoriesClientForAgent,
   resolveMemoriesServiceAdminToken,
   resolveMemoriesServiceBaseUrl,
 } from "../tools/_helpers/toolkit-env.ts";
@@ -81,7 +81,7 @@ export async function loadPlannerSkillCatalog(agentDid: string): Promise<SkillCa
     const ontology =
       getInstalledMemoriesOntology() ??
       (memoriesBaseUrl !== undefined && memoriesAdminToken !== undefined
-        ? minimalHarnessMemoriesOntology
+        ? minimalAgentMemoriesOntology
         : undefined);
     if (
       memoriesBaseUrl === undefined ||
@@ -90,13 +90,13 @@ export async function loadPlannerSkillCatalog(agentDid: string): Promise<SkillCa
     ) {
       return [];
     }
-    const memoriesClient = await createHarnessMemoriesClientForAgent({
+    const memoriesClient = await createAgentMemoriesClientForAgent({
       baseUrl: memoriesBaseUrl,
       agentDid,
       ontology,
       adminToken: memoriesAdminToken,
     });
-    const embeddingModel = resolveHarnessEmbeddingModel();
+    const embeddingModel = resolveAgentEmbeddingModel();
     const skills = await discoverSkillsFromMemories(memoriesClient, {
       embeddingModel,
     });

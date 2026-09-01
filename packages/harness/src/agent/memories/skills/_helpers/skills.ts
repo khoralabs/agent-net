@@ -1,9 +1,9 @@
 import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
-import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import {
   MEMORY_SEARCH_SCOPE_EXACT,
   runStandardHybridMemorySearch,
-} from "../../tools/_helpers/memory-search.ts";
+} from "@khoralabs/memories-node/helpers/agent";
+import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import { loadMemoryTextByKey } from "../../tools/_helpers/memory-text.ts";
 
 export const SKILLS_NAMESPACE = "_skills_";

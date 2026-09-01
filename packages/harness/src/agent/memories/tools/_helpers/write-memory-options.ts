@@ -1,6 +1,8 @@
+import type { WriteMemoryNodeOptions } from "@khoralabs/memories-node/helpers/agent";
 import type { HarnessToolkitEnv } from "../../../turn/tools/types.ts";
 import { requireInstalledMemoriesOntology } from "./memories-ontology-install.ts";
-import type { WriteMemoryNodeOptions } from "./memory-write.ts";
+
+export type { WriteMemoryNodeOptions };
 
 /** Resolve embedding + ontology (+ optional integrate enqueue) for writeMemoryNode. */
 export function resolveWriteMemoryOptions(

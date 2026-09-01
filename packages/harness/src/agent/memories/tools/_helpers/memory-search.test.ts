@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import type { SearchOutput, SearchParams } from "@khoralabs/memories-node";
-import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import {
   EMBEDDING_MODEL_REQUIRED_MESSAGE,
   resolveMemoriesSearchAsOf,
   runStandardHybridMemorySearch,
-} from "./memory-search.ts";
+} from "@khoralabs/memories-node/helpers/agent";
+import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import { createTestEmbeddingModel } from "./test-embedding.ts";
 
 function mockClient(): RemoteMemoriesClientAsync {

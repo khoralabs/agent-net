@@ -9,12 +9,12 @@
     "vendor/libs/packages/*/**"
   ],
   "overrides": {
-    "@khoralabs/memories-node": "0.7.6",
-    "@khoralabs/memories-service": "0.7.6",
-    "@khoralabs/memories-otel": "0.7.6",
-    "@khoralabs/memories-agents": "0.7.6",
-    "@khoralabs/memories-react-graph": "0.7.6",
-    "@khoralabs/memories-spec": "0.7.6",
+    "@khoralabs/memories-node": "0.8.0",
+    "@khoralabs/memories-service": "0.8.0",
+    "@khoralabs/memories-otel": "0.8.0",
+    "@khoralabs/memories-agents": "0.8.0",
+    "@khoralabs/memories-react-graph": "0.8.0",
+    "@khoralabs/memories-spec": "0.8.0",
     "@libsql/client": "0.17.4"
   },
   "scripts": {
@@ -37,7 +37,7 @@
     "review": "agent-review run --scope staged --include-workstream"
   },
   "dependencies": {
-    "@khoralabs/memories-node": "^0.7.6"
+    "@khoralabs/memories-node": "^0.8.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.5",

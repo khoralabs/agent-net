@@ -1,10 +1,9 @@
 import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
-
+import { minimalAgentMemoriesOntology } from "@khoralabs/memories-service/client/agent";
 import {
   installMemoriesOntology,
   resetMemoriesOntologyForTests,
 } from "./memories-ontology-install.ts";
-import { minimalHarnessMemoriesOntology } from "./minimal-ontology.ts";
 
 /** Deterministic embedding model for unit tests (no network). */
 export function createTestEmbeddingModel(): EmbeddingModel {
@@ -28,7 +27,7 @@ export function createTestEmbeddingModel(): EmbeddingModel {
 }
 
 export function installTestMemoriesOntology(): void {
-  installMemoriesOntology(minimalHarnessMemoriesOntology);
+  installMemoriesOntology(minimalAgentMemoriesOntology);
 }
 
 export function resetTestMemoriesOntology(): void {

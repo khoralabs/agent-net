@@ -1,14 +1,14 @@
 import { tool } from "@khoralabs/agent-capabilities";
+import { writeMemoryNode } from "@khoralabs/memories-node/helpers/agent";
+import {
+  type AgentMemoriesOntology,
+  minimalAgentMemoriesOntology,
+  resolveAgentMemoriesOntology,
+} from "@khoralabs/memories-service/client/agent";
 import { z } from "zod";
 import { toolEnabled } from "../../turn/tools/_helpers/disable-policies.ts";
 import { hasMemoriesClient } from "../../turn/tools/policies.ts";
 import type { HarnessToolkitEnv } from "../../turn/tools/types.ts";
-import {
-  type HarnessMemoriesOntology,
-  resolveHarnessMemoriesOntology,
-} from "../tools/_helpers/memories-client.ts";
-import { writeMemoryNode } from "../tools/_helpers/memory-write.ts";
-import { minimalHarnessMemoriesOntology } from "../tools/_helpers/minimal-ontology.ts";
 import { memoryLinkSchema, parseMemoryLinkRow } from "../tools/_helpers/ontology-tool-schema.ts";
 import { touchRecentNamespaces } from "../tools/_helpers/recent-namespaces.ts";
 import { resolveWriteMemoryOptions } from "../tools/_helpers/write-memory-options.ts";
@@ -24,8 +24,8 @@ export type WriteSkillResult =
   | { memoryIds: string[]; key: string; name: string; namespace: string }
   | { memoryIds: []; error: string };
 
-export function createWriteSkillTool(ontology: HarnessMemoriesOntology) {
-  const resolved = resolveHarnessMemoriesOntology(ontology);
+export function createWriteSkillTool(ontology: AgentMemoriesOntology) {
+  const resolved = resolveAgentMemoriesOntology(ontology);
   const zLink = memoryLinkSchema(resolved, { namespaceOptional: true });
 
   return tool<
@@ -119,4 +119,4 @@ export function createWriteSkillTool(ontology: HarnessMemoriesOntology) {
   });
 }
 
-export const writeSkillTool = createWriteSkillTool(minimalHarnessMemoriesOntology);
+export const writeSkillTool = createWriteSkillTool(minimalAgentMemoriesOntology);

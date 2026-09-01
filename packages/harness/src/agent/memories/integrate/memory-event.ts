@@ -83,7 +83,7 @@ function parseOptionalObject(value: unknown): Record<string, unknown> | undefine
   return value as Record<string, unknown>;
 }
 
-function parseFeatures(raw: unknown, legacyText?: string): IntegrateMemoryFeatures {
+function parseFeatures(raw: unknown): IntegrateMemoryFeatures {
   if (raw !== null && typeof raw === "object" && !Array.isArray(raw)) {
     const f = raw as Record<string, unknown>;
     const lexical = Array.isArray(f.lexical)
@@ -120,11 +120,6 @@ function parseFeatures(raw: unknown, legacyText?: string): IntegrateMemoryFeatur
       vector,
       ...(embeddingModel !== undefined ? { embeddingModel } : {}),
     };
-  }
-
-  // Legacy: text-only events (pre-features). Vector empty — caller/workflow embeds.
-  if (legacyText !== undefined && legacyText.trim().length > 0) {
-    return { lexical: [legacyText.trim()], vector: [] };
   }
 
   throw new Error("features is required");
@@ -170,13 +165,11 @@ export function parseIntegrateMemoryEvent(body: unknown): IntegrateMemoryEvent {
   if (kind === "memory" && memoryKeyRaw.length === 0) {
     throw new Error('memoryKey is required when kind is "memory"');
   }
-  const legacyText =
-    typeof raw.text === "string" && raw.text.trim().length > 0 ? raw.text.trim() : undefined;
-  const features = parseFeatures(raw.features, legacyText);
+  const features = parseFeatures(raw.features);
   const instructions = typeof raw.instructions === "string" ? raw.instructions.trim() : "";
-  // Accept legacy `contextRefs` as memories-only refs when present.
-  const memoriesContextRefs = (parseOptionalObject(raw.memoriesContextRefs) ??
-    parseOptionalObject(raw.contextRefs)) as MemoriesContextRefs | undefined;
+  const memoriesContextRefs = parseOptionalObject(raw.memoriesContextRefs) as
+    | MemoriesContextRefs
+    | undefined;
   const contextSourceWire = parseOptionalObject(raw.contextSourceWire) as
     | ResolvedSourceWire
     | undefined;

@@ -29,11 +29,9 @@ export async function runAgentResponseStep(
   }
 
   const session = requireNetworkSession(sessionId);
-  const { resolveHarnessEmbeddingModel } = await import(
-    "../../memories/tools/_helpers/embedding-model.ts"
-  );
+  const { resolveAgentEmbeddingModel } = await import("@khoralabs/memories-node/helpers/agent");
   const networkDeps = await session.resolveAgentWorkflowDeps(params.agent.actingFor.id);
-  const embeddingModel = resolveHarnessEmbeddingModel();
+  const embeddingModel = resolveAgentEmbeddingModel();
   if (networkDeps.memoriesClient !== undefined && embeddingModel === undefined) {
     throw new Error(
       "AI_GATEWAY_API_KEY is required for agent-response memory search (set it on this service's env)",

@@ -1,13 +1,13 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import type { MemorySearchHit } from "@khoralabs/memories-node/helpers";
+import {
+  MEMORY_SEARCH_SCOPE_EXACT,
+  runStandardHybridMemorySearch,
+} from "@khoralabs/memories-node/helpers/agent";
 import { z } from "zod";
 import { toolEnabled } from "../../turn/tools/_helpers/disable-policies.ts";
 import { hasMemoriesClient } from "../../turn/tools/policies.ts";
 import type { HarnessToolkitEnv } from "../../turn/tools/types.ts";
-import {
-  MEMORY_SEARCH_SCOPE_EXACT,
-  runStandardHybridMemorySearch,
-} from "../tools/_helpers/memory-search.ts";
 import { touchRecentNamespaces } from "../tools/_helpers/recent-namespaces.ts";
 import { SKILLS_NAMESPACE } from "./_helpers/skills.ts";
 

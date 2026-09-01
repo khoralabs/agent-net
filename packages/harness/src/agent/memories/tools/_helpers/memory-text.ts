@@ -1,9 +1,8 @@
-import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
-
 import {
   createRemoteSourceMapContentStore,
   MEMORY_TEXT_SOURCE_PREFIX,
-} from "./source-map-content-store.ts";
+} from "@khoralabs/memories-node/helpers/agent";
+import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 
 /** Max `text:N` chunks to assemble when reading a logical memory. */
 const MAX_TEXT_CHUNKS = 64;

@@ -13,15 +13,15 @@ import {
   type RemoteMemoriesClientAsync,
   storedOntologyFromDefinition,
 } from "@khoralabs/memories-service/client";
-import type { AgentHandle } from "../../agent/handle.ts";
 import {
+  type AgentMemoriesOntology,
   agentMemoriesDatabase,
-  createDeferredHarnessMemoriesClient,
-  createHarnessMemoriesClient,
-  type HarnessMemoriesOntology,
-  harnessMemoriesFetch,
-  resolveHarnessMemoriesOntology,
-} from "../../agent/memories/tools/_helpers/memories-client.ts";
+  createAgentMemoriesClient,
+  createDeferredAgentMemoriesClient,
+  memoriesServiceFetch,
+  resolveAgentMemoriesOntology,
+} from "@khoralabs/memories-service/client/agent";
+import type { AgentHandle } from "../../agent/handle.ts";
 import { createBoundAgentMemoriesClient } from "../../agent/memories-types.ts";
 import {
   type AgentChatClient,
@@ -196,14 +196,14 @@ export type NetworkHarnessHandle = NetworkHarnessCore & NetworkHarnessAgentApi;
 function bindAgentServices(
   harness: NetworkHarnessCore,
   agent: AgentHandle,
-  ontology: HarnessMemoriesOntology,
+  ontology: AgentMemoriesOntology,
 ): AgentHandle {
   const database: MemoriesDatabaseId = { kind: "account", ownerKey: agent.did };
   const memories = createBoundAgentMemoriesClient({
     database,
     ontology,
     serviceClient: harness.memoriesClient,
-    client: createDeferredHarnessMemoriesClient({
+    client: createDeferredAgentMemoriesClient({
       baseUrl: harness.memoriesBaseUrl,
       database,
       ontology,
@@ -225,7 +225,7 @@ export async function spawnWithMemories(
   harness: NetworkHarnessCore,
   opts: SpawnWithMemoriesOptions,
 ): Promise<AgentHandle> {
-  const ontology: HarnessMemoriesOntology = resolveHarnessMemoriesOntology(opts.ontology);
+  const ontology: AgentMemoriesOntology = resolveAgentMemoriesOntology(opts.ontology);
   let capturedHandle: AgentHandle | undefined;
 
   const did = await harness.pool.spawn(
@@ -262,7 +262,7 @@ function createHarnessAgentApi(
 
     async get(did, getOpts) {
       const agent = await harness.pool.focus(did);
-      const ontology: HarnessMemoriesOntology = resolveHarnessMemoriesOntology(getOpts.ontology);
+      const ontology: AgentMemoriesOntology = resolveAgentMemoriesOntology(getOpts.ontology);
       return bindAgentServices(harness, agent, ontology);
     },
 
@@ -272,7 +272,7 @@ function createHarnessAgentApi(
         const existingDid = harness.pool.getDidByExternalId(externalId);
         if (existingDid !== undefined) {
           const agent = await harness.pool.focus(existingDid);
-          const ontology: HarnessMemoriesOntology = resolveHarnessMemoriesOntology(opts.ontology);
+          const ontology: AgentMemoriesOntology = resolveAgentMemoriesOntology(opts.ontology);
           return {
             agent: bindAgentServices(harness, agent, ontology),
             created: false,
@@ -332,7 +332,7 @@ function createHarnessAgentApi(
     },
 
     async resolveAgentWorkflowDeps(agent, resolveOpts) {
-      const memoriesClient = await createHarnessMemoriesClient({
+      const memoriesClient = await createAgentMemoriesClient({
         baseUrl: harness.memoriesBaseUrl,
         database: agentMemoriesDatabase(agent.did),
         ontology: agent.memories.ontology,
@@ -414,7 +414,7 @@ export async function startNetworkHarness(
   const memoriesClient = new MemoriesServiceClient({
     baseUrl: memoriesBaseUrl,
     auth: createBearerTokenAuthProvider(memoriesAdminToken),
-    fetch: harnessMemoriesFetch(),
+    fetch: memoriesServiceFetch(),
   });
 
   const poolInbox = new HarnessPoolInbox({ khoraBaseUrl });

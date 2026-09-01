@@ -1,17 +1,17 @@
 import type { KhoraClient } from "@khoralabs/khora-client";
 import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
+import { resolveMemoriesHeadRootHex } from "@khoralabs/memories-node/helpers/agent";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
+import {
+  type AgentMemoriesOntology,
+  agentMemoriesDatabase,
+  createAgentMemoriesClient,
+} from "@khoralabs/memories-service/client/agent";
 import {
   resolveMemoriesAdminTokenFromEnv,
   resolveMemoriesBaseUrlFromEnv,
 } from "../../../../lib/memories-base-url.ts";
 import { discoverSkillsFromMemories } from "../../../memories/skills/_helpers/skills.ts";
-import {
-  agentMemoriesDatabase,
-  createHarnessMemoriesClient,
-  type HarnessMemoriesOntology,
-} from "../../../memories/tools/_helpers/memories-client.ts";
-import { resolveMemoriesHeadRootHex } from "../../../memories/tools/_helpers/memory-search.ts";
 import { resolveRecentNamespacesTracker } from "../../../memories/tools/_helpers/recent-namespaces.ts";
 import type { AgentChatClient } from "../../../social/message/chat.ts";
 import type { RunAgentWorkflowDependencies } from "../../run-agent-workflow.ts";
@@ -77,13 +77,13 @@ function resolveIntegrateMemoriesFromEnv(
   return { baseUrl, token, writeScope: "under" };
 }
 
-export async function createHarnessMemoriesClientForAgent(opts: {
+export async function createAgentMemoriesClientForAgent(opts: {
   baseUrl: string;
   agentDid: string;
-  ontology: HarnessMemoriesOntology;
+  ontology: AgentMemoriesOntology;
   adminToken: string;
 }): Promise<RemoteMemoriesClientAsync> {
-  return createHarnessMemoriesClient({
+  return createAgentMemoriesClient({
     baseUrl: opts.baseUrl,
     database: agentMemoriesDatabase(opts.agentDid),
     ontology: opts.ontology,
@@ -119,12 +119,12 @@ export async function createHarnessAgentWorkflowDeps(input: {
   memoriesBaseUrl: string;
   memoriesAdminToken: string;
   agentDid: string;
-  ontology: HarnessMemoriesOntology;
+  ontology: AgentMemoriesOntology;
   khoraClient?: KhoraClient;
   embeddingModel?: import("@khoralabs/memories-node/helpers").EmbeddingModel;
 }): Promise<HarnessAgentWorkflowDeps> {
   return {
-    memoriesClient: await createHarnessMemoriesClientForAgent({
+    memoriesClient: await createAgentMemoriesClientForAgent({
       baseUrl: input.memoriesBaseUrl,
       agentDid: input.agentDid,
       ontology: input.ontology,

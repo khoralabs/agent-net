@@ -15,41 +15,10 @@ export {
   writeScopeNeedsNamespaceChoice,
   writeScopeNeighborSearchOptions,
 } from "./agent/memories/integrate/write-scope.ts";
-export { resolveHarnessEmbeddingModel } from "./agent/memories/tools/_helpers/embedding-model.ts";
-export {
-  agentMemoriesDatabase,
-  createDeferredHarnessMemoriesClient,
-  createHarnessMemoriesClient,
-  harnessMemoriesFetch,
-  installHarnessMemoriesFetch,
-  type MemoriesServiceFetch,
-} from "./agent/memories/tools/_helpers/memories-client.ts";
 export {
   getInstalledMemoriesOntology,
   installMemoriesOntology,
 } from "./agent/memories/tools/_helpers/memories-ontology-install.ts";
-export {
-  EMBEDDING_MODEL_REQUIRED_MESSAGE,
-  type EnrichedNamespaceSearchHit,
-  type EnrichedNamespaceSearchResult,
-  MEMORY_SEARCH_SCOPE_EXACT,
-  MEMORY_SEARCH_SCOPE_SUBTREE,
-  type MemorySearchScopeMode,
-  type NamespaceSearchArms,
-  resolveMemoriesHeadRootHex,
-  resolveMemoriesSearchAsOf,
-  runStandardHybridMemorySearch,
-  runStandardNamespaceSearch,
-  type StandardHybridMemorySearchInput,
-  type StandardNamespaceSearchInput,
-} from "./agent/memories/tools/_helpers/memory-search.ts";
-export { writeMemoryNode } from "./agent/memories/tools/_helpers/memory-write.ts";
-export {
-  createRemoteSourceMapContentStore,
-  DEFAULT_MEMORY_SOURCE_KEY,
-  MEMORY_TEXT_SOURCE_PREFIX,
-  type SourceMapTextPreviewClient,
-} from "./agent/memories/tools/_helpers/source-map-content-store.ts";
 export {
   type AgentMemoriesClient,
   createBoundAgentMemoriesClient,

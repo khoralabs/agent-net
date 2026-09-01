@@ -1,18 +1,17 @@
 import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
+import {
+  resolveAgentEmbeddingModel,
+  runStandardHybridMemorySearch,
+  type StandardHybridMemorySearchInput,
+  writeMemoryNode,
+} from "@khoralabs/memories-node/helpers/agent";
 import type { LabelSchemaMap, OntologyDefinition } from "@khoralabs/memories-node/ontology";
 import type { MemoriesDatabaseId } from "@khoralabs/memories-service";
 import type {
   MemoriesServiceClient,
   RemoteMemoriesClientAsync,
 } from "@khoralabs/memories-service/client";
-
 import type { IntegrateMemoryEvent } from "./memories/integrate/memory-event.ts";
-import { resolveHarnessEmbeddingModel } from "./memories/tools/_helpers/embedding-model.ts";
-import {
-  runStandardHybridMemorySearch,
-  type StandardHybridMemorySearchInput,
-} from "./memories/tools/_helpers/memory-search.ts";
-import { writeMemoryNode } from "./memories/tools/_helpers/memory-write.ts";
 
 /** A bound memories client scoped to a single agent's database. */
 export type AgentMemoriesClient = {
@@ -65,7 +64,7 @@ export function createBoundAgentMemoriesClient(input: {
     serviceClient,
     client,
     search(searchInput) {
-      const embeddingModel = searchInput.embeddingModel ?? resolveHarnessEmbeddingModel();
+      const embeddingModel = searchInput.embeddingModel ?? resolveAgentEmbeddingModel();
       return runStandardHybridMemorySearch(client, {
         ...searchInput,
         ...(embeddingModel !== undefined ? { embeddingModel } : {}),
@@ -79,7 +78,7 @@ export function createBoundAgentMemoriesClient(input: {
       }
       const key =
         event.memoryKey?.trim() || event.correlationId.trim() || `integrate-${event.occurredAtMs}`;
-      const embeddingModel = options?.embeddingModel ?? resolveHarnessEmbeddingModel();
+      const embeddingModel = options?.embeddingModel ?? resolveAgentEmbeddingModel();
       if (embeddingModel === undefined) {
         throw new Error(
           "memories.integrate: embeddingModel required (pass options.embeddingModel or set AI_GATEWAY_API_KEY)",

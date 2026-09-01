@@ -12,7 +12,8 @@ describe("parseIntegrateMemoryEvent", () => {
       correlationId: "c1",
       occurredAtMs: 1,
       payload: { summary: "x" },
-      text: "x",
+      features: { lexical: ["x"], vector: [] },
+      instructions: "",
     });
     expect(event.kind).toBe("interaction");
     expect(event.ownerKey).toBe("did:key:abc");
@@ -31,7 +32,8 @@ describe("parseIntegrateMemoryEvent", () => {
       correlationId: "c1",
       occurredAtMs: 1,
       payload: { source: "writeMemory" },
-      text: "Name: Gia",
+      features: { lexical: ["Name: Gia"], vector: [] },
+      instructions: "",
     });
     expect(event.kind).toBe("memory");
     expect(event.memoryKey).toBe("gia-kim");
@@ -49,7 +51,8 @@ describe("parseIntegrateMemoryEvent", () => {
       correlationId: "c1",
       occurredAtMs: 1,
       payload: { source: "ops-deepen" },
-      text: "About Acme",
+      features: { lexical: ["About Acme"], vector: [] },
+      instructions: "",
     });
     expect(event.writeScope).toBe("cross");
     expect(event.features.lexical).toEqual(["About Acme"]);
@@ -64,6 +67,8 @@ describe("parseIntegrateMemoryEvent", () => {
         correlationId: "c1",
         occurredAtMs: 1,
         payload: {},
+        features: { lexical: ["x"], vector: [] },
+        instructions: "",
       }),
     ).toThrow(/memoryKey/);
   });
@@ -78,8 +83,24 @@ describe("parseIntegrateMemoryEvent", () => {
         correlationId: "c1",
         occurredAtMs: 1,
         payload: {},
+        features: { lexical: ["x"], vector: [] },
+        instructions: "",
       }),
     ).toThrow(/writeScope/);
+  });
+
+  test("rejects legacy text-only wire", () => {
+    expect(() =>
+      parseIntegrateMemoryEvent({
+        kind: "interaction",
+        ownerKey: "c",
+        namespace: "notes",
+        correlationId: "c1",
+        occurredAtMs: 1,
+        payload: {},
+        text: "legacy",
+      }),
+    ).toThrow(/features/);
   });
 
   test("rejects companyId wire alias", () => {

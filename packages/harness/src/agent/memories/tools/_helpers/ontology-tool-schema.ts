@@ -1,7 +1,6 @@
 import type { LabelSchemaMap, OntologyDefinition } from "@khoralabs/memories-node/ontology";
+import type { AgentMemoriesOntology } from "@khoralabs/memories-service/client/agent";
 import { z } from "zod";
-
-import type { HarnessMemoriesOntology } from "./memories-client.ts";
 
 /** Ontology label schemas are zod; ontology types widen them to Standard Schema. */
 function asZod(schema: unknown): z.ZodType {
@@ -24,7 +23,7 @@ export function ontologyEdgeKinds(
  * Optional nodeLabels map: each key is an ontology node kind; value is that kind's Zod props.
  * Aligns with integrate-memories `zNodeLabels` (without requiring at least one kind — omit for default).
  */
-export function nodeLabelsInputSchema(ontology: HarnessMemoriesOntology) {
+export function nodeLabelsInputSchema(ontology: AgentMemoriesOntology) {
   const shape: Record<string, z.ZodType> = {};
   for (const kind of ontologyNodeKinds(ontology)) {
     shape[kind] = asZod(ontology.nodeLabels[kind])
@@ -53,7 +52,7 @@ export type ParsedMemoryLink = {
  * Same idea as integrate-memories `zEdgeRow`.
  */
 export function memoryLinkSchema(
-  ontology: HarnessMemoriesOntology,
+  ontology: AgentMemoriesOntology,
   opts?: { namespaceOptional?: boolean },
 ) {
   const edgeKinds = ontologyEdgeKinds(ontology);
@@ -100,7 +99,7 @@ export function memoryLinkSchema(
 /** Normalize a parsed link row into MemoryLinkInput (default edge kind when none set). */
 export function parseMemoryLinkRow(
   row: Record<string, unknown>,
-  ontology: HarnessMemoriesOntology,
+  ontology: AgentMemoriesOntology,
   defaults?: { namespace?: string },
 ): ParsedMemoryLink {
   const edgeKinds = ontologyEdgeKinds(ontology);

@@ -1,11 +1,11 @@
 import { describe, expect, test } from "bun:test";
 import { ids } from "@khoralabs/memories-node";
-import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
-import type { UIMessage } from "ai";
 import {
   createRemoteSourceMapContentStore,
   DEFAULT_MEMORY_SOURCE_KEY,
-} from "../memories/tools/_helpers/source-map-content-store.ts";
+} from "@khoralabs/memories-node/helpers/agent";
+import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
+import type { UIMessage } from "ai";
 import {
   AGENT_MEMORY_DOMAIN,
   agentMemorySourceRef,

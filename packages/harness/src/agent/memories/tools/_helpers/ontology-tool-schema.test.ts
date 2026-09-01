@@ -1,16 +1,17 @@
 import { describe, expect, test } from "bun:test";
 import { defineOntology } from "@khoralabs/memories-node/ontology";
+import {
+  minimalAgentMemoriesOntology,
+  resolveAgentMemoriesOntology,
+} from "@khoralabs/memories-service/client/agent";
 import { z } from "zod";
-
-import { resolveHarnessMemoriesOntology } from "./memories-client.ts";
-import { minimalHarnessMemoriesOntology } from "./minimal-ontology.ts";
 import {
   memoryLinkSchema,
   nodeLabelsInputSchema,
   parseMemoryLinkRow,
 } from "./ontology-tool-schema.ts";
 
-const testOntology = resolveHarnessMemoriesOntology(
+const testOntology = resolveAgentMemoriesOntology(
   defineOntology({
     nodeLabels: {
       fact: z.object({
@@ -90,7 +91,7 @@ describe("ontology-tool-schema", () => {
   });
 
   test("minimal ontology schemas still build", () => {
-    expect(() => nodeLabelsInputSchema(minimalHarnessMemoriesOntology)).not.toThrow();
-    expect(() => memoryLinkSchema(minimalHarnessMemoriesOntology)).not.toThrow();
+    expect(() => nodeLabelsInputSchema(minimalAgentMemoriesOntology)).not.toThrow();
+    expect(() => memoryLinkSchema(minimalAgentMemoriesOntology)).not.toThrow();
   });
 });

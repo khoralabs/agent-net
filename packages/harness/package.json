@@ -85,12 +85,6 @@
       "import": "./src/agent/turn/run-harness-agent-step.ts",
       "default": "./src/agent/turn/run-harness-agent-step.ts"
     },
-    "./memory-search": {
-      "types": "./src/agent/memories/tools/_helpers/memory-search.ts",
-      "bun": "./src/agent/memories/tools/_helpers/memory-search.ts",
-      "import": "./src/agent/memories/tools/_helpers/memory-search.ts",
-      "default": "./src/agent/memories/tools/_helpers/memory-search.ts"
-    },
     "./nbc-run-model-turn-run": {
       "types": "./src/agent/turn/workflows/nbc-run-model-turn-run.ts",
       "bun": "./src/agent/turn/workflows/nbc-run-model-turn-run.ts",
@@ -137,8 +131,8 @@
     "@khoralabs/chat": "^0.1.11",
     "@khoralabs/did-key-identity": "^0.1.0",
     "@khoralabs/khora-client": "^0.1.6",
-    "@khoralabs/memories-node": "^0.7.6",
-    "@khoralabs/memories-service": "^0.7.6",
+    "@khoralabs/memories-node": "^0.8.0",
+    "@khoralabs/memories-service": "^0.8.0",
     "@khoralabs/obp-core": "^0.2.0",
     "@khoralabs/obp-nbc": "^0.2.0",
     "@khoralabs/relay": "^0.1.1",

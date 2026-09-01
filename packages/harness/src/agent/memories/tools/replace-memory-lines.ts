@@ -1,4 +1,5 @@
 import { tool } from "@khoralabs/agent-capabilities";
+import { writeMemoryNode } from "@khoralabs/memories-node/helpers/agent";
 import { z } from "zod";
 import { toolEnabled } from "../../turn/tools/_helpers/disable-policies.ts";
 
@@ -15,7 +16,6 @@ import {
   upsertSkillInEnv,
 } from "../skills/_helpers/skills.ts";
 import { loadMemoryTextByKey } from "./_helpers/memory-text.ts";
-import { writeMemoryNode } from "./_helpers/memory-write.ts";
 import { touchRecentNamespaces } from "./_helpers/recent-namespaces.ts";
 import { resolveWriteMemoryOptions } from "./_helpers/write-memory-options.ts";
 

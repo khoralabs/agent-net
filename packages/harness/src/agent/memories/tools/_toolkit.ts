@@ -1,12 +1,14 @@
 import { dynamicToolkit, toolkit } from "@khoralabs/agent-capabilities";
 
+import {
+  minimalAgentMemoriesOntology,
+  resolveAgentMemoriesOntology,
+} from "@khoralabs/memories-service/client/agent";
 import { toolkitEnabled } from "../../turn/tools/_helpers/disable-policies.ts";
 import { HARNESS_TOOLKIT } from "../../turn/tools/ids.ts";
 import type { HarnessToolkitEnv } from "../../turn/tools/types.ts";
-import { resolveHarnessMemoriesOntology } from "./_helpers/memories-client.ts";
 import { formatMemoriesContextInstructions } from "./_helpers/memories-context-instructions.ts";
 import { getInstalledMemoriesOntology } from "./_helpers/memories-ontology-install.ts";
-import { minimalHarnessMemoriesOntology } from "./_helpers/minimal-ontology.ts";
 import {
   formatRecentNamespacesInstruction,
   RECENT_NAMESPACES_TOP_K,
@@ -20,9 +22,9 @@ import { createWriteMemoryTool } from "./write-memory.ts";
 function resolveToolkitOntology() {
   const installed = getInstalledMemoriesOntology();
   if (installed !== undefined) {
-    return resolveHarnessMemoriesOntology(installed);
+    return resolveAgentMemoriesOntology(installed);
   }
-  return minimalHarnessMemoriesOntology;
+  return minimalAgentMemoriesOntology;
 }
 
 export const memoriesToolkit = dynamicToolkit<"memories", HarnessToolkitEnv>({

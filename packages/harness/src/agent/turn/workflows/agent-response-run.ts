@@ -1,5 +1,5 @@
-import { resolveHarnessEmbeddingModel } from "../../memories/tools/_helpers/embedding-model.ts";
-import { minimalHarnessMemoriesOntology } from "../../memories/tools/_helpers/minimal-ontology.ts";
+import { resolveAgentEmbeddingModel } from "@khoralabs/memories-node/helpers/agent";
+import { minimalAgentMemoriesOntology } from "@khoralabs/memories-service/client/agent";
 import {
   ensureDevAgentIdentity,
   getAgentChatClientForDid,
@@ -12,7 +12,7 @@ import {
 } from "../../social/tools/_helpers/khora-client-factory.ts";
 import { type RunAgentWorkflowDependencies, runAgentWorkflow } from "../run-agent-workflow.ts";
 import {
-  createHarnessMemoriesClientForAgent,
+  createAgentMemoriesClientForAgent,
   resolveMemoriesServiceAdminToken,
   resolveMemoriesServiceBaseUrl,
 } from "../tools/_helpers/toolkit-env.ts";
@@ -24,7 +24,7 @@ export type AgentResponseDeps = RunAgentWorkflowDependencies;
  * Agent-response body without a workflow step directive. Safe to call from a
  * host `"use step"` after the host has installed chat/ontology into the isolate.
  *
- * When no ontology is installed, uses {@link minimalHarnessMemoriesOntology}.
+ * When no ontology is installed, uses {@link minimalAgentMemoriesOntology}.
  * Hosts that need a richer ontology must install it in the step module graph.
  */
 export async function runExecuteAgentResponse(
@@ -44,13 +44,13 @@ export async function runExecuteAgentResponse(
   const ontology =
     getInstalledMemoriesOntology() ??
     (memoriesBaseUrl !== undefined && memoriesAdminToken !== undefined
-      ? minimalHarnessMemoriesOntology
+      ? minimalAgentMemoriesOntology
       : undefined);
   const agentDid = params.agent.actingFor.id;
   const memoriesClient =
     memoriesBaseUrl === undefined || memoriesAdminToken === undefined || ontology === undefined
       ? undefined
-      : await createHarnessMemoriesClientForAgent({
+      : await createAgentMemoriesClientForAgent({
           baseUrl: memoriesBaseUrl,
           agentDid,
           ontology,
@@ -68,7 +68,7 @@ export async function runExecuteAgentResponse(
 
   await ensureDevAgentIdentity();
 
-  const embeddingModel = resolveHarnessEmbeddingModel();
+  const embeddingModel = resolveAgentEmbeddingModel();
   if (memoriesClient !== undefined && embeddingModel === undefined) {
     throw new Error(
       "AI_GATEWAY_API_KEY is required for agent-response memory search (set it on this service's env)",

@@ -1,8 +1,8 @@
 export {
   agentMemoriesDatabase,
-  createDeferredHarnessMemoriesClient,
-  createHarnessMemoriesClient,
-} from "../../memories/tools/_helpers/memories-client.ts";
+  createAgentMemoriesClient,
+  createDeferredAgentMemoriesClient,
+} from "@khoralabs/memories-service/client/agent";
 export { harnessToolkit } from "./_toolkit.ts";
 export { HARNESS_TOOLKIT, type HarnessToolkitId } from "./ids.ts";
 export type { HarnessToolkitEnv } from "./types.ts";
