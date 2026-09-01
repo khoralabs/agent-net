@@ -1,17 +1,18 @@
 /**
- * Harness helpers for {@link VellumPool} attachments and e2e chain open.
+ * Harness helpers for Vellum pool attachments and e2e chain open.
+ * Pool/host wiring comes from `@khoralabs/vellum-client/pool/host`.
  */
 import type { IdentitySecret, PersistableSigner } from "@khoralabs/did-key-identity";
 import { RelayClient } from "@khoralabs/relay/client";
-import type {
-  ChainInitResponse,
-  ChainSnapshot,
-  ChainStateResponse,
-  VellumChainRow,
-} from "@khoralabs/vellum-client";
 import { VellumChain } from "@khoralabs/vellum-client";
-import { VellumPool } from "@khoralabs/vellum-client/pool";
-import { createSharedUplinkChannelFabric } from "@khoralabs/vellum-client/session";
+import type { VellumPool } from "@khoralabs/vellum-client/pool";
+import {
+  createSharedUplinkVellumPool,
+  type SharedUplinkVellumPoolOptions,
+  type VellumHandle,
+  wrapVellumPoolClient,
+} from "@khoralabs/vellum-client/pool/host";
+
 import { waitFor } from "../../../lib/wait-for.ts";
 import {
   loadHarnessIdentity,
@@ -20,27 +21,17 @@ import {
 import { AgentStore } from "../../../pool/index.ts";
 import type { AgentActor } from "../../actor.ts";
 
-/** Per-DID Vellum channel ops returned by {@link wrapPoolClient}. */
-export type VellumHandle = {
-  connect(options?: {
-    webSocketUrl?: string;
-    upgradeNonce?: string;
-  }): Promise<"spawned" | "already-running">;
-  /** Tear down the in-process channel attachment (or spawned daemon, if used). */
-  disconnect(): void;
-  chainCreate(input: {
-    counterpartyDid: string;
-    sessionId?: string;
-    genesisHash?: string;
-    genesisTurn?: Record<string, unknown>;
-  }): Promise<ChainInitResponse>;
-  chainRelease(sessionId: string): Promise<void>;
-  endOffers(sessionId: string): Promise<void>;
-  sendTurn(sessionId: string, body: Record<string, unknown>): Promise<void>;
-  getChainSnapshot(): Promise<ChainStateResponse>;
-  getSessionSnapshot(sessionId: string): Promise<ChainSnapshot>;
-  listChains(): VellumChainRow[];
-};
+export type { SharedUplinkVellumPoolOptions, VellumHandle };
+export { createSharedUplinkVellumPool, wrapVellumPoolClient };
+
+/** @deprecated Prefer {@link SharedUplinkVellumPoolOptions}. */
+export type HarnessVellumPoolOptions = SharedUplinkVellumPoolOptions;
+
+/** Stable harness name for {@link createSharedUplinkVellumPool}. */
+export const createHarnessVellumPool = createSharedUplinkVellumPool;
+
+/** Stable harness name for {@link wrapVellumPoolClient}. */
+export const wrapPoolClient = wrapVellumPoolClient;
 
 export type VellumPairOptions = {
   /** Base URL of the relay server. */
@@ -57,42 +48,6 @@ export type VellumPairOptions = {
   /** When set, skip binding the peer if they are not on this host. Default: both local. */
   isOnHost?: (did: string) => boolean;
 };
-
-export type HarnessVellumPoolOptions = {
-  relayBaseUrl: string;
-  dataDirRoot: string;
-  isOnHost?: (did: string) => boolean;
-};
-
-export function createHarnessVellumPool(opts: HarnessVellumPoolOptions): VellumPool {
-  const isOnHost = opts.isOnHost ?? (() => true);
-  return new VellumPool({
-    relayBaseUrl: opts.relayBaseUrl,
-    dataDirRoot: opts.dataDirRoot,
-    fabric: createSharedUplinkChannelFabric({
-      relayBaseUrl: opts.relayBaseUrl,
-      inclusion: { isOnHost },
-    }),
-  });
-}
-
-export function wrapPoolClient(pool: VellumPool, did: string, channelId: string): VellumHandle {
-  const ref = { did, channelId };
-  const client = () => pool.handle(ref);
-  return {
-    connect: async () => "already-running",
-    disconnect: () => {
-      void pool.unbind(ref);
-    },
-    chainCreate: (i) => client().chainCreate(i),
-    chainRelease: (s) => client().chainRelease(s),
-    endOffers: (s) => client().endOffers(s),
-    sendTurn: (s, b) => client().sendTurn(s, b),
-    getChainSnapshot: () => client().getChainSnapshot(),
-    getSessionSnapshot: (s) => client().getSessionSnapshot(s),
-    listChains: () => client().listChainsFromStore(),
-  };
-}
 
 async function resolveAgentSigner(
   agent: AgentActor,

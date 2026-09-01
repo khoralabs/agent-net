@@ -1,10 +1,4 @@
-import path from "node:path";
-
-/** Matches `@khoralabs/vellum-client` `VellumPool` attachment data dirs. */
-export function vellumPoolAttachmentDataDir(
-  dataDirRoot: string,
-  did: string,
-  channelId: string,
-): string {
-  return path.join(dataDirRoot, encodeURIComponent(did), encodeURIComponent(channelId));
-}
+/**
+ * Thin re-export of attachment path helper from `@khoralabs/vellum-client/pool/host`.
+ */
+export { vellumPoolAttachmentDataDir } from "@khoralabs/vellum-client/pool/host";

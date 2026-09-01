@@ -115,11 +115,14 @@ export {
 } from "./agent/social/negotiate/negotiate.ts";
 export {
   createHarnessVellumPool,
+  createSharedUplinkVellumPool,
   disconnectVellum,
   type HarnessVellumPoolOptions,
   openVellumChain,
+  type SharedUplinkVellumPoolOptions,
   type VellumPairOptions,
   wrapPoolClient,
+  wrapVellumPoolClient,
 } from "./agent/social/negotiate/vellum.ts";
 export { vellumPoolAttachmentDataDir } from "./agent/social/negotiate/vellum-pool-paths.ts";
 export {
