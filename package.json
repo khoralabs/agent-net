@@ -6,8 +6,7 @@
   "workspaces": {
     "packages": [
       "packages/*",
-      "apps/*",
-      "vendor/libs/packages/*/**"
+      "apps/*"
     ],
     "catalog": {
       "@khoralabs/agent-capabilities": "^0.2.0",
@@ -63,8 +62,6 @@
     "swarm:setup": "bun run --filter @khoralabs/agent-net-reference agent:setup",
     "swarm:events": "bun run --filter @khoralabs/agent-net-reference events",
     "swarm:test": "bash scripts/test-with-homebrew-sqlite.sh packages/harness/src/swarm packages/harness/src",
-    "submodules:init": "git submodule update --init --recursive",
-    "submodules:update": "git submodule update --remote --merge vendor/libs && bun install",
     "prepare": "husky",
     "agent-review": "agent-review",
     "review": "agent-review run --scope staged --include-workstream"

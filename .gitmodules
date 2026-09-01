@@ -1,3 +1,0 @@
-[submodule "vendor/libs"]
-	path = vendor/libs
-	url = git@github.com:khoralabs/libs.git

@@ -10,7 +10,6 @@ Monorepo for the Khora multi-agent network harness.
 ## Setup
 
 ```bash
-git submodule update --init --recursive   # or: bun run submodules:init
 bun install
 ```
 
@@ -52,11 +51,5 @@ Harness and swarm workflows use the abstract [Workflow SDK](https://useworkflow.
 | `bun run swarm` | Swarm CLI (secondary) |
 | `bun run typecheck` | Typecheck all workspace packages |
 | `bun run swarm:test` | Swarm + harness unit tests |
-
-## Vendored submodules
-
-| Path | Repo |
-| --- | --- |
-| `vendor/libs` | libs |
 
 Chat, relay, and memories are consumed from npm (`@khoralabs/chat`, `@khoralabs/relay`, `@khoralabs/memories-node`, `@khoralabs/memories-service`, etc.).
