@@ -9,6 +9,7 @@
     "vendor/libs/packages/*/**"
   ],
   "overrides": {
+    "@khoralabs/khora-client": "0.1.7",
     "@khoralabs/memories-node": "0.8.0",
     "@khoralabs/memories-service": "0.8.0",
     "@khoralabs/memories-otel": "0.8.0",
