@@ -5,7 +5,7 @@ Monorepo for the Khora multi-agent network harness.
 | Package | Path | Role |
 | --- | --- | --- |
 | `@khoralabs/agent-net` | [`packages/harness`](packages/harness) | Abstract harness library (`./swarm` = budgeted multi-agent orchestration) |
-| `@khoralabs/agent-net-reference` | [`apps/reference`](apps/reference) | Turso world, local memories/relay, orchestrator + marketplace (primary) / swarm CLIs |
+| `@khoralabs/agent-net-reference` | [`apps/reference`](apps/reference) | Turso world, embedded Khora + local memories/relay/chat, orchestrator + marketplace (primary) / swarm CLIs |
 
 ## Setup
 
@@ -17,13 +17,13 @@ bun install
 
 Use **two terminals**. Keep the orchestrator running in the first.
 
-1. Start the reference stack (local memories + relay + chat + Turso world; data under `apps/reference/.data`):
+1. Start the reference stack (embedded Khora + memories + relay + chat + Turso world; data under `apps/reference/.data`):
 
 ```bash
 bun run reference:start
 ```
 
-2. In a **second** terminal, export the printed URLs (and a running Khora host), then run marketplace:
+2. In a **second** terminal, export the printed URLs, then run marketplace:
 
 ```bash
 export KHORA_BASE_URL=http://127.0.0.1:8788
@@ -52,10 +52,10 @@ Harness and swarm workflows use the abstract [Workflow SDK](https://useworkflow.
 
 | Script | Description |
 | --- | --- |
-| `bun run reference:start` | Start memories + relay + Turso world |
+| `bun run reference:start` | Start Khora + memories + relay + chat + Turso world |
 | `bun run marketplace` | Marketplace CLI (primary reference demo) |
 | `bun run swarm` | Swarm CLI (secondary) |
 | `bun run typecheck` | Typecheck all workspace packages |
 | `bun run swarm:test` | Swarm + harness unit tests |
 
-Chat, relay, and memories are consumed from npm (`@khoralabs/chat`, `@khoralabs/relay`, `@khoralabs/memories-node`, `@khoralabs/memories-service`, etc.).
+Chat, relay, memories, and Khora host are consumed from npm (`@khoralabs/chat`, `@khoralabs/relay`, `@khoralabs/memories-node`, `@khoralabs/memories-service`, `@khoralabs/khora-host`, etc.).
