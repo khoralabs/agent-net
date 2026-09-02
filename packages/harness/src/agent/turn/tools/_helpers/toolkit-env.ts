@@ -1,4 +1,5 @@
 import type { KhoraClient } from "@khoralabs/khora-client";
+import { toMemorySearchEnv } from "@khoralabs/memories-agents/tools";
 import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
 import { resolveMemoriesHeadRootHex } from "@khoralabs/memories-node/helpers/agent";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
@@ -38,6 +39,13 @@ export async function createHarnessToolkitEnv(input: {
   });
 
   const integrateMemories = input.integrateMemories ?? resolveIntegrateMemoriesFromEnv();
+  const namespace = agentDid ?? "";
+  const embeddingCache = new Map<string, number[]>();
+  const memorySearchExtensions = {
+    ...(input.khoraClient !== undefined ? { khoraClient: input.khoraClient } : {}),
+    ...(input.agentChat !== undefined ? { agentChat: input.agentChat } : {}),
+    ...(input.nbc !== undefined ? { nbc: input.nbc } : {}),
+  };
 
   const env: HarnessToolkitEnv = {
     memoriesClient: input.memoriesClient,
@@ -47,14 +55,9 @@ export async function createHarnessToolkitEnv(input: {
     sessionId: input.sessionId,
     networkDataDir: input.networkDataDir,
     embeddingModel: input.embeddingModel,
-    embeddingCache: new Map(),
-    /** Default scope for composed `memory_search`; write tools still take namespace as args. */
-    namespace: agentDid ?? "",
-    memorySearchExtensions: {
-      ...(input.khoraClient !== undefined ? { khoraClient: input.khoraClient } : {}),
-      ...(input.agentChat !== undefined ? { agentChat: input.agentChat } : {}),
-      ...(input.nbc !== undefined ? { nbc: input.nbc } : {}),
-    },
+    embeddingCache,
+    namespace,
+    memorySearchExtensions,
     skills: [],
     activatedSkillNames: new Set(),
     recentNamespaces,
@@ -70,8 +73,22 @@ export async function createHarnessToolkitEnv(input: {
   env.memoriesSnapshotRootHex = (await resolveMemoriesHeadRootHex(input.memoriesClient)) ?? "";
   env.skills = await discoverSkillsFromMemories(input.memoriesClient, {
     embeddingModel: input.embeddingModel,
-    embeddingCache: env.embeddingCache,
+    embeddingCache,
   });
+
+  if (input.embeddingModel !== undefined) {
+    Object.assign(
+      env,
+      toMemorySearchEnv({
+        client: input.memoriesClient as never,
+        namespace,
+        embeddingModel: input.embeddingModel,
+        embeddingCache,
+        memorySearchExtensions,
+        memoriesSnapshotRootHex: env.memoriesSnapshotRootHex,
+      }),
+    );
+  }
   return env;
 }
 

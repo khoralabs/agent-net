@@ -30,7 +30,13 @@ export type HarnessMemorySearchExtensions = {
   nbc?: NbcToolkitContext;
 };
 
-export type HarnessToolkitEnv = {
+/** Optional `MemorySearchEnv` fields filled by `toMemorySearchEnv` when a DB is present. */
+type MemorySearchEnvSlice = Omit<
+  Partial<MemorySearchEnv>,
+  "memoriesClient" | "namespace" | "embeddingModel" | "memorySearchExtensions"
+>;
+
+export type HarnessToolkitEnv = MemorySearchEnvSlice & {
   memoriesClient?: RemoteMemoriesClientAsync;
   khoraClient?: KhoraClient;
   agentChat?: AgentChatClient;
@@ -38,8 +44,6 @@ export type HarnessToolkitEnv = {
   sessionId?: string;
   networkDataDir?: string;
   embeddingModel?: EmbeddingModel;
-  embeddingCache?: Map<string, number[]>;
-  memoriesSnapshotRootHex?: string;
   /**
    * Default namespace for {@link memorySearchToolkit}'s `memory_search` (env-scoped).
    * Harness write/search tools still take namespace as tool args.
@@ -47,10 +51,6 @@ export type HarnessToolkitEnv = {
   namespace?: string;
   /** Forwarded into memory-search env for domain toolkit composition. */
   memorySearchExtensions?: HarnessMemorySearchExtensions & Record<string, unknown>;
-  memorySearchBudget?: MemorySearchEnv["memorySearchBudget"];
-  additionalNamespaces?: MemorySearchEnv["additionalNamespaces"];
-  discoveredMemoryKeys?: MemorySearchEnv["discoveredMemoryKeys"];
-  logger?: MemorySearchEnv["logger"];
   /**
    * When set, memory/skill writes fire-and-forget a `kind: "memory"` integrate
    * job after embed+merge.
