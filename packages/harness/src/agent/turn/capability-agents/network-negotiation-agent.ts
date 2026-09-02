@@ -3,6 +3,7 @@ import {
   type RegisteredAgent,
   toolkit,
 } from "@khoralabs/agent-capabilities";
+import { memorySearchToolkit } from "@khoralabs/memories-agents/tools";
 import { skillsToolkit } from "../../memories/skills/_toolkit.ts";
 import { memoriesToolkit } from "../../memories/tools/_toolkit.ts";
 
@@ -13,7 +14,7 @@ export type NegotiationAgentDefinition = {
   agent: RegisteredAgent;
 };
 
-const negotiationToolkit = toolkit([memoriesToolkit, skillsToolkit], {
+const negotiationToolkit = toolkit([memorySearchToolkit, memoriesToolkit, skillsToolkit], {
   name: "network-negotiation",
 });
 

@@ -196,14 +196,19 @@ export {
   repairTruncatedJson,
 } from "./agent/turn/structured-output.ts";
 export { HARNESS_TOOLKIT, type HarnessToolkitId } from "./agent/turn/tools/ids.ts";
-export type { NbcToolkitContext } from "./agent/turn/tools/types.ts";
+export type { HarnessMemorySearchExtensions, NbcToolkitContext } from "./agent/turn/tools/types.ts";
 export type {
   AgentStepContext,
   AgentStepNamespaceEntry,
   AgentStepSourceContext,
   AgentWorkflowParams,
   AgentWorkflowResult,
+  HarnessAgentExecutor,
   MemoriesDatabaseContext,
+  MemorySearchAgentExecutor,
+  MemorySearchAgentMessage,
+  MemorySearchAgentRunResult,
+  MemorySearchSessionContextSlice,
 } from "./agent/turn/types.ts";
 export {
   AI_STEP_MAX_RETRIES,

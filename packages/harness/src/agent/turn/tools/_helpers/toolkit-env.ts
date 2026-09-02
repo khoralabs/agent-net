@@ -48,6 +48,13 @@ export async function createHarnessToolkitEnv(input: {
     networkDataDir: input.networkDataDir,
     embeddingModel: input.embeddingModel,
     embeddingCache: new Map(),
+    /** Default scope for composed `memory_search`; write tools still take namespace as args. */
+    namespace: agentDid ?? "",
+    memorySearchExtensions: {
+      ...(input.khoraClient !== undefined ? { khoraClient: input.khoraClient } : {}),
+      ...(input.agentChat !== undefined ? { agentChat: input.agentChat } : {}),
+      ...(input.nbc !== undefined ? { nbc: input.nbc } : {}),
+    },
     skills: [],
     activatedSkillNames: new Set(),
     recentNamespaces,

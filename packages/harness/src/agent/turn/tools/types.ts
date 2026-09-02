@@ -1,4 +1,5 @@
 import type { KhoraClient } from "@khoralabs/khora-client";
+import type { MemorySearchEnv } from "@khoralabs/memories-agents/tools";
 import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import type { NbcChainGraph } from "@khoralabs/obp-nbc";
@@ -19,6 +20,16 @@ export type NbcToolkitContext = {
   leave: (reason?: string) => Promise<void>;
 };
 
+/**
+ * Host bag for co-located domain toolkits on the shared memory-search session env
+ * (`MemorySearchEnv.memorySearchExtensions`).
+ */
+export type HarnessMemorySearchExtensions = {
+  khoraClient?: KhoraClient;
+  agentChat?: AgentChatClient;
+  nbc?: NbcToolkitContext;
+};
+
 export type HarnessToolkitEnv = {
   memoriesClient?: RemoteMemoriesClientAsync;
   khoraClient?: KhoraClient;
@@ -29,6 +40,17 @@ export type HarnessToolkitEnv = {
   embeddingModel?: EmbeddingModel;
   embeddingCache?: Map<string, number[]>;
   memoriesSnapshotRootHex?: string;
+  /**
+   * Default namespace for {@link memorySearchToolkit}'s `memory_search` (env-scoped).
+   * Harness write/search tools still take namespace as tool args.
+   */
+  namespace?: string;
+  /** Forwarded into memory-search env for domain toolkit composition. */
+  memorySearchExtensions?: HarnessMemorySearchExtensions & Record<string, unknown>;
+  memorySearchBudget?: MemorySearchEnv["memorySearchBudget"];
+  additionalNamespaces?: MemorySearchEnv["additionalNamespaces"];
+  discoveredMemoryKeys?: MemorySearchEnv["discoveredMemoryKeys"];
+  logger?: MemorySearchEnv["logger"];
   /**
    * When set, memory/skill writes fire-and-forget a `kind: "memory"` integrate
    * job after embed+merge.

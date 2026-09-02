@@ -1,3 +1,9 @@
+import type {
+  MemorySearchAgentExecutor,
+  MemorySearchAgentMessage,
+  MemorySearchAgentRunResult,
+  MemorySearchSessionContextSlice,
+} from "@khoralabs/memories-agents/tools";
 import type { ThreadHashSnapshot } from "../../pool/network/types.ts";
 
 export type AgentUIMessage = {
@@ -5,6 +11,20 @@ export type AgentUIMessage = {
   role: string;
   parts: Array<{ type: string } & Record<string, unknown>>;
   metadata?: unknown;
+};
+
+/**
+ * Harness turn executor port — same contract as memories-agents
+ * {@link MemorySearchAgentExecutor}. Core accepts this; `./ai-sdk` supplies the
+ * streamText implementation.
+ */
+export type HarnessAgentExecutor = MemorySearchAgentExecutor;
+
+export type {
+  MemorySearchAgentExecutor,
+  MemorySearchAgentMessage,
+  MemorySearchAgentRunResult,
+  MemorySearchSessionContextSlice,
 };
 
 /** Host-supplied framing for the agent's memories database (injected into memories toolkit). */

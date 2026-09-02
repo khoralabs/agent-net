@@ -38,14 +38,16 @@ describe("writeScopeNeighborSearchOptions", () => {
     });
   });
 
-  test("under and exact use pathSubtree", () => {
+  test("under uses pathSubtree; exact/undefined keep seed namespace only", () => {
     expect(writeScopeNeighborSearchOptions("under", "ns/a")).toEqual({
       namespace: "ns/a",
       searchScopeMode: "pathSubtree",
     });
+    expect(writeScopeNeighborSearchOptions("exact", "ns/a")).toEqual({
+      namespace: "ns/a",
+    });
     expect(writeScopeNeighborSearchOptions(undefined, "ns/a")).toEqual({
       namespace: "ns/a",
-      searchScopeMode: "pathSubtree",
     });
   });
 });

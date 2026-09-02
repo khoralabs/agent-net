@@ -160,6 +160,7 @@
     "@khoralabs/chat": "catalog:",
     "@khoralabs/did-key-identity": "catalog:",
     "@khoralabs/khora-client": "catalog:",
+    "@khoralabs/memories-agents": "catalog:",
     "@khoralabs/memories-node": "catalog:",
     "@khoralabs/memories-service": "catalog:",
     "@khoralabs/obp-core": "catalog:",
