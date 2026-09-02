@@ -1,22 +1,26 @@
-import { getRun, start } from "workflow/api";
-import { runAgentResponseStep as runAgentTurn } from "../ai-sdk/workflows/agent-response-step.ts";
-import { type AgentTurnParams, emitNetworkEvent, networkEventId } from "../index.ts";
-
-import { assembleTurnContext } from "./assemble-turn-context.ts";
-import { takeHarnessForSession } from "./pending-harness.ts";
-import { takeOntologyForSession } from "./pending-ontology.ts";
-import { getSwarmSession } from "./session-store.ts";
-import { setupSwarm, teardownSwarm } from "./setup.ts";
+import { type AgentTurnParams, emitNetworkEvent, networkEventId } from "@khoralabs/agent-net";
 import {
+  type AgentLoopResult,
+  type AgentLoopState,
+  assembleTurnContext,
   checkTokenBudgetRemainingStep,
   getInboxCursor,
+  getSwarmSession,
   incrementTokensUsedStep,
   listInboxEntriesSince,
   recordTurnTelemetryStep,
+  type SwarmConfig,
+  type SwarmResult,
   setInboxCursor,
+  setupSwarm,
   summarizeSwarmState,
-} from "./swarm-state.ts";
-import type { AgentLoopResult, AgentLoopState, SwarmConfig, SwarmResult } from "./types.ts";
+  takeHarnessForSession,
+  takeOntologyForSession,
+  teardownSwarm,
+} from "@khoralabs/agent-net/swarm-run";
+import { getRun, start } from "workflow/api";
+
+import { runAgentResponseStep } from "./agent-response-step.ts";
 
 export async function assembleTurnParamsStep(
   _swarmStateId: string,
@@ -131,7 +135,7 @@ export async function agentLoop(
       runId: params.runId,
       payload: { agentTurnIndex: turnCount, inboxEntryIds },
     });
-    const result = await runAgentTurn(params);
+    const result = await runAgentResponseStep(params);
     await recordTurnTelemetryStep(config.dataDir, swarmStateId, {
       sessionId: config.sessionId,
       agentTurnIndex: turnCount,

@@ -2,6 +2,8 @@
  * Optional AI SDK surface for `@khoralabs/agent-net`.
  * Core barrels stay free of `ai` / `agent-capabilities-ai-sdk`; import this entry
  * for streamText turns, structured helpers, and tool capture.
+ *
+ * Durable Workflow directives are owned by the host (see apps/reference/src/workflows).
  */
 
 export { captureHarnessCapabilities } from "./capture-harness-capabilities.ts";
@@ -28,17 +30,10 @@ export {
   repairTruncatedJson,
 } from "./structured-output.ts";
 export {
-  agentResponse,
-  startAgentResponseWorkflow,
-} from "./workflows/agent-response.ts";
-export {
   type AgentResponseDeps,
+  runAgentResponseWithSession,
   runExecuteAgentResponse,
 } from "./workflows/agent-response-run.ts";
-export {
-  executeAgentResponse,
-  runAgentResponseStep,
-} from "./workflows/agent-response-step.ts";
 export {
   type ClassifyResponsePlanInput,
   type ClassifyResponsePlanResult,

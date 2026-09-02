@@ -42,6 +42,12 @@
       "import": "./dist/swarm/index.js",
       "default": "./dist/swarm/index.js"
     },
+    "./swarm-run": {
+      "types": "./src/swarm/run.ts",
+      "bun": "./src/swarm/run.ts",
+      "import": "./dist/swarm/run.js",
+      "default": "./dist/swarm/run.js"
+    },
     "./ai-sdk": {
       "types": "./src/ai-sdk/index.ts",
       "bun": "./src/ai-sdk/index.ts",

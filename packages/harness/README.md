@@ -69,7 +69,7 @@ Spawning binds the agent DID on the shared inbox socket; `harness.removeAgent` u
 
 ## Workflow world
 
-Harness workflows use the abstract [Workflow SDK](https://useworkflow.dev) APIs (`"use workflow"`, `"use step"`, `start`). They do **not** select a world backend.
+Harness publishes directive-free run helpers. Hosts own Workflow SDK wrappers (`start`, durable steps). The package does **not** select a world backend.
 
 The process that hosts the workflow worker must configure the world **before** running workflows — for example set `WORKFLOW_TARGET_WORLD=local` (and optionally `WORKFLOW_LOCAL_DATA_DIR`) and call `getWorld().start()`. The reference app (`apps/reference`) does this with the [local world](https://workflow-sdk.dev/worlds/local) and also starts local memories/relay/chat/Khora servers.
 

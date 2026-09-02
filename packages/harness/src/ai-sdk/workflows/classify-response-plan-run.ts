@@ -111,7 +111,7 @@ export async function loadPlannerSkillCatalog(agentDid: string): Promise<SkillCa
 
 /**
  * Classify a response plan for the upcoming agent turn.
- * Safe to call from a host `"use step"`.
+ * Safe to call from a host durable step wrapper.
  */
 export async function runClassifyResponsePlan(
   input: ClassifyResponsePlanInput,

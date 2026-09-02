@@ -1,18 +1,19 @@
 # `@khoralabs/agent-net/swarm`
 
-Budgeted multi-agent orchestration on top of the harness control plane.
+Session/config helpers for budgeted multi-agent orchestration. This entrypoint does **not** export Workflow orchestrators or steps — hosts own durable directives.
 
-Exports `swarmOrchestrator`, `provideHarnessForSession`, `provideOntologyForSession`, and `SwarmConfig`. It does **not** select a Workflow world or host memories/relay.
+Exports `provideHarnessForSession`, `provideOntologyForSession`, and `SwarmConfig`. Directive-free run helpers (`setupSwarm`, `assembleTurnContext`, swarm-state ops, …) live on `@khoralabs/agent-net/swarm-run`.
 
 ```ts
 import { startNetworkHarness } from "@khoralabs/agent-net";
 import {
   provideHarnessForSession,
   provideOntologyForSession,
-  swarmOrchestrator,
   type SwarmConfig,
 } from "@khoralabs/agent-net/swarm";
 import { start } from "workflow/api";
+// Host-owned wrapper (see apps/reference/src/workflows/swarm.ts):
+import { swarmOrchestrator } from "./workflows/swarm.ts";
 
 const harness = await startNetworkHarness({ /* … */ });
 provideHarnessForSession(sessionId, harness);

@@ -18,12 +18,12 @@ import {
   provideHarnessForSession,
   provideOntologyForSession,
   type SwarmConfig,
-  swarmOrchestrator,
 } from "@khoralabs/agent-net/swarm";
 import { start } from "workflow/api";
 
 import { referenceMemoriesOntology } from "./memories/ontology.ts";
 import { installReferenceObservability } from "./observability/install.ts";
+import { swarmOrchestrator } from "./workflows/swarm.ts";
 import { configureLocalWorldEnv, startLocalWorldWorker } from "./world/local.ts";
 import { resolveHarnessDataDir } from "./world/paths.ts";
 

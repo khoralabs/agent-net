@@ -1,20 +1,14 @@
+import type { AgentWorkflowParams, AgentWorkflowResult } from "@khoralabs/agent-net";
 import { start } from "workflow/api";
 
-import type { AgentWorkflowParams, AgentWorkflowResult } from "../../agent/turn/types.ts";
 import { executeAgentResponse } from "./agent-response-step.ts";
 
 /**
- * Durable agent-response workflow.
- * The hosting process must configure and start the Workflow world (e.g. local)
- * before invoking this — harness workflows do not select a world backend.
- *
- * This file must stay free of Node.js imports (`node:*`) and must not re-export
- * step/run helpers (that would pull Node into the workflow graph). Step
- * implementation lives in {@link ./agent-response-step.ts}.
+ * Reference-app durable agent-response workflow.
+ * Hosting process must configure and start the Workflow world before invoking.
  */
 export async function agentResponse(params: AgentWorkflowParams): Promise<AgentWorkflowResult> {
   "use workflow";
-
   return await executeAgentResponse(params);
 }
 

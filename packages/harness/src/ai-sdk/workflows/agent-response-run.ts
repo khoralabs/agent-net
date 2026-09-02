@@ -16,13 +16,14 @@ import {
   resolveMemoriesServiceBaseUrl,
 } from "../../agent/turn/tools/_helpers/toolkit-env.ts";
 import type { AgentWorkflowParams, AgentWorkflowResult } from "../../agent/turn/types.ts";
+import { requireNetworkSession } from "../../pool/network/session-registry.ts";
 import { type RunAgentWorkflowDependencies, runAgentWorkflow } from "../run-agent-workflow.ts";
 
 export type AgentResponseDeps = RunAgentWorkflowDependencies;
 
 /**
- * Agent-response body without a workflow step directive. Safe to call from a
- * host `"use step"` after the host has installed chat/ontology into the isolate.
+ * Agent-response body without a Workflow directive. Hosts wrap this in their
+ * own durable step entry after installing chat/ontology into the isolate.
  *
  * When no ontology is installed, uses {@link minimalAgentMemoriesOntology}.
  * Hosts that need a richer ontology must install it in the step module graph.
@@ -81,6 +82,32 @@ export async function runExecuteAgentResponse(
     agentChat: getAgentChatClientForDid(agentDid),
     memoriesClient,
     khoraClient,
+    embeddingModel,
+  });
+}
+
+/**
+ * Resolve network-session deps then run the agent-response body.
+ * Directive-free; hosts wrap with a durable step when needed.
+ */
+export async function runAgentResponseWithSession(
+  params: AgentWorkflowParams,
+): Promise<AgentWorkflowResult> {
+  const sessionId = params.context.sessionId;
+  if (sessionId === undefined || sessionId.length === 0) {
+    return runExecuteAgentResponse(params);
+  }
+
+  const session = requireNetworkSession(sessionId);
+  const networkDeps = await session.resolveAgentWorkflowDeps(params.agent.actingFor.id);
+  const embeddingModel = resolveAgentEmbeddingModel();
+  if (networkDeps.memoriesClient !== undefined && embeddingModel === undefined) {
+    throw new Error(
+      "AI_GATEWAY_API_KEY is required for agent-response memory search (set it on this service's env)",
+    );
+  }
+  return runAgentWorkflow(params, {
+    ...(networkDeps as AgentResponseDeps),
     embeddingModel,
   });
 }
