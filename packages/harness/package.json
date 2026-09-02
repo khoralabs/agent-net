@@ -42,6 +42,12 @@
       "import": "./dist/swarm/index.js",
       "default": "./dist/swarm/index.js"
     },
+    "./ai-sdk": {
+      "types": "./src/ai-sdk/index.ts",
+      "bun": "./src/ai-sdk/index.ts",
+      "import": "./dist/ai-sdk/index.js",
+      "default": "./dist/ai-sdk/index.js"
+    },
     "./agent-workflow-types": {
       "types": "./src/agent/turn/types.ts",
       "bun": "./src/agent/turn/types.ts",
@@ -49,16 +55,16 @@
       "default": "./dist/agent/turn/types.js"
     },
     "./agent-response-run": {
-      "types": "./src/agent/turn/workflows/agent-response-run.ts",
-      "bun": "./src/agent/turn/workflows/agent-response-run.ts",
-      "import": "./dist/agent/turn/workflows/agent-response-run.js",
-      "default": "./dist/agent/turn/workflows/agent-response-run.js"
+      "types": "./src/ai-sdk/workflows/agent-response-run.ts",
+      "bun": "./src/ai-sdk/workflows/agent-response-run.ts",
+      "import": "./dist/ai-sdk/workflows/agent-response-run.js",
+      "default": "./dist/ai-sdk/workflows/agent-response-run.js"
     },
     "./classify-response-plan-run": {
-      "types": "./src/agent/turn/workflows/classify-response-plan-run.ts",
-      "bun": "./src/agent/turn/workflows/classify-response-plan-run.ts",
-      "import": "./dist/agent/turn/workflows/classify-response-plan-run.js",
-      "default": "./dist/agent/turn/workflows/classify-response-plan-run.js"
+      "types": "./src/ai-sdk/workflows/classify-response-plan-run.ts",
+      "bun": "./src/ai-sdk/workflows/classify-response-plan-run.ts",
+      "import": "./dist/ai-sdk/workflows/classify-response-plan-run.js",
+      "default": "./dist/ai-sdk/workflows/classify-response-plan-run.js"
     },
     "./response-plan": {
       "types": "./src/agent/turn/response-plan.ts",
@@ -97,22 +103,22 @@
       "default": "./dist/agent/turn/step-context.js"
     },
     "./run-harness-agent-step": {
-      "types": "./src/agent/turn/run-harness-agent-step.ts",
-      "bun": "./src/agent/turn/run-harness-agent-step.ts",
-      "import": "./dist/agent/turn/run-harness-agent-step.js",
-      "default": "./dist/agent/turn/run-harness-agent-step.js"
+      "types": "./src/ai-sdk/run-harness-agent-step.ts",
+      "bun": "./src/ai-sdk/run-harness-agent-step.ts",
+      "import": "./dist/ai-sdk/run-harness-agent-step.js",
+      "default": "./dist/ai-sdk/run-harness-agent-step.js"
     },
     "./nbc-run-model-turn-run": {
-      "types": "./src/agent/turn/workflows/nbc-run-model-turn-run.ts",
-      "bun": "./src/agent/turn/workflows/nbc-run-model-turn-run.ts",
-      "import": "./dist/agent/turn/workflows/nbc-run-model-turn-run.js",
-      "default": "./dist/agent/turn/workflows/nbc-run-model-turn-run.js"
+      "types": "./src/ai-sdk/workflows/nbc-run-model-turn-run.ts",
+      "bun": "./src/ai-sdk/workflows/nbc-run-model-turn-run.ts",
+      "import": "./dist/ai-sdk/workflows/nbc-run-model-turn-run.js",
+      "default": "./dist/ai-sdk/workflows/nbc-run-model-turn-run.js"
     },
     "./nbc-prepare-turn-run": {
-      "types": "./src/agent/turn/workflows/nbc-prepare-turn-run.ts",
-      "bun": "./src/agent/turn/workflows/nbc-prepare-turn-run.ts",
-      "import": "./dist/agent/turn/workflows/nbc-prepare-turn-run.js",
-      "default": "./dist/agent/turn/workflows/nbc-prepare-turn-run.js"
+      "types": "./src/ai-sdk/workflows/nbc-prepare-turn-run.ts",
+      "bun": "./src/ai-sdk/workflows/nbc-prepare-turn-run.ts",
+      "import": "./dist/ai-sdk/workflows/nbc-prepare-turn-run.js",
+      "default": "./dist/ai-sdk/workflows/nbc-prepare-turn-run.js"
     },
     "./attribution-digest": {
       "types": "./src/pool/observability/attribution-digest.ts",
@@ -133,10 +139,10 @@
       "default": "./dist/pool/network/persistence/sqlite/index.js"
     },
     "./structured-output": {
-      "types": "./src/agent/turn/structured-output.ts",
-      "bun": "./src/agent/turn/structured-output.ts",
-      "import": "./dist/agent/turn/structured-output.js",
-      "default": "./dist/agent/turn/structured-output.js"
+      "types": "./src/ai-sdk/structured-output.ts",
+      "bun": "./src/ai-sdk/structured-output.ts",
+      "import": "./dist/ai-sdk/structured-output.js",
+      "default": "./dist/ai-sdk/structured-output.js"
     },
     "./dist": {
       "types": "./dist/index.d.ts",

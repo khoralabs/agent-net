@@ -1,6 +1,6 @@
 /**
- * Public agent-turn surface for consumers (e.g. swarm) that must not deep-import
- * agent workflow internals.
+ * Public agent-turn types for consumers (e.g. swarm) that must not deep-import
+ * agent workflow internals. LLM run helpers live on `@khoralabs/agent-net/ai-sdk`.
  */
 
 export type {
@@ -8,5 +8,3 @@ export type {
   AgentWorkflowParams as AgentTurnParams,
   AgentWorkflowResult as AgentTurnResult,
 } from "./types.ts";
-export type { AgentResponseDeps as AgentTurnDeps } from "./workflows/agent-response-run.ts";
-export { runAgentResponseStep as runAgentTurn } from "./workflows/agent-response-step.ts";

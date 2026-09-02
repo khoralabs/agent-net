@@ -33,8 +33,8 @@ import {
 import { createHarnessChatCrypto } from "../../agent/social/message/chat-crypto.ts";
 import { createHarnessKhoraClientForAgent } from "../../agent/social/tools/_helpers/khora-client-factory.ts";
 import { getCapabilityRegistry } from "../../agent/turn/agent-runtime.ts";
-import type { RunAgentWorkflowDependencies } from "../../agent/turn/run-agent-workflow.ts";
 import { harnessToolkit } from "../../agent/turn/tools/index.ts";
+import type { RunAgentWorkflowDependencies } from "../../agent/turn/workflow-deps.ts";
 import { requireChatBaseUrl, requireChatToken } from "../../lib/chat-base-url.ts";
 import { requireMemoriesAdminToken } from "../../lib/memories-base-url.ts";
 import { loadHarnessIdentity, resolveIdentitySecretFromEnv } from "../identity-wrap-key.ts";

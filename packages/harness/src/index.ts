@@ -149,7 +149,6 @@ export {
   sourcesFromMemoryToolParts,
 } from "./agent/turn/agent-memory-source.ts";
 export {
-  captureHarnessCapabilities,
   configureHarnessAgentRegistry,
   configureHarnessCapabilityTurnHook,
   getAgentRegistry,
@@ -158,15 +157,8 @@ export {
   resetHarnessAgentRegistryForTests,
 } from "./agent/turn/agent-runtime.ts";
 export type { AgentTurnParams, AgentTurnResult, AgentUIMessage } from "./agent/turn/agent-turn.ts";
-export { runAgentTurn } from "./agent/turn/agent-turn.ts";
 export { HARNESS_AGENT_ID } from "./agent/turn/capability-agents/index.ts";
 export { NETWORK_NEGOTIATION_AGENT_ID } from "./agent/turn/capability-agents/network-negotiation-agent.ts";
-export {
-  type PreparedHarnessStep,
-  type PrepareHarnessStepInput,
-  prepareHarnessStepRuntime,
-} from "./agent/turn/prepare-harness-step.ts";
-export { runHarnessAgentStep } from "./agent/turn/run-harness-agent-step.ts";
 export {
   formatAgentStepContext,
   resolveAgentStepContext,
@@ -190,11 +182,6 @@ export {
   namespaceCatalogSourceRef,
   resolveMemoriesStepContextFacets,
 } from "./agent/turn/step-context-sources.ts";
-export {
-  describeGenerationFailure,
-  generateStructured,
-  repairTruncatedJson,
-} from "./agent/turn/structured-output.ts";
 export { HARNESS_TOOLKIT, type HarnessToolkitId } from "./agent/turn/tools/ids.ts";
 export type { HarnessMemorySearchExtensions, NbcToolkitContext } from "./agent/turn/tools/types.ts";
 export type {
@@ -216,15 +203,6 @@ export {
   isAbortError,
   rethrowAsRetryableTimeout,
 } from "./agent/turn/workflow-resilience.ts";
-export { agentResponse } from "./agent/turn/workflows/agent-response.ts";
-export {
-  type AgentResponseDeps,
-  runExecuteAgentResponse,
-} from "./agent/turn/workflows/agent-response-run.ts";
-export {
-  executeAgentResponse,
-  runAgentResponseStep,
-} from "./agent/turn/workflows/agent-response-step.ts";
 export {
   requireChatBaseUrl,
   requireChatToken,

@@ -1,6 +1,6 @@
 import { start } from "workflow/api";
 
-import type { AgentWorkflowParams, AgentWorkflowResult } from "../types.ts";
+import type { AgentWorkflowParams, AgentWorkflowResult } from "../../agent/turn/types.ts";
 import { executeAgentResponse } from "./agent-response-step.ts";
 
 /**

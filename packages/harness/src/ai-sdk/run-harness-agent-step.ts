@@ -1,19 +1,18 @@
-import type { LanguageModel } from "ai";
-
+import type { AgentWorkflowParams, AgentWorkflowResult } from "../agent/turn/types.ts";
+import type { RunAgentWorkflowDependencies } from "../agent/turn/workflow-deps.ts";
 import {
   type PreparedHarnessStep,
   type PrepareHarnessStepInput,
   prepareHarnessStepRuntime,
 } from "./prepare-harness-step.ts";
-import type { RunAgentWorkflowDependencies } from "./run-agent-workflow.ts";
 import { runAgentWorkflow } from "./run-agent-workflow.ts";
 import { generateStructured } from "./structured-output.ts";
-import type { AgentWorkflowParams, AgentWorkflowResult } from "./types.ts";
 
 export type RunHarnessStructuredStepArgs<_T = unknown> = {
   mode: "structured";
   label: string;
-  model: LanguageModel;
+  /** Gateway / provider model id (string). */
+  model: string;
   /** JSON Schema or Zod schema for `generateObject` (loosely typed across `ai` copies). */
   schema: unknown;
   /** Task-specific prompt body (step context is prepended automatically). */

@@ -1,7 +1,7 @@
-import { requireNetworkSession } from "../../../pool/network/session-registry.ts";
+import type { AgentWorkflowParams, AgentWorkflowResult } from "../../agent/turn/types.ts";
+import { AI_STEP_MAX_RETRIES } from "../../agent/turn/workflow-resilience.ts";
+import { requireNetworkSession } from "../../pool/network/session-registry.ts";
 import { runAgentWorkflow } from "../run-agent-workflow.ts";
-import type { AgentWorkflowParams, AgentWorkflowResult } from "../types.ts";
-import { AI_STEP_MAX_RETRIES } from "../workflow-resilience.ts";
 import { type AgentResponseDeps, runExecuteAgentResponse } from "./agent-response-run.ts";
 
 /**

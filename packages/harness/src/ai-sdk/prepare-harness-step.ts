@@ -3,18 +3,18 @@ import type { KhoraClient } from "@khoralabs/khora-client";
 import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import type { ToolSet } from "ai";
-import type { AgentChatClient } from "../social/message/chat.ts";
+import type { AgentChatClient } from "../agent/social/message/chat.ts";
 import {
-  captureHarnessCapabilities,
   createHarnessAgentTelemetry,
   getCapabilityRegistry,
   type OnCapabilityTurn,
   resolveWorkflowAgent,
-} from "./agent-runtime.ts";
-import { formatAgentStepContext, resolveAgentStepContext } from "./step-context.ts";
-import { createHarnessToolkitEnv } from "./tools/_helpers/toolkit-env.ts";
-import type { HarnessToolkitEnv } from "./tools/types.ts";
-import type { AgentStepContext, AgentWorkflowParams } from "./types.ts";
+} from "../agent/turn/agent-runtime.ts";
+import { formatAgentStepContext, resolveAgentStepContext } from "../agent/turn/step-context.ts";
+import { createHarnessToolkitEnv } from "../agent/turn/tools/_helpers/toolkit-env.ts";
+import type { HarnessToolkitEnv } from "../agent/turn/tools/types.ts";
+import type { AgentStepContext, AgentWorkflowParams } from "../agent/turn/types.ts";
+import { captureHarnessCapabilities } from "./capture-harness-capabilities.ts";
 
 export type PrepareHarnessStepInput = {
   /** Explicit step context bag (preferred). */
@@ -34,7 +34,7 @@ export type PrepareHarnessStepInput = {
     agentChat?: AgentChatClient;
     disableToolkits?: readonly string[];
     disableTools?: readonly string[];
-    nbc?: import("./tools/types.ts").HarnessToolkitEnv["nbc"];
+    nbc?: HarnessToolkitEnv["nbc"];
     /** Capture harness tools for chat / tool-loop modes. */
     captureTools?: boolean;
     /** Full workflow params required when captureTools is true. */

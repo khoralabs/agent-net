@@ -5,18 +5,18 @@ import {
   getAgentChatClientForDid,
   getAgentChatService,
   getAgentChatSigner,
-} from "../../social/message/chat-service.ts";
+} from "../../agent/social/message/chat-service.ts";
 import {
   createHarnessKhoraClientForAgent,
   resolveKhoraServerBaseUrl,
-} from "../../social/tools/_helpers/khora-client-factory.ts";
-import { type RunAgentWorkflowDependencies, runAgentWorkflow } from "../run-agent-workflow.ts";
+} from "../../agent/social/tools/_helpers/khora-client-factory.ts";
 import {
   createAgentMemoriesClientForAgent,
   resolveMemoriesServiceAdminToken,
   resolveMemoriesServiceBaseUrl,
-} from "../tools/_helpers/toolkit-env.ts";
-import type { AgentWorkflowParams, AgentWorkflowResult } from "../types.ts";
+} from "../../agent/turn/tools/_helpers/toolkit-env.ts";
+import type { AgentWorkflowParams, AgentWorkflowResult } from "../../agent/turn/types.ts";
+import { type RunAgentWorkflowDependencies, runAgentWorkflow } from "../run-agent-workflow.ts";
 
 export type AgentResponseDeps = RunAgentWorkflowDependencies;
 
@@ -36,7 +36,7 @@ export async function runExecuteAgentResponse(
   }
 
   const { getInstalledMemoriesOntology } = await import(
-    "../../memories/tools/_helpers/memories-ontology-install.ts"
+    "../../agent/memories/tools/_helpers/memories-ontology-install.ts"
   );
 
   const memoriesBaseUrl = resolveMemoriesServiceBaseUrl();

@@ -14,7 +14,7 @@ import {
 import { discoverSkillsFromMemories } from "../../../memories/skills/_helpers/skills.ts";
 import { resolveRecentNamespacesTracker } from "../../../memories/tools/_helpers/recent-namespaces.ts";
 import type { AgentChatClient } from "../../../social/message/chat.ts";
-import type { RunAgentWorkflowDependencies } from "../../run-agent-workflow.ts";
+import type { RunAgentWorkflowDependencies } from "../../workflow-deps.ts";
 import type { HarnessToolkitEnv } from "../types.ts";
 
 export async function createHarnessToolkitEnv(input: {

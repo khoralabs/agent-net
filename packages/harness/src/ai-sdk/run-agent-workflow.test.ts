@@ -1,13 +1,13 @@
 import { afterEach, beforeEach, expect, test } from "bun:test";
 import type { UIMessage } from "ai";
+import { HARNESS_AGENT_ID } from "../agent/turn/capability-agents/index.ts";
+import type { AgentWorkflowParams } from "../agent/turn/types.ts";
 import {
   createSignedTestChat,
   readPostSignatures,
   type SignedTestChat,
-} from "../../tests/signed-chat.ts";
-import { HARNESS_AGENT_ID } from "./capability-agents/index.ts";
+} from "../tests/signed-chat.ts";
 import { runAgentWorkflow, withAssistantText } from "./run-agent-workflow.ts";
-import type { AgentWorkflowParams } from "./types.ts";
 
 test("withAssistantText preserves reasoning and tool parts", () => {
   const message: UIMessage = {

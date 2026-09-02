@@ -1,11 +1,10 @@
 import { describe, expect, test } from "bun:test";
-
-import type { ResponseModelCapabilities } from "./gateway-model-capabilities.ts";
-import type { AgentWorkflowParams } from "./types.ts";
 import {
   mergeResponsePlanIntoParams,
   runClassifyResponsePlan,
-} from "./workflows/classify-response-plan-run.ts";
+} from "../../ai-sdk/workflows/classify-response-plan-run.ts";
+import type { ResponseModelCapabilities } from "./gateway-model-capabilities.ts";
+import type { AgentWorkflowParams } from "./types.ts";
 
 function baseParams(modelId: string): AgentWorkflowParams {
   return {

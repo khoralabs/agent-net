@@ -1,16 +1,11 @@
-import {
-  type FlexibleSchema,
-  generateObject,
-  type LanguageModel,
-  NoObjectGeneratedError,
-} from "ai";
+import { type FlexibleSchema, generateObject, NoObjectGeneratedError } from "ai";
 import { FatalError } from "workflow";
 
 import {
   AI_STEP_TIMEOUT_MS,
   isAbortError,
   rethrowAsRetryableTimeout,
-} from "./workflow-resilience.ts";
+} from "../agent/turn/workflow-resilience.ts";
 
 const DEFAULT_ATTEMPTS = 2;
 /** Gemini counts thinking tokens against the output budget; leave headroom. */
@@ -144,7 +139,8 @@ function retryHint(error: unknown): string {
  */
 export async function generateStructured<T>(args: {
   label: string;
-  model: LanguageModel;
+  /** Gateway / provider model id (string). */
+  model: string;
   schema: unknown;
   prompt: string;
   attempts?: number;

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-
+import { mergeResponsePlanIntoParams } from "../../ai-sdk/workflows/classify-response-plan-run.ts";
 import {
   buildResponsePlanSchema,
   clampMaxOutputTokens,
@@ -11,7 +11,6 @@ import {
   responsePlanOptionsFromEnv,
 } from "./response-plan.ts";
 import type { AgentWorkflowParams } from "./types.ts";
-import { mergeResponsePlanIntoParams } from "./workflows/classify-response-plan-run.ts";
 
 describe("responsePlanOptionsFromEnv", () => {
   test("defaults to reasoning only", () => {

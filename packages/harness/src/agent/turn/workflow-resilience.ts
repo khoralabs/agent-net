@@ -1,4 +1,3 @@
-import { NoOutputGeneratedError } from "ai";
 import { FatalError, RetryableError } from "workflow";
 
 /** Durable AI-step retries (3 total attempts including the first). */
@@ -35,12 +34,22 @@ export function rethrowAsRetryableTimeout(err: unknown, label: string): never {
   throw err;
 }
 
+function isNoOutputGeneratedError(err: unknown): err is Error {
+  return (
+    err !== null &&
+    typeof err === "object" &&
+    typeof (err as { name?: unknown }).name === "string" &&
+    ((err as { name: string }).name === "AI_NoOutputGeneratedError" ||
+      (err as { name: string }).name === "NoOutputGeneratedError")
+  );
+}
+
 /**
- * If `err` is {@link NoOutputGeneratedError}, throw {@link FatalError}.
- * Otherwise rethrow `err`.
+ * If `err` looks like AI SDK {@code NoOutputGeneratedError}, throw {@link FatalError}.
+ * Otherwise rethrow `err`. Duck-typed so core stays free of `ai` imports.
  */
 export function rethrowAsFatalAiNoOutput(err: unknown, label = "AI step"): never {
-  if (NoOutputGeneratedError.isInstance(err)) {
+  if (isNoOutputGeneratedError(err)) {
     throw new FatalError(`${label}: ${err.message}`);
   }
   throw err;

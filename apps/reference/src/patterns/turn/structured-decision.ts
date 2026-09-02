@@ -1,5 +1,4 @@
-import { generateStructured } from "@khoralabs/agent-net";
-import { gateway } from "ai";
+import { generateStructured } from "@khoralabs/agent-net/ai-sdk";
 import { z } from "zod";
 
 export const engageDecisionSchema = z.object({
@@ -30,7 +29,7 @@ export function requireGatewayModelId(modelId: string): string {
 
 /**
  * Domain-agnostic structured LLM decision (no tools).
- * Promote candidate — wraps harness `generateStructured`.
+ * Promote candidate — wraps harness `generateStructured` with string model IDs.
  */
 export async function runStructuredDecision<T>(input: {
   label: string;
@@ -41,7 +40,7 @@ export async function runStructuredDecision<T>(input: {
   const modelId = requireGatewayModelId(input.modelId);
   return generateStructured<T>({
     label: input.label,
-    model: gateway(modelId),
+    model: modelId,
     schema: input.schema,
     prompt: input.prompt,
   });

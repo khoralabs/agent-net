@@ -1,10 +1,8 @@
 import { afterEach, describe, expect, test } from "bun:test";
 import { evaluateComposable } from "@khoralabs/agent-capabilities";
+import { captureHarnessCapabilities } from "../../../../ai-sdk/capture-harness-capabilities.ts";
 import { createEphemeralRecentNamespacesTracker } from "../../../memories/tools/_helpers/recent-namespaces.ts";
-import {
-  captureHarnessCapabilities,
-  resetHarnessAgentRegistryForTests,
-} from "../../../turn/agent-runtime.ts";
+import { resetHarnessAgentRegistryForTests } from "../../../turn/agent-runtime.ts";
 import { defineNegotiationAgent } from "../../../turn/capability-agents/network-negotiation-agent.ts";
 import { HARNESS_TOOLKIT } from "../../../turn/tools/ids.ts";
 import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../../../turn/tools/types.ts";

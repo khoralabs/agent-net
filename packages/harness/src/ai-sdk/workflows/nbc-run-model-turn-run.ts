@@ -1,7 +1,7 @@
 import { generateText, Output, stepCountIs } from "ai";
 
-import { runNbcModelTurn } from "../../social/negotiate/nbc/run-nbc-model-turn.ts";
-import { negotiationTurnEnvelopeSchema } from "../../social/negotiate/nbc/turn-output-schema.ts";
+import { runNbcModelTurn } from "../../agent/social/negotiate/nbc/run-nbc-model-turn.ts";
+import { negotiationTurnEnvelopeSchema } from "../../agent/social/negotiate/nbc/turn-output-schema.ts";
 import {
   buildNbcToolSet,
   executeNbcTool,

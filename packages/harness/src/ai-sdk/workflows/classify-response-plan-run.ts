@@ -2,11 +2,11 @@ import { captureAgentSnapshotEnvelope } from "@khoralabs/agent-capabilities";
 import { resolveAgentEmbeddingModel } from "@khoralabs/memories-node/helpers/agent";
 import { minimalAgentMemoriesOntology } from "@khoralabs/memories-service/client/agent";
 import { generateText, Output } from "ai";
-import { discoverSkillsFromMemories } from "../../memories/skills/_helpers/skills.ts";
-import { getInstalledMemoriesOntology } from "../../memories/tools/_helpers/memories-ontology-install.ts";
-import { getCapabilityRegistry, resolveGatewayModel } from "../agent-runtime.ts";
-import { defineResponsePlannerAgent } from "../capability-agents/response-planner.ts";
-import type { ResponseModelCapabilities } from "../gateway-model-capabilities.ts";
+import { discoverSkillsFromMemories } from "../../agent/memories/skills/_helpers/skills.ts";
+import { getInstalledMemoriesOntology } from "../../agent/memories/tools/_helpers/memories-ontology-install.ts";
+import { getCapabilityRegistry, resolveGatewayModel } from "../../agent/turn/agent-runtime.ts";
+import { defineResponsePlannerAgent } from "../../agent/turn/capability-agents/response-planner.ts";
+import type { ResponseModelCapabilities } from "../../agent/turn/gateway-model-capabilities.ts";
 import {
   anyResponsePlanKnobEnabled,
   buildResponsePlanSchema,
@@ -18,13 +18,13 @@ import {
   type ResponsePlanOptions,
   resolveResponsePlanOptions,
   responsePlanOptionsFromEnv,
-} from "../response-plan.ts";
+} from "../../agent/turn/response-plan.ts";
 import {
   createAgentMemoriesClientForAgent,
   resolveMemoriesServiceAdminToken,
   resolveMemoriesServiceBaseUrl,
-} from "../tools/_helpers/toolkit-env.ts";
-import type { AgentWorkflowParams } from "../types.ts";
+} from "../../agent/turn/tools/_helpers/toolkit-env.ts";
+import type { AgentWorkflowParams } from "../../agent/turn/types.ts";
 
 export type SkillCatalogEntry = {
   name: string;

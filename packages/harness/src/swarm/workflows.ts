@@ -1,5 +1,6 @@
 import { getRun, start } from "workflow/api";
-import { type AgentTurnParams, emitNetworkEvent, networkEventId, runAgentTurn } from "../index.ts";
+import { runAgentResponseStep as runAgentTurn } from "../ai-sdk/workflows/agent-response-step.ts";
+import { type AgentTurnParams, emitNetworkEvent, networkEventId } from "../index.ts";
 
 import { assembleTurnContext } from "./assemble-turn-context.ts";
 import { takeHarnessForSession } from "./pending-harness.ts";

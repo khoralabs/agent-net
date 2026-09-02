@@ -1,7 +1,4 @@
-import type { ChatSigner, PostModelMetadata, PostUsage } from "@khoralabs/chat";
-import type { KhoraClient } from "@khoralabs/khora-client";
-import type { EmbeddingModel } from "@khoralabs/memories-node/helpers";
-import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
+import type { PostModelMetadata, PostUsage } from "@khoralabs/chat";
 import {
   convertToModelMessages,
   type ModelMessage,
@@ -13,34 +10,29 @@ import {
   type UIMessage,
 } from "ai";
 import { FatalError } from "workflow";
-import { buildNetworkAttribution } from "../../pool/observability/attribution-digest.ts";
-import { runWithAttributionAsync } from "../../pool/observability/network-log.ts";
-import { formatSkillCatalog } from "../memories/skills/_helpers/skills.ts";
-import { activateSkillByName } from "../memories/skills/activate-skill.ts";
-import type { AgentChatClient, ChatServiceClient } from "../social/message/chat.ts";
-import { createAgentChatWriter } from "../social/message/chat-writer.ts";
-import { sourcesFromMemoryToolParts } from "./agent-memory-source.ts";
-import { resolveGatewayModel } from "./agent-runtime.ts";
-import { prepareHarnessStepRuntime } from "./prepare-harness-step.ts";
-import { formatAgentStepContext } from "./step-context.ts";
-import { collectThreadHashSnapshots } from "./thread-provenance.ts";
-import type { AgentWorkflowParams, AgentWorkflowResult } from "./types.ts";
+import { formatSkillCatalog } from "../agent/memories/skills/_helpers/skills.ts";
+import { activateSkillByName } from "../agent/memories/skills/activate-skill.ts";
+import { createAgentChatWriter } from "../agent/social/message/chat-writer.ts";
+import { sourcesFromMemoryToolParts } from "../agent/turn/agent-memory-source.ts";
+import { resolveGatewayModel } from "../agent/turn/agent-runtime.ts";
+import { formatAgentStepContext } from "../agent/turn/step-context.ts";
+import { collectThreadHashSnapshots } from "../agent/turn/thread-provenance.ts";
+import type { AgentWorkflowParams, AgentWorkflowResult } from "../agent/turn/types.ts";
 import {
   buildUserLocalDateTimeContext,
   formatUserLocalDateTimeInstruction,
-} from "./user-local-datetime.ts";
-import { AGENT_STEP_TIMEOUT_MS, rethrowAsFatalAiNoOutput } from "./workflow-resilience.ts";
+} from "../agent/turn/user-local-datetime.ts";
+import type { RunAgentWorkflowDependencies as CoreWorkflowDeps } from "../agent/turn/workflow-deps.ts";
+import {
+  AGENT_STEP_TIMEOUT_MS,
+  rethrowAsFatalAiNoOutput,
+} from "../agent/turn/workflow-resilience.ts";
+import { buildNetworkAttribution } from "../pool/observability/attribution-digest.ts";
+import { runWithAttributionAsync } from "../pool/observability/network-log.ts";
+import { prepareHarnessStepRuntime } from "./prepare-harness-step.ts";
 
-export type RunAgentWorkflowDependencies = {
-  chatService?: ChatServiceClient;
-  chatSigner?: ChatSigner;
-  agentChat?: AgentChatClient;
-  sessionId?: string;
-  networkDataDir?: string;
+export type RunAgentWorkflowDependencies = CoreWorkflowDeps & {
   streamTextFn?: typeof streamText;
-  memoriesClient?: RemoteMemoriesClientAsync;
-  khoraClient?: KhoraClient;
-  embeddingModel?: EmbeddingModel;
 };
 
 function assistantMessage(id: string, text: string): UIMessage {
