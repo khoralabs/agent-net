@@ -1,4 +1,3 @@
-import type { UIMessage } from "ai";
 import type { AgentChatClient, AgentTurnParams, AgentUIMessage } from "../index.ts";
 
 import type { InboxEntry } from "./swarm-state.ts";
@@ -7,7 +6,7 @@ import type { AgentLoopState, SwarmConfig } from "./types.ts";
 function postToUiMessage(post: {
   id: string;
   role: string;
-  parts: UIMessage["parts"];
+  parts: AgentUIMessage["parts"];
 }): AgentUIMessage {
   return {
     id: post.id,

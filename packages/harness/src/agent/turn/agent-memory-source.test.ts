@@ -5,7 +5,6 @@ import {
   DEFAULT_MEMORY_SOURCE_KEY,
 } from "@khoralabs/memories-node/helpers/agent";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
-import type { UIMessage } from "ai";
 import {
   AGENT_MEMORY_DOMAIN,
   agentMemorySourceRef,
@@ -13,20 +12,21 @@ import {
   isAgentMemorySourceRef,
   sourcesFromMemoryToolParts,
 } from "./agent-memory-source.ts";
+import type { AgentUIMessage } from "./types.ts";
 
 function toolPart(
   name: string,
   input: unknown,
   output: unknown,
   state = "output-available",
-): UIMessage["parts"][number] {
+): AgentUIMessage["parts"][number] {
   return {
     type: `tool-${name}`,
     toolCallId: `${name}-1`,
     state,
     input,
     output,
-  } as UIMessage["parts"][number];
+  } as AgentUIMessage["parts"][number];
 }
 
 describe("agent-memory-source", () => {
@@ -95,7 +95,7 @@ describe("agent-memory-source", () => {
         { hits: [] },
         "input-available",
       ),
-    ] as UIMessage["parts"];
+    ] as AgentUIMessage["parts"];
 
     const sources = sourcesFromMemoryToolParts(parts);
     const sourceIds = sources.map((s) => s.id).sort();
@@ -140,7 +140,7 @@ describe("agent-memory-source", () => {
         { memories: [{ namespace: "ns", key: "k" }] },
         { results: [{ namespace: "ns", key: "k", text: "" }] },
       ),
-    ] as UIMessage["parts"];
+    ] as AgentUIMessage["parts"];
     expect(sourcesFromMemoryToolParts(parts)).toHaveLength(1);
   });
 
@@ -180,7 +180,7 @@ describe("agent-memory-source", () => {
           results: [{ key: "draft", namespace: "_skills_", text: "---" }],
         },
       ),
-    ] as UIMessage["parts"];
+    ] as AgentUIMessage["parts"];
 
     const sources = sourcesFromMemoryToolParts(parts);
     expect(sources.some((s) => s.id === "mem-skill")).toBe(true);

@@ -1,25 +1,25 @@
 import type {
+  ApplyPostDeltaInput,
   ChatSigner,
   PostModelMetadata,
   PostUsage,
   ScopeRef,
   SignablePostVersion,
+  StartStreamedPostInput,
 } from "@khoralabs/chat";
 import { canonicalSignedPostVersionPayload, signedPayloadBytes } from "@khoralabs/chat";
 import type { ChatServiceClient } from "@khoralabs/chat/http/client";
-import type { UIMessage } from "ai";
-
-import type { AgentWorkflowParams } from "../../turn/types.ts";
+import type { AgentUIMessage, AgentWorkflowParams } from "../../turn/types.ts";
 
 export type AgentChatWriter = {
   postId: string;
   revision: number;
-  start(message: UIMessage): Promise<void>;
+  start(message: AgentUIMessage): Promise<void>;
   apply(
-    message: UIMessage,
+    message: AgentUIMessage,
     metadata?: { model?: PostModelMetadata; usage?: PostUsage },
   ): Promise<void>;
-  complete(): Promise<UIMessage>;
+  complete(): Promise<AgentUIMessage>;
   abort(): Promise<void>;
 };
 
@@ -35,9 +35,9 @@ function signableFromCompletePost(post: {
   versionId: string;
   threadId: string;
   author: ScopeRef;
-  role: UIMessage["role"];
-  parts: UIMessage["parts"];
-  metadata?: UIMessage["metadata"];
+  role: AgentUIMessage["role"];
+  parts: AgentUIMessage["parts"];
+  metadata?: AgentUIMessage["metadata"];
   mentions?: SignablePostVersion["mentions"];
   model?: PostModelMetadata;
   usage?: PostUsage;
@@ -85,7 +85,8 @@ export function createAgentChatWriter(options: CreateAgentChatWriterOptions): Ag
       const result = await client.startStreamedPost({
         threadId,
         author,
-        message: { ...message, id: postId },
+        // Chat wire still types messages as AI SDK UIMessage; AgentUIMessage is structural.
+        message: { ...message, id: postId } as StartStreamedPostInput["message"],
         idempotencyKey: `${params.runId}:start`,
       });
       postId = result.post.id;
@@ -94,7 +95,7 @@ export function createAgentChatWriter(options: CreateAgentChatWriterOptions): Ag
     async apply(message, metadata) {
       const result = await client.applyPostDelta({
         postId,
-        message: { ...message, id: postId },
+        message: { ...message, id: postId } as ApplyPostDeltaInput["message"],
         model: metadata?.model,
         usage: metadata?.usage,
         expectedRevision: revision,
@@ -110,12 +111,14 @@ export function createAgentChatWriter(options: CreateAgentChatWriterOptions): Ag
       if (post.status !== "complete") {
         throw new Error(`expected complete post, got ${post.status}`);
       }
-      if (signer === undefined) return post;
+      if (signer === undefined) {
+        return post as AgentUIMessage;
+      }
 
       const payload = canonicalSignedPostVersionPayload(signableFromCompletePost(post));
       const envelope = await signer.sign(signedPayloadBytes(payload), author);
       await client.setPostVersionSignature(post.versionId, envelope);
-      return { ...post, signature: envelope };
+      return { ...post, signature: envelope } as AgentUIMessage;
     },
     async abort() {
       await client.abortStreamedPost({ postId });

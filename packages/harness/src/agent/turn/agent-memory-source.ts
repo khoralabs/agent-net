@@ -4,9 +4,9 @@ import { ids } from "@khoralabs/memories-node";
 import { createRemoteSourceMapContentStore } from "@khoralabs/memories-node/helpers/agent";
 import type { RemoteMemoriesClientAsync } from "@khoralabs/memories-service/client";
 import type { ResolvedSource, Store as SourcemapsStore, SourceRef } from "@khoralabs/sourcemaps";
-import type { UIMessage } from "ai";
 import { SKILLS_NAMESPACE } from "../memories/skills/_helpers/skills.ts";
 import { loadMemoryTextByKey } from "../memories/tools/_helpers/memory-text.ts";
+import type { AgentUIMessage } from "./types.ts";
 
 /** Domain tag for memory citations on chat posts (`ChatSourceWire.sourceRef`). */
 export const AGENT_MEMORY_DOMAIN = "agent-memory" as const;
@@ -165,7 +165,7 @@ type ToolPart = {
   output?: unknown;
 };
 
-function asToolParts(parts: UIMessage["parts"]): ToolPart[] {
+function asToolParts(parts: AgentUIMessage["parts"]): ToolPart[] {
   const out: ToolPart[] = [];
   for (const part of parts) {
     if (
@@ -197,7 +197,7 @@ function addSource(
  * Build `ChatSourceWire[]` for memories accessed in this turn via memory tools.
  * Dedupes by `memory_id`. Ignores non-memory tools and incomplete tool parts.
  */
-export function sourcesFromMemoryToolParts(parts: UIMessage["parts"]): ChatSourceWire[] {
+export function sourcesFromMemoryToolParts(parts: AgentUIMessage["parts"]): ChatSourceWire[] {
   const byId = new Map<string, ChatSourceWire>();
 
   for (const part of asToolParts(parts)) {

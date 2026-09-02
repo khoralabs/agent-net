@@ -17,7 +17,7 @@ import {
   createChatClient,
 } from "@khoralabs/chat/http/client";
 import { prepareAppendPost, signPreparedAppendPost } from "@khoralabs/chat/persistence";
-import type { UIMessage } from "ai";
+import type { AgentUIMessage } from "../../turn/types.ts";
 
 import { createHarnessChatCrypto, type ResolveHarnessChatSigner } from "./chat-crypto.ts";
 
@@ -48,8 +48,8 @@ export type CreateAgentThreadInput = {
 export type SendAgentMessageInput = {
   text: string;
   messageId?: string;
-  role?: UIMessage["role"];
-  /** Host-defined UIMessage.metadata (e.g. documents, sources). */
+  role?: AgentUIMessage["role"];
+  /** Host-defined message metadata (e.g. documents, sources). */
   metadata?: JsonObject;
 };
 
@@ -99,10 +99,10 @@ function agentScope(did: string): ScopeRef {
 
 function textMessage(
   id: string,
-  role: UIMessage["role"],
+  role: AgentUIMessage["role"],
   text: string,
   metadata?: JsonObject,
-): UIMessage {
+): AgentUIMessage {
   return {
     id,
     role,
@@ -246,7 +246,12 @@ function createScopedChatClient(
           input.text,
           input.metadata,
         );
-        const appendInput = { threadId, author: scope, message };
+        // Chat wire still types messages as AI SDK UIMessage; AgentUIMessage is structural.
+        const appendInput: AppendPostInput = {
+          threadId,
+          author: scope,
+          message: message as AppendPostInput["message"],
+        };
         const tip = await client.getThreadTip(threadId);
         const prepared = prepareAppendForSigningFromTip(tip, appendInput);
         const signature = await signPreparedAppendPost(chatSigner, scope, prepared);
