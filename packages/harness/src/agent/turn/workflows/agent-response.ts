@@ -5,7 +5,7 @@ import { executeAgentResponse } from "./agent-response-step.ts";
 
 /**
  * Durable agent-response workflow.
- * The hosting process must configure and start the Workflow world (e.g. Turso)
+ * The hosting process must configure and start the Workflow world (e.g. local)
  * before invoking this — harness workflows do not select a world backend.
  *
  * This file must stay free of Node.js imports (`node:*`) and must not re-export

@@ -5,14 +5,14 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./world/turso": "./src/world/turso.ts"
+    "./world/local": "./src/world/local.ts"
   },
   "scripts": {
     "start": "bun run src/orchestrator.ts -- --data-dir .data",
     "marketplace": "bun run src/run-marketplace.ts -- --data-dir .data",
     "swarm": "bun run src/run-swarm.ts -- --data-dir .data",
     "events": "bun run src/events-cli.ts -- --data-dir .data",
-    "agent:setup": "bun -e \"import { mkdirSync } from 'node:fs'; mkdirSync('.data', { recursive: true })\" && WORKFLOW_TURSO_DATABASE_URL=file:.data/workflow.db workflow-turso-setup",
+    "agent:setup": "bun -e \"import { mkdirSync } from 'node:fs'; mkdirSync('.data', { recursive: true })\"",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
@@ -25,8 +25,6 @@
     "@khoralabs/relay": "catalog:",
     "@khoralabs/sqlite-crypto": "catalog:",
     "@khoralabs/sqlite-migrate": "catalog:",
-    "@tursodatabase/serverless": "^0.2.0",
-    "@workflow-worlds/turso": "^0.2.2",
     "ai": "catalog:",
     "ajv": "^8",
     "pino": "^9.6.0",

@@ -12,4 +12,4 @@ export {
   type RelayServerOptions,
   startRelayServer,
 } from "./services/relay.ts";
-export { configureTursoWorldEnv, startTursoWorldWorker } from "./world/turso.ts";
+export { configureLocalWorldEnv, startLocalWorldWorker } from "./world/local.ts";

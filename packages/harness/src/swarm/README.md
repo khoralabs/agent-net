@@ -25,7 +25,7 @@ The hosting process must configure and start the Workflow world before `start(sw
 
 ## CLI (reference app)
 
-From the agent-net repo root (reference configures Turso and wires remote URLs):
+From the agent-net repo root (reference configures the local Workflow world and wires remote URLs):
 
 ```bash
 bun run swarm -- \

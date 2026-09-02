@@ -8,8 +8,8 @@ import { startKhoraHost } from "./services/khora/index.ts";
 import { startMemoriesService } from "./services/memories.ts";
 import { startRelayServer } from "./services/relay.ts";
 import { prepareSqliteForEncryptedMemories } from "./services/sqlite-prep.ts";
+import { configureLocalWorldEnv, startLocalWorldWorker } from "./world/local.ts";
 import { resolveHarnessDataDir } from "./world/paths.ts";
-import { configureTursoWorldEnv, startTursoWorldWorker } from "./world/turso.ts";
 
 const DEFAULT_CHAT_TOKEN = "reference-chat-token";
 const DEFAULT_MEMORIES_ADMIN_TOKEN = "reference-memories-admin-token";
@@ -80,8 +80,8 @@ async function main(): Promise<void> {
   const opts = parseArgs(process.argv.slice(2));
   const dataDir = path.resolve(opts.dataDir);
 
-  configureTursoWorldEnv({ dataDir });
-  await startTursoWorldWorker({ dataDir });
+  configureLocalWorldEnv({ dataDir });
+  await startLocalWorldWorker({ dataDir });
 
   installReferenceObservability({ serviceName: "network-harness-memories" });
 
@@ -130,7 +130,7 @@ async function main(): Promise<void> {
           DEFAULT_KHORA_ADMIN_TOKEN,
         memoriesAdminToken: process.env.MEMORIES_SERVICE_ADMIN_TOKEN,
         workflowTargetWorld: process.env.WORKFLOW_TARGET_WORLD,
-        workflowTursoDatabaseUrl: process.env.WORKFLOW_TURSO_DATABASE_URL,
+        workflowLocalDataDir: process.env.WORKFLOW_LOCAL_DATA_DIR,
       },
       null,
       2,

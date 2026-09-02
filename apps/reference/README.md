@@ -2,7 +2,7 @@
 
 Concrete stack for local development and demos:
 
-- Turso Workflow world bootstrap
+- Zero-config [Workflow local world](https://workflow-sdk.dev/worlds/local)
 - In-process Khora host + memories + relay + chat
 - Orchestrator process that starts those services
 - **Marketplace CLI** (`marketplace`) — primary demo: buy/sell pool, percolator inbox, seller evaluate, Vellum connect, buyer invite accept/decline (mutual interest; stop before NBC)
@@ -20,7 +20,7 @@ src/
   marketplace/                # MRO surplus demo domain (not promote-as-is)
     config.ts seed.ts pipeline.ts evaluate-on-inbox.ts evaluate-on-invite.ts GAPS.md
   run-swarm.ts                # secondary swarm demo
-  orchestrator.ts             # local khora + memories + relay + chat + Turso
+  orchestrator.ts             # local khora + memories + relay + chat + Workflow world
 ```
 
 `patterns/**` must not import `marketplace/**`. Host-glue pain points live in `marketplace/GAPS.md`.

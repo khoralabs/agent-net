@@ -11,7 +11,3 @@ export function resolveHarnessDataDir(configured?: string): string {
   if (fromEnv !== undefined && fromEnv.length > 0) return path.resolve(fromEnv);
   return path.join(process.cwd(), REFERENCE_DEFAULT_DATA_DIR);
 }
-
-export function workflowDbPath(dataDir: string): string {
-  return path.join(dataDir, "workflow.db");
-}

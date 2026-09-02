@@ -21,8 +21,8 @@ import { reportLine } from "./marketplace/report.ts";
 import { referenceMemoriesOntology } from "./memories/ontology.ts";
 import { installReferenceObservability } from "./observability/install.ts";
 import { requireKhoraReachable, requireReferenceStackReachable } from "./services/stack-health.ts";
+import { configureLocalWorldEnv, startLocalWorldWorker } from "./world/local.ts";
 import { resolveHarnessDataDir } from "./world/paths.ts";
-import { configureTursoWorldEnv, startTursoWorldWorker } from "./world/turso.ts";
 
 function parseArgs(argv: string[]): {
   buyers: number;
@@ -100,8 +100,8 @@ async function main(): Promise<void> {
     ...(parsed.inboxTimeoutMs !== undefined ? { inboxTimeoutMs: parsed.inboxTimeoutMs } : {}),
   });
 
-  configureTursoWorldEnv({ dataDir: config.dataDir });
-  await startTursoWorldWorker({ dataDir: config.dataDir });
+  configureLocalWorldEnv({ dataDir: config.dataDir });
+  await startLocalWorldWorker({ dataDir: config.dataDir });
 
   const networkEvents = createSqliteNetworkEventPersistencePlugin({ dataDir: config.dataDir });
   bindNetworkSessionContext({ sessionId: config.sessionId });

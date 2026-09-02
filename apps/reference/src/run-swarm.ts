@@ -24,8 +24,8 @@ import { start } from "workflow/api";
 
 import { referenceMemoriesOntology } from "./memories/ontology.ts";
 import { installReferenceObservability } from "./observability/install.ts";
+import { configureLocalWorldEnv, startLocalWorldWorker } from "./world/local.ts";
 import { resolveHarnessDataDir } from "./world/paths.ts";
-import { configureTursoWorldEnv, startTursoWorldWorker } from "./world/turso.ts";
 
 function parseArgs(argv: string[]): {
   config: SwarmConfig;
@@ -85,14 +85,14 @@ function parseArgs(argv: string[]): {
 }
 
 /**
- * Reference swarm CLI: configure Turso world, then run the swarm orchestrator.
+ * Reference swarm CLI: configure local Workflow world, then run the swarm orchestrator.
  */
 async function main(): Promise<void> {
   const { config, khoraBaseUrl, relayBaseUrl, memoriesBaseUrl, chatBaseUrl, chatToken } = parseArgs(
     process.argv.slice(2),
   );
-  configureTursoWorldEnv({ dataDir: config.dataDir });
-  await startTursoWorldWorker({ dataDir: config.dataDir });
+  configureLocalWorldEnv({ dataDir: config.dataDir });
+  await startLocalWorldWorker({ dataDir: config.dataDir });
 
   const networkEvents = createSqliteNetworkEventPersistencePlugin({ dataDir: config.dataDir });
   bindNetworkSessionContext({ sessionId: config.sessionId });

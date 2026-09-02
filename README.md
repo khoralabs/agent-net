@@ -5,7 +5,7 @@ Monorepo for the Khora multi-agent network harness.
 | Package | Path | Role |
 | --- | --- | --- |
 | `@khoralabs/agent-net` | [`packages/harness`](packages/harness) | Abstract harness library (`./swarm` = budgeted multi-agent orchestration) |
-| `@khoralabs/agent-net-reference` | [`apps/reference`](apps/reference) | Turso world, embedded Khora + local memories/relay/chat, orchestrator + marketplace (primary) / swarm CLIs |
+| `@khoralabs/agent-net-reference` | [`apps/reference`](apps/reference) | Local Workflow world, embedded Khora + memories/relay/chat, orchestrator + marketplace (primary) / swarm CLIs |
 
 ## Setup
 
@@ -17,7 +17,7 @@ bun install
 
 Use **two terminals**. Keep the orchestrator running in the first.
 
-1. Start the reference stack (embedded Khora + memories + relay + chat + Turso world; data under `apps/reference/.data`):
+1. Start the reference stack (embedded Khora + memories + relay + chat + local Workflow world; data under `apps/reference/.data`):
 
 ```bash
 bun run reference:start
@@ -46,13 +46,13 @@ GitHub Actions: [`.github/workflows/release.yml`](.github/workflows/release.yml)
 
 ## Workflow world
 
-Harness and swarm workflows use the abstract [Workflow SDK](https://useworkflow.dev) only. The **hosting app** must configure and start a world before running workflows. The reference app selects Turso (`configureTursoWorldEnv` / `startTursoWorldWorker`).
+Harness and swarm workflows use the abstract [Workflow SDK](https://useworkflow.dev) only. The **hosting app** must configure and start a world before running workflows. The reference app uses the [local world](https://workflow-sdk.dev/worlds/local) (`configureLocalWorldEnv` / `startLocalWorldWorker`).
 
 ## Scripts
 
 | Script | Description |
 | --- | --- |
-| `bun run reference:start` | Start Khora + memories + relay + chat + Turso world |
+| `bun run reference:start` | Start Khora + memories + relay + chat + local Workflow world |
 | `bun run marketplace` | Marketplace CLI (primary reference demo) |
 | `bun run swarm` | Swarm CLI (secondary) |
 | `bun run typecheck` | Typecheck all workspace packages |
