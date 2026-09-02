@@ -14,7 +14,8 @@
       "@khoralabs/agent-capabilities-otel": "^0.2.0",
       "@khoralabs/chat": "^0.1.11",
       "@khoralabs/did-key-identity": "^0.1.0",
-      "@khoralabs/khora-client": "0.1.7",
+      "@khoralabs/khora-client": "0.1.8",
+      "@khoralabs/khora-host": "0.1.8",
       "@khoralabs/memories-node": "0.8.0",
       "@khoralabs/memories-service": "0.8.0",
       "@khoralabs/memories-otel": "0.8.0",
@@ -38,6 +39,7 @@
   },
   "overrides": {
     "@khoralabs/khora-client": "catalog:",
+    "@khoralabs/khora-host": "catalog:",
     "@khoralabs/memories-node": "catalog:",
     "@khoralabs/memories-service": "catalog:",
     "@khoralabs/memories-otel": "catalog:",
