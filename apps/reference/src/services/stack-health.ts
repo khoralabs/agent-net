@@ -34,11 +34,11 @@ export async function requireReferenceStackReachable(input: {
   );
 }
 
-/** Khora is external to the reference orchestrator; agents register on spawn. */
+/** Khora is started by the reference orchestrator (default :8788). */
 export async function requireKhoraReachable(khoraBaseUrl: string): Promise<void> {
   await requireServiceHealth(
     "Khora",
     khoraBaseUrl,
-    "Start khora-server (default :8788), e.g. cd khora/apps/server && bun run start",
+    "Start the orchestrator in another terminal: bun run start",
   );
 }

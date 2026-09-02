@@ -4,20 +4,27 @@ import { getHarnessMemoriesTelemetry } from "@khoralabs/agent-net";
 
 import { installReferenceObservability } from "./observability/install.ts";
 import { startChatHttpService } from "./services/chat.ts";
+import { startKhoraHost } from "./services/khora/index.ts";
 import { startMemoriesService } from "./services/memories.ts";
 import { startRelayServer } from "./services/relay.ts";
+import { prepareSqliteForEncryptedMemories } from "./services/sqlite-prep.ts";
 import { resolveHarnessDataDir } from "./world/paths.ts";
 import { configureTursoWorldEnv, startTursoWorldWorker } from "./world/turso.ts";
 
 const DEFAULT_CHAT_TOKEN = "reference-chat-token";
 const DEFAULT_MEMORIES_ADMIN_TOKEN = "reference-memories-admin-token";
+const DEFAULT_KHORA_ADMIN_TOKEN = "reference-khora-admin-token";
+const DEFAULT_KHORA_OUTBOX_ENCRYPTION_KEY =
+  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
 /** Fixed local ports — must match apps/reference/.env defaults. */
+const DEFAULT_KHORA_PORT = 8788;
 const DEFAULT_RELAY_PORT = 8790;
 const DEFAULT_MEMORIES_PORT = 8791;
 const DEFAULT_CHAT_PORT = 8792;
 
 function parseArgs(argv: string[]): {
   dataDir: string;
+  khoraPort?: number;
   memoriesPort?: number;
   relayPort?: number;
   chatPort?: number;
@@ -37,6 +44,7 @@ function parseArgs(argv: string[]): {
     }
   }
 
+  const khoraPortRaw = args.get("khora-port");
   const memoriesPortRaw = args.get("memories-port");
   const relayPortRaw = args.get("relay-port");
   const chatPortRaw = args.get("chat-port");
@@ -46,11 +54,26 @@ function parseArgs(argv: string[]): {
       args.get("chat-token")?.trim() ||
       process.env.CHAT_INTERNAL_TOKEN?.trim() ||
       DEFAULT_CHAT_TOKEN,
+    khoraPort: khoraPortRaw !== undefined ? Number.parseInt(khoraPortRaw, 10) : DEFAULT_KHORA_PORT,
     memoriesPort:
       memoriesPortRaw !== undefined ? Number.parseInt(memoriesPortRaw, 10) : DEFAULT_MEMORIES_PORT,
     relayPort: relayPortRaw !== undefined ? Number.parseInt(relayPortRaw, 10) : DEFAULT_RELAY_PORT,
     chatPort: chatPortRaw !== undefined ? Number.parseInt(chatPortRaw, 10) : DEFAULT_CHAT_PORT,
   };
+}
+
+function ensureKhoraDevEnvDefaults(): void {
+  if (!process.env.KHORA_OUTBOX_ENCRYPTION_KEY?.trim()) {
+    process.env.KHORA_OUTBOX_ENCRYPTION_KEY = DEFAULT_KHORA_OUTBOX_ENCRYPTION_KEY;
+  }
+  const admin =
+    process.env.KHORA_ADMIN_TOKEN?.trim() ||
+    process.env.ADMIN_ROOT_TOKEN?.trim() ||
+    process.env.KHORA_CONSOLE_ROOT_TOKEN?.trim();
+  if (admin === undefined || admin.length === 0) {
+    process.env.ADMIN_ROOT_TOKEN = DEFAULT_KHORA_ADMIN_TOKEN;
+    process.env.KHORA_ADMIN_TOKEN = DEFAULT_KHORA_ADMIN_TOKEN;
+  }
 }
 
 async function main(): Promise<void> {
@@ -62,6 +85,13 @@ async function main(): Promise<void> {
 
   installReferenceObservability({ serviceName: "network-harness-memories" });
 
+  prepareSqliteForEncryptedMemories();
+  ensureKhoraDevEnvDefaults();
+
+  const khora = await startKhoraHost({
+    dataDir: path.join(dataDir, "khora"),
+    port: opts.khoraPort,
+  });
   const memories = startMemoriesService({
     dataDir: path.join(dataDir, "memories"),
     port: opts.memoriesPort,
@@ -77,6 +107,7 @@ async function main(): Promise<void> {
     port: opts.chatPort,
   });
 
+  process.env.KHORA_BASE_URL = khora.baseUrl;
   process.env.MEMORIES_BASE_URL = memories.baseUrl;
   process.env.RELAY_BASE_URL = relay.baseUrl;
   process.env.CHAT_BASE_URL = chat.baseUrl;
@@ -89,9 +120,14 @@ async function main(): Promise<void> {
       {
         ok: true,
         dataDir,
+        khoraBaseUrl: khora.baseUrl,
         memoriesBaseUrl: memories.baseUrl,
         relayBaseUrl: relay.baseUrl,
         chatBaseUrl: chat.baseUrl,
+        khoraAdminToken:
+          process.env.KHORA_ADMIN_TOKEN?.trim() ||
+          process.env.ADMIN_ROOT_TOKEN?.trim() ||
+          DEFAULT_KHORA_ADMIN_TOKEN,
         memoriesAdminToken: process.env.MEMORIES_SERVICE_ADMIN_TOKEN,
         workflowTargetWorld: process.env.WORKFLOW_TARGET_WORLD,
         workflowTursoDatabaseUrl: process.env.WORKFLOW_TURSO_DATABASE_URL,
@@ -101,13 +137,14 @@ async function main(): Promise<void> {
     )}\n`,
   );
   process.stdout.write(
-    "Reference stack is running. Also start khora-server (KHORA_BASE_URL, default :8788), then run marketplace/swarm.\n",
+    "Reference stack is running (khora + memories + relay + chat). Run marketplace/swarm in another terminal.\n",
   );
 
   const shutdown = () => {
     chat.stop();
     memories.stop();
     relay.stop();
+    khora.stop();
     process.exit(0);
   };
   process.on("SIGINT", shutdown);
