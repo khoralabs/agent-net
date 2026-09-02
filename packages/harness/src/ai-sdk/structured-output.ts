@@ -1,11 +1,8 @@
 import { type FlexibleSchema, generateObject, NoObjectGeneratedError } from "ai";
 import { FatalError } from "workflow";
 
-import {
-  AI_STEP_TIMEOUT_MS,
-  isAbortError,
-  rethrowAsRetryableTimeout,
-} from "../agent/turn/workflow-resilience.ts";
+import { AI_STEP_TIMEOUT_MS, isAbortError } from "../agent/turn/workflow-resilience.ts";
+import { rethrowAsRetryableTimeout } from "./workflow-errors.ts";
 
 const DEFAULT_ATTEMPTS = 2;
 /** Gemini counts thinking tokens against the output budget; leave headroom. */

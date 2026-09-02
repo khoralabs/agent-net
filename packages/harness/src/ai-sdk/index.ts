@@ -29,6 +29,7 @@ export {
   generateStructured,
   repairTruncatedJson,
 } from "./structured-output.ts";
+export { rethrowAsFatalAiNoOutput, rethrowAsRetryableTimeout } from "./workflow-errors.ts";
 export {
   type AgentResponseDeps,
   runAgentResponseWithSession,

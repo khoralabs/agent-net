@@ -201,7 +201,6 @@ export {
   AI_STEP_MAX_RETRIES,
   AI_STEP_TIMEOUT_MS,
   isAbortError,
-  rethrowAsRetryableTimeout,
 } from "./agent/turn/workflow-resilience.ts";
 export {
   requireChatBaseUrl,

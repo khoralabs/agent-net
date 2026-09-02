@@ -23,13 +23,11 @@ import {
   formatUserLocalDateTimeInstruction,
 } from "../agent/turn/user-local-datetime.ts";
 import type { RunAgentWorkflowDependencies as CoreWorkflowDeps } from "../agent/turn/workflow-deps.ts";
-import {
-  AGENT_STEP_TIMEOUT_MS,
-  rethrowAsFatalAiNoOutput,
-} from "../agent/turn/workflow-resilience.ts";
+import { AGENT_STEP_TIMEOUT_MS } from "../agent/turn/workflow-resilience.ts";
 import { buildNetworkAttribution } from "../pool/observability/attribution-digest.ts";
 import { runWithAttributionAsync } from "../pool/observability/network-log.ts";
 import { prepareHarnessStepRuntime } from "./prepare-harness-step.ts";
+import { rethrowAsFatalAiNoOutput } from "./workflow-errors.ts";
 
 export type RunAgentWorkflowDependencies = CoreWorkflowDeps & {
   streamTextFn?: typeof streamText;
