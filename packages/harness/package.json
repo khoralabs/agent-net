@@ -1,6 +1,6 @@
 {
   "name": "@khoralabs/agent-net",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Custodial multi-agent network harness: agent pool, social fabric, memories, signed chat, and durable turn workflows",
   "license": "MIT",
   "type": "module",
