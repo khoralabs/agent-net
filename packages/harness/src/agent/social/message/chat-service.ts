@@ -1,6 +1,5 @@
 import path from "node:path";
-import { loadOrCreateIdentity } from "@khoralabs/did-key-identity";
-import type { RelaySigner } from "@khoralabs/relay/crypto";
+import { loadOrCreateIdentity, type Signer } from "@khoralabs/did-key-identity";
 import { requireChatBaseUrl, requireChatToken } from "../../../lib/chat-base-url.ts";
 import {
   loadHarnessIdentity,
@@ -31,7 +30,7 @@ function devAgentKeyPath(): string {
   return path.join(resolveAgentsDataDir(), "dev-agent", "identity.json");
 }
 
-export async function ensureDevAgentIdentity(): Promise<RelaySigner> {
+export async function ensureDevAgentIdentity(): Promise<Signer> {
   const secret = identitySecret();
   const signer = await loadOrCreateIdentity(
     devAgentKeyPath(),
@@ -46,7 +45,7 @@ export async function getDevAgentDid(): Promise<string> {
 }
 
 /** Default DID key resolution for the agent process (dev agent + AgentStore). */
-export async function resolveAgentChatSigner(did: string): Promise<RelaySigner | undefined> {
+export async function resolveAgentChatSigner(did: string): Promise<Signer | undefined> {
   const secret = identitySecret();
   const devDid = devAgentDid ?? (await ensureDevAgentIdentity()).did;
   if (did === devDid) {
