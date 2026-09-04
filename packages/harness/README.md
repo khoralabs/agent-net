@@ -68,13 +68,51 @@ const unsub = harness.subscribeInbox((event) => {
 
 Spawning binds the agent DID on the shared inbox socket; `harness.removeAgent` unbinds it. Prefer `harness.get` / `spawn` over raw `pool.focus` when you need memories + `social`.
 
+## Invite minting
+
+Registering an agent on a gated network needs an invite token. Minting is an **operator** capability, so the harness takes it as a callback and the host owns the request — agent-net hardcodes no other package's routes:
+
+```ts
+const harness = await startNetworkHarness({
+  // …
+  mintInvite: async () => {
+    const res = await fetch(`${khoraBaseUrl}/v1/ops/invites/mint`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${operatorToken}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ count: 1 }),
+    });
+    const { tokens } = (await res.json()) as { tokens: string[] };
+    return tokens[0];
+  },
+});
+```
+
+`pool.spawn` calls `mintInvite` then registers with the returned token. Omit it and agents register without an invite. See `apps/reference/src/services/khora/mint-invite.ts` for a complete host implementation.
+
+## Host helpers
+
+Control-plane hosts that expose their own HTTP surface can reuse these instead of reimplementing them:
+
+| Export | Role |
+|--------|------|
+| `commitNbcTurn` | Party checks, Vellum commit, turn counting, turn-limit detection, and error classification for one NBC turn. Rejections are returned, not thrown, so each transport maps its own status codes |
+| `nbcNegotiationStatusFields` | Map an `NbcLoopStatusPatch` onto negotiation columns for host storage; empty result means nothing to persist |
+| `openVellumChainForDids` | Focus both parties by DID, then open the chain session between them |
+| `createInboxFanout` | Stream `PoolInboxEvent`s to SSE clients; feed from `harness.subscribeInbox` |
+| `createNetworkEventsFanout` + `networkEventsSseOptions` | Stream `NetworkEvent`s to SSE clients, deduped by `eventId` and backfilled from the installed events plugin |
+| `recordNetworkEvent` | Persist a network event, deriving `eventId` and `tsMs` |
+| `createSseFanout` | Generic ring-buffer SSE fan-out (replay, dedupe, catch-up poll, keepalive) behind the two above |
+
+The NBC mesh HTTP contract (`createNbcMeshClient` + `registerNbcInternalNegotiationRoutes` over `/api/internal/negotiations/*`) stays owned by this package; hosts mount the routes rather than defining paths.
+
 ## Layout
 
 | Module | Role |
 |--------|------|
 | `pool/` | Control plane: identities, registry, invite bank |
-| `pool/inbox/` | Multiplex Khora inbox for the pool |
-| `pool/network/` | Session registry, network events |
+| `pool/inbox/` | Multiplex Khora inbox for the pool + SSE fan-out |
+| `pool/network/` | Session registry, network events + SSE fan-out |
+| `pool/sse/` | Generic ring-buffer SSE fan-out core |
 | `pool/observability/` | Telemetry install + attribution ALS |
 | `pool/host/` | `startNetworkHarness` (wires pool + agent) |
 | `agent/` | One network actor: handle, social, memories, turn |
