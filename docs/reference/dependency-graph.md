@@ -2,6 +2,8 @@
 
 How `@khoralabs/agent-net` (harness) and the reference host relate to the primary Khora stack packages. Versions are intentionally omitted; treat this as a structural map for upgrade planning.
 
+For why each system exists in the composition, see [system roles](../explanation/system-roles.md). For control plane vs host, see [architecture](../explanation/architecture.md).
+
 ## Layers
 
 ```mermaid
