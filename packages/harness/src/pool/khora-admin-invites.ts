@@ -1,13 +1,17 @@
+import { KHORA_HTTP_PATH } from "@khoralabs/khora-client";
+
 export type MintKhoraInviteTokensOptions = {
   baseUrl: string;
   adminToken: string;
   /** Defaults to 1; server clamps to 1..10. */
   count?: number;
+  /** Override fetch (tests). */
+  fetchFn?: (input: string, init?: RequestInit) => Promise<Response>;
 };
 
 /**
- * Mint invite tokens via Khora host admin API:
- * `POST /admin/api/invites/mint` with Bearer admin token.
+ * Mint invite tokens via Khora host ops API:
+ * `POST /v1/ops/invites/mint` with Bearer admin token.
  */
 export async function mintKhoraInviteTokens(opts: MintKhoraInviteTokensOptions): Promise<string[]> {
   const baseUrl = opts.baseUrl.trim().replace(/\/$/, "");
@@ -19,8 +23,9 @@ export async function mintKhoraInviteTokens(opts: MintKhoraInviteTokensOptions):
     throw new Error("mintKhoraInviteTokens: adminToken is required");
   }
   const count = opts.count ?? 1;
+  const fetchFn = opts.fetchFn ?? fetch;
 
-  const res = await fetch(`${baseUrl}/admin/api/invites/mint`, {
+  const res = await fetchFn(`${baseUrl}${KHORA_HTTP_PATH.opsInvitesMint}`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${adminToken}`,
