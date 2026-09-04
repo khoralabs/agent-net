@@ -1,4 +1,4 @@
-import { ChatHttpClientError } from "@khoralabs/chat/http";
+import { ChatHttpClientError } from "@khoralabs/chat/http/client";
 import { KhoraClientError } from "@khoralabs/khora-client";
 import { MemoriesServiceClientError } from "@khoralabs/memories-service/client";
 import { RelayClientError } from "@khoralabs/relay/client";

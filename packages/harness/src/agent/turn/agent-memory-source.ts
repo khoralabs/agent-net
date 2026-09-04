@@ -1,4 +1,4 @@
-import type { ChatSourceWire } from "@khoralabs/chat";
+import type { ChatSourceWire } from "@khoralabs/chat/sources";
 import type { SourceMap, Store } from "@khoralabs/memories-node";
 import { ids } from "@khoralabs/memories-node";
 import { createRemoteSourceMapContentStore } from "@khoralabs/memories-node/helpers/agent";
