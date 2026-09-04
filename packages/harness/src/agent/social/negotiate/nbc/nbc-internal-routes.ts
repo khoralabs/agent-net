@@ -20,12 +20,21 @@ export type NbcInternalNegotiationHost = {
   onLeft(input: { chainId: string; detail?: string }): void;
 };
 
+export type NbcInternalLoadGraphInput = {
+  chainId: string;
+  asDid: string;
+  chain: NbcInternalNegotiationChain;
+};
+
 export type RegisterNbcInternalNegotiationRoutesInput = {
   requireAuth: (req: Request) => Response | null;
   host: NbcInternalNegotiationHost;
   sessions: VellumChainSessionRegistry;
   notifyChainChanged: (event: NbcChainChanged) => void;
-  loadGraph?: () => Promise<NbcChainGraph>;
+  /**
+   * Optional host graph reader (receives chain + asDid). Return `null` when unavailable.
+   */
+  loadGraph?: (input: NbcInternalLoadGraphInput) => Promise<NbcChainGraph | null>;
 };
 
 function json(data: unknown, status = 200): Response {
@@ -64,7 +73,7 @@ export function registerNbcInternalNegotiationRoutes(
         try {
           const graph =
             input.loadGraph !== undefined
-              ? await input.loadGraph()
+              ? ((await input.loadGraph({ chainId, asDid, chain })) ?? undefined)
               : (
                   await sessions
                     .handleForDid(chainId, chain.initiatorDid, chain.counterpartyDid, asDid)

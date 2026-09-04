@@ -103,7 +103,7 @@ describe("nbc internal negotiation routes", () => {
       host,
       sessions: { dataDirForDid: () => "/tmp/replica" } as never,
       notifyChainChanged: () => undefined,
-      loadGraph: async () => emptyGraph(),
+      loadGraph: async (_input) => emptyGraph(),
     });
 
     const initiator = await routes["/api/internal/negotiations/:chainId"].GET(
@@ -222,7 +222,7 @@ describe("nbc internal negotiation routes", () => {
         }),
       } as never,
       notifyChainChanged: () => undefined,
-      loadGraph: async () => emptyGraph(),
+      loadGraph: async (_input) => emptyGraph(),
     });
 
     const genesis = {
