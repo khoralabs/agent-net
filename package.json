@@ -28,7 +28,7 @@
       "@khoralabs/sourcemaps": "^0.1.0",
       "@khoralabs/sqlite-crypto": "^0.1.0",
       "@khoralabs/sqlite-migrate": "^0.1.0",
-      "@khoralabs/vellum-client": "0.5.0",
+      "@khoralabs/vellum-client": "^0.5.0",
       "@libsql/client": "0.17.4",
       "@types/bun": "latest",
       "ai": "^7.0.9",
