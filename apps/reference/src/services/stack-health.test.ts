@@ -1,7 +1,7 @@
 import { afterAll, describe, expect, test } from "bun:test";
 import { CHAT_HTTP_PATH } from "@khoralabs/chat/http";
 import { KHORA_HTTP_PATH } from "@khoralabs/khora-client";
-import { MEMORIES_HTTP_PATH } from "@khoralabs/memories-service/client";
+import { MEMORIES_HTTP_PATH } from "@khoralabs/memories-service/http/contracts";
 import { RELAY_HTTP_PATH } from "@khoralabs/relay/contracts";
 import { requireKhoraReachable, requireReferenceStackReachable } from "./stack-health.ts";
 

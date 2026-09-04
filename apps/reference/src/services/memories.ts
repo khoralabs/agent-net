@@ -1,7 +1,7 @@
 import type { MemoriesTelemetry } from "@khoralabs/memories-node/telemetry";
 import { createNoneAuthStrategy } from "@khoralabs/memories-service/auth";
-import { MEMORIES_HTTP_PATH } from "@khoralabs/memories-service/client";
 import { handleMemoriesServiceHttpRequest } from "@khoralabs/memories-service/http";
+import { MEMORIES_HTTP_PATH } from "@khoralabs/memories-service/http/contracts";
 import { createLocalSqliteServiceStack } from "@khoralabs/memories-service/storage/sqlite";
 
 import { prepareSqliteForEncryptedMemories } from "./sqlite-prep.ts";

@@ -11,8 +11,8 @@ import type {
   ThreadTip,
 } from "@khoralabs/chat";
 import { isChatNotFoundError } from "@khoralabs/chat";
-import { ChatHttpClientError } from "@khoralabs/chat/http";
 import {
+  ChatHttpClientError,
   type ChatServiceClient,
   type ChatServiceClientOptions,
   createChatClient,

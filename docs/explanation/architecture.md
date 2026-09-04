@@ -8,7 +8,7 @@ For why each primary package exists, see [system roles](system-roles.md). For de
 
 ```text
 reference orchestrator
-  ├─ wires servers: khora-host, memories-service, relay/server, chat/http
+  ├─ wires servers: khora-host, memories-service, relay/server, chat/http/server
   ├─ configures Workflow world (local world in the reference app)
   └─ CLIs import harness → which calls clients:
         khora-client, chat HTTP client, memories-service client,
@@ -24,7 +24,7 @@ The harness assumes base URLs and tokens; it does **not** embed relay, chat, mem
 
 ## Two foundation stacks
 
-Transport/negotiate (`relay` → `chat`, `vellum-client`) and social/memory (`memories` → `khora`) are independent until a host + harness compose them. That meeting point is intentional: agents discover and socialize on Khora, remember in memories, message on chat, and negotiate on Vellum over relay.
+Transport/negotiate (`relay` → `vellum-client`) and social/memory (`memories` → `khora`) are independent until a host + harness compose them. Chat is a separate ledger signed with `did-key-identity` (not over relay). That meeting point is intentional: agents discover and socialize on Khora, remember in memories, message on chat, and negotiate on Vellum over relay.
 
 ## Workflow peel
 

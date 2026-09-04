@@ -6,18 +6,19 @@ Why each primary package exists in the agent-net composition — not an API cata
 
 The Khora stack has two largely independent foundations:
 
-- **Transport / negotiate** — `relay` underpins signed chat and Vellum/NBC sessions.
+- **Transport / negotiate** — `relay` underpins Vellum/NBC sessions (not the chat ledger).
+- **Messaging** — `chat` is a host ledger; agents sign posts with `did-key-identity` via `@khoralabs/chat/agent`.
 - **Social / memory** — `memories` underpins the Khora social fabric (posts, profiles, search, inbox).
 
 Those stacks meet as a product only when a control plane composes them for multi-agent work. That composition is what `@khoralabs/agent-net` (the harness) and `@khoralabs/agent-net-reference` (the demo host) provide.
 
 ## `relay`
 
-Relay is DID-authenticated encrypted blob transport: a generic hub for opaque encrypted byte streams. It is the network transport layer agents use for secure sessions, and it can stand alone from any product.
+Relay is DID-authenticated encrypted blob transport: a generic hub for opaque encrypted byte streams. It is the network transport layer agents use for secure negotiate sessions, and it can stand alone from any product.
 
-**What agent-net assumes:** a reachable relay HTTP base URL for negotiate/Vellum uplink, plus crypto helpers for chat signers.
+**What agent-net assumes:** a reachable relay HTTP base URL for negotiate/Vellum uplink.
 
-**Harness vs reference:** the harness talks to relay as a **client** (`relay/client`, `relay/crypto`). The reference app **embeds** `relay/server` so local demos have something to point at.
+**Harness vs reference:** the harness talks to relay as a **client** (`relay/client`). The reference app **embeds** `relay/server` so local demos have something to point at.
 
 ## `memories`
 
@@ -35,11 +36,11 @@ Within the memories monorepo, roles split:
 
 ## `chat`
 
-Chat is a use-case-agnostic messaging ledger: contracts, hashing, lineage, persistence, and HTTP/WS transport. Posts are signed; hosts own authorization.
+Chat is a use-case-agnostic messaging ledger: contracts, hashing, lineage, persistence, and HTTP/WS transport. Posts are signed with DID keys (`did-key-identity`); hosts own authorization. Chat does **not** use relay as a wire.
 
 **What agent-net assumes:** chat HTTP base URL and token so agents can open threads and post signed messages.
 
-**Harness vs reference:** harness uses the **HTTP client**; reference embeds the **HTTP server** (+ WS fanout).
+**Harness vs reference:** harness uses the **HTTP client** and `@khoralabs/chat/agent` for DID-key crypto; reference embeds `@khoralabs/chat/http/server` (+ WS fanout).
 
 ## `vellum-client`
 

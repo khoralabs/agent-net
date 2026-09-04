@@ -1,6 +1,5 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { generateIdentity } from "@khoralabs/did-key-identity";
-import type { RelaySigner } from "@khoralabs/relay/crypto";
+import { generateIdentity, type Signer } from "@khoralabs/did-key-identity";
 
 import type { HarnessChat, SignedChatBackend } from "../agent/social/message/chat.ts";
 import {
@@ -9,7 +8,7 @@ import {
   type TestChatHttpHandle,
 } from "./test-chat-http.ts";
 
-const signers = new Map<string, RelaySigner>();
+const signers = new Map<string, Signer>();
 let chatHttp: TestChatHttpHandle;
 let backend: SignedChatBackend;
 let chat: HarnessChat;
