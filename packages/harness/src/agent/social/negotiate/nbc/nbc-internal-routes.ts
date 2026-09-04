@@ -1,4 +1,5 @@
 import type { NbcChainGraph } from "@khoralabs/obp-nbc";
+import { boundaryClientErrorFields } from "../../../../lib/boundary-client-error.ts";
 import { NBC_GENESIS_NOT_INITIATOR, type VellumChainSessionRegistry } from "../vellum-sessions.ts";
 import type { NbcLoopChain } from "./loop-host.ts";
 import type { NbcChainChanged } from "./nbc-chain-change-bus.ts";
@@ -94,8 +95,14 @@ export function registerNbcInternalNegotiationRoutes(
             ...(brief !== undefined && Object.keys(brief).length > 0 ? { brief } : {}),
           });
         } catch (err) {
-          const message = err instanceof Error ? err.message : String(err);
-          return json({ error: message }, 502);
+          const fields = boundaryClientErrorFields(err);
+          return json(
+            {
+              error: fields.message,
+              ...(fields.code !== undefined ? { code: fields.code } : {}),
+            },
+            fields.status !== undefined && fields.status >= 400 ? fields.status : 502,
+          );
         }
       },
     },
@@ -144,14 +151,26 @@ export function registerNbcInternalNegotiationRoutes(
           });
           return json({ ok: true, turnsCompleted });
         } catch (err) {
-          const message = err instanceof Error ? err.message : String(err);
-          if (message === NBC_GENESIS_NOT_INITIATOR) {
-            return json({ error: message }, 409);
+          const fields = boundaryClientErrorFields(err);
+          if (fields.message === NBC_GENESIS_NOT_INITIATOR) {
+            return json(
+              {
+                error: fields.message,
+                ...(fields.code !== undefined ? { code: fields.code } : {}),
+              },
+              409,
+            );
           }
-          if (message.includes("no Vellum handle")) {
+          if (fields.message.includes("no Vellum handle")) {
             return json({ error: "No Vellum handle for asDid" }, 409);
           }
-          return json({ error: message }, 502);
+          return json(
+            {
+              error: fields.message,
+              ...(fields.code !== undefined ? { code: fields.code } : {}),
+            },
+            fields.status !== undefined && fields.status >= 400 ? fields.status : 502,
+          );
         }
       },
     },
@@ -180,11 +199,17 @@ export function registerNbcInternalNegotiationRoutes(
             body: { disconnect: true },
           });
         } catch (err) {
-          const message = err instanceof Error ? err.message : String(err);
-          if (message.includes("no Vellum handle")) {
+          const fields = boundaryClientErrorFields(err);
+          if (fields.message.includes("no Vellum handle")) {
             return json({ error: "No Vellum handle for asDid" }, 409);
           }
-          return json({ error: message }, 502);
+          return json(
+            {
+              error: fields.message,
+              ...(fields.code !== undefined ? { code: fields.code } : {}),
+            },
+            fields.status !== undefined && fields.status >= 400 ? fields.status : 502,
+          );
         }
         host.onLeft({
           chainId,

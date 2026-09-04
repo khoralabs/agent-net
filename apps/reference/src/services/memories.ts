@@ -1,5 +1,6 @@
 import type { MemoriesTelemetry } from "@khoralabs/memories-node/telemetry";
 import { createNoneAuthStrategy } from "@khoralabs/memories-service/auth";
+import { MEMORIES_HTTP_PATH } from "@khoralabs/memories-service/client";
 import { handleMemoriesServiceHttpRequest } from "@khoralabs/memories-service/http";
 import { createLocalSqliteServiceStack } from "@khoralabs/memories-service/storage/sqlite";
 
@@ -33,7 +34,7 @@ export function startMemoriesService(opts: MemoriesServiceOptions): MemoriesServ
     port: opts.port ?? 0,
     fetch(req) {
       const url = new URL(req.url);
-      if (req.method === "GET" && url.pathname === "/health") {
+      if (req.method === "GET" && url.pathname === MEMORIES_HTTP_PATH.health) {
         return Response.json({ ok: true });
       }
       return handleMemoriesServiceHttpRequest(req, {

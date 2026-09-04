@@ -45,7 +45,7 @@
     },
     "packages/harness": {
       "name": "@khoralabs/agent-net",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "dependencies": {
         "@khoralabs/agent-capabilities": "catalog:",
         "@khoralabs/chat": "catalog:",
@@ -104,23 +104,23 @@
     "@khoralabs/agent-capabilities": "^0.2.0",
     "@khoralabs/agent-capabilities-ai-sdk": "^0.2.0",
     "@khoralabs/agent-capabilities-otel": "^0.2.0",
-    "@khoralabs/chat": "^0.1.11",
+    "@khoralabs/chat": "^0.1.13",
     "@khoralabs/did-key-identity": "^0.1.0",
-    "@khoralabs/khora-client": "0.1.9",
-    "@khoralabs/khora-host": "0.1.9",
-    "@khoralabs/memories-agents": "^0.10.0",
-    "@khoralabs/memories-node": "^0.10.0",
-    "@khoralabs/memories-otel": "^0.10.0",
-    "@khoralabs/memories-react-graph": "^0.10.0",
-    "@khoralabs/memories-service": "^0.10.0",
-    "@khoralabs/memories-spec": "^0.10.0",
+    "@khoralabs/khora-client": "0.1.10",
+    "@khoralabs/khora-host": "0.1.10",
+    "@khoralabs/memories-agents": "^0.11.0",
+    "@khoralabs/memories-node": "^0.11.0",
+    "@khoralabs/memories-otel": "^0.11.0",
+    "@khoralabs/memories-react-graph": "^0.11.0",
+    "@khoralabs/memories-service": "^0.11.0",
+    "@khoralabs/memories-spec": "^0.11.0",
     "@khoralabs/obp-core": "0.2.1",
     "@khoralabs/obp-nbc": "0.2.1",
-    "@khoralabs/relay": "^0.1.1",
+    "@khoralabs/relay": "^0.2.0",
     "@khoralabs/sourcemaps": "^0.1.0",
     "@khoralabs/sqlite-crypto": "^0.1.0",
     "@khoralabs/sqlite-migrate": "^0.1.0",
-    "@khoralabs/vellum-client": "0.3.3",
+    "@khoralabs/vellum-client": "0.4.0",
     "@libsql/client": "0.17.4",
     "@types/bun": "latest",
     "ai": "^7.0.9",
@@ -273,21 +273,21 @@
 
     "@khoralabs/agent-review": ["@khoralabs/agent-review@0.2.2", "", { "dependencies": { "@khoralabs/agent-capabilities": "^0.2.0", "@khoralabs/agent-capabilities-ai-sdk": "^0.2.0", "@khoralabs/agent-capabilities-otel": "^0.2.0", "@opentelemetry/api": "^1.9.1", "ai": "^7.0.9", "just-bash": "^3.2.0", "pino": "^9", "yaml": "^2.8.0", "zod": "^4.4.3" }, "bin": { "agent-review": "bin/agent-review" } }, "sha512-bjNh7fvxLxSEKIjK2kSVwhpGlPv+236dX7rPzoXL/yY+b9HeeU3hLopibWo1jdx1DU0qvS6gXNzOPbH/BOR+gA=="],
 
-    "@khoralabs/chat": ["@khoralabs/chat@0.1.11", "", { "dependencies": { "@khoralabs/sourcemaps": "^0.1.0", "ai": "^7.0.9" }, "peerDependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "@tursodatabase/serverless": "*", "typescript": "^5" }, "optionalPeers": ["@khoralabs/sqlite-crypto", "@tursodatabase/serverless"] }, "sha512-YlvciUd4kFAb3hldw25pE/NpVM1f09FN56+2IH6JgzQVGl3LPHhXNe3JTpvNoN4cPdBOudZ8WIJ3eabGWdeWmg=="],
+    "@khoralabs/chat": ["@khoralabs/chat@0.1.13", "", { "dependencies": { "@khoralabs/sourcemaps": "^0.1.0", "@noble/ed25519": "^3.1.0", "ai": "^7.0.9" }, "peerDependencies": { "@khoralabs/relay": "^0.2.0", "@khoralabs/sqlite-crypto": "^0.1.0", "@tursodatabase/serverless": "*", "typescript": "^5" }, "optionalPeers": ["@khoralabs/relay", "@khoralabs/sqlite-crypto", "@tursodatabase/serverless"] }, "sha512-uLEa2MU87lqYacCUYaeuhHefauXCSUHs7unHRlEEe5tRqsHuZzLp1171dPBEyVcEWpC6ogFccjAZbJ/EiO2Zvg=="],
 
     "@khoralabs/did-key-identity": ["@khoralabs/did-key-identity@0.1.0", "", { "dependencies": { "@noble/ed25519": "^3.1.0", "@noble/hashes": "^2.2.0", "iso-base": "^4.2.1", "iso-signatures": "^0.5.1" }, "peerDependencies": { "typescript": "^5" } }, "sha512-ALGgj7L6iTBuEvQ0hnu1FLArd/69rjUKXBfUx1ZhN8JmOPU7NM+XK9HnbLBeg65/5q+CHaNl+KMdDq0i9uW/oA=="],
 
-    "@khoralabs/khora-client": ["@khoralabs/khora-client@0.1.9", "", { "dependencies": { "@khoralabs/did-key-identity": "^0.1.0", "zod": "^4" }, "peerDependencies": { "typescript": "^5" } }, "sha512-Vs9HozNMzDr+v/mUT+i6o96o6edE2EOD+7l7RMOADAOOiGDtErHgelKrHSCq5V8u0d06kjgXJXbNZ20Z5rTqvw=="],
+    "@khoralabs/khora-client": ["@khoralabs/khora-client@0.1.10", "", { "dependencies": { "@khoralabs/did-key-identity": "^0.1.0", "zod": "^4" }, "peerDependencies": { "typescript": "^5" } }, "sha512-OuK4JQuhZgL/d43/DbORv16+gMfuGM9og/Cw9Vcrxs/ZE0rra7Eq36jpewBFf68GWwIk3XKjlGUb3F4cB3kl3w=="],
 
-    "@khoralabs/khora-host": ["@khoralabs/khora-host@0.1.9", "", { "dependencies": { "@khoralabs/khora-client": "0.1.9", "@khoralabs/khora-registry": "0.1.9", "@khoralabs/memories-node": "^0.10.0", "@khoralabs/memories-service": "^0.10.0", "@khoralabs/sourcemaps": "^0.1.0", "@khoralabs/sqlite-crypto": "^0.1.0", "zod": "^4" }, "peerDependencies": { "typescript": "^5" } }, "sha512-I7yGoOMUsuofyL8sId20AsTBLSxQEmz6ssuZDJr7rVRXkITln28Mzx7/D/0yHNG+a3XzkudC42TK8dVk6kkJDg=="],
+    "@khoralabs/khora-host": ["@khoralabs/khora-host@0.1.10", "", { "dependencies": { "@khoralabs/khora-registry": "0.1.10", "@khoralabs/memories-node": "^0.11.0", "@khoralabs/memories-service": "^0.11.0", "@khoralabs/sourcemaps": "^0.1.0", "@khoralabs/sqlite-crypto": "^0.1.0", "zod": "^4" }, "peerDependencies": { "typescript": "^5" } }, "sha512-fZHQ3Cwy1SewkLsAd4KLOxlb+N4ZQZpQc37HOWxVZf89JK+a6VAuuQNAc444ScVWxxjrxS0VhqhsBm+ihKlatQ=="],
 
-    "@khoralabs/khora-registry": ["@khoralabs/khora-registry@0.1.9", "", { "dependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "@opentelemetry/api": "^1.9.0" }, "optionalDependencies": { "@tursodatabase/serverless": "^1.2.3" }, "peerDependencies": { "typescript": "^5" } }, "sha512-5VeZkWwUyOdnu/k6jtHBVSx19AY0LpxtKYUGdmYGBLwUUeO9QbaDmCFF9+anyOadG6Mo0Xz+uXeCGNAQB3IEYw=="],
+    "@khoralabs/khora-registry": ["@khoralabs/khora-registry@0.1.10", "", { "dependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "@opentelemetry/api": "^1.9.0" }, "optionalDependencies": { "@tursodatabase/serverless": "^1.2.3" }, "peerDependencies": { "typescript": "^5" } }, "sha512-2Qi7vpq8TfYlqV2We7DgyEQgDmAkhQt8M/dFp/65IrQt0rNV5+3f+oAw7OC2xwTifBAlt2duRXB0MiSNMg5pUQ=="],
 
-    "@khoralabs/memories-agents": ["@khoralabs/memories-agents@0.10.0", "", { "dependencies": { "@khoralabs/agent-capabilities": "^0.2.0", "@khoralabs/agent-capabilities-otel": "^0.2.0", "@khoralabs/memories-node": "0.10.0", "zod": "^4" }, "peerDependencies": { "@khoralabs/agent-capabilities-ai-sdk": "^0.2.0", "ai": "^7.0.77", "typescript": "^5" }, "optionalPeers": ["@khoralabs/agent-capabilities-ai-sdk", "ai"] }, "sha512-uyTxPzBvgFeDaToXsJuHx7OS+vQkROUBLtSbOSjDDbPaocqJFAdEwpXsmWuPAt23ic1bLzGrdrgwVaSCvTa/Yg=="],
+    "@khoralabs/memories-agents": ["@khoralabs/memories-agents@0.11.0", "", { "dependencies": { "@khoralabs/agent-capabilities": "^0.2.0", "@khoralabs/agent-capabilities-otel": "^0.2.0", "@khoralabs/memories-node": "0.11.0", "zod": "^4" }, "peerDependencies": { "@khoralabs/agent-capabilities-ai-sdk": "^0.2.0", "ai": "^7.0.77", "typescript": "^5" }, "optionalPeers": ["@khoralabs/agent-capabilities-ai-sdk", "ai"] }, "sha512-HI7hmr6scvPHS5TL5HGKIEWas5Jdt5ZiWRTaMGJOXalKlogXOfAE8zsg8wPOFGA6HRAId8cnw44P62to2aQIPQ=="],
 
-    "@khoralabs/memories-node": ["@khoralabs/memories-node@0.10.0", "", { "dependencies": { "@ai-sdk/provider-utils": "^5.0.2", "@khoralabs/sourcemaps": "^0.1.0", "@standard-schema/spec": "^1.1.0", "ai": "^7.0.77", "zod": "^4" }, "peerDependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "@khoralabs/sqlite-migrate": "^0.1.0", "@libsql/client": "^0.17.4", "@tursodatabase/serverless": "^0.2.0", "ajv": "^8", "sqlite-vec": "^0.1.10-alpha.4", "typescript": "^5", "umap-js": "^1.4.0", "workflow": "^4.5.0" }, "optionalPeers": ["@khoralabs/sqlite-crypto", "@khoralabs/sqlite-migrate", "@libsql/client", "@tursodatabase/serverless", "ajv", "sqlite-vec", "umap-js", "workflow"] }, "sha512-xRjKL0gmBUcX9m6Gg+lBYH/xueuXtK9wekV+T9p3xktH4DTozeswKE4IAId8roi6Uyoq3Upv75ZzCEpB/qp6Mg=="],
+    "@khoralabs/memories-node": ["@khoralabs/memories-node@0.11.0", "", { "dependencies": { "@ai-sdk/provider-utils": "^5.0.2", "@khoralabs/sourcemaps": "^0.1.0", "@standard-schema/spec": "^1.1.0", "ai": "^7.0.77", "zod": "^4" }, "peerDependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "@khoralabs/sqlite-migrate": "^0.1.0", "@libsql/client": "^0.17.4", "@tursodatabase/serverless": "^0.2.0", "ajv": "^8", "sqlite-vec": "^0.1.10-alpha.4", "typescript": "^5", "umap-js": "^1.4.0", "workflow": "^4.5.0" }, "optionalPeers": ["@khoralabs/sqlite-crypto", "@khoralabs/sqlite-migrate", "@libsql/client", "@tursodatabase/serverless", "ajv", "sqlite-vec", "umap-js", "workflow"] }, "sha512-EgrEALD9A1sWT4Fop72FB4Cx0zs4dRFyJsIlAJblHxx6LmTDBKZBdJl6pw6WiOet0UJsW0C3lQatZCzLkmAcIQ=="],
 
-    "@khoralabs/memories-service": ["@khoralabs/memories-service@0.10.0", "", { "dependencies": { "@khoralabs/memories-node": "0.10.0", "ajv": "^8", "lru-cache": "^11.5.1", "zod": "^4" }, "peerDependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "typescript": "^5" }, "optionalPeers": ["@khoralabs/sqlite-crypto"] }, "sha512-cnZdoJ+ZYsyctRmn9pxXpirhYh6GX/6apkVvjiMwucjcRNxDxJz31g4JmEfOo1RwS6A7mL37a99KHUFxULEuZg=="],
+    "@khoralabs/memories-service": ["@khoralabs/memories-service@0.11.0", "", { "dependencies": { "@khoralabs/memories-node": "0.11.0", "ajv": "^8", "lru-cache": "^11.5.1", "zod": "^4" }, "peerDependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "typescript": "^5" }, "optionalPeers": ["@khoralabs/sqlite-crypto"] }, "sha512-wWVG4MrH4iky62l0A24vK5dAJPgFUcQ1jfdXyFRGrZx5J1OS9A5YtaleYsOTmDgR/bN41BP2Y9nZOlRzJ9p36Q=="],
 
     "@khoralabs/obp-core": ["@khoralabs/obp-core@0.2.1", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-xHdBTnaOUCqQyrZpGLV5tc+OlwoVXXqwqx2GZbHS4P7VZ1hav5oj5zihuxTcg8lf90vGtxjbRML5Zh4LxL2VvQ=="],
 
@@ -295,7 +295,7 @@
 
     "@khoralabs/obp-wire": ["@khoralabs/obp-wire@0.2.1", "", { "dependencies": { "@khoralabs/obp-core": "0.2.1", "@khoralabs/obp-nbc": "0.2.1", "@noble/curves": "^2.2.0" }, "peerDependencies": { "typescript": "^5" } }, "sha512-HGGOWFRhcxrWLgM2GWx6ZHHY0F510m05ckSfaUMJDoSpnZulMFTnXVuSnu0PB+82/LC8JSDhq9H8oeXsAU00zA=="],
 
-    "@khoralabs/relay": ["@khoralabs/relay@0.1.1", "", { "dependencies": { "@hpke/core": "^1.9.0", "@noble/curves": "^2.2.0", "@noble/ed25519": "^3.1.0", "@noble/hashes": "^2.2.0", "@scure/base": "^1.2.6", "lru-cache": "^11.5.1", "ts-mls": "^1.6.2" }, "peerDependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "typescript": "^5" }, "optionalPeers": ["@khoralabs/sqlite-crypto"] }, "sha512-wrkX3g6oe9/KjsZpKhxnd6V0AYXZe53eGKAFMguKBgL0aq0ZYrkbF4miMCAUPlqI6jI25u5V9oAe9ExsaNvBLQ=="],
+    "@khoralabs/relay": ["@khoralabs/relay@0.2.0", "", { "dependencies": { "@hpke/core": "^1.9.0", "@noble/curves": "^2.2.0", "@noble/ed25519": "^3.1.0", "@noble/hashes": "^2.2.0", "@scure/base": "^1.2.6", "lru-cache": "^11.5.1", "ts-mls": "^1.6.2" }, "peerDependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "typescript": "^5" }, "optionalPeers": ["@khoralabs/sqlite-crypto"] }, "sha512-3/XZlprfvAnCNC2eUP5+jUuNSliwds4IxUc+9NN6C6FlOOBLwcmv9oe8Fm9OJfoSUU1MtF0ZS5zLS6e6iakF/Q=="],
 
     "@khoralabs/sourcemaps": ["@khoralabs/sourcemaps@0.1.0", "", { "peerDependencies": { "typescript": "^5" } }, "sha512-9eXXrtxYeOCGpKdcEWoGtLVzHfi3zF+6s//LPv4SFWoy9tJtGu1hLdW9gGFhtbRfTHDxMb1/RHblk7NREqQdwQ=="],
 
@@ -303,7 +303,7 @@
 
     "@khoralabs/sqlite-migrate": ["@khoralabs/sqlite-migrate@0.1.0", "", {}, "sha512-mGkPR6WposZArUh1k4A1s2VwyOtGJUPlKkUY+DYjZ8pkhgJ6mEhHQOlRQJNOAXKlJETsdVy4iPTeyuvzPl/zFg=="],
 
-    "@khoralabs/vellum-client": ["@khoralabs/vellum-client@0.3.3", "", { "dependencies": { "@khoralabs/did-key-identity": "^0.1.0", "@khoralabs/obp-core": "^0.2.1", "@khoralabs/obp-nbc": "^0.2.1", "@khoralabs/obp-wire": "^0.2.1", "@khoralabs/relay": "^0.1.1", "zod": "^4" }, "peerDependencies": { "typescript": "^5" } }, "sha512-XINiJBiD5ttmbHkW/DH9iyD+BNEMgWTmj2UmUB8b8QFyuvvC1TnhvA67w256/1BWd4qO8Qa4Wk5j68T09gMpeg=="],
+    "@khoralabs/vellum-client": ["@khoralabs/vellum-client@0.4.0", "", { "dependencies": { "@khoralabs/did-key-identity": "^0.1.0", "@khoralabs/obp-core": "^0.2.1", "@khoralabs/obp-nbc": "^0.2.1", "@khoralabs/obp-wire": "^0.2.1", "@khoralabs/relay": "^0.2.0", "zod": "^4" }, "peerDependencies": { "typescript": "^5" } }, "sha512-UY+SYxke4VkcWBYSegNC2UiGtdTfYw3u7pPHA9rAbBwhtu8bx5g2x/g4CW7OZ2C2qj98jv/cLwhomNBIIGu3aA=="],
 
     "@libsql/client": ["@libsql/client@0.17.4", "", { "dependencies": { "@libsql/core": "^0.17.4", "@libsql/hrana-client": "^0.10.0", "js-base64": "^3.7.5", "libsql": "^0.5.28", "promise-limit": "^2.7.0" } }, "sha512-lYayFWasDV78A+TjlEhr6ubb3odBV6OHjb+wdp8VQcyWWAEIjuwbCHaraEUS4m4yWoo0BvZo96It4VdzZRmRWw=="],
 
@@ -459,7 +459,7 @@
 
     "@tursodatabase/serverless": ["@tursodatabase/serverless@1.4.0", "", {}, "sha512-ZU3T76NG/E0NTKULqJ9TggJfbdPgRaChOS4HDOu3Srds7w7fSPie7jbPHzz+CLGrxs2TtMYtYB1lH5Bh6q1w7A=="],
 
-    "@types/bun": ["@types/bun@1.4.0", "", { "dependencies": { "bun-types": "1.4.0" } }, "sha512-K+lZULY23vRgK/CfTjFIV+tyifaNdSMlPh9j+6mQ/cLfpOznLyAuzgV/JQysyECpkBQLVMSyvjlr2fBUSA9wFQ=="],
+    "@types/bun": ["@types/bun@1.4.1", "", { "dependencies": { "bun-types": "1.4.1" } }, "sha512-0AVGiTXGajf1rgKom3N+c5L7CBxuoyyv1i44M0nX4UDK0G/fnRAMiri93nHuVPIb429KKtAgj7HatVmmOjeQLA=="],
 
     "@types/estree": ["@types/estree@1.0.9", "", {}, "sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg=="],
 
@@ -613,7 +613,7 @@
 
     "builtin-modules": ["builtin-modules@5.0.0", "", {}, "sha512-bkXY9WsVpY7CvMhKSR6pZilZu9Ln5WDrKVBUXf2S443etkmEO4V58heTecXcUIsNsi4Rx8JUO4NfX1IcQl4deg=="],
 
-    "bun-types": ["bun-types@1.4.0", "", { "dependencies": { "@types/node": "*" } }, "sha512-iIKw23BspnQQYd3prITOBxeUsxBHnwzX6YJfGMuNOZzeNcMmVqzIIVGRm1l69ogaPQmb4wB6BN8mA5bE9YuC5Q=="],
+    "bun-types": ["bun-types@1.4.1", "", { "dependencies": { "@types/node": "*" } }, "sha512-loKuVrAFZKfEv+JvWkHRS9GW5IqLuLRjVXN9p+vZvBN86O5hf/pBZQ5hSoyipsrMmWObZBDvWnlmKvjKTM0PdA=="],
 
     "bundle-name": ["bundle-name@4.1.0", "", { "dependencies": { "run-applescript": "^7.0.0" } }, "sha512-tjwM5exMg6BGRI+kNmTntNsvdZS1X8BFYS6tnJ2hdH0kVxM6/eVZ2xy+FqStSWvYmtfFMDLIxurorHwDKfDz5Q=="],
 
@@ -1395,8 +1395,6 @@
 
     "@khoralabs/agent-review/ai": ["ai@7.0.42", "", { "dependencies": { "@ai-sdk/gateway": "4.0.32", "@ai-sdk/provider": "4.0.4", "@ai-sdk/provider-utils": "5.0.15" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-61AEmo8DynuQmfxt1yOJHLJRonCnzK5baFvN6bsDiuOTt/qYk9ZexpbG4aRv3F6rx418BV6Eyblj6fA7UcH5vQ=="],
 
-    "@khoralabs/chat/ai": ["ai@7.0.42", "", { "dependencies": { "@ai-sdk/gateway": "4.0.32", "@ai-sdk/provider": "4.0.4", "@ai-sdk/provider-utils": "5.0.15" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-61AEmo8DynuQmfxt1yOJHLJRonCnzK5baFvN6bsDiuOTt/qYk9ZexpbG4aRv3F6rx418BV6Eyblj6fA7UcH5vQ=="],
-
     "@nuxt/kit/semver": ["semver@7.8.5", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA=="],
 
     "@oclif/core/semver": ["semver@7.8.5", "", { "bin": { "semver": "bin/semver.js" } }, "sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA=="],
@@ -1544,12 +1542,6 @@
     "@khoralabs/agent-review/ai/@ai-sdk/provider": ["@ai-sdk/provider@4.0.4", "", { "dependencies": { "json-schema": "^0.4.0" } }, "sha512-tbHKNLirllUNF3ZlkCsXnwab2ZV1Sl4b1H/Cp9ruCce15IBmskE8Gwkk0yo9xDWY+jho2of7lVXtwSsyrq7cwQ=="],
 
     "@khoralabs/agent-review/ai/@ai-sdk/provider-utils": ["@ai-sdk/provider-utils@5.0.15", "", { "dependencies": { "@ai-sdk/provider": "4.0.4", "@standard-schema/spec": "^1.1.0", "@workflow/serde": "4.1.0", "eventsource-parser": "^3.0.8", "undici": "^7.28.0" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-dnDM4/fS17qO+D7LxVU4003V1+8ZDEWgG7rPhvcDNNFs269qLx+Jnm2mTf72ejyjdzu+f0J+rKNSLXWjZWzxwA=="],
-
-    "@khoralabs/chat/ai/@ai-sdk/gateway": ["@ai-sdk/gateway@4.0.32", "", { "dependencies": { "@ai-sdk/provider": "4.0.4", "@ai-sdk/provider-utils": "5.0.15", "@vercel/oidc": "3.2.0" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-U82ZbFEQY80YTyzOEI0jrCjV4Q52uN7/ln/KyI1AvSNR/IX3XwePOfsQWOfDhvmqXkb3TcYbVzWr4p85msKgOw=="],
-
-    "@khoralabs/chat/ai/@ai-sdk/provider": ["@ai-sdk/provider@4.0.4", "", { "dependencies": { "json-schema": "^0.4.0" } }, "sha512-tbHKNLirllUNF3ZlkCsXnwab2ZV1Sl4b1H/Cp9ruCce15IBmskE8Gwkk0yo9xDWY+jho2of7lVXtwSsyrq7cwQ=="],
-
-    "@khoralabs/chat/ai/@ai-sdk/provider-utils": ["@ai-sdk/provider-utils@5.0.15", "", { "dependencies": { "@ai-sdk/provider": "4.0.4", "@standard-schema/spec": "^1.1.0", "@workflow/serde": "4.1.0", "eventsource-parser": "^3.0.8", "undici": "^7.28.0" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-dnDM4/fS17qO+D7LxVU4003V1+8ZDEWgG7rPhvcDNNFs269qLx+Jnm2mTf72ejyjdzu+f0J+rKNSLXWjZWzxwA=="],
 
     "@swc/cli/minimatch/brace-expansion": ["brace-expansion@2.1.3", "", { "dependencies": { "balanced-match": "^1.0.0" } }, "sha512-DRdx5neNsG/QXbniLFWi2YmC/68oeOOmKz6zOjVk6ZS1ZLXgLIKqVEc6hWsmkjBbgii0SwaBTcJ5XKj5gzY/4A=="],
 

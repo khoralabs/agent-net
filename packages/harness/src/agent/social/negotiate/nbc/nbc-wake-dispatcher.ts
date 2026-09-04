@@ -3,6 +3,7 @@
  */
 import type { ChainSnapshot } from "@khoralabs/vellum-client";
 
+import { boundaryClientErrorMessage } from "../../../../lib/boundary-client-error.ts";
 import type { VellumChainSessionRegistry } from "../vellum-sessions.ts";
 import type { NbcLoopHost } from "./loop-host.ts";
 import type { NbcChainChanged } from "./nbc-chain-change-bus.ts";
@@ -123,7 +124,7 @@ export function createNbcWakeDispatcher(deps: NbcWakeDispatcherDeps) {
         }
         completed.add(key);
       } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
+        const message = boundaryClientErrorMessage(err);
         deps.host.onStatus(event.chainId, {
           status: "failed",
           outcome: "error",

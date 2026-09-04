@@ -6,6 +6,7 @@ import {
   resolveAgentMemoriesOntology,
 } from "@khoralabs/memories-service/client/agent";
 import { z } from "zod";
+import { boundaryClientErrorMessage } from "../../../lib/boundary-client-error.ts";
 import { toolEnabled } from "../../turn/tools/_helpers/disable-policies.ts";
 import { hasMemoriesClient } from "../../turn/tools/policies.ts";
 import type { HarnessToolkitEnv } from "../../turn/tools/types.ts";
@@ -93,9 +94,7 @@ export function createWriteMemoryTool(ontology: AgentMemoriesOntology) {
         ]);
         return { memoryIds };
       } catch (err) {
-        const message =
-          err instanceof Error && err.message.trim().length > 0 ? err.message.trim() : String(err);
-        return { memoryIds: [], error: message };
+        return { memoryIds: [], error: boundaryClientErrorMessage(err) };
       }
     },
   });

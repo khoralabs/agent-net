@@ -11,6 +11,7 @@ import type {
   ThreadTip,
 } from "@khoralabs/chat";
 import { isChatNotFoundError } from "@khoralabs/chat";
+import { ChatHttpClientError } from "@khoralabs/chat/http";
 import {
   type ChatServiceClient,
   type ChatServiceClientOptions,
@@ -126,11 +127,21 @@ async function ensureHarnessChannel(client: ChatServiceClient, channelId: string
   try {
     await client.getChannel(channelId);
   } catch (error) {
-    if (!isChatNotFoundError(error)) throw error;
-    await client.createChannel({
-      id: channelId,
-      metadata: { title: "Network Harness", kind: "harness-network" },
-    });
+    if (isChatNotFoundError(error)) {
+      await client.createChannel({
+        id: channelId,
+        metadata: { title: "Network Harness", kind: "harness-network" },
+      });
+      return;
+    }
+    if (error instanceof ChatHttpClientError && error.code === "not_found") {
+      await client.createChannel({
+        id: channelId,
+        metadata: { title: "Network Harness", kind: "harness-network" },
+      });
+      return;
+    }
+    throw error;
   }
 }
 
