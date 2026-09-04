@@ -63,6 +63,7 @@ export {
   type NbcChainChanged,
 } from "./agent/social/negotiate/nbc/nbc-chain-change-bus.ts";
 export {
+  type NbcInternalLoadGraphInput,
   type NbcInternalNegotiationChain,
   type NbcInternalNegotiationHost,
   type RegisterNbcInternalNegotiationRoutesInput,
