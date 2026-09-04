@@ -11,6 +11,7 @@ flowchart TB
   subgraph foundations [Foundations]
     relay[relay]
     memories[memories]
+    didKey[did-key-identity]
   end
   subgraph mid [Mid-tier libraries]
     chat[chat]
@@ -21,14 +22,16 @@ flowchart TB
     harness["@khoralabs/agent-net harness"]
     reference[agent-net-reference host]
   end
-  chat --> relay
+  chat --> didKey
   vellum --> relay
   khora --> memories
+  khora --> didKey
   harness --> chat
   harness --> relay
   harness --> vellum
   harness --> memories
   harness --> khora
+  harness --> didKey
   reference --> harness
   reference --> chat
   reference --> relay
@@ -36,11 +39,12 @@ flowchart TB
   reference --> khora
 ```
 
-Two independent foundation stacks meet only at agent-net:
+Two independent foundation stacks meet only at agent-net (`did-key-identity` is shared identity primitives, not a third product stack):
 
 | Stack | Foundation | Mid-tier | Typical role |
 | --- | --- | --- | --- |
-| Transport / negotiate | `relay` | `chat`, `vellum-client` | Signed channels, MLS, chat ledger, Vellum pool uplink |
+| Transport / negotiate | `relay` | `vellum-client` | DID channels, MLS, Vellum pool uplink |
+| Messaging ledger | `did-key-identity` (signing) | `chat` | Signed posts/threads over chat HTTP (not over relay) |
 | Social / memory | `memories` | `khora-client`, `khora-host` | Memory service + host social graph |
 
 Within agent-net there is a further split:
@@ -56,13 +60,13 @@ Within agent-net there is a further split:
 
 ### `relay`
 
-**Depends on (among primaries):** none.
+**Depends on (among primaries):** `did-key-identity` (DID helpers; also re-exported from `relay/crypto` for compat).
 
-**Used by:** `chat` (peer/crypto), `vellum-client` (client/MLS/contracts), harness, reference.
+**Used by:** `vellum-client` (client/MLS/contracts), harness, reference. **Not** a dependency of `chat`.
 
 | Agent-net layer | Import surface | How it is used |
 | --- | --- | --- |
-| Harness | `relay/client`, `relay/crypto` | Negotiate/Vellum uplink via `RelayClient`; DID/ed25519 helpers for chat signers |
+| Harness | `relay/client` | Negotiate/Vellum uplink via `RelayClient` |
 | Reference | `relay/server` | Runs the in-process relay the harness points at (`RELAY_BASE_URL`) |
 
 **Direct vs wiring:** harness = direct client; reference = server wiring.
@@ -88,14 +92,14 @@ Within agent-net there is a further split:
 
 ### `chat`
 
-**Depends on (among primaries):** `relay` (crypto / optional peer).
+**Depends on (among primaries):** `did-key-identity` (DID-key signing helpers). **Does not** depend on `relay`.
 
 **Used by:** harness, reference.
 
 | Agent-net layer | Import surface | How it is used |
 | --- | --- | --- |
-| Harness | `chat`, `chat/http/client`, `chat/persistence` | Signed messaging: thread/post client, writers, crypto adapters |
-| Reference | `chat/http` | Embeds chat HTTP (+ WS fanout) for the harness to call |
+| Harness | `chat`, `chat/http/client`, `chat/agent`, `chat/sources`, `chat/persistence` | Signed messaging: thread/post client, writers, `createDidKeyChatCrypto` |
+| Reference | `chat/http/server` | Embeds chat HTTP (+ WS fanout) for the harness to call |
 
 **Direct vs wiring:** harness = HTTP client; reference = HTTP server.
 
@@ -135,7 +139,7 @@ Within agent-net there is a further split:
 
 ```
 reference orchestrator
-  ├─ wires servers: khora-host, memories-service, relay/server, chat/http
+  ├─ wires servers: khora-host, memories-service, relay/server, chat/http/server
   └─ CLIs import harness → which calls clients:
         khora-client, chat HTTP client, memories-service client,
         relay/client + vellum-client, memories-node, memories-agents
@@ -165,9 +169,9 @@ Lower-level SemVer bumps do **not** always force the same bump one layer up. Pro
 
 | Change in lower package | Typical mid-tier response | Why |
 | --- | --- | --- |
-| **relay** patch (internal bugfix, types unchanged) | **chat** / **vellum**: none–patch | Peer/catalog refresh; no public API change |
-| **relay** minor (new exports: path map, `RelayClientError`, additive health fields) | **vellum**: minor if it adopts or re-exports; **chat**: often none–patch (crypto-only usage) | Chat barely touches relay HTTP; vellum’s session fabric sits on `RelayClient` |
-| **relay** major / breaking wire (e.g. health body shape, removed routes) | **vellum**: major if callers observe relay HTTP/errors; **chat**: none–patch unless crypto/API break | Reference host that serves relay feels the break even if chat’s published API does not |
+| **relay** patch (internal bug fix, types unchanged) | **vellum**: none–patch; **chat**: none | Chat has no relay dependency |
+| **relay** minor (new exports: path map, `RelayClientError`, additive health fields) | **vellum**: minor if it adopts or re-exports; **chat**: none | Vellum’s session fabric sits on `RelayClient` |
+| **relay** major / breaking wire (e.g. health body shape, removed routes) | **vellum**: major if callers observe relay HTTP/errors; **chat**: none | Reference host that serves relay feels the break; chat ledger is independent |
 | **memories** patch | **khora**: none–patch | Host still talks the same service client |
 | **memories** minor (well-known discovery, error codes, shared paths) | **khora**: minor when host adopts discovery/codes; else patch | Adoption is intentional; unused additive APIs need no khora bump |
 | **memories** major (auth scheme, storage contract, removed routes) | **khora**: major | Host embeds and configures the service |
@@ -193,7 +197,7 @@ Harness also depends on **relay** and **memories-*** directly (not only via mid-
 
 | Lower change | Harness | Notes |
 | --- | --- | --- |
-| relay patch | none–patch | Crypto + `RelayClient` |
+| relay patch | none–patch | `RelayClient` for negotiate |
 | relay minor (client errors / paths) | minor if negotiate adopts shared errors/paths | Can ship without waiting on vellum if types remain compatible |
 | relay breaking wire | major **or** reference-only fix | If only the **hosted** relay health/probe breaks, reference may change without a harness major |
 | memories patch | none–patch | |
@@ -238,7 +242,7 @@ At each wave: bump and publish the lower package, refresh the higher package’s
 
 | Primary | Harness feels it? | Reference feels it? |
 | --- | --- | --- |
-| relay | Yes (client/crypto) | Yes (server) |
+| relay | Yes (`RelayClient` for negotiate) | Yes (server) |
 | memories | Yes (client/node/agents) | Yes (HTTP+sqlite host) |
 | chat | Yes (HTTP client) | Yes (HTTP server) |
 | vellum-client | Yes (negotiate/pool) | Indirect (via harness) |
