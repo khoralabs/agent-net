@@ -44,6 +44,8 @@ Publishable package: `@khoralabs/agent-net` ([`packages/harness`](packages/harne
 
 GitHub Actions: [`.github/workflows/release.yml`](.github/workflows/release.yml) (`workflow_dispatch` with a semver, or push a `v*` tag). Requires repository secret `NPM_TOKEN` (or `NPM_CONFIG_TOKEN`).
 
+Notable changes are recorded in [`CHANGELOG.md`](CHANGELOG.md) ([Keep a Changelog](https://keepachangelog.com/en/1.1.0/) + SemVer). Add bullets under `## [Unreleased]` as you land work; at release time move them into a `## [X.Y.Z] - YYYY-MM-DD` section and update the compare links.
+
 ## Workflow world
 
 Harness and swarm workflows use the abstract [Workflow SDK](https://useworkflow.dev) only. The **hosting app** must configure and start a world before running workflows. The reference app uses the [local world](https://workflow-sdk.dev/worlds/local) (`configureLocalWorldEnv` / `startLocalWorldWorker`).
