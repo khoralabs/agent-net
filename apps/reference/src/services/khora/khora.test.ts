@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, test } from "bun:test";
 
+import { KHORA_HTTP_PATH } from "@khoralabs/khora-client";
 import {
   assertKhoraMemoriesDbPathUnset,
   envMemoriesEnabled,
@@ -61,9 +62,9 @@ describe("startKhoraHost", () => {
     const dataDir = `/tmp/agent-net-khora-test-${process.pid}-${Date.now()}`;
     const host = await startKhoraHost({ dataDir, port: 0 });
     try {
-      const res = await fetch(`${host.baseUrl}/health`);
+      const res = await fetch(`${host.baseUrl}${KHORA_HTTP_PATH.health}`);
       expect(res.ok).toBe(true);
-      expect(await res.text()).toBe("ok");
+      expect(await res.json()).toEqual({ ok: true });
     } finally {
       host.stop();
     }

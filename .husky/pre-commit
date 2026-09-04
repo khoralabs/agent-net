@@ -8,3 +8,6 @@ bun run format:check
 
 echo "pre-commit: Typecheck…"
 bun run typecheck
+
+echo "pre-commit: Tests…"
+bun test
