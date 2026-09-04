@@ -1,12 +1,12 @@
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 
-import type { KhoraWsData } from "@khoralabs/khora-client/transport";
 import { bootstrapKhoraEncryption } from "@khoralabs/khora-host/bootstrap";
 import {
   createHostRouteDepsFromEnv,
   createHostRouter,
   createInboxDrainWebSocketHandlersForDeps,
+  type KhoraWsData,
   runWithRequestPeerIp,
 } from "@khoralabs/khora-host/http";
 
