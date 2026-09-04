@@ -75,6 +75,15 @@ export {
   type NbcNegotiationStateResponse,
 } from "./agent/social/negotiate/nbc/nbc-mesh-client.ts";
 export { startNbcReplicaWatch } from "./agent/social/negotiate/nbc/nbc-replica-watch.ts";
+export {
+  type CommitNbcTurnInput,
+  commitNbcTurn,
+  type NbcNegotiationStatusFields,
+  type NbcTurnCommitChain,
+  type NbcTurnCommitRejection,
+  type NbcTurnCommitResult,
+  nbcNegotiationStatusFields,
+} from "./agent/social/negotiate/nbc/nbc-turn-commit.ts";
 export { nbcTurnContext } from "./agent/social/negotiate/nbc/nbc-turn-context.ts";
 export {
   createNbcWakeDispatcher,

@@ -1,7 +1,8 @@
 import type { NbcChainGraph } from "@khoralabs/obp-nbc";
-import { NBC_GENESIS_NOT_INITIATOR, type VellumChainSessionRegistry } from "../vellum-sessions.ts";
+import type { VellumChainSessionRegistry } from "../vellum-sessions.ts";
 import type { NbcLoopChain } from "./loop-host.ts";
 import type { NbcChainChanged } from "./nbc-chain-change-bus.ts";
+import { commitNbcTurn, type NbcTurnCommitRejection } from "./nbc-turn-commit.ts";
 
 export type NbcInternalNegotiationChain = NbcLoopChain & {
   id: string;
@@ -35,6 +36,12 @@ function sanitizeReason(raw: unknown): string | undefined {
   if (typeof raw !== "string") return undefined;
   const trimmed = raw.trim().slice(0, 500);
   return trimmed.length > 0 ? trimmed : undefined;
+}
+
+function turnCommitStatus(rejection: NbcTurnCommitRejection): number {
+  if (rejection === "not-a-party") return 400;
+  if (rejection === "commit-failed") return 502;
+  return 409;
 }
 
 export function registerNbcInternalNegotiationRoutes(
@@ -123,36 +130,28 @@ export function registerNbcInternalNegotiationRoutes(
         if (body.turn === null || typeof body.turn !== "object") {
           return json({ error: "turn object is required" }, 400);
         }
-        const turn = body.turn as Record<string, unknown>;
-        try {
-          const committed = await sessions.commitTurn(chainId, {
-            asDid,
-            body: turn,
-          });
-          const turnsCompleted = chain.turnsCompleted + 1;
-          const turnLimitReached = turnsCompleted >= chain.maxTurns;
-          host.onTurnCommitted({
-            chainId,
-            sessionId: committed.sessionId,
-            turnsCompleted,
-            turnLimitReached,
-          });
-          notifyChainChanged({
-            chainId,
-            turnSeq: turnsCompleted,
-            cause: "turn",
-          });
-          return json({ ok: true, turnsCompleted });
-        } catch (err) {
-          const message = err instanceof Error ? err.message : String(err);
-          if (message === NBC_GENESIS_NOT_INITIATOR) {
-            return json({ error: message }, 409);
-          }
-          if (message.includes("no Vellum handle")) {
-            return json({ error: "No Vellum handle for asDid" }, 409);
-          }
-          return json({ error: message }, 502);
+        const committed = await commitNbcTurn({
+          chainId,
+          asDid,
+          turn: body.turn as Record<string, unknown>,
+          chain,
+          sessions,
+        });
+        if (!committed.ok) {
+          return json({ error: committed.message }, turnCommitStatus(committed.rejection));
         }
+        host.onTurnCommitted({
+          chainId,
+          sessionId: committed.sessionId,
+          turnsCompleted: committed.turnsCompleted,
+          turnLimitReached: committed.turnLimitReached,
+        });
+        notifyChainChanged({
+          chainId,
+          turnSeq: committed.turnsCompleted,
+          cause: "turn",
+        });
+        return json({ ok: true, turnsCompleted: committed.turnsCompleted });
       },
     },
 
