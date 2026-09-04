@@ -2,6 +2,8 @@
 
 Guidance for coding agents working in this package. Closest [`AGENTS.md`](https://agents.md) wins for nested paths; user chat overrides everything.
 
+Consumer-facing architecture (control plane vs host, Workflow peel): [`docs/explanation/architecture.md`](../../docs/explanation/architecture.md). Docs hub: [`docs/README.md`](../../docs/README.md).
+
 ## Package overview
 
 - **Control plane** (`src/agent`, `src/pool`, `src/lib`, root `src/index.ts`): identities, pool, inbox, social, memories, network events — framework-free of AI SDK / Workflow directives.
@@ -20,7 +22,7 @@ Guidance for coding agents working in this package. Closest [`AGENTS.md`](https:
 | `@khoralabs/agent-net/swarm` | `src/swarm/index.ts` |
 | `@khoralabs/agent-net/swarm-run` | `src/swarm/run.ts` |
 
-**Do not** re-export swarm symbols from `src/index.ts` or other non-swarm entrypoints.
+**Do not** re-export swarm symbols from `src/index.ts` or other non-swarm entrypoints. Published export map: [`docs/reference/entrypoints.md`](../../docs/reference/entrypoints.md).
 
 ## Hosts own Workflow directives
 

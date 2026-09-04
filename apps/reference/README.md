@@ -5,25 +5,18 @@ Concrete stack for local development and demos:
 - Zero-config [Workflow local world](https://workflow-sdk.dev/worlds/local)
 - In-process Khora host + memories + relay + chat
 - Orchestrator process that starts those services
-- **Marketplace CLI** (`marketplace`) — primary demo: buy/sell pool, percolator inbox, seller evaluate, Vellum connect, buyer invite accept/decline (mutual interest; stop before NBC)
+- **Marketplace CLI** (`marketplace`) — primary demo
 - Swarm CLI (`swarm`) — secondary; budgeted multi-agent orchestration
 
-## Layout
+## Documentation
 
-```text
-src/
-  run-marketplace.ts          # marketplace CLI composition root
-  patterns/                   # domain-agnostic host glue (promote candidates)
-    inbox/                    # subscribe → filter → dispatch / wait
-    turn/                     # structured LLM decisions
-    negotiate/                # Vellum pair open + cleanup
-  marketplace/                # MRO surplus demo domain (not promote-as-is)
-    config.ts seed.ts pipeline.ts evaluate-on-inbox.ts evaluate-on-invite.ts GAPS.md
-  run-swarm.ts                # secondary swarm demo
-  orchestrator.ts             # local khora + memories + relay + chat + Workflow world
-```
+- [Getting started](../../docs/tutorials/getting-started.md)
+- [Docs hub](../../docs/README.md)
+- [Architecture](../../docs/explanation/architecture.md)
+- [Env and CLI](../../docs/reference/env-and-cli.md)
+- Host-glue backlog: [`marketplace/GAPS.md`](src/marketplace/GAPS.md)
 
-`patterns/**` must not import `marketplace/**`. Host-glue pain points live in `marketplace/GAPS.md`.
+## Run
 
 ```bash
 # terminal 1 — reference infra (leave running; .data under apps/reference)
@@ -43,9 +36,23 @@ bun run marketplace
 bun run swarm -- --agents 2
 ```
 
-Marketplace needs **two** long-running processes: reference orchestrator (`start`, which embeds Khora on `:8788`), then the CLI. Orchestrator ports are fixed at khora `8788`, relay `8790`, memories `8791`, chat `8792` (matching `.env`). Do not stop orchestrator with ^C while marketplace is running.
+From the workspace root you can use `bun run reference:start` and `bun run marketplace` instead.
 
-The marketplace demo ends at **mutual interest**: sellers engage/skip on the RFQ, engagers open Vellum, then the buyer accepts or declines each invite (declines disconnect immediately). Negotiation turns / NBC are out of scope.
+Marketplace needs **two** long-running processes. Do not stop the orchestrator with ^C while marketplace is running. The demo ends at **mutual interest** (before NBC).
+
+## Layout
+
+```text
+src/
+  run-marketplace.ts          # marketplace CLI composition root
+  patterns/                   # domain-agnostic host glue (promote candidates)
+  marketplace/                # MRO surplus demo domain (not promote-as-is)
+  run-swarm.ts                # secondary swarm demo
+  orchestrator.ts             # local khora + memories + relay + chat + Workflow world
+  workflows/                  # host-owned Workflow durable wrappers
+```
+
+`patterns/**` must not import `marketplace/**`.
 
 ## Observability
 
