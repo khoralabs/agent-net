@@ -123,6 +123,12 @@ export {
   type VellumHandle,
 } from "./agent/social/negotiate/negotiate.ts";
 export {
+  type OpenedVellumChain,
+  type OpenVellumChainForDidsInput,
+  openVellumChainForDids,
+  type VellumChainAgentFocus,
+} from "./agent/social/negotiate/open-vellum-chain.ts";
+export {
   createHarnessVellumPool,
   createSharedUplinkVellumPool,
   disconnectVellum,
