@@ -23,6 +23,7 @@ import { start } from "workflow/api";
 
 import { referenceMemoriesOntology } from "./memories/ontology.ts";
 import { installReferenceObservability } from "./observability/install.ts";
+import { resolveKhoraMintInvite } from "./services/khora/mint-invite.ts";
 import { swarmOrchestrator } from "./workflows/swarm.ts";
 import { configureLocalWorldEnv, startLocalWorldWorker } from "./world/local.ts";
 import { resolveHarnessDataDir } from "./world/paths.ts";
@@ -105,15 +106,19 @@ async function main(): Promise<void> {
     source: "swarm",
   });
 
+  const resolvedKhoraBaseUrl = requireKhoraBaseUrl(khoraBaseUrl);
+  const mintInvite = resolveKhoraMintInvite({ khoraBaseUrl: resolvedKhoraBaseUrl });
+
   const harness = await startNetworkHarness({
     dataDir: config.dataDir,
     chatBaseUrl: requireChatBaseUrl(chatBaseUrl),
     chatToken: requireChatToken(chatToken),
     networkEvents,
-    khoraBaseUrl: requireKhoraBaseUrl(khoraBaseUrl),
+    khoraBaseUrl: resolvedKhoraBaseUrl,
     relayBaseUrl: requireRelayBaseUrl(relayBaseUrl),
     memoriesBaseUrl: requireMemoriesBaseUrl(memoriesBaseUrl),
     memoriesAdminToken: requireMemoriesAdminToken(undefined),
+    ...(mintInvite !== undefined ? { mintInvite } : {}),
     // Optional: HARNESS_IDENTITY_WRAP_KEY resolved inside startNetworkHarness
   });
   installMemoriesOntology(referenceMemoriesOntology);

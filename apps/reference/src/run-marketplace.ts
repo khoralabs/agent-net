@@ -20,6 +20,7 @@ import { runMarketplacePipeline } from "./marketplace/pipeline.ts";
 import { reportLine } from "./marketplace/report.ts";
 import { referenceMemoriesOntology } from "./memories/ontology.ts";
 import { installReferenceObservability } from "./observability/install.ts";
+import { resolveKhoraMintInvite } from "./services/khora/mint-invite.ts";
 import { requireKhoraReachable, requireReferenceStackReachable } from "./services/stack-health.ts";
 import { configureLocalWorldEnv, startLocalWorldWorker } from "./world/local.ts";
 import { resolveHarnessDataDir } from "./world/paths.ts";
@@ -127,6 +128,8 @@ async function main(): Promise<void> {
     chatBaseUrl,
   });
 
+  const mintInvite = resolveKhoraMintInvite({ khoraBaseUrl });
+
   const harness = await startNetworkHarness({
     dataDir: config.dataDir,
     chatBaseUrl,
@@ -136,6 +139,7 @@ async function main(): Promise<void> {
     relayBaseUrl,
     memoriesBaseUrl,
     memoriesAdminToken: requireMemoriesAdminToken(undefined),
+    ...(mintInvite !== undefined ? { mintInvite } : {}),
   });
 
   installMemoriesOntology(referenceMemoriesOntology);
