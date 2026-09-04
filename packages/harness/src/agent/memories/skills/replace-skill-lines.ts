@@ -1,6 +1,7 @@
 import { tool } from "@khoralabs/agent-capabilities";
 import { writeMemoryNode } from "@khoralabs/memories-node/helpers/agent";
 import { z } from "zod";
+import { boundaryClientErrorMessage } from "../../../lib/boundary-client-error.ts";
 import { toolEnabled } from "../../turn/tools/_helpers/disable-policies.ts";
 import {
   applyLineChanges,
@@ -63,7 +64,7 @@ export const replaceSkillLinesTool = tool<
     try {
       skillRecordFromText(SKILLS_NAMESPACE, key, updated);
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
+      const message = boundaryClientErrorMessage(error);
       throw new Error(`skill document invalid after line changes: ${message}`);
     }
 

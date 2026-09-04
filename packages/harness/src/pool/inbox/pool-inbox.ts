@@ -8,6 +8,7 @@ import {
 } from "@khoralabs/khora-client";
 
 import type { AgentHandle } from "../../agent/handle.ts";
+import { boundaryClientErrorMessage } from "../../lib/boundary-client-error.ts";
 
 const MIN_BACKOFF_MS = 1_000;
 const MAX_BACKOFF_MS = 30_000;
@@ -251,8 +252,7 @@ export function connectPoolInbox(opts: PoolInboxOptions): InboxConnection {
     }
     opts.onLifecycle?.("connected");
   })().catch((e) => {
-    const error = e instanceof Error ? e.message : String(e);
-    opts.onLifecycle?.("connect_failed", { error });
+    opts.onLifecycle?.("connect_failed", { error: boundaryClientErrorMessage(e) });
   });
   return {
     close() {
