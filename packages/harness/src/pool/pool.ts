@@ -25,8 +25,8 @@ export type ManagedAgentPoolOptions = {
   /** When set, agent identity files are sealed with AES-256-GCM. */
   identitySecret?: IdentitySecret;
   /**
-   * When set, each spawn mints one invite (typically via Khora admin API)
-   * and passes it to `register({ inviteToken })`.
+   * When set, each spawn mints one invite and passes it to
+   * `register({ inviteToken })`. Hosts own the mint call (operator capability).
    */
   mintInvite?: () => Promise<string>;
   /**

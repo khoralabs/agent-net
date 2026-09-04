@@ -24,6 +24,8 @@ Swarm orchestrators and `"use workflow"` / `"use step"` wrappers are **host-owne
 | `agentResponse`, `executeAgentResponse`, `runAgentResponseStep` | Host wrappers (copy `apps/reference/src/workflows/agent-response*.ts`) + `./agent-response-run` |
 | `swarmOrchestrator` from `./swarm` | Host wrapper (`apps/reference/src/workflows/swarm.ts`) + `./swarm` session helpers + `./swarm-run` |
 | `LanguageModel` / `gateway(modelId)` on structured helpers | Pass `model: string` (gateway model id) |
+| `khoraAdminToken` on `startNetworkHarness` | Pass `mintInvite: () => Promise<string>`; the host owns the operator mint request |
+| `mintKhoraInviteTokens`, `requireKhoraAdminToken`, `resolveKhoraAdminTokenFromEnv` | Host-owned: call your network's operator invite-mint endpoint from `mintInvite` |
 
 `ai`, `workflow`, and `@khoralabs/agent-capabilities-ai-sdk` are **optional peer dependencies**. Install them when using `./ai-sdk` or host Workflow wrappers.
 
@@ -40,7 +42,7 @@ const harness = await startNetworkHarness({
   memoriesAdminToken,
   chatBaseUrl,
   chatToken,
-  khoraAdminToken, // optional
+  mintInvite, // optional: host-owned invite mint for spawn
   identitySecret, // optional
 });
 

@@ -39,7 +39,6 @@ import { requireChatBaseUrl, requireChatToken } from "../../lib/chat-base-url.ts
 import { requireMemoriesAdminToken } from "../../lib/memories-base-url.ts";
 import { loadHarnessIdentity, resolveIdentitySecretFromEnv } from "../identity-wrap-key.ts";
 import { HarnessPoolInbox, type PoolInboxEvent } from "../inbox/pool-inbox.ts";
-import { mintKhoraInviteTokens, resolveKhoraAdminTokenFromEnv } from "../khora-admin-invites.ts";
 import {
   emitNetworkEvent,
   installNetworkEventsPlugin,
@@ -175,10 +174,11 @@ export type NetworkHarnessOptions = {
   /** Shared-secret Bearer token for memories server-admin auth. */
   memoriesAdminToken: string;
   /**
-   * Khora host admin Bearer token for minting invites on spawn.
-   * Falls back to `KHORA_ADMIN_TOKEN` / `ADMIN_ROOT_TOKEN` / `KHORA_CONSOLE_ROOT_TOKEN`.
+   * Mints one network invite per spawn (operator capability).
+   * Hosts own the network call — e.g. a Khora operator invite-mint request.
+   * When omitted, agents register without an invite token.
    */
-  khoraAdminToken?: string;
+  mintInvite?: () => Promise<string>;
   /**
    * Wrap key for sealing agent identity files.
    * Falls back to `HARNESS_IDENTITY_WRAP_KEY` (32-byte base64/hex).
@@ -399,8 +399,6 @@ export async function startNetworkHarness(
   const chatBaseUrl = requireChatBaseUrl(opts.chatBaseUrl);
   const chatToken = requireChatToken(opts.chatToken);
   const memoriesAdminToken = requireMemoriesAdminToken(opts.memoriesAdminToken);
-  const khoraAdminToken =
-    opts.khoraAdminToken?.trim() || resolveKhoraAdminTokenFromEnv() || undefined;
   const identitySecret = opts.identitySecret ?? resolveIdentitySecretFromEnv();
   const operatorSigner = opts.operator?.signer;
 
@@ -427,22 +425,7 @@ export async function startNetworkHarness(
     onMemberAdded: (handle) => poolInbox.add(handle.signer),
     onMemberRemoving: (did) => poolInbox.remove(did),
     ...(opts.agentRegistry !== undefined ? { agentRegistry: opts.agentRegistry } : {}),
-    ...(khoraAdminToken !== undefined && khoraAdminToken.length > 0
-      ? {
-          mintInvite: async () => {
-            const tokens = await mintKhoraInviteTokens({
-              baseUrl: khoraBaseUrl,
-              adminToken: khoraAdminToken,
-              count: 1,
-            });
-            const token = tokens[0];
-            if (token === undefined) {
-              throw new Error("startNetworkHarness: admin mint returned no token");
-            }
-            return token;
-          },
-        }
-      : {}),
+    ...(opts.mintInvite !== undefined ? { mintInvite: opts.mintInvite } : {}),
   });
 
   const loadSigner = async (did: string): Promise<PersistableSigner | undefined> => {

@@ -247,11 +247,6 @@ export {
   wrapKeySecretFromBytes,
 } from "./pool/index.ts";
 export {
-  mintKhoraInviteTokens,
-  requireKhoraAdminToken,
-  resolveKhoraAdminTokenFromEnv,
-} from "./pool/khora-admin-invites.ts";
-export {
   emitNetworkEvent,
   installNetworkEventsPlugin,
   type ListNetworkEventsOptions,
