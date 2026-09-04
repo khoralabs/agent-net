@@ -8,6 +8,14 @@ export {
   type NetworkEventsPlugin,
 } from "./events-plugin.ts";
 export {
+  agentNetworkEventFilter,
+  createNetworkEventsFanout,
+  type NetworkEventsFanout,
+  networkEventsSseOptions,
+  type RecordNetworkEventInput,
+  recordNetworkEvent,
+} from "./network-events-fanout.ts";
+export {
   getNetworkSession,
   type NetworkAgentWorkflowDeps,
   type NetworkRuntimeSession,

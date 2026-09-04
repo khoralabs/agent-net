@@ -7,6 +7,7 @@ export {
   saveHarnessIdentity,
   wrapKeySecretFromBytes,
 } from "./identity-wrap-key.ts";
+export { createInboxFanout, type InboxFanout } from "./inbox/inbox-fanout.ts";
 export type {
   HarnessPoolInboxOptions,
   InboxConnection,
@@ -18,6 +19,8 @@ export type {
 /** @deprecated Prefer {@link HarnessPoolInbox} / harness.subscribeInbox. */
 export { connectPoolInbox, HarnessPoolInbox } from "./inbox/pool-inbox.ts";
 export {
+  agentNetworkEventFilter,
+  createNetworkEventsFanout,
   emitNetworkEvent,
   getInstalledNetworkEventsPlugin,
   getNetworkSession,
@@ -28,9 +31,13 @@ export {
   type NetworkAttribution,
   type NetworkEvent,
   type NetworkEventSource,
+  type NetworkEventsFanout,
   type NetworkEventsPlugin,
   type NetworkRuntimeSession,
   networkEventId,
+  networkEventsSseOptions,
+  type RecordNetworkEventInput,
+  recordNetworkEvent,
   registerNetworkSession,
   removeNetworkSession,
   requireNetworkSession,
@@ -60,6 +67,12 @@ export {
 } from "./observability/network-log.ts";
 export type { AgentCallback, ManagedAgentPoolOptions } from "./pool.ts";
 export { ManagedAgentPool } from "./pool.ts";
+export {
+  createSseFanout,
+  type SseFanout,
+  type SseFanoutOptions,
+  type SseResponseOptions,
+} from "./sse/sse-fanout.ts";
 export {
   type AgentMemoriesFraming,
   type AgentRecord,
