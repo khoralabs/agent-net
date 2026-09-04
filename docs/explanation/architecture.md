@@ -32,7 +32,7 @@ Published harness barrels must contain **zero** `"use workflow"` / `"use step"` 
 
 Why peel: Workflow directives bind a package to a world backend and to the Workflow SDK’s bundling model. Keeping them host-owned lets `@khoralabs/agent-net` stay a control-plane library while apps choose local world, a remote world, or no Workflow at all.
 
-The process that hosts the workflow worker must configure the world **before** running workflows (for example `WORKFLOW_TARGET_WORLD=local` and `getWorld().start()`).
+The process that hosts the workflow worker must configure the world **before** running workflows (for example `WORKFLOW_TARGET_WORLD=local` and `getWorld().start()`). See [How to host a Workflow world](../how-to/host-workflow-world.md).
 
 ## Harness internal layout (mental model)
 
