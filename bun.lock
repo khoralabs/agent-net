@@ -45,7 +45,7 @@
     },
     "packages/harness": {
       "name": "@khoralabs/agent-net",
-      "version": "0.3.1",
+      "version": "0.3.2",
       "dependencies": {
         "@khoralabs/agent-capabilities": "catalog:",
         "@khoralabs/chat": "catalog:",
@@ -120,7 +120,7 @@
     "@khoralabs/sourcemaps": "^0.1.0",
     "@khoralabs/sqlite-crypto": "^0.1.0",
     "@khoralabs/sqlite-migrate": "^0.1.0",
-    "@khoralabs/vellum-client": "^0.5.0",
+    "@khoralabs/vellum-client": "^0.6.0",
     "@libsql/client": "0.17.4",
     "@types/bun": "latest",
     "ai": "^7.0.9",
@@ -303,7 +303,7 @@
 
     "@khoralabs/sqlite-migrate": ["@khoralabs/sqlite-migrate@0.1.0", "", {}, "sha512-mGkPR6WposZArUh1k4A1s2VwyOtGJUPlKkUY+DYjZ8pkhgJ6mEhHQOlRQJNOAXKlJETsdVy4iPTeyuvzPl/zFg=="],
 
-    "@khoralabs/vellum-client": ["@khoralabs/vellum-client@0.5.1", "", { "dependencies": { "@khoralabs/did-key-identity": "^0.2.0", "@khoralabs/obp-core": "^0.2.1", "@khoralabs/obp-nbc": "^0.2.1", "@khoralabs/obp-wire": "^0.2.1", "@khoralabs/relay": "^0.3.1", "zod": "^4" }, "peerDependencies": { "typescript": "^5" } }, "sha512-8MpW7TStVg7jaNg1ir2CDG4BfH0JMxg1OeVFf8pNQAz1VM21wvkfhbRkgiJe6IswpNkbn/KiGo6w5YMFoU0Xsw=="],
+    "@khoralabs/vellum-client": ["@khoralabs/vellum-client@0.6.0", "", { "dependencies": { "@khoralabs/did-key-identity": "^0.2.0", "@khoralabs/obp-core": "^0.2.1", "@khoralabs/obp-nbc": "^0.2.1", "@khoralabs/obp-wire": "^0.2.1", "@khoralabs/relay": "^0.3.1", "zod": "^4" }, "peerDependencies": { "typescript": "^5" } }, "sha512-uYsPCnlt2avSKykn3We00om9MYpZFC89hCp6hBeMMD0YdLl9c//tWDnF1XoLbIWFgtWC5TeWR2secs3aepLGug=="],
 
     "@libsql/client": ["@libsql/client@0.17.4", "", { "dependencies": { "@libsql/core": "^0.17.4", "@libsql/hrana-client": "^0.10.0", "js-base64": "^3.7.5", "libsql": "^0.5.28", "promise-limit": "^2.7.0" } }, "sha512-lYayFWasDV78A+TjlEhr6ubb3odBV6OHjb+wdp8VQcyWWAEIjuwbCHaraEUS4m4yWoo0BvZo96It4VdzZRmRWw=="],
 
