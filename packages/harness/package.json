@@ -36,6 +36,24 @@
       "import": "./dist/pool/index.js",
       "default": "./dist/pool/index.js"
     },
+    "./negotiate": {
+      "types": "./src/agent/social/negotiate/index.ts",
+      "bun": "./src/agent/social/negotiate/index.ts",
+      "import": "./dist/agent/social/negotiate/index.js",
+      "default": "./dist/agent/social/negotiate/index.js"
+    },
+    "./chat": {
+      "types": "./src/agent/social/message/index.ts",
+      "bun": "./src/agent/social/message/index.ts",
+      "import": "./dist/agent/social/message/index.js",
+      "default": "./dist/agent/social/message/index.js"
+    },
+    "./memories": {
+      "types": "./src/agent/memories/index.ts",
+      "bun": "./src/agent/memories/index.ts",
+      "import": "./dist/agent/memories/index.js",
+      "default": "./dist/agent/memories/index.js"
+    },
     "./swarm": {
       "types": "./src/swarm/index.ts",
       "bun": "./src/swarm/index.ts",
