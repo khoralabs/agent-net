@@ -113,7 +113,7 @@ Within agent-net there is a further split:
 
 | Agent-net layer | Import surface | How it is used |
 | --- | --- | --- |
-| Harness | `vellum-client`, `vellum-client/pool`, `vellum-client/pool/host` | `VellumChain` / NBC negotiate, shared uplink pool, attachment dirs, handles |
+| Harness | `vellum-client`, `vellum-client/paths`, `vellum-client/pool`, `vellum-client/pool/host` | `VellumChain` / NBC negotiate; attachment dirs via `./paths`; shared uplink pool + handles via `pool` / `pool/host` |
 | Reference | (via `@khoralabs/agent-net`) | Opens/disconnects Vellum through harness APIs — does not import vellum-client directly |
 
 **Direct vs wiring:** harness = direct; reference = transitive through harness.
