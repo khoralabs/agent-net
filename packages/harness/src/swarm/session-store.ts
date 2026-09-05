@@ -1,10 +1,5 @@
-import type {
-  AgentChatClient,
-  AgentHandle,
-  ChatServiceClient,
-  HarnessAgentWorkflowDeps,
-  NetworkHarnessHandle,
-} from "../index.ts";
+import type { AgentChatClient, ChatServiceClient } from "../agent/social/message/chat.ts";
+import type { AgentHandle, HarnessAgentWorkflowDeps, NetworkHarnessHandle } from "../index.ts";
 
 import type { AgentLoopState, SwarmConfig } from "./types.ts";
 

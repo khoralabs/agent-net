@@ -1,4 +1,5 @@
-import type { AgentChatClient, AgentTurnParams, AgentUIMessage } from "../index.ts";
+import type { AgentChatClient } from "../agent/social/message/chat.ts";
+import type { AgentTurnParams, AgentUIMessage } from "../index.ts";
 
 import type { InboxEntry } from "./swarm-state.ts";
 import type { AgentLoopState, SwarmConfig } from "./types.ts";
