@@ -114,7 +114,7 @@ Within agent-net there is a further split:
 | Agent-net layer | Import surface | How it is used |
 | --- | --- | --- |
 | Harness | `vellum-client`, `vellum-client/paths`, `vellum-client/pool`, `vellum-client/pool/host` | `VellumChain` / NBC negotiate; attachment dirs via `./paths`; shared uplink pool + handles via `pool` / `pool/host` |
-| Reference | (via `@khoralabs/agent-net`) | Opens/disconnects Vellum through harness APIs — does not import vellum-client directly |
+| Reference | (via `@khoralabs/agent-net/negotiate`) | Opens/disconnects Vellum through harness negotiate APIs — does not import vellum-client directly |
 
 **Direct vs wiring:** harness = direct; reference = transitive through harness.
 
@@ -147,7 +147,7 @@ reference orchestrator
 
 | Consumer | Role |
 | --- | --- |
-| Reference CLIs / workflows | Import `@khoralabs/agent-net` (+ `/swarm`, `/ai-sdk`, …) for pool, agents, negotiate, durable turn helpers |
+| Reference CLIs / workflows | Import `@khoralabs/agent-net` (+ `/negotiate`, `/chat`, `/memories`, `/swarm`, `/ai-sdk`, …) for pool, agents, negotiate, durable turn helpers |
 | Harness | Does **not** host relay/chat/memories/khora; assumes base URLs / tokens from the environment or host |
 
 ---
