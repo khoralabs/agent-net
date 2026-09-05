@@ -39,6 +39,9 @@ export type AgentSocialSubscribeInput = Omit<
 /**
  * Relationship surface for one agent: fabric (posts incl. subscriptions),
  * nested negotiate (Vellum/NBC), and nested message (chat).
+ *
+ * Prefer `@khoralabs/agent-net/negotiate` for negotiate-only hosts so the
+ * package root need not re-export that graph.
  */
 export class AgentSocial {
   readonly #client: KhoraClient;

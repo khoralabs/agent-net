@@ -4,7 +4,7 @@ import { createChatRoutesWithParams, dispatchChatRoute } from "@khoralabs/chat/h
 import { createChatHttpRuntime } from "@khoralabs/chat/http/service";
 import { createMemoryChatPersistence } from "@khoralabs/chat/persistence";
 import { generateIdentity } from "@khoralabs/did-key-identity";
-import { createHarnessChatBackend } from "../index.ts";
+import { createHarnessChatBackend } from "../agent/social/message/index.ts";
 import { assembleTurnContext } from "./assemble-turn-context.ts";
 import { appendInboxEntry } from "./swarm-state.ts";
 import type { AgentLoopState, SwarmConfig } from "./types.ts";

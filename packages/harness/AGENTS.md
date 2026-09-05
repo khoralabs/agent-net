@@ -18,11 +18,14 @@ Consumer-facing architecture (control plane vs host, Workflow peel): [`docs/expl
 | `@khoralabs/agent-net` | `src/index.ts` |
 | `@khoralabs/agent-net/agent` | `src/agent/index.ts` |
 | `@khoralabs/agent-net/pool` | `src/pool/index.ts` |
+| `@khoralabs/agent-net/negotiate` | `src/agent/social/negotiate/index.ts` |
+| `@khoralabs/agent-net/chat` | `src/agent/social/message/index.ts` |
+| `@khoralabs/agent-net/memories` | `src/agent/memories/index.ts` |
 | `@khoralabs/agent-net/ai-sdk` | `src/ai-sdk/index.ts` |
 | `@khoralabs/agent-net/swarm` | `src/swarm/index.ts` |
 | `@khoralabs/agent-net/swarm-run` | `src/swarm/run.ts` |
 
-**Do not** re-export swarm symbols from `src/index.ts` or other non-swarm entrypoints. Published export map: [`docs/reference/entrypoints.md`](../../docs/reference/entrypoints.md).
+**Do not** re-export swarm, ai-sdk, negotiate, chat, or memories peels from `src/index.ts`. Published export map: [`docs/reference/entrypoints.md`](../../docs/reference/entrypoints.md).
 
 ## Hosts own Workflow directives
 

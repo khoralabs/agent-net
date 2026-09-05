@@ -1,10 +1,10 @@
 import type { AgentWorkflowParams, AgentWorkflowResult } from "@khoralabs/agent-net";
-import { AI_STEP_MAX_RETRIES } from "@khoralabs/agent-net";
 import {
   type AgentResponseDeps,
   runAgentResponseWithSession,
   runExecuteAgentResponse,
 } from "@khoralabs/agent-net/ai-sdk";
+import { AI_STEP_MAX_RETRIES } from "@khoralabs/agent-net/workflow-resilience";
 
 /**
  * Reference-app durable step wrappers. The published package stays directive-free;

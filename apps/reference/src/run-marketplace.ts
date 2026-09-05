@@ -4,7 +4,6 @@ import {
   bindNetworkSessionContext,
   clearNetworkSessionContext,
   getHarnessObservability,
-  installMemoriesOntology,
   requireChatBaseUrl,
   requireChatToken,
   requireKhoraBaseUrl,
@@ -13,6 +12,7 @@ import {
   requireRelayBaseUrl,
   startNetworkHarness,
 } from "@khoralabs/agent-net";
+import { installMemoriesOntology } from "@khoralabs/agent-net/memories";
 import { createSqliteNetworkEventPersistencePlugin } from "@khoralabs/agent-net/network-events/sqlite";
 
 import { buildMarketplaceConfig } from "./marketplace/config.ts";
