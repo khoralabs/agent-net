@@ -1,4 +1,8 @@
-import type { InboxPostNotificationPayload, KhoraClientEvent } from "@khoralabs/khora-client";
+import type {
+  InboxPostNotificationPayload,
+  KhoraClientEvent,
+  KhoraConnectionRequestPayload,
+} from "@khoralabs/khora-client";
 
 function postPayloadFromEvent(e: KhoraClientEvent): InboxPostNotificationPayload | undefined {
   if (e.type === "inbox:post") {
@@ -8,6 +12,45 @@ function postPayloadFromEvent(e: KhoraClientEvent): InboxPostNotificationPayload
     return e.notification.payload;
   }
   return undefined;
+}
+
+/** Extract a peer relationship request from a live or drained inbox event. */
+export function inboxConnectionRequest(
+  event: KhoraClientEvent,
+): KhoraConnectionRequestPayload | undefined {
+  if (event.type === "inbox:connection_request") {
+    return event.notification.payload;
+  }
+  if (event.type === "inbox:notification" && event.notification.kind === "connection_request") {
+    return event.notification.payload;
+  }
+  if (event.type === "inbox:drain") {
+    for (const item of event.items) {
+      const projection = item.projection as Record<string, unknown> | null | undefined;
+      if (
+        typeof projection?.channelId === "string" &&
+        typeof projection.fromPrincipalId === "string" &&
+        typeof projection.createdAtMs === "number"
+      ) {
+        return {
+          channelId: projection.channelId,
+          fromPrincipalId: projection.fromPrincipalId,
+          createdAtMs: projection.createdAtMs,
+        };
+      }
+    }
+  }
+  return undefined;
+}
+
+export function inboxHasConnectionRequest(
+  events: readonly KhoraClientEvent[],
+  channelId?: string,
+): boolean {
+  return events.some((event) => {
+    const request = inboxConnectionRequest(event);
+    return request !== undefined && (channelId === undefined || request.channelId === channelId);
+  });
 }
 
 export function inboxHasPost(events: readonly KhoraClientEvent[], postId: string): boolean {

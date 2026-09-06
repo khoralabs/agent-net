@@ -81,8 +81,10 @@ export {
   resolveChatTokenFromEnv,
 } from "./lib/chat-base-url.ts";
 export {
+  inboxConnectionRequest,
   inboxEventPostId,
   inboxEventPostIds,
+  inboxHasConnectionRequest,
   inboxHasPost,
   inboxPostAuthorDid,
 } from "./lib/inbox.ts";
