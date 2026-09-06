@@ -19,10 +19,24 @@ function fakeChat(did: string): AgentChatClient {
 }
 
 describe("AgentSocial", () => {
-  test("post/search/connect delegate to khora client; connect uses invite bank", async () => {
+  test("post/search/connect and relationship lifecycle delegate to khora client", async () => {
     const createPost = mock(async (body: unknown) => ({ id: "p1", body }));
     const search = mock(async () => ({ hits: [] }));
-    const previewInvite = mock(async () => ({ inviter: null, source: "seed" }));
+    const relationship = {
+      channelId: "ch1",
+      peerDid: "did:key:peer",
+      role: "creator" as const,
+      status: "pending" as const,
+      createdAtMs: 1,
+    };
+    const createRelationship = mock(async () => ({ relationship }));
+    const listRelationships = mock(async () => ({ relationships: [relationship] }));
+    const acceptRelationship = mock(async () => ({
+      relationship: { ...relationship, status: "accepted" },
+    }));
+    const declineRelationship = mock(async () => {});
+    const revokeRelationship = mock(async () => {});
+    const deleteRelationship = mock(async () => {});
     const client = {
       createPost,
       createSubscription: mock(async (body: unknown) => ({ id: "sub-1", body })),
@@ -35,18 +49,21 @@ describe("AgentSocial", () => {
       lookupProfileByDid: mock(async () => null),
       lookupProfileByUsername: mock(async () => null),
       listAuthorSubscriptions: mock(async () => ({ subscriptions: [] })),
-      previewInvite,
+      createRelationship,
+      listRelationships,
+      acceptRelationship,
+      declineRelationship,
+      revokeRelationship,
+      deleteRelationship,
       did: "did:key:self",
     };
     const handle = {
       did: "did:key:self",
       client,
     } as unknown as AgentActor;
-    const listInvites = mock(async () => ["tok-a", "tok-b"]);
     const social = new AgentSocial({
       handle,
       chat: fakeChat("did:key:self"),
-      listInvites,
     });
 
     await social.post({ kind: "subscription", search: { content: { text: "x" } } });
@@ -55,14 +72,16 @@ describe("AgentSocial", () => {
     await social.search({ q: "hello" } as never);
     expect(search).toHaveBeenCalled();
 
-    const invitation = await social.connect("did:key:peer");
-    expect(invitation).toEqual({
-      peerDid: "did:key:peer",
-      kind: "invitation",
-      token: "tok-a",
-    });
-    expect(listInvites).toHaveBeenCalled();
-    expect(previewInvite).toHaveBeenCalledWith("tok-a");
+    expect(await social.connect("did:key:peer")).toEqual(relationship);
+    expect(createRelationship).toHaveBeenCalledWith({ peerDid: "did:key:peer" });
+    expect(await social.listRelationships()).toEqual({ relationships: [relationship] });
+    expect((await social.acceptRelationship("ch1")).status).toBe("accepted");
+    await social.declineRelationship("ch1");
+    await social.revokeRelationship("ch1");
+    await social.deleteRelationship("ch1");
+    expect(declineRelationship).toHaveBeenCalledWith("ch1");
+    expect(revokeRelationship).toHaveBeenCalledWith("ch1");
+    expect(deleteRelationship).toHaveBeenCalledWith("ch1");
   });
 
   test("subscribe uses buildSubscriptionSearch via createSubscription", async () => {
@@ -79,7 +98,6 @@ describe("AgentSocial", () => {
       lookupProfileByDid: mock(async () => null),
       lookupProfileByUsername: mock(async () => null),
       listAuthorSubscriptions: mock(async () => ({ subscriptions: [] })),
-      previewInvite: mock(async () => ({ inviter: null, source: "seed" })),
       did: "did:key:self",
     };
     const handle = { did: "did:key:self", client } as unknown as AgentActor;

@@ -4,7 +4,7 @@ export {
   AgentHandle,
   type AgentHandleOptions,
 } from "./agent/handle.ts";
-export { AgentSocial, type SocialInvitation } from "./agent/social/social.ts";
+export { AgentSocial } from "./agent/social/social.ts";
 export { resolveAgentsDataDir } from "./agent/social/tools/_helpers/khora-client-factory.ts";
 export {
   AGENT_MEMORY_DOMAIN,

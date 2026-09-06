@@ -6,6 +6,8 @@ import type {
   KhoraPostPatch,
   KhoraProfile,
   KhoraProfilePatch,
+  KhoraRelationship,
+  KhoraRelationshipListResponse,
   KhoraSearchQuery,
   KhoraSearchRequest,
   KhoraSearchResponse,
@@ -19,14 +21,6 @@ import type { AgentActor } from "../actor.ts";
 import type { AgentChatClient } from "./message/chat.ts";
 import { AgentSocialMessage } from "./message/message.ts";
 import { AgentSocialNegotiate } from "./negotiate/negotiate.ts";
-
-export type SocialInvitation = {
-  /** Peer DID the invitation targets. */
-  peerDid: string;
-  /** Invite token when available from the invite bank. */
-  token?: string;
-  kind: "invitation";
-};
 
 export type AgentSocialSubscribeInput = Omit<
   KhoraSubscriptionCreate,
@@ -47,17 +41,14 @@ export class AgentSocial {
   readonly #client: KhoraClient;
   readonly negotiate: AgentSocialNegotiate;
   readonly message: AgentSocialMessage;
-  #listInvites: (() => Promise<string[]>) | undefined;
 
   constructor(opts: {
     handle: AgentActor;
     chat: AgentChatClient;
-    listInvites?: () => Promise<string[]>;
   }) {
     this.#client = opts.handle.client;
     this.negotiate = new AgentSocialNegotiate(opts.handle);
     this.message = new AgentSocialMessage(opts.chat);
-    this.#listInvites = opts.listInvites;
   }
 
   /**
@@ -100,28 +91,33 @@ export class AgentSocial {
     return this.#client.searchAdvanced(body);
   }
 
-  /**
-   * Begin a relationship invite toward `peerDid`.
-   * Token comes from the invite bank; validated via `previewInvite` when present.
-   */
-  async connect(peerDid: string): Promise<SocialInvitation> {
+  /** Begin a peer relationship invite toward a registered Khora principal. */
+  async connect(peerDid: string): Promise<KhoraRelationship> {
     const did = peerDid.trim();
     if (did.length === 0) {
       throw new Error("social.connect: peerDid is required");
     }
-    let token: string | undefined;
-    if (this.#listInvites !== undefined) {
-      const tokens = await this.#listInvites();
-      token = tokens[0];
-    }
-    if (token !== undefined) {
-      await this.#client.previewInvite(token);
-    }
-    return {
-      peerDid: did,
-      kind: "invitation",
-      ...(token !== undefined ? { token } : {}),
-    };
+    return (await this.#client.createRelationship({ peerDid: did })).relationship;
+  }
+
+  listRelationships(): Promise<KhoraRelationshipListResponse> {
+    return this.#client.listRelationships();
+  }
+
+  async acceptRelationship(channelId: string): Promise<KhoraRelationship> {
+    return (await this.#client.acceptRelationship(channelId)).relationship;
+  }
+
+  declineRelationship(channelId: string): Promise<void> {
+    return this.#client.declineRelationship(channelId);
+  }
+
+  revokeRelationship(channelId: string): Promise<void> {
+    return this.#client.revokeRelationship(channelId);
+  }
+
+  deleteRelationship(channelId: string): Promise<void> {
+    return this.#client.deleteRelationship(channelId);
   }
 
   updateProfile(patch: KhoraProfilePatch): Promise<KhoraProfile> {

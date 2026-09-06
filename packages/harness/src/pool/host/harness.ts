@@ -213,7 +213,6 @@ function bindAgentServices(
   return agent.bindServices({
     memories,
     chat: harness.chat.forAgent(agent.did),
-    listInvites: () => harness.listInvitesForAgent(agent.did),
   });
 }
 

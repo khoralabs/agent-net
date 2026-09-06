@@ -45,7 +45,7 @@
     },
     "packages/harness": {
       "name": "@khoralabs/agent-net",
-      "version": "0.4.0",
+      "version": "0.5.0",
       "dependencies": {
         "@khoralabs/agent-capabilities": "catalog:",
         "@khoralabs/chat": "catalog:",

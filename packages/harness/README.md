@@ -42,7 +42,7 @@ const agent = await harness.spawn({ ontology });
 await agent.social.post({ kind: "post", /* … */ });
 await agent.social.post({ kind: "subscription", search: { /* … */ } });
 await agent.social.search({ /* … */ });
-const invitation = await agent.social.connect(peerDid);
+const relationship = await agent.social.connect(peerDid);
 
 await agent.social.message.thread();
 await agent.social.negotiate.start(peerHandle, vellumOptions);
