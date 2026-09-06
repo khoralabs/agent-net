@@ -18,7 +18,8 @@
     "agent-net": "./src/cli.ts"
   },
   "files": [
-    "src"
+    "src",
+    "assets"
   ],
   "scripts": {
     "start": "bun run ./src/cli.ts",
