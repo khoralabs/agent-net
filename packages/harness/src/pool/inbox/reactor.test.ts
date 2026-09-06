@@ -1,6 +1,10 @@
 import { describe, expect, test } from "bun:test";
 
-import { inboxHasPost } from "../../lib/inbox.ts";
+import {
+  inboxConnectionRequest,
+  inboxHasConnectionRequest,
+  inboxHasPost,
+} from "../../lib/inbox.ts";
 import type { PoolInboxEvent } from "./pool-inbox.ts";
 import { createInboxReactor } from "./reactor.ts";
 
@@ -23,6 +27,18 @@ function drain(did: string, postIds: string[]): PoolInboxEvent {
       projection: { postId },
     })),
   } as unknown as PoolInboxEvent;
+}
+
+function connectionRequest(did: string, channelId: string): PoolInboxEvent {
+  return {
+    type: "inbox:connection_request",
+    did,
+    id: 1,
+    notification: {
+      kind: "connection_request",
+      payload: { channelId, fromPrincipalId: "did:key:peer", createdAtMs: 1 },
+    },
+  } as PoolInboxEvent;
 }
 
 describe("createInboxReactor", () => {
@@ -99,5 +115,11 @@ describe("createInboxReactor", () => {
     expect(subs).toBe(1);
     stop2();
     expect(subs).toBe(0);
+  });
+
+  test("extracts peer connection requests", () => {
+    const event = connectionRequest("did:key:a", "ch1");
+    expect(inboxHasConnectionRequest([event], "ch1")).toBe(true);
+    expect(inboxConnectionRequest(event)?.fromPrincipalId).toBe("did:key:peer");
   });
 });

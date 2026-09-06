@@ -21,8 +21,6 @@ export type AgentHandleOptions = {
 export type BindAgentServicesOptions = {
   memories: AgentMemoriesClient;
   chat: AgentChatClient;
-  /** Optional invite listing for `social.connect`. */
-  listInvites?: () => Promise<string[]>;
 };
 
 /**
@@ -47,7 +45,6 @@ export class AgentHandle implements AgentActor {
   #memories: AgentMemoriesClient | undefined;
   #chat: AgentChatClient | undefined;
   #social: AgentSocial | undefined;
-  #listInvites: (() => Promise<string[]>) | undefined;
 
   constructor(opts: AgentHandleOptions) {
     this.did = opts.signer.did;
@@ -96,7 +93,6 @@ export class AgentHandle implements AgentActor {
     if ("memories" in memoriesOrOpts && "chat" in memoriesOrOpts) {
       this.#memories = memoriesOrOpts.memories;
       this.#chat = memoriesOrOpts.chat;
-      this.#listInvites = memoriesOrOpts.listInvites;
     } else {
       if (chat === undefined) {
         throw new Error(`Agent ${this.did}: bindServices requires a chat client`);
@@ -107,7 +103,6 @@ export class AgentHandle implements AgentActor {
     this.#social = new AgentSocial({
       handle: this,
       chat: this.#chat,
-      ...(this.#listInvites !== undefined ? { listInvites: this.#listInvites } : {}),
     });
     return this;
   }

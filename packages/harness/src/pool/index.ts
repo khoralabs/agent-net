@@ -66,7 +66,7 @@ export {
   getCurrentAttribution,
   getNetworkSessionContext,
 } from "./observability/network-log.ts";
-export type { AgentCallback, ManagedAgentPoolOptions } from "./pool.ts";
+export type { AgentCallback, ManagedAgentPoolOptions, SpawnAgentOptions } from "./pool.ts";
 export { ManagedAgentPool } from "./pool.ts";
 export {
   POOL_AGENT_QUERY_DEFAULT_LIMIT,

@@ -13,4 +13,4 @@ export {
   AgentSocialNegotiate,
   type NegotiateStartResult,
 } from "./social/negotiate/negotiate.ts";
-export { AgentSocial, type SocialInvitation } from "./social/social.ts";
+export { AgentSocial } from "./social/social.ts";

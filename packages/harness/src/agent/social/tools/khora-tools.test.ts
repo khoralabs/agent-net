@@ -6,6 +6,7 @@ import type {
   KhoraClient,
   KhoraPost,
   KhoraProfile,
+  KhoraRelationship,
   KhoraSearchResponse,
   PublicProfileResult,
 } from "@khoralabs/khora-client";
@@ -13,7 +14,17 @@ import { createEphemeralRecentNamespacesTracker } from "../../memories/tools/_he
 import { harnessToolkit } from "../../turn/tools/_toolkit.ts";
 import { emptyDisabledToolSets, type HarnessToolkitEnv } from "../../turn/tools/types.ts";
 
-type KhoraToolName = "searchNetwork" | "createPost" | "lookupProfile" | "updateProfile";
+type KhoraToolName =
+  | "searchNetwork"
+  | "createPost"
+  | "lookupProfile"
+  | "updateProfile"
+  | "inviteRelationship"
+  | "listRelationships"
+  | "acceptRelationship"
+  | "declineRelationship"
+  | "revokeRelationship"
+  | "deleteRelationship";
 
 type MockKhoraClient = {
   search: (params: {
@@ -32,6 +43,12 @@ type MockKhoraClient = {
   deletePost: (id: string) => Promise<void>;
   createSubscription: (body: unknown) => Promise<KhoraPost>;
   listAuthorSubscriptions: () => Promise<AuthorSubscriptionsSnapshot>;
+  createRelationship: (body: { peerDid: string }) => Promise<{ relationship: KhoraRelationship }>;
+  listRelationships: () => Promise<{ relationships: KhoraRelationship[] }>;
+  acceptRelationship: (channelId: string) => Promise<{ relationship: KhoraRelationship }>;
+  declineRelationship: (channelId: string) => Promise<void>;
+  revokeRelationship: (channelId: string) => Promise<void>;
+  deleteRelationship: (channelId: string) => Promise<void>;
 };
 
 function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEnv {
@@ -46,6 +63,13 @@ function createEnv(overrides: Partial<HarnessToolkitEnv> = {}): HarnessToolkitEn
 }
 
 function createMockKhoraClient(overrides: Partial<MockKhoraClient> = {}): MockKhoraClient {
+  const relationship: KhoraRelationship = {
+    channelId: "ch1",
+    peerDid: "did:key:peer",
+    role: "creator",
+    status: "pending",
+    createdAtMs: 1,
+  };
   return {
     search: async () => ({ hits: [] }),
     createPost: async () =>
@@ -90,6 +114,14 @@ function createMockKhoraClient(overrides: Partial<MockKhoraClient> = {}): MockKh
         visibility: "public",
       }) as KhoraPost,
     listAuthorSubscriptions: async () => ({ subscriptions: [] }),
+    createRelationship: async () => ({ relationship }),
+    listRelationships: async () => ({ relationships: [relationship] }),
+    acceptRelationship: async () => ({
+      relationship: { ...relationship, status: "accepted" },
+    }),
+    declineRelationship: async () => {},
+    revokeRelationship: async () => {},
+    deleteRelationship: async () => {},
     ...overrides,
   };
 }
@@ -204,5 +236,38 @@ describe("harness khora tools", () => {
 
     expect(captured).toEqual({ displayName: "Harness Agent" });
     expect(result.profile.displayName).toBe("Harness Agent");
+  });
+
+  test("relationship tools cover invite, list, accept, decline, revoke, and delete", async () => {
+    const invite = await toolHandler("inviteRelationship");
+    const invited = (await invite(
+      { env, agentId: "agent", agentName: "Agent" },
+      { peerDid: "did:key:peer" },
+    )) as { relationship: KhoraRelationship };
+    expect(invited.relationship.channelId).toBe("ch1");
+
+    const list = await toolHandler("listRelationships");
+    const listed = (await list({ env, agentId: "agent", agentName: "Agent" }, {})) as {
+      relationships: KhoraRelationship[];
+    };
+    expect(listed.relationships).toHaveLength(1);
+
+    const accept = await toolHandler("acceptRelationship");
+    const accepted = (await accept(
+      { env, agentId: "agent", agentName: "Agent" },
+      { channelId: "ch1" },
+    )) as { relationship: KhoraRelationship };
+    expect(accepted.relationship.status).toBe("accepted");
+
+    for (const name of [
+      "declineRelationship",
+      "revokeRelationship",
+      "deleteRelationship",
+    ] as const) {
+      const handler = await toolHandler(name);
+      await expect(
+        handler({ env, agentId: "agent", agentName: "Agent" }, { channelId: "ch1" }),
+      ).resolves.toEqual({ ok: true });
+    }
   });
 });

@@ -9,6 +9,14 @@ import { deletePostTool } from "./delete-post.ts";
 import { getPostTool } from "./get-post.ts";
 import { listAuthorSubscriptionsTool } from "./list-author-subscriptions.ts";
 import { lookupProfileTool } from "./lookup-profile.ts";
+import {
+  acceptRelationshipTool,
+  declineRelationshipTool,
+  deleteRelationshipTool,
+  inviteRelationshipTool,
+  listRelationshipsTool,
+  revokeRelationshipTool,
+} from "./relationships.ts";
 import { searchNetworkTool } from "./search-network.ts";
 import { updatePostTool } from "./update-post.ts";
 import { updateProfileTool } from "./update-profile.ts";
@@ -24,11 +32,17 @@ const khoraCore = toolkit(
     updateProfileTool,
     lookupProfileTool,
     listAuthorSubscriptionsTool,
+    inviteRelationshipTool,
+    listRelationshipsTool,
+    acceptRelationshipTool,
+    declineRelationshipTool,
+    revokeRelationshipTool,
+    deleteRelationshipTool,
   ],
   {
     name: "khora-network-core",
     instructions: [
-      "Interact with the Khora network: discover content, manage posts and subscriptions, and maintain the agent's public profile.",
+      "Interact with the Khora network: discover content, manage posts, subscriptions, peer relationships, and the agent's public profile. Network visibility reaches accepted peer relationships only; registration invite tokens are separate.",
     ],
   },
 );

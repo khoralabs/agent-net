@@ -3,7 +3,7 @@ import path from "node:path";
 import { createRegisteredAgent } from "@khoralabs/agent-capabilities";
 import type { ChatSigner } from "@khoralabs/chat";
 import type { IdentitySecret, PersistableSigner } from "@khoralabs/did-key-identity";
-import type { KhoraClient } from "@khoralabs/khora-client";
+import { KhoraClient } from "@khoralabs/khora-client";
 import type { LabelSchemaMap, OntologyDefinition } from "@khoralabs/memories-node/ontology";
 import type { MemoriesDatabaseId } from "@khoralabs/memories-service";
 import {
@@ -59,6 +59,10 @@ export type SpawnWithMemoriesOptions = {
   ontology: OntologyDefinition<LabelSchemaMap, LabelSchemaMap>;
   /** Optional opaque external linkage id (tenant/org/etc.). */
   externalId?: string;
+  /** Registration invite token to consume on this agent's behalf. */
+  inviteToken?: string;
+  /** Withdraw a registration invite from this existing pool agent. */
+  inviteFromDid?: string;
 };
 
 export type RegisterHarnessAgentInput = {
@@ -114,7 +118,7 @@ export type NetworkHarnessCore = {
   readonly signedChat: SignedChatBackend;
   /** DID of an optional host-supplied operator (human ↔ agent chat). */
   readonly uiUserDid: string | undefined;
-  /** Decrypt and list registration-issued invites for an agent (sovereign viral use later). */
+  /** Decrypt and list registration-issued invites available for custodial viral growth. */
   listInvitesForAgent(did: string): Promise<string[]>;
   /** Subscribe to harness multiplex inbox events (demux by `event.did`). */
   subscribeInbox(onEvent: (event: PoolInboxEvent) => void): () => void;
@@ -213,7 +217,6 @@ function bindAgentServices(
   return agent.bindServices({
     memories,
     chat: harness.chat.forAgent(agent.did),
-    listInvites: () => harness.listInvitesForAgent(agent.did),
   });
 }
 
@@ -239,7 +242,11 @@ export async function spawnWithMemories(
         schema: storedOntologyFromDefinition(ontology),
       });
     },
-    opts.externalId !== undefined ? { externalId: opts.externalId } : undefined,
+    {
+      ...(opts.externalId !== undefined ? { externalId: opts.externalId } : {}),
+      ...(opts.inviteToken !== undefined ? { inviteToken: opts.inviteToken } : {}),
+      ...(opts.inviteFromDid !== undefined ? { inviteFromDid: opts.inviteFromDid } : {}),
+    },
   );
 
   const agent = capturedHandle;
@@ -279,14 +286,12 @@ function createHarnessAgentApi(
           };
         }
         const agent = await spawnWithMemories(harness, {
-          ontology: opts.ontology,
+          ...opts,
           externalId,
         });
         return { agent, created: true };
       }
-      const agent = await spawnWithMemories(harness, {
-        ontology: opts.ontology,
-      });
+      const agent = await spawnWithMemories(harness, opts);
       return { agent, created: true };
     },
 
@@ -418,12 +423,14 @@ export async function startNetworkHarness(
   });
 
   const poolInbox = new HarnessPoolInbox({ khoraBaseUrl });
+  const discovery = await KhoraClient.discover(khoraBaseUrl);
 
   const pool = await ManagedAgentPool.create({
     dataDir: agentsDataDir,
     baseUrl: khoraBaseUrl,
     identitySecret,
     inviteBank,
+    invitesRequired: discovery.features?.invitesRequired ?? false,
     onMemberAdded: (handle) => poolInbox.add(handle.signer),
     onMemberRemoving: (did) => poolInbox.remove(did),
     ...(opts.agentRegistry !== undefined ? { agentRegistry: opts.agentRegistry } : {}),

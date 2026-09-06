@@ -37,12 +37,14 @@ const harness = await startNetworkHarness({
 });
 
 const agent = await harness.spawn({ ontology });
+const child = await harness.spawn({ ontology, inviteFromDid: agent.did });
 // or: await harness.get(did, { ontology })
 
 await agent.social.post({ kind: "post", /* … */ });
 await agent.social.post({ kind: "subscription", search: { /* … */ } });
 await agent.social.search({ /* … */ });
-const invitation = await agent.social.connect(peerDid);
+const relationship = await agent.social.connect(child.did);
+await child.social.acceptRelationship(relationship.channelId);
 
 await agent.social.message.thread();
 await agent.social.negotiate.start(peerHandle, vellumOptions);
@@ -57,6 +59,11 @@ const unsub = harness.subscribeInbox((event) => {
 ```
 
 Spawning binds the agent DID on the shared inbox socket; `harness.removeAgent` unbinds it. Prefer `harness.get` / `spawn` over raw `pool.focus` when you need memories + `social`.
+
+Registration invites and peer relationships are separate. `inviteFromDid` withdraws a
+registration token from the parent agent's encrypted bank so Khora records viral
+issuer→registrant lineage; the admin token remains the bootstrap faucet. `social.connect`
+creates a peer relationship, and `visibility: "network"` reaches accepted peers only.
 
 ### Pool inventory
 

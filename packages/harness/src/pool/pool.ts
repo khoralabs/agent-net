@@ -13,6 +13,14 @@ import { type AgentMemoriesFraming, AgentStore, type PoolAgentRegistry } from ".
 
 export type AgentCallback = (handle: AgentHandle) => Promise<void>;
 
+export type SpawnAgentOptions = {
+  externalId?: string;
+  /** Registration invite token to consume even when the host does not require one. */
+  inviteToken?: string;
+  /** Withdraw a registration invite from this managed parent agent's bank. */
+  inviteFromDid?: string;
+};
+
 export type ManagedAgentPoolOptions = {
   /** Directory where agents.json and per-agent key files are stored. */
   dataDir: string;
@@ -30,9 +38,11 @@ export type ManagedAgentPoolOptions = {
    * and passes it to `register({ inviteToken })`.
    */
   mintInvite?: () => Promise<string>;
+  /** Whether the Khora host rejects registration without an invite token. */
+  invitesRequired?: boolean;
   /**
    * Stores registration-issued invite tokens per agent (encrypted).
-   * Not consumed by spawn — for future sovereign viral flows.
+   * Spawn can consume from a specified parent agent via `inviteFromDid`.
    */
   inviteBank?: PerAgentInviteBank;
   /** Fired after a new agent is registered and stored (e.g. bind inbox multiplex). */
@@ -52,6 +62,7 @@ export class ManagedAgentPool {
   readonly #dataDir: string;
   readonly #identitySecret: IdentitySecret | undefined;
   readonly #mintInvite: (() => Promise<string>) | undefined;
+  readonly #invitesRequired: boolean;
   readonly #inviteBank: PerAgentInviteBank | undefined;
   readonly #onMemberAdded: ((handle: AgentHandle) => Promise<void>) | undefined;
   readonly #onMemberRemoving: ((did: string) => Promise<void>) | undefined;
@@ -62,6 +73,7 @@ export class ManagedAgentPool {
     dataDir: string,
     identitySecret: IdentitySecret | undefined,
     mintInvite: (() => Promise<string>) | undefined,
+    invitesRequired: boolean,
     inviteBank: PerAgentInviteBank | undefined,
     onMemberAdded: ((handle: AgentHandle) => Promise<void>) | undefined,
     onMemberRemoving: ((did: string) => Promise<void>) | undefined,
@@ -71,6 +83,7 @@ export class ManagedAgentPool {
     this.#dataDir = dataDir;
     this.#identitySecret = identitySecret;
     this.#mintInvite = mintInvite;
+    this.#invitesRequired = invitesRequired;
     this.#inviteBank = inviteBank;
     this.#onMemberAdded = onMemberAdded;
     this.#onMemberRemoving = onMemberRemoving;
@@ -88,6 +101,7 @@ export class ManagedAgentPool {
       opts.dataDir,
       opts.identitySecret,
       opts.mintInvite,
+      opts.invitesRequired ?? false,
       opts.inviteBank,
       opts.onMemberAdded,
       opts.onMemberRemoving,
@@ -156,7 +170,7 @@ export class ManagedAgentPool {
    * immediately after registration — use it to perform per-agent setup
    * (e.g. initialising a memories database). Returns the new agent's DID.
    */
-  async spawn(onSpawned?: AgentCallback, opts?: { externalId?: string }): Promise<string> {
+  async spawn(onSpawned?: AgentCallback, opts?: SpawnAgentOptions): Promise<string> {
     const externalId = opts?.externalId?.trim();
     if (externalId !== undefined && externalId.length > 0) {
       const existing = this.#store.getByExternalId(externalId);
@@ -172,15 +186,53 @@ export class ManagedAgentPool {
     const client = new KhoraClient({ baseUrl: this.#baseUrl, signer });
     const username = `agent-${crypto.randomUUID().replace(/-/g, "").slice(0, 8)}`;
 
-    let inviteToken: string | undefined;
-    if (this.#mintInvite !== undefined) {
-      inviteToken = await this.#mintInvite();
+    const explicitInvite = opts?.inviteToken?.trim();
+    const inviteFromDid = opts?.inviteFromDid?.trim();
+    if (
+      explicitInvite !== undefined &&
+      explicitInvite.length > 0 &&
+      inviteFromDid !== undefined &&
+      inviteFromDid.length > 0
+    ) {
+      throw new Error("spawn: pass inviteToken or inviteFromDid, not both");
     }
 
-    const result = await client.register({
-      metadata: { username },
-      ...(inviteToken !== undefined ? { inviteToken } : {}),
-    });
+    let inviteToken =
+      explicitInvite !== undefined && explicitInvite.length > 0 ? explicitInvite : undefined;
+    let parentSigner: PersistableSigner | undefined;
+    if (inviteToken === undefined && inviteFromDid !== undefined && inviteFromDid.length > 0) {
+      const parent = this.#store.get(inviteFromDid);
+      if (parent === undefined) {
+        throw new Error(`spawn: invite parent ${inviteFromDid} is not managed by this pool`);
+      }
+      parentSigner = await this.#loadSigner(parent.keyPath);
+      if (parentSigner === undefined) {
+        throw new Error(`spawn: key file missing for invite parent ${inviteFromDid}`);
+      }
+      inviteToken = await this.#inviteBank?.take(parentSigner);
+      if (inviteToken === undefined) {
+        throw new Error(`spawn: invite parent ${inviteFromDid} has no available invite tokens`);
+      }
+    }
+    if (inviteToken === undefined && this.#mintInvite !== undefined) {
+      inviteToken = await this.#mintInvite();
+    }
+    if (inviteToken === undefined && this.#invitesRequired) {
+      throw new Error("spawn: Khora host requires an invite, but no invite token is available");
+    }
+
+    let result: Awaited<ReturnType<KhoraClient["register"]>>;
+    try {
+      result = await client.register({
+        metadata: { username },
+        ...(inviteToken !== undefined ? { inviteToken } : {}),
+      });
+    } catch (error) {
+      if (parentSigner !== undefined && inviteToken !== undefined) {
+        await this.#inviteBank?.deposit(parentSigner, [inviteToken]);
+      }
+      throw error;
+    }
 
     if (this.#inviteBank !== undefined && result.inviteTokens !== undefined) {
       await this.#inviteBank.deposit(signer, result.inviteTokens);

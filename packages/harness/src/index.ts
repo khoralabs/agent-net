@@ -4,7 +4,7 @@ export {
   AgentHandle,
   type AgentHandleOptions,
 } from "./agent/handle.ts";
-export { AgentSocial, type SocialInvitation } from "./agent/social/social.ts";
+export { AgentSocial } from "./agent/social/social.ts";
 export { resolveAgentsDataDir } from "./agent/social/tools/_helpers/khora-client-factory.ts";
 export {
   AGENT_MEMORY_DOMAIN,
@@ -81,8 +81,10 @@ export {
   resolveChatTokenFromEnv,
 } from "./lib/chat-base-url.ts";
 export {
+  inboxConnectionRequest,
   inboxEventPostId,
   inboxEventPostIds,
+  inboxHasConnectionRequest,
   inboxHasPost,
   inboxPostAuthorDid,
 } from "./lib/inbox.ts";
@@ -96,6 +98,7 @@ export {
   type HarnessAgentWorkflowDeps,
   harnessAgentsDataDir,
   type NetworkHarnessHandle,
+  type SpawnWithMemoriesOptions,
   startNetworkHarness,
 } from "./pool/host/harness.ts";
 export {
@@ -127,6 +130,7 @@ export {
   queryPoolAgents,
   requireIdentitySecret,
   resolveIdentitySecretFromEnv,
+  type SpawnAgentOptions,
   saveHarnessIdentity,
   type WaitForPostInput,
   wrapKeySecretFromBytes,

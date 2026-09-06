@@ -56,8 +56,8 @@ function safeDidFileName(did: string): string {
  * Plaintext is never written to disk — AES-256-GCM with a key derived via
  * HKDF-SHA256 from the agent's Ed25519 seed (`harness-invite-bank-v1`).
  *
- * Spawn/register does not consume from this bank; {@link list} is for future
- * sovereign viral invite flows.
+ * The host may withdraw a token while registering a child agent so Khora can
+ * retain the issuing agent → registrant lineage.
  */
 export class PerAgentInviteBank {
   readonly #dataDir: string;
@@ -99,6 +99,15 @@ export class PerAgentInviteBank {
     const key = deriveInviteBankKey(signer);
     const plaintext = decryptWithWrapKey(Buffer.from(parsed.ciphertext, "base64"), key);
     return decodeTokens(plaintext);
+  }
+
+  /** Remove and return the oldest token, or undefined when the bank is empty. */
+  async take(signer: PersistableSigner): Promise<string | undefined> {
+    const tokens = await this.list(signer);
+    const token = tokens.shift();
+    if (token === undefined) return undefined;
+    await this.#write(signer, tokens);
+    return token;
   }
 
   async clear(did: string): Promise<void> {
