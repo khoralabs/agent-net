@@ -58,4 +58,9 @@ const unsub = harness.subscribeInbox((event) => {
 
 Spawning binds the agent DID on the shared inbox socket; `harness.removeAgent` unbinds it. Prefer `harness.get` / `spawn` over raw `pool.focus` when you need memories + `social`.
 
+### Pool inventory
+
+- `harness.agentDids` / `pool.list()` — unbounded DID array for boot (inbox rebind) and small pools.
+- `pool.queryAgents({ query, hasExternalId, orderBy, order, limit, offset })` — paginated search/filter/sort for host UIs. Returns `{ agents, total, limit, offset }` list items (`did`, optional `externalId` / `memoriesFraming`; no `keyPath`). Also on `PoolAgentRegistry.query` / `@khoralabs/agent-net/pool`.
+
 Hosts own Workflow durable wrappers; see [How to host a Workflow world](../../docs/how-to/host-workflow-world.md). Local demo stack: [`apps/reference`](../../apps/reference).
