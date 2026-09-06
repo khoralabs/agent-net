@@ -52,7 +52,8 @@
     "@libsql/client": "catalog:"
   },
   "scripts": {
-    "typecheck": "bun run --filter '@khoralabs/agent-net' typecheck && bun run --filter '@khoralabs/agent-net-reference' typecheck",
+    "typecheck": "bun run --filter '@khoralabs/agent-net' typecheck && bun run --filter '@khoralabs/agent-net-cli' typecheck && bun run --filter '@khoralabs/agent-net-reference' typecheck",
+    "cli": "bun run --filter @khoralabs/agent-net-cli start",
     "format": "biome check --write .",
     "format:check": "biome check --error-on-warnings .",
     "agent:setup": "bun run --filter @khoralabs/agent-net-reference agent:setup",

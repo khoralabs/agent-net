@@ -1,0 +1,36 @@
+{
+  "name": "@khoralabs/agent-net-cli",
+  "version": "0.1.0",
+  "description": "Headless CLI for the agent-net network harness",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khoralabs/agent-net.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/khoralabs/agent-net/tree/main/packages/cli#readme",
+  "bugs": "https://github.com/khoralabs/agent-net/issues",
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "agent-net": "./src/cli.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "start": "bun run ./src/cli.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "bun test src"
+  },
+  "dependencies": {
+    "@khoralabs/agent-net": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
+  }
+}
