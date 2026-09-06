@@ -98,6 +98,7 @@ export {
   type HarnessAgentWorkflowDeps,
   harnessAgentsDataDir,
   type NetworkHarnessHandle,
+  type SpawnWithMemoriesOptions,
   startNetworkHarness,
 } from "./pool/host/harness.ts";
 export {
@@ -129,6 +130,7 @@ export {
   queryPoolAgents,
   requireIdentitySecret,
   resolveIdentitySecretFromEnv,
+  type SpawnAgentOptions,
   saveHarnessIdentity,
   type WaitForPostInput,
   wrapKeySecretFromBytes,
