@@ -1,3 +1,4 @@
+import { resolveGatewayModel } from "@khoralabs/agent-net";
 import { generateStructured } from "@khoralabs/agent-net/ai-sdk";
 import { z } from "zod";
 
@@ -16,20 +17,8 @@ export const inviteDecisionSchema = z.object({
 export type InviteDecision = z.infer<typeof inviteDecisionSchema>;
 
 /**
- * Resolve a gateway model id (mirrors harness resolveGatewayModel; not yet on public barrel).
- */
-export function requireGatewayModelId(modelId: string): string {
-  const id = modelId.trim() || process.env.AGENT_DEFAULT_MODEL?.trim();
-  if (id === undefined || id.length === 0) throw new Error("model.id is required");
-  if (!process.env.AI_GATEWAY_API_KEY?.trim()) {
-    throw new Error("AI_GATEWAY_API_KEY environment variable not set");
-  }
-  return id;
-}
-
-/**
  * Domain-agnostic structured LLM decision (no tools).
- * Promote candidate — wraps harness `generateStructured` with string model IDs.
+ * Uses harness {@link resolveGatewayModel} for gateway env checks.
  */
 export async function runStructuredDecision<T>(input: {
   label: string;
@@ -37,7 +26,7 @@ export async function runStructuredDecision<T>(input: {
   schema: z.ZodType<T>;
   prompt: string;
 }): Promise<T> {
-  const modelId = requireGatewayModelId(input.modelId);
+  const modelId = resolveGatewayModel(input.modelId);
   return generateStructured<T>({
     label: input.label,
     model: modelId,

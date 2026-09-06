@@ -26,6 +26,7 @@ export {
   getCapabilityRegistry,
   type OnCapabilityTurn,
   resetHarnessAgentRegistryForTests,
+  resolveGatewayModel,
 } from "./agent/turn/agent-runtime.ts";
 export type { AgentTurnParams, AgentTurnResult, AgentUIMessage } from "./agent/turn/agent-turn.ts";
 export { HARNESS_AGENT_ID } from "./agent/turn/capability-agents/index.ts";

@@ -6,6 +6,7 @@
  * Durable Workflow directives are owned by the host (see apps/reference/src/workflows).
  */
 
+export { resolveGatewayModel } from "../agent/turn/agent-runtime.ts";
 export { captureHarnessCapabilities } from "./capture-harness-capabilities.ts";
 export {
   type PreparedHarnessStep,

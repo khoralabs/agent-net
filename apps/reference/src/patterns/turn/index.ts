@@ -3,7 +3,6 @@ export {
   engageDecisionSchema,
   type InviteDecision,
   inviteDecisionSchema,
-  requireGatewayModelId,
   runEngageDecision,
   runInviteDecision,
   runStructuredDecision,
