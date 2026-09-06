@@ -8,6 +8,7 @@ import { KhoraClient } from "@khoralabs/khora-client";
 import { AgentHandle } from "../agent/handle.ts";
 import { loadHarnessIdentity, saveHarnessIdentity } from "./identity-wrap-key.ts";
 import type { PerAgentInviteBank } from "./per-agent-invite-bank.ts";
+import type { PoolAgentPage, PoolAgentQuery } from "./query.ts";
 import { type AgentMemoriesFraming, AgentStore, type PoolAgentRegistry } from "./store.ts";
 
 export type AgentCallback = (handle: AgentHandle) => Promise<void>;
@@ -105,6 +106,14 @@ export class ManagedAgentPool {
   /** All agent DIDs currently managed by this pool. */
   list(): readonly string[] {
     return this.#store.all().map((a) => a.did);
+  }
+
+  /**
+   * Filtered / sorted / paginated pool inventory for host UIs.
+   * Prefer over {@link list} when paging; `list` remains the unbounded DID scan for boot.
+   */
+  queryAgents(opts?: PoolAgentQuery): PoolAgentPage {
+    return this.#store.query(opts);
   }
 
   /** Lookup agent DID by opaque external id, if linked. */
