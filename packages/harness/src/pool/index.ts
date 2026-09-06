@@ -69,6 +69,15 @@ export {
 export type { AgentCallback, ManagedAgentPoolOptions } from "./pool.ts";
 export { ManagedAgentPool } from "./pool.ts";
 export {
+  POOL_AGENT_QUERY_DEFAULT_LIMIT,
+  POOL_AGENT_QUERY_MAX_LIMIT,
+  type PoolAgentListItem,
+  type PoolAgentOrderBy,
+  type PoolAgentPage,
+  type PoolAgentQuery,
+  queryPoolAgents,
+} from "./query.ts";
+export {
   type AgentMemoriesFraming,
   type AgentRecord,
   AgentStore,

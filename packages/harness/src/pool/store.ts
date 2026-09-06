@@ -1,6 +1,8 @@
 import { mkdir } from "node:fs/promises";
 import path from "node:path";
 
+import { type PoolAgentPage, type PoolAgentQuery, queryPoolAgents } from "./query.ts";
+
 /** Editable host prose for memories-database framing (namespaces stay host-derived, not stored). */
 export type AgentMemoriesFraming = {
   /** Human label for this DB (e.g. company name). */
@@ -24,6 +26,8 @@ export type AgentRecord = {
 /** Persistence-agnostic agent registry contract. */
 export type PoolAgentRegistry = {
   all(): readonly AgentRecord[];
+  /** Filtered / sorted / paginated inventory (no keyPath on page rows). */
+  query(opts?: PoolAgentQuery): PoolAgentPage;
   get(did: string): AgentRecord | undefined;
   getByExternalId(externalId: string): AgentRecord | undefined;
   add(record: AgentRecord): Promise<void>;
@@ -99,6 +103,10 @@ export class AgentStore implements PoolAgentRegistry {
 
   all(): readonly AgentRecord[] {
     return this.#agents;
+  }
+
+  query(opts?: PoolAgentQuery): PoolAgentPage {
+    return queryPoolAgents(this.#agents, opts);
   }
 
   get(did: string): AgentRecord | undefined {
