@@ -1,9 +1,9 @@
 import { describe, expect, mock, test } from "bun:test";
 
-import type { AgentActor, AgentHandle } from "@khoralabs/agent-net";
-import type { VellumHandle } from "@khoralabs/agent-net/negotiate";
-
-import { createNegotiatePairRegistry } from "./open-pair.ts";
+import type { AgentActor } from "../../actor.ts";
+import type { AgentHandle } from "../../handle.ts";
+import { createNegotiatePairRegistry } from "./pair-registry.ts";
+import type { VellumHandle } from "./vellum.ts";
 
 function fakeHandle(id: string): VellumHandle {
   return { id } as unknown as VellumHandle;

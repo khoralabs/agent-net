@@ -7,12 +7,11 @@ import {
   type InboxReactor,
   type NetworkHarnessHandle,
 } from "@khoralabs/agent-net";
-
 import {
   createNegotiatePairRegistry,
   type NegotiatePairRegistry,
   type OpenedPair,
-} from "../patterns/negotiate/index.ts";
+} from "@khoralabs/agent-net/negotiate";
 import type { MarketplaceConfig } from "./config.ts";
 import { topicsFor } from "./config.ts";
 import { evaluateSellersOnInbox, type SellerEvaluateResult } from "./evaluate-on-inbox.ts";

@@ -70,6 +70,14 @@ export {
   type VellumHandle,
 } from "./negotiate.ts";
 export {
+  createNegotiatePairRegistry,
+  type NegotiatePairRegistry,
+  type NegotiatePairRegistryDeps,
+  type NegotiateStartFn,
+  type OpenedPair,
+  type OpenPairOptions,
+} from "./pair-registry.ts";
+export {
   createHarnessVellumPool,
   createSharedUplinkVellumPool,
   disconnectVellum,

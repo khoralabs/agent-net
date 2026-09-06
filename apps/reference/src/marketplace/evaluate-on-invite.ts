@@ -1,4 +1,4 @@
-import type { OpenedPair } from "../patterns/negotiate/index.ts";
+import type { OpenedPair } from "@khoralabs/agent-net/negotiate";
 import { type InviteDecision, runInviteDecision } from "../patterns/turn/index.ts";
 import type { MarketplaceConfig } from "./config.ts";
 import type { SellerEvaluateResult } from "./evaluate-on-inbox.ts";
