@@ -36,6 +36,8 @@ describe("PerAgentInviteBank", () => {
       await bank.deposit(signer, ["token-c"]);
 
       expect(await bank.list(signer)).toEqual(["token-a", "token-b", "token-c"]);
+      expect(await bank.take(signer)).toBe("token-a");
+      expect(await bank.list(signer)).toEqual(["token-b", "token-c"]);
 
       const raw = await Bun.file(bank.filePath(signer.did)).text();
       expect(raw).not.toContain("token-a");
