@@ -1,4 +1,5 @@
 import type { FlagMap } from "../lib/argv.ts";
+import { handleDoctor } from "./doctor.ts";
 import { handleConfigSet, handleConfigShow, handleSetup } from "./setup.ts";
 
 export async function dispatch(positional: string[], flags: FlagMap): Promise<void> {
@@ -14,6 +15,10 @@ export async function dispatch(positional: string[], flags: FlagMap): Promise<vo
   }
   if (a === "config" && b === "set") {
     await handleConfigSet(flags);
+    return;
+  }
+  if (a === "doctor") {
+    await handleDoctor(flags);
     return;
   }
   if (a === "version") {

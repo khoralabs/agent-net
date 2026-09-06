@@ -2,6 +2,7 @@
 import { dispatch } from "./commands/handlers.ts";
 import { printVersion } from "./commands/version.ts";
 import { boolFlag, parseArgv } from "./lib/argv.ts";
+import { CommandExitError } from "./lib/errors.ts";
 import { errorMessage } from "./lib/json-out.ts";
 
 export function printHelp(): void {
@@ -14,6 +15,7 @@ Commands:
   setup                Seed ~/.agent-net and write cli.config.json (-y)
   config show          Print resolved config
   config set           Patch config keys (-y)
+  doctor               Check connectivity to khora/relay/memories/chat
   help                 Show this help
   version              Print CLI version
 
@@ -63,6 +65,16 @@ export async function runCli(argv: string[]): Promise<number> {
     await dispatch(positional, flags);
     return 0;
   } catch (e) {
+    if (e instanceof CommandExitError) {
+      if (!e.alreadyPrinted) {
+        if (boolFlag(flags, "json")) {
+          console.log(JSON.stringify({ ok: false, error: e.message }));
+        } else {
+          console.error(e.message);
+        }
+      }
+      return 1;
+    }
     const msg = errorMessage(e);
     if (msg.startsWith("Unknown command:")) {
       console.error(msg);
