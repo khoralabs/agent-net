@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 
-import type { PoolInboxEvent } from "@khoralabs/agent-net";
-import { inboxHasPost } from "./match.ts";
+import { inboxHasPost } from "../../lib/inbox.ts";
+import type { PoolInboxEvent } from "./pool-inbox.ts";
 import { createInboxReactor } from "./reactor.ts";
 
 function notification(did: string, postId: string): PoolInboxEvent {

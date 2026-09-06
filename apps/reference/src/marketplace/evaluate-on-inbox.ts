@@ -1,5 +1,4 @@
-import { inboxPostAuthorDid } from "../patterns/inbox/match.ts";
-import type { InboxReactor } from "../patterns/inbox/reactor.ts";
+import { type InboxReactor, inboxPostAuthorDid } from "@khoralabs/agent-net";
 import { type EngageDecision, runEngageDecision } from "../patterns/turn/index.ts";
 import type { MarketplaceConfig } from "./config.ts";
 import { reportLine } from "./report.ts";

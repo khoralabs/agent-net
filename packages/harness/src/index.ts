@@ -102,10 +102,15 @@ export {
   type AgentMemoriesFraming,
   type AgentRecord,
   AgentStore,
+  type CreateInboxReactorOptions,
+  createInboxReactor,
   HARNESS_IDENTITY_WRAP_KEY_ENV,
   HarnessPoolInbox,
   type InboxConnection,
   type InboxConnectionHandle,
+  type InboxFilter,
+  type InboxHandler,
+  type InboxReactor,
   loadHarnessIdentity,
   ManagedAgentPool,
   type PoolAgentRegistry,
@@ -116,6 +121,7 @@ export {
   requireIdentitySecret,
   resolveIdentitySecretFromEnv,
   saveHarnessIdentity,
+  type WaitForPostInput,
   wrapKeySecretFromBytes,
 } from "./pool/index.ts";
 export {

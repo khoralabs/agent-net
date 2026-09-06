@@ -2,11 +2,12 @@ import path from "node:path";
 
 import {
   type AgentHandle,
+  createInboxReactor,
   harnessAgentsDataDir,
+  type InboxReactor,
   type NetworkHarnessHandle,
 } from "@khoralabs/agent-net";
 
-import { createInboxReactor, type InboxReactor } from "../patterns/inbox/index.ts";
 import {
   createNegotiatePairRegistry,
   type NegotiatePairRegistry,

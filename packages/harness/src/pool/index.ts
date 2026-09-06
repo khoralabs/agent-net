@@ -18,6 +18,14 @@ export type {
 /** @deprecated Prefer {@link HarnessPoolInbox} / harness.subscribeInbox. */
 export { connectPoolInbox, HarnessPoolInbox } from "./inbox/pool-inbox.ts";
 export {
+  type CreateInboxReactorOptions,
+  createInboxReactor,
+  type InboxFilter,
+  type InboxHandler,
+  type InboxReactor,
+  type WaitForPostInput,
+} from "./inbox/reactor.ts";
+export {
   emitNetworkEvent,
   getInstalledNetworkEventsPlugin,
   getNetworkSession,
