@@ -1,0 +1,48 @@
+name: Publish agent-net-cli skills
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Semver stamped into skill-source.json (usually the CLI package version)"
+        required: true
+        type: string
+      ref:
+        description: "Git ref to publish from (default: the ref this workflow runs on)"
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  publish-skills:
+    runs-on: ubuntu-latest
+    env:
+      HUSKY: "0"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref != '' && inputs.ref || github.ref }}
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Require SKILLS_REPO_TOKEN
+        env:
+          SKILLS_REPO_TOKEN: ${{ secrets.SKILLS_REPO_TOKEN }}
+        run: |
+          if [ -z "$SKILLS_REPO_TOKEN" ]; then
+            echo "::error::Set repository secret SKILLS_REPO_TOKEN with push access to khoralabs/skills."
+            exit 1
+          fi
+
+      - name: Publish skills
+        env:
+          SKILLS_REPO_TOKEN: ${{ secrets.SKILLS_REPO_TOKEN }}
+        run: bun run scripts/release/publish-skills.ts "${{ inputs.version }}"

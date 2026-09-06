@@ -51,6 +51,7 @@
       },
       "dependencies": {
         "@khoralabs/agent-net": "workspace:*",
+        "@khoralabs/memories-service": "catalog:",
         "zod": "catalog:",
       },
       "devDependencies": {

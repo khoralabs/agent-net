@@ -16,6 +16,12 @@ Commands:
   config show          Print resolved config
   config set           Patch config keys (-y)
   doctor               Check connectivity to khora/relay/memories/chat
+  agent spawn          Spawn a custodial agent (optional --ontology, --external-id)
+  agent list           List agent DIDs in dataDir
+  agent get            Get agent summary (--did)
+  agent remove         Remove agent (--did)
+  inbox watch          Stream pool inbox events as NDJSON
+  skills install       Install bundled agent-net-cli skill via bunx skills (-y)
   help                 Show this help
   version              Print CLI version
 

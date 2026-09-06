@@ -11,10 +11,26 @@ From the agent-net repo root:
 | `bun run reference:start` | Start Khora + memories + relay + chat + local Workflow world |
 | `bun run marketplace` | Marketplace CLI (primary reference demo) |
 | `bun run swarm` | Swarm CLI (secondary) |
+| `bun run cli` | Headless `@khoralabs/agent-net-cli` (`packages/cli`) |
 | `bun run typecheck` | Typecheck all workspace packages |
 | `bun run swarm:test` | Swarm + harness unit tests |
 
 Inside `apps/reference`, `bun run start` / `bun run marketplace` / `bun run swarm` are the package-local equivalents.
+
+## agent-net CLI (`@khoralabs/agent-net-cli`)
+
+Publishable control-plane CLI. Config merge: flags → `AGENT_NET_CONFIG` / `~/.agent-net/cli.config.json` → env → defaults.
+
+| Variable / flag | Role |
+|-----------------|------|
+| `--json` / `AGENT_NET_NO_INTERACTIVE=1` | Agent-friendly output; no prompts |
+| `--config` / `AGENT_NET_CONFIG` | Config file path |
+| `--data-dir` / `AGENT_NET_DATA_DIR` | Harness data directory |
+| `KHORA_BASE_URL`, `RELAY_BASE_URL`, `MEMORIES_BASE_URL`, `CHAT_BASE_URL` | Service URLs |
+| `CHAT_INTERNAL_TOKEN`, `MEMORIES_SERVICE_ADMIN_TOKEN` | Required tokens for harness commands |
+| `AGENT_NET_CLI_ASSETS_DIR` | Packaged assets root (skills/configs) |
+
+After npm release, sync skills with the separate **Publish agent-net-cli skills** workflow (does not block release).
 
 ## Reference orchestrator ports
 
@@ -49,3 +65,4 @@ Harness `startNetworkHarness` also accepts `memoriesAdminToken`, `chatToken`, op
 
 - [Getting started](../tutorials/getting-started.md)
 - [Dependency graph](dependency-graph.md)
+- [CLI package README](../../packages/cli/README.md)

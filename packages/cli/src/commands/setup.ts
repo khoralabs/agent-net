@@ -41,12 +41,26 @@ export async function handleSetup(flags: FlagMap): Promise<void> {
   const configPath = strFlag(flags, "config")?.trim() || path.join(dataDir, "cli.config.json");
   writeCliConfigFile(configPath, out);
 
+  let skill: unknown;
+  if (boolFlag(flags, "install-skills") || boolFlag(flags, "skills")) {
+    const { installBundledAgentNetCliSkill } = await import("./skills.ts");
+    skill = installBundledAgentNetCliSkill({
+      global: boolFlag(flags, "global", "g"),
+      force: boolFlag(flags, "force", "f"),
+      home: process.env.HOME ?? process.env.USERPROFILE ?? homedir(),
+      cwd: process.cwd(),
+    });
+  }
+
   if (boolFlag(flags, "json")) {
-    printJson({ ok: true, configPath, dataDir: out.dataDir });
+    printJson({ ok: true, configPath, dataDir: out.dataDir, ...(skill ? { skill } : {}) });
     return;
   }
   console.log(`wrote ${configPath}`);
   console.log(`dataDir ${out.dataDir}`);
+  if (skill !== undefined) {
+    console.log(`skills: ${JSON.stringify(skill)}`);
+  }
 }
 
 export async function handleConfigShow(flags: FlagMap): Promise<void> {

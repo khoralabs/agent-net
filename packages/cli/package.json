@@ -19,15 +19,17 @@
   },
   "files": [
     "src",
-    "assets"
+    "assets",
+    "scripts"
   ],
   "scripts": {
     "start": "bun run ./src/cli.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "bun test src"
+    "test": "bun test src scripts"
   },
   "dependencies": {
     "@khoralabs/agent-net": "workspace:*",
+    "@khoralabs/memories-service": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {

@@ -1,5 +1,7 @@
 import type { FlagMap } from "../lib/argv.ts";
+import { handleAgentGet, handleAgentList, handleAgentRemove, handleAgentSpawn } from "./agent.ts";
 import { handleDoctor } from "./doctor.ts";
+import { handleInboxWatch } from "./inbox.ts";
 import { handleConfigSet, handleConfigShow, handleSetup } from "./setup.ts";
 
 export async function dispatch(positional: string[], flags: FlagMap): Promise<void> {
@@ -19,6 +21,31 @@ export async function dispatch(positional: string[], flags: FlagMap): Promise<vo
   }
   if (a === "doctor") {
     await handleDoctor(flags);
+    return;
+  }
+  if (a === "agent" && b === "spawn") {
+    await handleAgentSpawn(flags);
+    return;
+  }
+  if (a === "agent" && b === "list") {
+    await handleAgentList(flags);
+    return;
+  }
+  if (a === "agent" && b === "get") {
+    await handleAgentGet(flags);
+    return;
+  }
+  if (a === "agent" && b === "remove") {
+    await handleAgentRemove(flags);
+    return;
+  }
+  if (a === "inbox" && b === "watch") {
+    await handleInboxWatch(flags);
+    return;
+  }
+  if (a === "skills" && b === "install") {
+    const { handleSkillsInstall } = await import("./skills.ts");
+    await handleSkillsInstall(flags);
     return;
   }
   if (a === "version") {
