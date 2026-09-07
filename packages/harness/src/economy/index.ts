@@ -1,3 +1,4 @@
+export { ensureEconomyAgentRegistered } from "./agent-registry.ts";
 export {
   checkTokenBudgetRemaining,
   createEconomyState,
@@ -14,6 +15,33 @@ export {
   updateEconomySessionStatus,
   upsertEconomyRound,
 } from "./economy-state.ts";
+export {
+  clearPendingEconomyHarnessForTests,
+  provideEconomyHarnessForSession,
+  takeEconomyHarnessForSession,
+} from "./pending-harness.ts";
+export {
+  clearPendingEconomyOntologyForTests,
+  type EconomyMemoriesOntology,
+  provideEconomyOntologyForSession,
+  takeEconomyOntologyForSession,
+} from "./pending-ontology.ts";
+export {
+  deferredEncounterRunner,
+  type EconomyEncounterRunner,
+  runEconomyRound,
+  runEconomyUntilDone,
+} from "./run-round.ts";
+export {
+  type EconomyRuntimeSession,
+  getEconomyAgentChatClient,
+  getEconomySession,
+  putEconomySession,
+  removeEconomySession,
+  resetEconomySessionsForTests,
+  resolveEconomyAgentWorkflowDeps,
+} from "./session-store.ts";
+export { setupEconomy, teardownEconomy } from "./setup.ts";
 export type {
   EconomyActor,
   EconomyConfig,
@@ -25,6 +53,7 @@ export type {
   EconomyRoundStatus,
   EconomyScenario,
   EconomyScenarioContext,
+  EconomyScenarioHookResult,
   EconomyScheduledEncounter,
   EconomySessionStatus,
 } from "./types.ts";

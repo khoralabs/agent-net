@@ -2,21 +2,23 @@
  * Directive-free economy runtime helpers.
  * Hosts wrap durable Workflow steps; see `@khoralabs/agent-net/economy` for config/session APIs.
  */
+
 export {
   checkTokenBudgetRemaining,
-  createEconomyState,
-  findPriorPairEncounter,
   incrementTokensUsed,
-  insertEconomyEncounter,
   listEconomyEncounters,
-  loadEconomyEncounter,
-  loadEconomyRound,
   loadEconomyState,
-  loadEconomyStateBySessionId,
-  updateEconomyEncounter,
-  updateEconomySessionStatus,
-  upsertEconomyRound,
 } from "./economy-state.ts";
+export { takeEconomyHarnessForSession } from "./pending-harness.ts";
+export { takeEconomyOntologyForSession } from "./pending-ontology.ts";
+export {
+  deferredEncounterRunner,
+  type EconomyEncounterRunner,
+  runEconomyRound,
+  runEconomyUntilDone,
+} from "./run-round.ts";
+export { getEconomySession } from "./session-store.ts";
+export { setupEconomy, teardownEconomy } from "./setup.ts";
 export type {
   EconomyActor,
   EconomyConfig,
