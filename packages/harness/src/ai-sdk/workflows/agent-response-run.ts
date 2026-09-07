@@ -1,5 +1,4 @@
 import { resolveAgentEmbeddingModel } from "@khoralabs/memories-node/helpers/agent";
-import { minimalAgentMemoriesOntology } from "@khoralabs/memories-service/client/agent";
 import {
   ensureDevAgentIdentity,
   getAgentChatClientForDid,
@@ -10,14 +9,13 @@ import {
   createHarnessKhoraClientForAgent,
   resolveKhoraServerBaseUrl,
 } from "../../agent/social/tools/_helpers/khora-client-factory.ts";
-import {
-  createAgentMemoriesClientForAgent,
-  resolveMemoriesServiceAdminToken,
-  resolveMemoriesServiceBaseUrl,
-} from "../../agent/turn/tools/_helpers/toolkit-env.ts";
 import type { AgentWorkflowParams, AgentWorkflowResult } from "../../agent/turn/types.ts";
 import { requireNetworkSession } from "../../pool/network/session-registry.ts";
 import { type RunAgentWorkflowDependencies, runAgentWorkflow } from "../run-agent-workflow.ts";
+import {
+  isOptionalMemoriesUnavailable,
+  resolveBoundAgentMemoriesClient,
+} from "./resolve-bound-memories-client.ts";
 
 export type AgentResponseDeps = RunAgentWorkflowDependencies;
 
@@ -25,8 +23,8 @@ export type AgentResponseDeps = RunAgentWorkflowDependencies;
  * Agent-response body without a Workflow directive. Hosts wrap this in their
  * own durable step entry after installing chat/ontology into the isolate.
  *
- * When no ontology is installed, uses {@link minimalAgentMemoriesOntology}.
- * Hosts that need a richer ontology must install it in the step module graph.
+ * Resolves memories via session-bound deps when `context.sessionId` is set;
+ * otherwise uses Bearer admin-token adapters when configured.
  */
 export async function runExecuteAgentResponse(
   params: AgentWorkflowParams,
@@ -36,27 +34,21 @@ export async function runExecuteAgentResponse(
     return runAgentWorkflow(params, deps);
   }
 
-  const { getInstalledMemoriesOntology } = await import(
-    "../../agent/memories/tools/_helpers/memories-ontology-install.ts"
-  );
-
-  const memoriesBaseUrl = resolveMemoriesServiceBaseUrl();
-  const memoriesAdminToken = resolveMemoriesServiceAdminToken();
-  const ontology =
-    getInstalledMemoriesOntology() ??
-    (memoriesBaseUrl !== undefined && memoriesAdminToken !== undefined
-      ? minimalAgentMemoriesOntology
-      : undefined);
   const agentDid = params.agent.actingFor.id;
-  const memoriesClient =
-    memoriesBaseUrl === undefined || memoriesAdminToken === undefined || ontology === undefined
-      ? undefined
-      : await createAgentMemoriesClientForAgent({
-          baseUrl: memoriesBaseUrl,
-          agentDid,
-          ontology,
-          adminToken: memoriesAdminToken,
-        });
+  const sessionId = params.context.sessionId;
+  let memoriesClient: AgentResponseDeps["memoriesClient"];
+  try {
+    memoriesClient = await resolveBoundAgentMemoriesClient({
+      agentDid,
+      sessionId,
+      allowMinimalOntology: true,
+    });
+  } catch (err) {
+    if (!isOptionalMemoriesUnavailable(err)) {
+      throw err;
+    }
+    memoriesClient = undefined;
+  }
 
   const khoraBaseUrl = resolveKhoraServerBaseUrl();
   const khoraClient =

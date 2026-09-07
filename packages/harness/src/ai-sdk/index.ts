@@ -59,3 +59,9 @@ export {
   type RunNbcNegotiationModelTurnInput,
   runNbcNegotiationModelTurn,
 } from "./workflows/nbc-run-model-turn-run.ts";
+export {
+  hasBoundNetworkSession,
+  isOptionalMemoriesUnavailable,
+  type ResolveBoundMemoriesClientInput,
+  resolveBoundAgentMemoriesClient,
+} from "./workflows/resolve-bound-memories-client.ts";

@@ -1,11 +1,6 @@
 import { resolveAgentEmbeddingModel } from "@khoralabs/memories-node/helpers/agent";
-import {
-  agentMemoriesDatabase,
-  createAgentMemoriesClient,
-} from "@khoralabs/memories-service/client/agent";
 import type { ToolSet } from "ai";
 import { jsonSchema, tool } from "ai";
-import { getInstalledMemoriesOntology } from "../../agent/memories/tools/_helpers/memories-ontology-install.ts";
 import { createNbcMeshClient } from "../../agent/social/negotiate/nbc/nbc-mesh-client.ts";
 import { nbcTurnContext } from "../../agent/social/negotiate/nbc/nbc-turn-context.ts";
 import {
@@ -18,6 +13,7 @@ import { NETWORK_NEGOTIATION_AGENT_ID } from "../../agent/turn/capability-agents
 import { HARNESS_TOOLKIT } from "../../agent/turn/tools/ids.ts";
 import type { AgentWorkflowParams } from "../../agent/turn/types.ts";
 import { prepareHarnessStepRuntime } from "../prepare-harness-step.ts";
+import { resolveBoundAgentMemoriesClient } from "./resolve-bound-memories-client.ts";
 
 const DISABLED_TOOLKITS = [
   HARNESS_TOOLKIT.chat,
@@ -34,6 +30,8 @@ export type NbcNegotiationTurnParams = {
   maxTurns: number;
   modelId: string;
   runId?: string;
+  /** Network session id for session-bound memories/chat deps (preferred). */
+  sessionId?: string;
   objective?: string;
   constraints?: string;
 };
@@ -135,23 +133,13 @@ export async function runPrepareNbcTurn(
         }
       : undefined;
 
-  const ontology = getInstalledMemoriesOntology();
-  if (ontology === undefined) {
-    throw new Error("memories ontology is not installed");
-  }
-  const memoriesBaseUrl = process.env.MEMORIES_BASE_URL?.trim() || "http://127.0.0.1:8791";
-  const memoriesAdminToken = process.env.MEMORIES_SERVICE_ADMIN_TOKEN?.trim();
-  if (memoriesAdminToken === undefined || memoriesAdminToken.length === 0) {
-    throw new Error("MEMORIES_SERVICE_ADMIN_TOKEN is required");
-  }
-  const memoriesClient = await createAgentMemoriesClient({
-    baseUrl: memoriesBaseUrl,
-    database: agentMemoriesDatabase(params.asDid),
-    ontology,
-    adminToken: memoriesAdminToken,
+  const memoriesClient = await resolveBoundAgentMemoriesClient({
+    agentDid: params.asDid,
+    sessionId: params.sessionId,
   });
 
   const runId = params.runId?.trim() || crypto.randomUUID();
+  const workflowSessionId = params.sessionId?.trim() || runId;
   const workflowParams: AgentWorkflowParams = {
     runId,
     agent: {
@@ -161,7 +149,7 @@ export async function runPrepareNbcTurn(
     },
     model: { id: params.modelId },
     context: {
-      sessionId: runId,
+      sessionId: workflowSessionId,
       chainId: params.chainId,
       asDid: params.asDid,
       messages: [],
@@ -186,7 +174,7 @@ export async function runPrepareNbcTurn(
       agentId: NETWORK_NEGOTIATION_AGENT_ID,
       agentDid: params.asDid,
       runId,
-      sessionId: runId,
+      sessionId: workflowSessionId,
       memoriesClient,
       embeddingModel: resolveAgentEmbeddingModel(),
       disableToolkits: [...DISABLED_TOOLKITS],
@@ -229,6 +217,7 @@ export type NbcToolExecuteCtx = {
   initiatorDid: string;
   toolKey: string;
   input: unknown;
+  sessionId?: string;
 };
 
 export function buildNbcToolSet(
@@ -239,6 +228,7 @@ export function buildNbcToolSet(
     runId: string;
     peerDid: string;
     initiatorDid: string;
+    sessionId?: string;
     execute: (input: NbcToolExecuteCtx) => Promise<unknown>;
   },
 ): ToolSet {
@@ -255,6 +245,7 @@ export function buildNbcToolSet(
           runId: ctx.runId,
           peerDid: ctx.peerDid,
           initiatorDid: ctx.initiatorDid,
+          sessionId: ctx.sessionId,
           toolKey: key,
           input,
         }),
@@ -268,21 +259,11 @@ export async function executeNbcTool(input: NbcToolExecuteCtx): Promise<unknown>
     throw new Error("asDid is required");
   }
 
-  const ontology = getInstalledMemoriesOntology();
-  if (ontology === undefined) {
-    throw new Error("memories ontology is not installed");
-  }
-  const memoriesBaseUrl = process.env.MEMORIES_BASE_URL?.trim() || "http://127.0.0.1:8791";
-  const memoriesAdminToken = process.env.MEMORIES_SERVICE_ADMIN_TOKEN?.trim();
-  if (memoriesAdminToken === undefined || memoriesAdminToken.length === 0) {
-    throw new Error("MEMORIES_SERVICE_ADMIN_TOKEN is required");
-  }
-  const memoriesClient = await createAgentMemoriesClient({
-    baseUrl: memoriesBaseUrl,
-    database: agentMemoriesDatabase(input.asDid),
-    ontology,
-    adminToken: memoriesAdminToken,
+  const memoriesClient = await resolveBoundAgentMemoriesClient({
+    agentDid: input.asDid,
+    sessionId: input.sessionId,
   });
+  const workflowSessionId = input.sessionId?.trim() || input.runId;
 
   const workflowParams: AgentWorkflowParams = {
     runId: input.runId,
@@ -295,7 +276,7 @@ export async function executeNbcTool(input: NbcToolExecuteCtx): Promise<unknown>
       id: process.env.AGENT_DEFAULT_MODEL?.trim() || "zai/glm-5.2-fast",
     },
     context: {
-      sessionId: input.runId,
+      sessionId: workflowSessionId,
       chainId: input.chainId,
       asDid: input.asDid,
       messages: [],
@@ -310,7 +291,7 @@ export async function executeNbcTool(input: NbcToolExecuteCtx): Promise<unknown>
       agentId: NETWORK_NEGOTIATION_AGENT_ID,
       agentDid: input.asDid,
       runId: input.runId,
-      sessionId: input.runId,
+      sessionId: workflowSessionId,
       memoriesClient,
       embeddingModel: resolveAgentEmbeddingModel(),
       disableToolkits: [...DISABLED_TOOLKITS],

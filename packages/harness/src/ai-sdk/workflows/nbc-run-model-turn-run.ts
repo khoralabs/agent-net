@@ -46,6 +46,7 @@ export async function runNbcNegotiationModelTurn(
     runId: input.runId,
     peerDid: input.params.peerDid,
     initiatorDid: input.params.initiatorDid,
+    sessionId: input.params.sessionId,
     execute: executeNbcTool,
   });
 
