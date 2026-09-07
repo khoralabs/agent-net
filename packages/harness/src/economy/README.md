@@ -45,9 +45,12 @@ The published dependencies already provide Khora posts/search/relationships, per
 
 ## Lifecycle
 
-1. `setupEconomy` — spawn/register actors, bind network session deps, emit `economy.setup.*`
-2. `runEconomyRound` / `runEconomyUntilDone` — scenario schedules encounters; optional NBC runner; experience index
-3. `teardownEconomy` — unbind session, stop negotiate runtime, emit `economy.teardown`
+1. `setupEconomy` spawns/registers persistent actors and binds network dependencies.
+2. `createSocietyRuntime` delivers durable mailbox wakes and runs one serialized decision lane per actor.
+3. Actor tools create invitations; accepted invitations open explicitly addressed Vellum/NBC chains.
+4. `teardownEconomy` stops negotiation, unbinds the session, and releases the harness.
+
+`runEconomyRound` and `runEconomyUntilDone` remain compatibility APIs for legacy scheduled experiments.
 
 Compute budgets (`maxTokenBudget`) are distinct from any scenario-defined economic resources.
 
@@ -69,10 +72,11 @@ bun run start          # khora :8788 + memories/relay/chat
 # other terminal:
 bun run economy -- \
   --actors 2 \
-  --scenario smoke-lifecycle
+  --max-actor-turns 2 \
+  --cadence-ms 1000
 ```
 
-Register additional scenarios via `registerEconomyScenario` before starting the Workflow.
+The production cadence default is 60 seconds. The shorter smoke cadence above makes periodic wakes visible quickly.
 
 ## Plugging in experiments
 

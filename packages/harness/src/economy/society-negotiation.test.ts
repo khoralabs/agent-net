@@ -5,6 +5,7 @@ import path from "node:path";
 import {
   createSocietyChainStatusNotifier,
   createSocietyNegotiations,
+  serializeSocietyNbcTurns,
 } from "./society-negotiation.ts";
 import type { SocietyRuntime } from "./society-runtime.ts";
 import { resetSocietyStateForTests } from "./society-state.ts";
@@ -149,5 +150,29 @@ describe("society negotiation invitations", () => {
 
     expect(keys).toHaveLength(4);
     expect(new Set(keys).size).toBe(4);
+  });
+
+  test("accounts NBC model usage without counting another decision turn", async () => {
+    const usage: number[] = [];
+    const runtime = {
+      runActorTask: async (_actorDid: string, task: () => Promise<unknown>) => task(),
+      recordUsage: async (tokensUsed: number) => {
+        usage.push(tokensUsed);
+      },
+    } as unknown as SocietyRuntime;
+    const startTurn = serializeSocietyNbcTurns(runtime, async () => ({
+      runId: "run",
+      tokensUsed: 17,
+    }));
+
+    await startTurn({
+      chainId: "chain",
+      asDid: "did:a",
+      peerDid: "did:b",
+      initiatorDid: "did:a",
+      turnIndex: 0,
+      maxTurns: 4,
+    });
+    expect(usage).toEqual([17]);
   });
 });

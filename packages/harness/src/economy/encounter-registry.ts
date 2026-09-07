@@ -11,6 +11,7 @@ import type {
   NbcLoopStartTurnInput,
   NbcLoopStatusPatch,
 } from "../agent/social/negotiate/nbc/loop-host.ts";
+import type { NbcChainChanged } from "../agent/social/negotiate/nbc/nbc-chain-change-bus.ts";
 import { type NbcLoopHandle, startNbcLoop } from "../agent/social/negotiate/nbc/nbc-loop.ts";
 import type { VellumPairOptions } from "../agent/social/negotiate/vellum.ts";
 import {
@@ -36,6 +37,7 @@ export type EconomyNegotiateRuntime = {
   listChains(): EconomyChainRecord[];
   getSnapshot(chainId: string, asDid?: string): Promise<ChainSnapshot | null>;
   onStatus(chainId: string, patch: NbcLoopStatusPatch): void;
+  notifyChainChanged(input: NbcChainChanged): void;
   localDids(): readonly string[];
   startTurn(
     input: NbcLoopStartTurnInput,
@@ -257,6 +259,7 @@ export function createEconomyNegotiateRuntime(
       return handle === null ? null : handle.getSessionSnapshot(live.sessionId);
     },
     onStatus: applyStatus,
+    notifyChainChanged: (event) => loop?.notify(event),
     localDids: host.localDids,
     startTurn: host.startTurn,
     openNegotiation,

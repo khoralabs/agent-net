@@ -223,4 +223,53 @@ describe("society runtime", () => {
     await expect(runtime.runActorTask("did:a", async () => "released")).resolves.toBe("released");
     await runtime.stop();
   });
+
+  test("failed model turns consume the actor turn limit", async () => {
+    const cfg = config({ actorDids: ["did:a"], maxActorTurns: 2 });
+    let attempts = 0;
+    const runtime = createSocietyRuntime({
+      config: cfg,
+      pollMs: 2,
+      scenario: {
+        id: "failure-limit",
+        observe: async () => ({}),
+        afterTurn: async () => {
+          if (attempts < 2) await runtime.requestWake("did:a");
+        },
+        shouldTerminate: async () => false,
+      },
+      runTurn: async () => {
+        attempts++;
+        throw new Error("model unavailable");
+      },
+    });
+
+    const result = await runtime.runUntilDone();
+    expect(result).toMatchObject({ turnsCompleted: 2, tokensUsed: 0, termination: "turn-limit" });
+    expect(attempts).toBe(2);
+  });
+
+  test("checks scenario termination after a failed turn", async () => {
+    const cfg = config({ actorDids: ["did:a"], maxActorTurns: 3 });
+    let failed = false;
+    const runtime = createSocietyRuntime({
+      config: cfg,
+      scenario: {
+        id: "failure-termination",
+        observe: async () => ({}),
+        afterTurn: async () => {
+          failed = true;
+        },
+        shouldTerminate: async () => failed,
+      },
+      runTurn: async () => {
+        throw new Error("model unavailable");
+      },
+    });
+
+    expect(await runtime.runUntilDone()).toMatchObject({
+      turnsCompleted: 1,
+      termination: "scenario",
+    });
+  });
 });

@@ -6,6 +6,7 @@ import {
   loadSocietyState,
   markSocietyPrepared,
   recordSocietyTurn,
+  recordSocietyUsage,
   recoverActorWakes,
   settleActorWake,
   updateSocietyStatus,
@@ -32,6 +33,7 @@ export type SocietyRuntime = {
   deliverEvent(actorDid: string, payload: unknown, dedupeKey?: string): Promise<ActorWake>;
   deliverNegotiation(actorDid: string, payload: unknown, dedupeKey?: string): Promise<ActorWake>;
   runActorTask<T>(actorDid: string, task: () => Promise<T>): Promise<T>;
+  recordUsage(tokensUsed: number): Promise<void>;
   pump(): Promise<void>;
   runUntilDone(): Promise<SocietyRunResult>;
   stop(): Promise<void>;
@@ -110,6 +112,14 @@ export function createSocietyRuntime(input: CreateSocietyRuntimeInput): SocietyR
     lastPeriodicBucket = bucket;
   }
 
+  async function stopIfScenarioDone(): Promise<void> {
+    if (!(await scenario.shouldTerminate())) return;
+    requestedTermination = "scenario";
+    stopping = true;
+    if (timer !== undefined) clearInterval(timer);
+    timer = undefined;
+  }
+
   async function execute(wake: ActorWake): Promise<void> {
     const controller = new AbortController();
     controllers.set(wake.actorDid, controller);
@@ -120,6 +130,7 @@ export function createSocietyRuntime(input: CreateSocietyRuntimeInput): SocietyR
             () => controller.abort(new Error(`actor turn ${wake.id} timed out`)),
             input.turnTimeoutMs,
           );
+    let turnRecorded = false;
     try {
       const observation = await scenario.observe({ actorDid: wake.actorDid, wake });
       const result = await runTurn({
@@ -132,26 +143,40 @@ export function createSocietyRuntime(input: CreateSocietyRuntimeInput): SocietyR
         throw new Error("actor turn tokensUsed must be a non-negative integer");
       }
       await recordSocietyTurn(config.dataDir, config.sessionId, wake.actorDid, result.tokensUsed);
+      turnRecorded = true;
       await settleActorWake(config.dataDir, wake.id, "completed");
       await scenario.afterTurn?.({
         actorDid: wake.actorDid,
         wakeId: wake.id,
         tokensUsed: result.tokensUsed,
       });
-      if (await scenario.shouldTerminate()) {
-        requestedTermination = "scenario";
-        stopping = true;
-        if (timer !== undefined) clearInterval(timer);
-        timer = undefined;
-      }
+      await stopIfScenarioDone();
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
+      if (!turnRecorded) {
+        await recordSocietyTurn(config.dataDir, config.sessionId, wake.actorDid, 0);
+        turnRecorded = true;
+        try {
+          await scenario.afterTurn?.({
+            actorDid: wake.actorDid,
+            wakeId: wake.id,
+            tokensUsed: 0,
+          });
+        } catch {
+          // The original turn error remains the wake failure reason.
+        }
+      }
       await settleActorWake(
         config.dataDir,
         wake.id,
         stopping && controller.signal.aborted ? "pending" : "failed",
         message,
       );
+      try {
+        await stopIfScenarioDone();
+      } catch {
+        // The original turn error remains the wake failure reason.
+      }
     } finally {
       if (timeout !== undefined) clearTimeout(timeout);
       controllers.delete(wake.actorDid);
@@ -231,6 +256,13 @@ export function createSocietyRuntime(input: CreateSocietyRuntimeInput): SocietyR
         activeActors.delete(actorDid);
         if (!stopping) void runtime.pump();
       }
+    },
+
+    async recordUsage(tokensUsed) {
+      if (!Number.isSafeInteger(tokensUsed) || tokensUsed < 0) {
+        throw new Error("society tokensUsed must be a non-negative integer");
+      }
+      await recordSocietyUsage(config.dataDir, config.sessionId, tokensUsed);
     },
 
     async pump() {

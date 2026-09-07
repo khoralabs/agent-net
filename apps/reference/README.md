@@ -6,6 +6,7 @@ Concrete stack for local development and demos:
 - In-process Khora host + memories + relay + chat
 - Orchestrator process that starts those services
 - **Marketplace CLI** (`marketplace`) — primary demo
+- Autonomous society CLI (`economy`) — actor-driven economy demo
 - Swarm CLI (`swarm`) — secondary; budgeted multi-agent orchestration
 
 ## Documentation
@@ -35,11 +36,14 @@ export AI_GATEWAY_API_KEY=…
 
 bun run marketplace
 
+# actor-driven society; actors choose actions, peers, and invitation responses
+bun run economy -- --actors 2 --max-actor-turns 2 --cadence-ms 1000
+
 # optional: swarm (secondary)
 bun run swarm -- --agents 2
 ```
 
-From the workspace root you can use `bun run reference:start` and `bun run marketplace` instead.
+From the workspace root use `bun run reference:start`, then `bun run economy`.
 
 Marketplace needs **two** long-running processes. Do not stop the orchestrator with ^C while marketplace is running. The demo ends at **mutual interest** (before NBC).
 
@@ -48,6 +52,7 @@ Marketplace needs **two** long-running processes. Do not stop the orchestrator w
 ```text
 src/
   run-marketplace.ts          # marketplace CLI composition root
+  run-economy.ts              # autonomous mailbox-driven society
   patterns/                   # domain-agnostic host glue (promote candidates)
   marketplace/                # MRO surplus demo domain (not promote-as-is)
   run-swarm.ts                # secondary swarm demo

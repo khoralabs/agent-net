@@ -23,6 +23,7 @@ Architecture decisions that harden for the project live under [adr/](adr/).
 
 - [System roles](explanation/system-roles.md) — why each primary exists in agent-net
 - [Architecture](explanation/architecture.md) — control plane vs host, Workflow peel
+- [Autonomous society](explanation/autonomous-society.md) — actor lifecycle, negotiation, and retrospective
 
 ## Reference
 

@@ -39,7 +39,12 @@ export function serializeSocietyNbcTurns(
   runtime: SocietyRuntime,
   startTurn: NbcLoopHost["startTurn"],
 ): NbcLoopHost["startTurn"] {
-  return (turn) => runtime.runActorTask(turn.asDid, () => startTurn(turn));
+  return (turn) =>
+    runtime.runActorTask(turn.asDid, async () => {
+      const result = await startTurn(turn);
+      await runtime.recordUsage(result?.tokensUsed ?? 0);
+      return result;
+    });
 }
 
 export function createSocietyNegotiations(input: {

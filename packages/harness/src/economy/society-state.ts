@@ -293,6 +293,20 @@ export async function recordSocietyTurn(
   });
 }
 
+export async function recordSocietyUsage(
+  dataDir: string,
+  sessionId: string,
+  tokensUsed: number,
+): Promise<void> {
+  await ensureSchema(dataDir);
+  await client(dataDir).execute({
+    sql: `UPDATE society_sessions
+          SET tokens_used = tokens_used + ?, updated_at_ms = ?
+          WHERE session_id = ?`,
+    args: [tokensUsed, Date.now(), sessionId],
+  });
+}
+
 export async function loadSocietyState(dataDir: string, sessionId: string): Promise<SocietyState> {
   await ensureSchema(dataDir);
   const db = client(dataDir);

@@ -61,6 +61,7 @@
     "test:with-sqlite": "bash scripts/test-with-homebrew-sqlite.sh",
     "reference:start": "bun run --filter @khoralabs/agent-net-reference start",
     "marketplace": "bun run --filter @khoralabs/agent-net-reference marketplace",
+    "economy": "bun run --filter @khoralabs/agent-net-reference economy",
     "swarm": "bun run --filter @khoralabs/agent-net-reference swarm",
     "swarm:setup": "bun run --filter @khoralabs/agent-net-reference agent:setup",
     "swarm:events": "bun run --filter @khoralabs/agent-net-reference events",
