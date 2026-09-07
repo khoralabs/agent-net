@@ -11,6 +11,7 @@ import {
   updateEconomySessionStatus,
   upsertEconomyRound,
 } from "./economy-state.ts";
+import { indexEconomyExperience } from "./experience-index.ts";
 import { getEconomySession } from "./session-store.ts";
 import type { EconomyEncounter, EconomyResult, EconomyScheduledEncounter } from "./types.ts";
 
@@ -176,6 +177,12 @@ export async function runEconomyRound(input: {
         session.scenarioState = after.scenarioState;
       }
     }
+
+    await indexEconomyExperience({
+      dataDir,
+      sessionId: input.sessionId,
+      encounter: completed,
+    });
 
     await emitNetworkEvent({
       eventId: networkEventId({

@@ -24,6 +24,18 @@ export {
   type EconomyNegotiateRuntime,
 } from "./encounter-registry.ts";
 export {
+  ECONOMY_ENCOUNTERS_NAMESPACE,
+  type EconomyExperienceRecord,
+  type EconomyOfferPortSummary,
+  type EconomyRepertoireEntry,
+  type IndexEconomyExperienceInput,
+  indexEconomyExperience,
+  listEconomyExperience,
+  listEconomyRepertoire,
+  repertoireEntryKey,
+  resetEconomyExperienceClientForTests,
+} from "./experience-index.ts";
+export {
   clearPendingEconomyHarnessForTests,
   provideEconomyHarnessForSession,
   takeEconomyHarnessForSession,

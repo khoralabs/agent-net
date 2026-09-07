@@ -3,6 +3,18 @@ export {
   createEconomyNegotiateRuntime,
   type EconomyNegotiateRuntime,
 } from "./encounter-registry.ts";
+export {
+  ECONOMY_ENCOUNTERS_NAMESPACE,
+  type EconomyExperienceRecord,
+  type EconomyOfferPortSummary,
+  type EconomyRepertoireEntry,
+  type IndexEconomyExperienceInput,
+  indexEconomyExperience,
+  listEconomyExperience,
+  listEconomyRepertoire,
+  repertoireEntryKey,
+  resetEconomyExperienceClientForTests,
+} from "./experience-index.ts";
 /**
  * Directive-free economy runtime helpers.
  * Hosts wrap durable Workflow steps; see `@khoralabs/agent-net/economy` for config/session APIs.
