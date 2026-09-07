@@ -11,6 +11,7 @@
     "start": "bun run src/orchestrator.ts -- --data-dir .data",
     "marketplace": "bun run src/run-marketplace.ts -- --data-dir .data",
     "swarm": "bun run src/run-swarm.ts -- --data-dir .data",
+    "economy": "bun run src/run-economy.ts -- --data-dir .data",
     "events": "bun run src/events-cli.ts -- --data-dir .data",
     "agent:setup": "bun -e \"import { mkdirSync } from 'node:fs'; mkdirSync('.data', { recursive: true })\"",
     "typecheck": "tsc --noEmit -p tsconfig.json"
