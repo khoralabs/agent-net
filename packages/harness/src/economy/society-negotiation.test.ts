@@ -79,7 +79,6 @@ describe("society negotiation invitations", () => {
     const actions = createSocietyNegotiations({
       config: cfg,
       runtime,
-      invitationTimeoutMs: 5,
       open: async (input) => ({
         channelId: `channel:${input.chainId}`,
         vellumSessionId: `vellum:${input.chainId}`,
@@ -108,12 +107,21 @@ describe("society negotiation invitations", () => {
     ])) as NegotiationInvitation[];
     expect(new Set(accepted.map((invitation) => invitation.chainId)).size).toBe(2);
 
-    const expired = (await actions.invite("did:b", "did:c")) as NegotiationInvitation;
+    const expiringActions = createSocietyNegotiations({
+      config: cfg,
+      runtime,
+      invitationTimeoutMs: 5,
+      open: async (input) => ({
+        channelId: `channel:${input.chainId}`,
+        vellumSessionId: `vellum:${input.chainId}`,
+      }),
+    });
+    const expired = (await expiringActions.invite("did:b", "did:c")) as NegotiationInvitation;
     await Bun.sleep(6);
-    await expect(actions.respond("did:c", expired.id, true)).rejects.toThrow(/not pending/);
-    const expiredCancel = (await actions.invite("did:b", "did:c")) as NegotiationInvitation;
+    await expect(expiringActions.respond("did:c", expired.id, true)).rejects.toThrow(/not pending/);
+    const expiredCancel = (await expiringActions.invite("did:b", "did:c")) as NegotiationInvitation;
     await Bun.sleep(6);
-    await expect(actions.cancel("did:b", expiredCancel.id)).rejects.toThrow(/not pending/);
+    await expect(expiringActions.cancel("did:b", expiredCancel.id)).rejects.toThrow(/not pending/);
   });
 
   test("gives every chain status notification a distinct deduplication key", async () => {

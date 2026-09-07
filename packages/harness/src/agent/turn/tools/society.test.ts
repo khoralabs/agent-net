@@ -39,6 +39,8 @@ describe("society actor tools", () => {
       listInvitations: async () => calls.push(["list", undefined]),
       respondInvitation: async (input) => calls.push(["respond", input]),
       cancelInvitation: async (input) => calls.push(["cancel", input]),
+      searchExperience: async (input) => calls.push(["experience", input]),
+      listRepertoire: async (input) => calls.push(["repertoire", input]),
     };
     const runtimeEnv = env(society);
     const { tools } = await evaluateComposable(harnessToolkit, { env: runtimeEnv });
@@ -60,6 +62,8 @@ describe("society actor tools", () => {
     await invoke("listNegotiationInvitations", {});
     await invoke("respondNegotiationInvitation", { invitationId: "i1", accept: true });
     await invoke("cancelNegotiationInvitation", { invitationId: "i2" });
+    await invoke("searchSocietyExperience", { peerDid: "did:peer", limit: 3 });
+    await invoke("listSocietyRepertoire", { minUsageCount: 2 });
 
     expect(calls).toEqual([
       ["wake", { delayMs: 10, payload: { reason: "later" } }],
@@ -67,6 +71,8 @@ describe("society actor tools", () => {
       ["list", undefined],
       ["respond", { invitationId: "i1", accept: true }],
       ["cancel", { invitationId: "i2" }],
+      ["experience", { peerDid: "did:peer", limit: 3 }],
+      ["repertoire", { minUsageCount: 2 }],
     ]);
   });
 });

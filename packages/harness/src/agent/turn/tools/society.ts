@@ -13,6 +13,11 @@ function society(env: HarnessToolkitEnv): SocietyToolkitContext {
 const hasSocietyRuntime = policy<HarnessToolkitEnv>("has-society-runtime", async (env) =>
   Promise.resolve(env.society !== undefined),
 );
+const hasSocietyExperience = policy<HarnessToolkitEnv>("has-society-experience", async (env) =>
+  Promise.resolve(
+    env.society?.searchExperience !== undefined && env.society.listRepertoire !== undefined,
+  ),
+);
 
 const requestSocietyWakeTool = tool<
   "requestSocietyWake",
@@ -93,6 +98,49 @@ const cancelNegotiationInvitationTool = tool<
   handler: (ctx, input) => society(ctx.env).cancelInvitation(input),
 });
 
+const searchSocietyExperienceTool = tool<
+  "searchSocietyExperience",
+  { peerDid?: string; terminalOutcome?: string; limit?: number },
+  unknown,
+  HarnessToolkitEnv
+>({
+  name: "searchSocietyExperience",
+  description:
+    "Voluntarily retrieve this actor's immutable negotiation history with circumstances and provenance.",
+  inputSchema: z.object({
+    peerDid: z.string().min(1).optional(),
+    terminalOutcome: z.string().min(1).optional(),
+    limit: z.number().int().min(1).max(100).optional(),
+  }),
+  policies: [hasSocietyExperience, toolEnabled("searchSocietyExperience")],
+  handler: (ctx, input) => {
+    const search = society(ctx.env).searchExperience;
+    if (search === undefined) throw new Error("society experience is not configured");
+    return search(input);
+  },
+});
+
+const listSocietyRepertoireTool = tool<
+  "listSocietyRepertoire",
+  { minUsageCount?: number; limit?: number },
+  unknown,
+  HarnessToolkitEnv
+>({
+  name: "listSocietyRepertoire",
+  description:
+    "Voluntarily retrieve this actor's protocol repertoire with usage, circumstances, and chain provenance.",
+  inputSchema: z.object({
+    minUsageCount: z.number().int().min(0).optional(),
+    limit: z.number().int().min(1).max(100).optional(),
+  }),
+  policies: [hasSocietyExperience, toolEnabled("listSocietyRepertoire")],
+  handler: (ctx, input) => {
+    const list = society(ctx.env).listRepertoire;
+    if (list === undefined) throw new Error("society repertoire is not configured");
+    return list(input);
+  },
+});
+
 export const societyToolkit = dynamicToolkit<"society-runtime", HarnessToolkitEnv>({
   name: HARNESS_TOOLKIT.society,
   policies: [toolkitEnabled(HARNESS_TOOLKIT.society), hasSocietyRuntime],
@@ -104,6 +152,8 @@ export const societyToolkit = dynamicToolkit<"society-runtime", HarnessToolkitEn
         listNegotiationInvitationsTool,
         respondNegotiationInvitationTool,
         cancelNegotiationInvitationTool,
+        searchSocietyExperienceTool,
+        listSocietyRepertoireTool,
       ],
       {
         name: "society-runtime-core",

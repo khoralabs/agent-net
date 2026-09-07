@@ -178,10 +178,21 @@ export async function runEconomyRound(input: {
       }
     }
 
+    const chain =
+      completed.chainId === undefined
+        ? null
+        : (session.negotiate?.getChain(completed.chainId) ?? null);
+    const snapshot =
+      completed.chainId === undefined
+        ? null
+        : ((await session.negotiate?.getSnapshot(completed.chainId).catch(() => null)) ?? null);
     await indexEconomyExperience({
       dataDir,
       sessionId: input.sessionId,
       encounter: completed,
+      ...(chain?.relationshipRef !== undefined ? { relationshipRef: chain.relationshipRef } : {}),
+      ...(chain?.vellumSessionId !== undefined ? { vellumSessionId: chain.vellumSessionId } : {}),
+      ...(snapshot !== null ? { graph: snapshot.graph } : {}),
     });
 
     await emitNetworkEvent({

@@ -26,6 +26,12 @@ export type SocietyToolkitContext = {
   listInvitations(): Promise<unknown>;
   respondInvitation(input: { invitationId: string; accept: boolean }): Promise<unknown>;
   cancelInvitation(input: { invitationId: string }): Promise<unknown>;
+  searchExperience?(input: {
+    peerDid?: string;
+    terminalOutcome?: string;
+    limit?: number;
+  }): Promise<unknown>;
+  listRepertoire?(input: { minUsageCount?: number; limit?: number }): Promise<unknown>;
 };
 
 /**

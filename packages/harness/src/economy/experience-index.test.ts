@@ -1,12 +1,14 @@
 import { expect, test } from "bun:test";
 import os from "node:os";
 import path from "node:path";
+import type { NbcChainGraph } from "@khoralabs/obp-nbc";
 
 import { installNetworkEventsPlugin, listNetworkEvents } from "../index.ts";
 import { createSqliteNetworkEventPersistencePlugin } from "../pool/network/persistence/sqlite/index.ts";
 
 import {
   ECONOMY_ENCOUNTERS_NAMESPACE,
+  extractEconomyOffersByAgent,
   indexEconomyExperience,
   listEconomyExperience,
   listEconomyRepertoire,
@@ -64,6 +66,10 @@ test("indexes per-agent experience, repertoire provenance, and private memory pr
         },
       ],
     },
+    circumstancesByAgent: {
+      "did:key:a": { market: "thin" },
+      "did:key:b": { market: "thin" },
+    },
     writeMemory: async ({ agentDid, namespace, text }) => {
       memories.push({ agentDid, namespace, text });
     },
@@ -76,17 +82,24 @@ test("indexes per-agent experience, repertoire provenance, and private memory pr
   expect(forA).toHaveLength(1);
   expect(forA[0]?.peerDid).toBe("did:key:b");
   expect(forA[0]?.role).toBe("initiator");
+  expect(forA[0]?.circumstances).toEqual({ market: "thin" });
+  expect(forA[0]?.provenance.source).toBe("host");
 
   const forB = await listEconomyExperience(dataDir, sessionId, "did:key:b");
   expect(forB[0]?.peerDid).toBe("did:key:a");
+  expect(await listEconomyExperience(dataDir, sessionId, "did:key:a", { limit: 0 })).toEqual([]);
   // Privacy: A cannot see B's experience list through this API without B's did
   expect(forA[0]?.agentDid).toBe("did:key:a");
   expect(forB[0]?.agentDid).toBe("did:key:b");
 
   const repA = await listEconomyRepertoire(dataDir, sessionId, "did:key:a");
   expect(repA).toHaveLength(1);
+  if (forA[0] === undefined) throw new Error("experience was not indexed");
   expect(repA[0]?.usageCount).toBe(1);
   expect(repA[0]?.chainRefs).toEqual(["chain-1"]);
+  expect(repA[0]?.experienceRefs).toEqual([forA[0].id]);
+  expect(repA[0]?.circumstances).toEqual([{ market: "thin" }]);
+  expect(await listEconomyRepertoire(dataDir, sessionId, "did:key:a", { limit: 0 })).toEqual([]);
 
   // Second encounter bumps repertoire usage
   await indexEconomyExperience({
@@ -121,4 +134,63 @@ test("indexes per-agent experience, repertoire provenance, and private memory pr
   const events = await listNetworkEvents(sessionId, { kind: "economy.experience.indexed" });
   expect(events.length).toBeGreaterThanOrEqual(2);
   expect(JSON.stringify(events).includes("private")).toBe(false);
+});
+
+test("extracts actual offers, ports, binds, and provenance from an OBP graph", async () => {
+  const graph = {
+    parties: [
+      { id: "did:key:a", name: "a" },
+      { id: "did:key:b", name: "b" },
+    ],
+    extends: [],
+    offers: [
+      {
+        id: "offer-a",
+        type: "service",
+        expires_turn: 8,
+        expires_at_ms: 0,
+        partyId: "did:key:a",
+      },
+      {
+        id: "offer-b",
+        type: "payment",
+        expires_turn: 8,
+        expires_at_ms: 0,
+        partyId: "did:key:b",
+      },
+    ],
+    ports: [
+      {
+        id: "port-a",
+        kind: "service",
+        promise: "deliver",
+        ref: "atom:port-a",
+        expires_turn: 8,
+        expires_at_ms: 0,
+        exposedOnOfferIds: ["offer-a"],
+        bindCount: 1,
+        bind_policy: { type: "object" },
+      },
+    ],
+    exposes: [{ offerId: "offer-a", portId: "port-a" }],
+    binds: [{ offerId: "offer-b", portId: "port-a", bind_payload: { amount: 10 } }],
+  } as unknown as NbcChainGraph;
+
+  const extracted = extractEconomyOffersByAgent(graph);
+  expect(extracted["did:key:a"]).toEqual([
+    expect.objectContaining({
+      offerId: "offer-a",
+      portId: "port-a",
+      polarity: "expose",
+      portKind: "service",
+    }),
+  ]);
+  expect(extracted["did:key:b"]).toContainEqual(
+    expect.objectContaining({
+      offerId: "offer-b",
+      portId: "port-a",
+      polarity: "bind",
+      bindPayload: { amount: 10 },
+    }),
+  );
 });

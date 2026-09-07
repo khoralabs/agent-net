@@ -2,6 +2,8 @@
  * Per-economy-session Vellum/NBC encounter registry.
  * Owns chain index, concurrent pair status, and NBC host callbacks.
  */
+
+import type { ChainSnapshot } from "@khoralabs/vellum-client";
 import type { AgentActor } from "../agent/actor.ts";
 import type {
   NbcLoopChain,
@@ -32,6 +34,7 @@ export type EconomyNegotiateRuntime = {
   sessions: VellumChainSessionRegistry;
   getChain(chainId: string): EconomyChainRecord | null;
   listChains(): EconomyChainRecord[];
+  getSnapshot(chainId: string, asDid?: string): Promise<ChainSnapshot | null>;
   onStatus(chainId: string, patch: NbcLoopStatusPatch): void;
   localDids(): readonly string[];
   startTurn(
@@ -245,6 +248,14 @@ export function createEconomyNegotiateRuntime(
     sessions,
     getChain: (chainId) => chains.get(chainId) ?? null,
     listChains: () => [...chains.values()],
+    getSnapshot: async (chainId, asDid) => {
+      const chain = chains.get(chainId);
+      const live = sessions.get(chainId);
+      if (chain === undefined || live === null) return null;
+      const did = asDid ?? chain.initiatorDid;
+      const handle = sessions.handleForDid(chainId, chain.initiatorDid, chain.counterpartyDid, did);
+      return handle === null ? null : handle.getSessionSnapshot(live.sessionId);
+    },
     onStatus: applyStatus,
     localDids: host.localDids,
     startTurn: host.startTurn,

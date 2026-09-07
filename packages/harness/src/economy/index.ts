@@ -1,5 +1,7 @@
 export {
   createSocietyActorTools,
+  createSocietyExperienceActions,
+  type SocietyExperienceActions,
   type SocietyInvitationActions,
 } from "./actor-tools.ts";
 export { ensureEconomyAgentRegistered } from "./agent-registry.ts";
@@ -33,6 +35,7 @@ export {
   type EconomyExperienceRecord,
   type EconomyOfferPortSummary,
   type EconomyRepertoireEntry,
+  extractEconomyOffersByAgent,
   type IndexEconomyExperienceInput,
   indexEconomyExperience,
   listEconomyExperience,
