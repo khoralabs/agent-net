@@ -12,7 +12,7 @@ export type ActorWake = {
   attempts: number;
   dedupeKey?: string;
   /** Private to the recipient; never broadcast in shared telemetry. */
-  payload: unknown;
+  payload?: unknown;
   createdAtMs: number;
   updatedAtMs: number;
 };

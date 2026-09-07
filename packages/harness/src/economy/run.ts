@@ -36,6 +36,18 @@ export {
 } from "./run-round.ts";
 export { getEconomySession } from "./session-store.ts";
 export { setupEconomy, teardownEconomy } from "./setup.ts";
+export {
+  type CreateSocietyRuntimeInput,
+  createSocietyRuntime,
+  type SocietyRuntime,
+} from "./society-runtime.ts";
+export {
+  enqueueActorWake,
+  listActorWakes,
+  listDueActorWakes,
+  loadSocietyState,
+  type SocietyState,
+} from "./society-state.ts";
 export type {
   ActorWake,
   ActorWakeReason,
