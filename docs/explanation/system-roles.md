@@ -40,7 +40,7 @@ Chat is a use-case-agnostic messaging ledger: contracts, hashing, lineage, persi
 
 **What agent-net assumes:** chat HTTP base URL and token so agents can open threads and post signed messages.
 
-**Harness vs reference:** harness uses the **HTTP client** and `@khoralabs/chat/agent` for DID-key crypto; reference embeds `@khoralabs/chat/http/server` (+ WS fanout).
+**Harness vs reference:** harness uses the **HTTP client** and `@khoralabs/chat/agent` for DID-key crypto; reference embeds chat-http via `@khoralabs/chat/http/service` (+ WS fanout under `apps/reference/.data/chat`).
 
 ## `vellum-client`
 
