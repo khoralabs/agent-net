@@ -8,7 +8,8 @@
     "./world/local": "./src/world/local.ts"
   },
   "scripts": {
-    "start": "bun run src/orchestrator.ts -- --data-dir .data",
+    "start": "bun run src/start.ts -- --data-dir .data",
+    "stop": "bun run src/stop-stack.ts -- --data-dir .data",
     "marketplace": "bun run src/run-marketplace.ts -- --data-dir .data",
     "swarm": "bun run src/run-swarm.ts -- --data-dir .data",
     "economy": "bun run src/run-economy.ts -- --data-dir .data",

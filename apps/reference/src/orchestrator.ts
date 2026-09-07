@@ -80,13 +80,15 @@ async function main(): Promise<void> {
   const opts = parseArgs(process.argv.slice(2));
   const dataDir = path.resolve(opts.dataDir);
 
+  // Must run before any bun:sqlite open (including the Workflow local world worker).
+  // Otherwise Bun keeps its bundled SQLite and sqlite-vec fails with extension loading errors.
+  prepareSqliteForEncryptedMemories();
+  ensureKhoraDevEnvDefaults();
+
   configureLocalWorldEnv({ dataDir });
   await startLocalWorldWorker({ dataDir });
 
   installReferenceObservability({ serviceName: "network-harness-memories" });
-
-  prepareSqliteForEncryptedMemories();
-  ensureKhoraDevEnvDefaults();
 
   const khora = await startKhoraHost({
     dataDir: path.join(dataDir, "khora"),

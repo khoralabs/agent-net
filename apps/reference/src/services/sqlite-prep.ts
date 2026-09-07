@@ -18,19 +18,31 @@ export function prepareSqliteForEncryptedMemories(): void {
     }
   }) as typeof Database.setCustomSQLite;
 
-  for (const p of [
-    process.env.SQLCIPHER_CUSTOM_LIB?.trim(),
-    "/opt/homebrew/opt/sqlcipher/lib/libsqlcipher.dylib",
-    "/usr/local/opt/sqlcipher/lib/libsqlcipher.dylib",
-  ]) {
-    if (p !== undefined && p.length > 0 && existsSync(p)) {
-      if (process.env.SQLITE_CUSTOM_LIB?.trim() === undefined) {
+  // Prefer Homebrew SQLite for SQLITE_CUSTOM_LIB (sqlite-vec needs extension loading).
+  if (!process.env.SQLITE_CUSTOM_LIB?.trim()) {
+    for (const p of [
+      "/opt/homebrew/opt/sqlite/lib/libsqlite3.dylib",
+      "/usr/local/opt/sqlite/lib/libsqlite3.dylib",
+      "/opt/homebrew/opt/sqlite3/lib/libsqlite3.dylib",
+      "/usr/local/opt/sqlite3/lib/libsqlite3.dylib",
+    ]) {
+      if (existsSync(p)) {
         process.env.SQLITE_CUSTOM_LIB = p;
+        break;
       }
-      if (process.env.SQLCIPHER_CUSTOM_LIB?.trim() === undefined) {
+    }
+  }
+
+  // Prefer SQLCipher only for the SQLCIPHER_CUSTOM_LIB slot (encrypted memories).
+  if (!process.env.SQLCIPHER_CUSTOM_LIB?.trim()) {
+    for (const p of [
+      "/opt/homebrew/opt/sqlcipher/lib/libsqlcipher.dylib",
+      "/usr/local/opt/sqlcipher/lib/libsqlcipher.dylib",
+    ]) {
+      if (existsSync(p)) {
         process.env.SQLCIPHER_CUSTOM_LIB = p;
+        break;
       }
-      break;
     }
   }
 

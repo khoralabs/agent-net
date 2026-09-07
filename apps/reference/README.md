@@ -19,8 +19,11 @@ Concrete stack for local development and demos:
 ## Run
 
 ```bash
-# terminal 1 — reference infra (leave running; .data under apps/reference)
-bun run start
+# terminal 1 — reference infra (.data under apps/reference)
+bun run start          # foreground
+bun run start -- -d    # detached (pid/log under .data); tear down with stop
+
+bun run stop           # frees :8788/:8790/:8791/:8792
 
 # terminal 2 — marketplace (values match pinned orchestrator ports + .env)
 export KHORA_BASE_URL=http://127.0.0.1:8788
