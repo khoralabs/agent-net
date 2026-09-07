@@ -17,13 +17,15 @@ import {
 } from "../agent/social/negotiate/vellum-sessions.ts";
 
 import type { EconomyEncounterRunner } from "./run-round.ts";
+import type { OpenSocietyNegotiation } from "./society-negotiation.ts";
 import type { EconomyEncounter, EconomyScheduledEncounter } from "./types.ts";
 
 export type EconomyChainRecord = NbcLoopChain & {
-  encounterId: string;
+  encounterId?: string;
   chainId: string;
   vellumSessionId?: string;
   relationshipRef?: string;
+  tokensUsed: number;
 };
 
 export type EconomyNegotiateRuntime = {
@@ -32,8 +34,20 @@ export type EconomyNegotiateRuntime = {
   listChains(): EconomyChainRecord[];
   onStatus(chainId: string, patch: NbcLoopStatusPatch): void;
   localDids(): readonly string[];
-  startTurn(input: NbcLoopStartTurnInput): Promise<{ runId?: string } | undefined>;
+  startTurn(
+    input: NbcLoopStartTurnInput,
+  ): Promise<{ runId?: string; tokensUsed?: number } | undefined>;
   waitForTerminal(chainId: string, opts?: { timeoutMs?: number }): Promise<EconomyChainRecord>;
+  openNegotiation(input: {
+    chainId: string;
+    relationshipRef: string;
+    initiator: AgentActor;
+    responder: AgentActor;
+    vellumOptions: VellumPairOptions;
+    maxTurns?: number;
+    objective?: string;
+    constraints?: string;
+  }): Promise<{ chainId: string; channelId: string; vellumSessionId: string }>;
   openAndRunEncounter(input: {
     encounter: EconomyEncounter;
     scheduled: EconomyScheduledEncounter;
@@ -43,6 +57,7 @@ export type EconomyNegotiateRuntime = {
     maxTurns?: number;
     objective?: string;
     constraints?: string;
+    relationshipRef?: string;
   }): Promise<{
     chainId: string;
     channelId: string;
@@ -51,6 +66,7 @@ export type EconomyNegotiateRuntime = {
     terminalOutcome?: string;
     status: EconomyEncounter["status"];
     relationshipRef?: string;
+    tokensUsed: number;
   }>;
   stop(): void;
 };
@@ -69,6 +85,7 @@ export type CreateEconomyNegotiateRuntimeInput = {
     responder: AgentActor;
     options: VellumPairOptions;
   }) => Promise<{ channelId: string; sessionId: string }>;
+  onChainStatus?: (chain: EconomyChainRecord, patch: NbcLoopStatusPatch) => void | Promise<void>;
 };
 
 function isTerminal(chain: EconomyChainRecord): boolean {
@@ -121,7 +138,14 @@ export function createEconomyNegotiateRuntime(
     if (patch.outcome !== undefined) {
       next.negotiationOutcome = patch.outcome;
     }
+    if (patch.tokensUsedDelta !== undefined) {
+      if (!Number.isSafeInteger(patch.tokensUsedDelta) || patch.tokensUsedDelta < 0) {
+        throw new Error("negotiation tokensUsedDelta must be a non-negative integer");
+      }
+      next.tokensUsed += patch.tokensUsedDelta;
+    }
     chains.set(chainId, next);
+    void Promise.resolve(input.onChainStatus?.(next, patch)).catch(() => undefined);
     notifyWaiters(chainId);
   };
 
@@ -160,6 +184,63 @@ export function createEconomyNegotiateRuntime(
 
   let loop: NbcLoopHandle | undefined = startNbcLoop({ sessions, host });
 
+  const openNegotiation: EconomyNegotiateRuntime["openNegotiation"] = async (args) => {
+    if (chains.has(args.chainId))
+      throw new Error(`negotiation chain ${args.chainId} already exists`);
+    const opened =
+      input.openChain !== undefined
+        ? await input.openChain({
+            chainId: args.chainId,
+            initiator: args.initiator,
+            responder: args.responder,
+            options: args.vellumOptions,
+          })
+        : await sessions.open({
+            chainId: args.chainId,
+            initiator: args.initiator,
+            responder: args.responder,
+            options: args.vellumOptions,
+          });
+    const record: EconomyChainRecord = {
+      chainId: args.chainId,
+      channelId: opened.channelId,
+      status: "open",
+      initiatorDid: args.initiator.did,
+      counterpartyDid: args.responder.did,
+      turnsCompleted: 0,
+      tokensUsed: 0,
+      maxTurns: args.maxTurns ?? 8,
+      vellumSessionId: opened.sessionId,
+      relationshipRef: args.relationshipRef,
+      ...(args.objective !== undefined ? { objective: args.objective } : {}),
+      ...(args.constraints !== undefined ? { constraints: args.constraints } : {}),
+    };
+    chains.set(args.chainId, record);
+
+    if (input.openChain !== undefined) {
+      const started = await host.startTurn({
+        chainId: args.chainId,
+        asDid: args.initiator.did,
+        peerDid: args.responder.did,
+        initiatorDid: args.initiator.did,
+        turnIndex: 0,
+        maxTurns: record.maxTurns,
+        ...(args.objective !== undefined ? { objective: args.objective } : {}),
+        ...(args.constraints !== undefined ? { constraints: args.constraints } : {}),
+      });
+      if (started?.tokensUsed !== undefined) {
+        applyStatus(args.chainId, { tokensUsedDelta: started.tokensUsed });
+      }
+    } else {
+      loop?.notify({ chainId: args.chainId, turnSeq: 0, cause: "opened" });
+    }
+    return {
+      chainId: args.chainId,
+      channelId: opened.channelId,
+      vellumSessionId: opened.sessionId,
+    };
+  };
+
   const runtime: EconomyNegotiateRuntime = {
     sessions,
     getChain: (chainId) => chains.get(chainId) ?? null,
@@ -167,6 +248,7 @@ export function createEconomyNegotiateRuntime(
     onStatus: applyStatus,
     localDids: host.localDids,
     startTurn: host.startTurn,
+    openNegotiation,
     waitForTerminal: async (chainId, opts) => {
       const existing = chains.get(chainId);
       if (existing !== undefined && isTerminal(existing)) return existing;
@@ -192,63 +274,28 @@ export function createEconomyNegotiateRuntime(
     },
     openAndRunEncounter: async (args) => {
       const chainId = args.encounter.chainId ?? `econ-${args.encounter.id}`;
-      const opened =
-        input.openChain !== undefined
-          ? await input.openChain({
-              chainId,
-              initiator: args.initiator,
-              responder: args.responder,
-              options: args.vellumOptions,
-            })
-          : await sessions.open({
-              chainId,
-              initiator: args.initiator,
-              responder: args.responder,
-              options: args.vellumOptions,
-            });
-
-      const record: EconomyChainRecord = {
+      const opened = await openNegotiation({
         chainId,
-        encounterId: args.encounter.id,
-        channelId: opened.channelId,
-        status: "open",
-        initiatorDid: args.initiator.did,
-        counterpartyDid: args.responder.did,
-        turnsCompleted: 0,
-        maxTurns: args.maxTurns ?? 8,
-        vellumSessionId: opened.sessionId,
-        relationshipRef: opened.sessionId,
+        relationshipRef:
+          args.relationshipRef ??
+          `relationship:${[args.initiator.did, args.responder.did].sort().join(":")}`,
+        initiator: args.initiator,
+        responder: args.responder,
+        vellumOptions: args.vellumOptions,
+        maxTurns: args.maxTurns,
         ...(args.objective !== undefined ? { objective: args.objective } : {}),
         ...(args.constraints !== undefined ? { constraints: args.constraints } : {}),
-      };
-      chains.set(chainId, record);
-
-      if (input.openChain !== undefined) {
-        // Test/integration path: drive one local turn then terminal status.
-        await host.startTurn({
-          chainId,
-          asDid: args.initiator.did,
-          peerDid: args.responder.did,
-          initiatorDid: args.initiator.did,
-          turnIndex: 0,
-          maxTurns: record.maxTurns,
-          ...(args.objective !== undefined ? { objective: args.objective } : {}),
-          ...(args.constraints !== undefined ? { constraints: args.constraints } : {}),
-        });
-        const afterTurn = chains.get(chainId);
-        if (afterTurn === undefined || !isTerminal(afterTurn)) {
-          applyStatus(chainId, { status: "completed", outcome: "bound" });
-        }
-      } else {
-        loop?.notify({ chainId, turnSeq: 0, cause: "opened" });
-      }
+      });
+      const record = chains.get(chainId);
+      if (record !== undefined) chains.set(chainId, { ...record, encounterId: args.encounter.id });
 
       const terminal = await runtime.waitForTerminal(chainId);
       return {
         chainId,
         channelId: opened.channelId,
-        vellumSessionId: opened.sessionId,
+        vellumSessionId: opened.vellumSessionId,
         turnsCompleted: terminal.turnsCompleted,
+        tokensUsed: terminal.tokensUsed,
         ...(terminal.negotiationOutcome != null
           ? { terminalOutcome: terminal.negotiationOutcome }
           : {}),
@@ -314,9 +361,35 @@ export function createEconomyNbcEncounterRunner(input: {
     return {
       chainId: result.chainId,
       turnsCompleted: result.turnsCompleted,
-      tokensUsed: 0,
+      tokensUsed: result.tokensUsed,
       terminalOutcome: result.terminalOutcome,
       status: result.status,
+    };
+  };
+}
+
+export function createEconomyNegotiationOpener(input: {
+  runtime: EconomyNegotiateRuntime;
+  resolveActors: (
+    initiatorDid: string,
+    responderDid: string,
+  ) => { initiator: AgentActor; responder: AgentActor };
+  vellumOptions: VellumPairOptions;
+  maxTurns?: number;
+}): OpenSocietyNegotiation {
+  return async (invitation) => {
+    const actors = input.resolveActors(invitation.initiatorDid, invitation.responderDid);
+    const opened = await input.runtime.openNegotiation({
+      chainId: invitation.chainId,
+      relationshipRef: invitation.relationshipRef,
+      initiator: actors.initiator,
+      responder: actors.responder,
+      vellumOptions: input.vellumOptions,
+      maxTurns: input.maxTurns,
+    });
+    return {
+      channelId: opened.channelId,
+      vellumSessionId: opened.vellumSessionId,
     };
   };
 }

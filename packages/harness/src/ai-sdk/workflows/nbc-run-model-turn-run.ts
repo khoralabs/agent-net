@@ -39,7 +39,7 @@ export type RunNbcNegotiationModelTurnInput = {
 /** Run generate → host-profile → mesh commit for one NBC turn. No workflow directive. */
 export async function runNbcNegotiationModelTurn(
   input: RunNbcNegotiationModelTurnInput,
-): Promise<{ ok: true }> {
+): Promise<{ ok: true; tokensUsed: number }> {
   const tools = buildNbcToolSet(input.prepared.tools, {
     chainId: input.params.chainId,
     asDid: input.params.asDid,
@@ -51,6 +51,7 @@ export async function runNbcNegotiationModelTurn(
   });
 
   let lastError: unknown;
+  let tokensUsed = 0;
   for (let attempt = 1; attempt <= input.maxAttempts; attempt++) {
     try {
       await runNbcModelTurn({
@@ -78,6 +79,7 @@ export async function runNbcNegotiationModelTurn(
           if (result.output === undefined || result.output === null) {
             throw new Error("negotiation turn produced no structured output");
           }
+          tokensUsed = result.usage.totalTokens ?? 0;
           return result.output;
         },
         postTurn: async (body) => {
@@ -100,5 +102,5 @@ export async function runNbcNegotiationModelTurn(
     input.onExhausted(input.describeFailure(lastError), input.maxAttempts);
   }
 
-  return { ok: true };
+  return { ok: true, tokensUsed };
 }

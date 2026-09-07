@@ -31,6 +31,7 @@ export type SocietyRuntime = {
   requestWake(actorDid: string, payload?: unknown, dueAtMs?: number): Promise<ActorWake>;
   deliverEvent(actorDid: string, payload: unknown, dedupeKey?: string): Promise<ActorWake>;
   deliverNegotiation(actorDid: string, payload: unknown, dedupeKey?: string): Promise<ActorWake>;
+  runActorTask<T>(actorDid: string, task: () => Promise<T>): Promise<T>;
   pump(): Promise<void>;
   runUntilDone(): Promise<SocietyRunResult>;
   stop(): Promise<void>;
@@ -206,6 +207,30 @@ export function createSocietyRuntime(input: CreateSocietyRuntimeInput): SocietyR
 
     deliverNegotiation(actorDid, payload, dedupeKey) {
       return enqueue({ actorDid, reason: "negotiation", payload, dedupeKey });
+    },
+
+    async runActorTask<T>(actorDid: string, task: () => Promise<T>): Promise<T> {
+      if (!config.actorDids.includes(actorDid))
+        throw new Error(`actor ${actorDid} is not in society`);
+      while (!stopping && (activeActors.has(actorDid) || activeTasks.size >= maxConcurrent)) {
+        await new Promise((resolve) => setTimeout(resolve, pollMs));
+      }
+      if (stopping) throw new Error("society is stopping");
+      activeActors.add(actorDid);
+      let tracked: Promise<void> | undefined;
+      try {
+        const result = Promise.resolve().then(task);
+        tracked = result.then(
+          () => undefined,
+          () => undefined,
+        );
+        activeTasks.add(tracked);
+        return await result;
+      } finally {
+        if (tracked !== undefined) activeTasks.delete(tracked);
+        activeActors.delete(actorDid);
+        if (!stopping) void runtime.pump();
+      }
     },
 
     async pump() {

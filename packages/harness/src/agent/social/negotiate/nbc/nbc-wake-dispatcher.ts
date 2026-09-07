@@ -119,8 +119,11 @@ export function createNbcWakeDispatcher(deps: NbcWakeDispatcherDeps) {
             ? { constraints: chain.constraints }
             : {}),
         });
-        if (started?.runId !== undefined) {
-          deps.host.onStatus(event.chainId, { runId: started.runId });
+        if (started !== undefined) {
+          deps.host.onStatus(event.chainId, {
+            ...(started.runId !== undefined ? { runId: started.runId } : {}),
+            ...(started.tokensUsed !== undefined ? { tokensUsedDelta: started.tokensUsed } : {}),
+          });
         }
         completed.add(key);
       } catch (err) {

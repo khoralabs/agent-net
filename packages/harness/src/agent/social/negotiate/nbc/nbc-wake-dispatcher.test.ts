@@ -47,6 +47,7 @@ describe("nbc wake dispatcher", () => {
   test("wakes only the local whoShouldAct DID and ignores extra opened/snapshot seqs", async () => {
     const chain = loopChain({ channelId: "ch-1" });
     let runId = "";
+    let tokensUsed = 0;
     const starts: string[] = [];
     const onChanged = createNbcWakeDispatcher({
       sessions: {
@@ -62,11 +63,12 @@ describe("nbc wake dispatcher", () => {
         getChain: (id) => (id === "c1" ? chain : null),
         onStatus: (_id, patch) => {
           if (patch.runId !== undefined) runId = patch.runId;
+          tokensUsed += patch.tokensUsedDelta ?? 0;
         },
         localDids: () => ["did:key:alice", "did:key:bob"],
         startTurn: async (input) => {
           starts.push(input.asDid);
-          return { runId: `run-${input.asDid}` };
+          return { runId: `run-${input.asDid}`, tokensUsed: 12 };
         },
       },
       getSnapshot: async () => snap(emptyGraph(), "did:key:alice"),
@@ -78,6 +80,7 @@ describe("nbc wake dispatcher", () => {
 
     expect(starts).toEqual(["did:key:alice"]);
     expect(runId).toBe("run-did:key:alice");
+    expect(tokensUsed).toBe(12);
   });
 
   test("non-local actor records waiting-peer and starts nothing", async () => {

@@ -19,6 +19,7 @@ export type NbcLoopStatusPatch = {
   outcome?: "bound" | "turn-limit" | "left" | "error";
   detail?: string;
   runId?: string;
+  tokensUsedDelta?: number;
 };
 
 export type NbcLoopStartTurnInput = {
@@ -37,5 +38,7 @@ export type NbcLoopHost = {
   getChain(chainId: string): NbcLoopChain | null;
   onStatus(chainId: string, patch: NbcLoopStatusPatch): void;
   localDids(): readonly string[];
-  startTurn(input: NbcLoopStartTurnInput): Promise<{ runId?: string } | undefined>;
+  startTurn(
+    input: NbcLoopStartTurnInput,
+  ): Promise<{ runId?: string; tokensUsed?: number } | undefined>;
 };

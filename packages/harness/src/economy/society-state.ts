@@ -6,6 +6,8 @@ import type {
   ActorWake,
   ActorWakeReason,
   ActorWakeStatus,
+  NegotiationInvitation,
+  NegotiationInvitationStatus,
   SocietyConfig,
 } from "./society-types.ts";
 
@@ -70,6 +72,31 @@ async function ensureSchema(dataDir: string): Promise<void> {
         ON society_wakes (session_id, status, due_at_ms);
       CREATE UNIQUE INDEX IF NOT EXISTS society_wakes_dedupe
         ON society_wakes (session_id, dedupe_key) WHERE dedupe_key IS NOT NULL;
+      CREATE TABLE IF NOT EXISTS society_relationships (
+        session_id TEXT NOT NULL,
+        pair_key TEXT NOT NULL,
+        relationship_ref TEXT NOT NULL,
+        created_at_ms INTEGER NOT NULL,
+        PRIMARY KEY (session_id, pair_key)
+      );
+      CREATE TABLE IF NOT EXISTS society_negotiation_invitations (
+        id TEXT PRIMARY KEY,
+        session_id TEXT NOT NULL,
+        initiator_did TEXT NOT NULL,
+        responder_did TEXT NOT NULL,
+        status TEXT NOT NULL,
+        message TEXT,
+        relationship_ref TEXT NOT NULL,
+        chain_id TEXT,
+        channel_id TEXT,
+        vellum_session_id TEXT,
+        last_error TEXT,
+        expires_at_ms INTEGER,
+        created_at_ms INTEGER NOT NULL,
+        updated_at_ms INTEGER NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS society_invitations_actor
+        ON society_negotiation_invitations (session_id, initiator_did, responder_did, created_at_ms);
     `);
   })().catch((error) => {
     schemaReady.delete(dataDir);
@@ -90,6 +117,23 @@ function wakeFromRow(row: Record<string, unknown>): ActorWake {
     attempts: Number(row.attempts),
     ...(row.dedupe_key != null ? { dedupeKey: String(row.dedupe_key) } : {}),
     ...(row.payload_json != null ? { payload: JSON.parse(String(row.payload_json)) } : {}),
+    createdAtMs: Number(row.created_at_ms),
+    updatedAtMs: Number(row.updated_at_ms),
+  };
+}
+
+function invitationFromRow(row: Record<string, unknown>): NegotiationInvitation {
+  return {
+    id: String(row.id),
+    sessionId: String(row.session_id),
+    initiatorDid: String(row.initiator_did),
+    responderDid: String(row.responder_did),
+    status: String(row.status) as NegotiationInvitationStatus,
+    ...(row.message != null ? { message: String(row.message) } : {}),
+    relationshipRef: String(row.relationship_ref),
+    ...(row.chain_id != null ? { chainId: String(row.chain_id) } : {}),
+    ...(row.channel_id != null ? { channelId: String(row.channel_id) } : {}),
+    ...(row.vellum_session_id != null ? { vellumSessionId: String(row.vellum_session_id) } : {}),
     createdAtMs: Number(row.created_at_ms),
     updatedAtMs: Number(row.updated_at_ms),
   };
@@ -299,6 +343,164 @@ export async function listActorWakes(
     args: [sessionId, actorDid],
   });
   return rows.rows.map((row) => wakeFromRow(row as Record<string, unknown>));
+}
+
+function pairKey(didA: string, didB: string): string {
+  return [didA, didB].sort().join("\0");
+}
+
+export async function createNegotiationInvitation(
+  config: SocietyConfig,
+  initiatorDid: string,
+  responderDid: string,
+  message?: string,
+  expiresAtMs?: number,
+): Promise<NegotiationInvitation> {
+  await ensureSchema(config.dataDir);
+  if (initiatorDid === responderDid) throw new Error("cannot invite self to a negotiation");
+  if (!config.actorDids.includes(initiatorDid) || !config.actorDids.includes(responderDid)) {
+    throw new Error("negotiation parties must belong to the society");
+  }
+  const db = client(config.dataDir);
+  const now = Date.now();
+  const key = pairKey(initiatorDid, responderDid);
+  await db.execute({
+    sql: `INSERT OR IGNORE INTO society_relationships
+            (session_id, pair_key, relationship_ref, created_at_ms)
+          VALUES (?, ?, ?, ?)`,
+    args: [config.sessionId, key, `relationship:${crypto.randomUUID()}`, now],
+  });
+  const relationship = await db.execute({
+    sql: "SELECT relationship_ref FROM society_relationships WHERE session_id = ? AND pair_key = ?",
+    args: [config.sessionId, key],
+  });
+  const relationshipRef = String(relationship.rows[0]?.relationship_ref);
+  const invitation: NegotiationInvitation = {
+    id: crypto.randomUUID(),
+    sessionId: config.sessionId,
+    initiatorDid,
+    responderDid,
+    status: "pending",
+    ...(message !== undefined ? { message } : {}),
+    relationshipRef,
+    createdAtMs: now,
+    updatedAtMs: now,
+  };
+  await db.execute({
+    sql: `INSERT INTO society_negotiation_invitations
+            (id, session_id, initiator_did, responder_did, status, message,
+             relationship_ref, expires_at_ms, created_at_ms, updated_at_ms)
+          VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?)`,
+    args: [
+      invitation.id,
+      invitation.sessionId,
+      initiatorDid,
+      responderDid,
+      message ?? null,
+      relationshipRef,
+      expiresAtMs ?? null,
+      now,
+      now,
+    ],
+  });
+  return invitation;
+}
+
+export async function listNegotiationInvitations(
+  dataDir: string,
+  sessionId: string,
+  actorDid: string,
+): Promise<NegotiationInvitation[]> {
+  await ensureSchema(dataDir);
+  const db = client(dataDir);
+  await db.execute({
+    sql: `UPDATE society_negotiation_invitations
+          SET status = 'expired', updated_at_ms = ?
+          WHERE session_id = ? AND status = 'pending' AND expires_at_ms <= ?`,
+    args: [Date.now(), sessionId, Date.now()],
+  });
+  const rows = await db.execute({
+    sql: `SELECT * FROM society_negotiation_invitations
+          WHERE session_id = ? AND (initiator_did = ? OR responder_did = ?)
+          ORDER BY created_at_ms`,
+    args: [sessionId, actorDid, actorDid],
+  });
+  return rows.rows.map((row) => invitationFromRow(row as Record<string, unknown>));
+}
+
+export async function loadNegotiationInvitation(
+  dataDir: string,
+  invitationId: string,
+): Promise<NegotiationInvitation | null> {
+  await ensureSchema(dataDir);
+  const rows = await client(dataDir).execute({
+    sql: "SELECT * FROM society_negotiation_invitations WHERE id = ?",
+    args: [invitationId],
+  });
+  const row = rows.rows[0];
+  if (row === undefined) return null;
+  const invitation = invitationFromRow(row as Record<string, unknown>);
+  if (
+    invitation.status === "pending" &&
+    row.expires_at_ms != null &&
+    Number(row.expires_at_ms) <= Date.now()
+  ) {
+    await client(dataDir).execute({
+      sql: `UPDATE society_negotiation_invitations
+            SET status = 'expired', updated_at_ms = ?
+            WHERE id = ? AND status = 'pending'`,
+      args: [Date.now(), invitationId],
+    });
+    return { ...invitation, status: "expired", updatedAtMs: Date.now() };
+  }
+  return invitation;
+}
+
+export async function updateNegotiationInvitation(
+  dataDir: string,
+  invitationId: string,
+  actorDid: string,
+  fromStatus: NegotiationInvitationStatus,
+  status: NegotiationInvitationStatus,
+  details?: {
+    chainId?: string;
+    channelId?: string;
+    vellumSessionId?: string;
+    error?: string;
+  },
+): Promise<NegotiationInvitation> {
+  await ensureSchema(dataDir);
+  const db = client(dataDir);
+  const existing = await loadNegotiationInvitation(dataDir, invitationId);
+  if (existing === null) throw new Error(`negotiation invitation ${invitationId} not found`);
+  const authorized =
+    (status === "cancelled" && existing.initiatorDid === actorDid) ||
+    (status !== "cancelled" && existing.responderDid === actorDid);
+  if (!authorized) throw new Error("actor is not authorized to update this invitation");
+  const result = await db.execute({
+    sql: `UPDATE society_negotiation_invitations SET
+            status = ?, chain_id = COALESCE(?, chain_id),
+            channel_id = COALESCE(?, channel_id),
+            vellum_session_id = COALESCE(?, vellum_session_id),
+            last_error = ?, updated_at_ms = ?
+          WHERE id = ? AND status = ?`,
+    args: [
+      status,
+      details?.chainId ?? null,
+      details?.channelId ?? null,
+      details?.vellumSessionId ?? null,
+      details?.error ?? null,
+      Date.now(),
+      invitationId,
+      fromStatus,
+    ],
+  });
+  if (result.rowsAffected !== 1) {
+    throw new Error(`negotiation invitation ${invitationId} is not ${fromStatus}`);
+  }
+  const updated = await loadNegotiationInvitation(dataDir, invitationId);
+  if (updated === null) throw new Error(`negotiation invitation ${invitationId} not found`);
+  return updated;
 }
 
 export function resetSocietyStateForTests(): void {

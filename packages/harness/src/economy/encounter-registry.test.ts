@@ -49,7 +49,8 @@ describe("economy encounter registry", () => {
         } else {
           expect(input.objective).toBeUndefined();
         }
-        return { runId: `run-${input.chainId}` };
+        runtime.onStatus(input.chainId, { status: "completed", outcome: "left" });
+        return { runId: `run-${input.chainId}`, tokensUsed: 7 };
       },
     });
 
@@ -74,7 +75,8 @@ describe("economy encounter registry", () => {
 
     expect(r1.status).toBe("completed");
     expect(r2.status).toBe("completed");
-    expect(r1.relationshipRef).toBe("vellum-econ-e1");
+    expect(r1.relationshipRef).toBe("relationship:did:key:a:did:key:b");
+    expect(r1.tokensUsed).toBe(7);
     expect(turns.length).toBe(2);
     expect(runtime.listChains()).toHaveLength(2);
 
@@ -97,8 +99,9 @@ describe("economy encounter registry", () => {
       },
       scheduled: { initiatorDid: "did:key:b", counterpartyDid: "did:key:c" },
     });
-    expect(again.terminalOutcome).toBe("bound");
+    expect(again.terminalOutcome).toBe("left");
     expect(again.chainId).toBe("econ-e3");
+    expect(again.tokensUsed).toBe(7);
 
     runtime.stop();
     expect(runtime.listChains()).toHaveLength(0);

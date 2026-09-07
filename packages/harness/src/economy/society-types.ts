@@ -53,3 +53,27 @@ export type SocietyRunResult = {
   tokensUsed: number;
   termination: "scenario" | "token-budget" | "turn-limit" | "stopped";
 };
+
+export type NegotiationInvitationStatus =
+  | "pending"
+  | "opening"
+  | "accepted"
+  | "rejected"
+  | "cancelled"
+  | "failed"
+  | "expired";
+
+export type NegotiationInvitation = {
+  id: string;
+  sessionId: string;
+  initiatorDid: string;
+  responderDid: string;
+  status: NegotiationInvitationStatus;
+  message?: string;
+  relationshipRef: string;
+  chainId?: string;
+  channelId?: string;
+  vellumSessionId?: string;
+  createdAtMs: number;
+  updatedAtMs: number;
+};

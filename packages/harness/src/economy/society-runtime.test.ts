@@ -178,4 +178,49 @@ describe("society runtime", () => {
     expect(turns).toBe(1);
     expect(result.termination).toBe("scenario");
   });
+
+  test("serializes external protocol work with the actor decision lane", async () => {
+    const cfg = config();
+    let releaseActor!: () => void;
+    const actorStarted = Promise.withResolvers<void>();
+    const actorRelease = new Promise<void>((resolve) => {
+      releaseActor = resolve;
+    });
+    const runtime = createSocietyRuntime({
+      config: cfg,
+      pollMs: 2,
+      scenario: {
+        id: "protocol-lane",
+        observe: async () => ({}),
+        shouldTerminate: async () => false,
+      },
+      runTurn: async ({ actorDid }) => {
+        if (actorDid === "did:a") {
+          actorStarted.resolve();
+          await actorRelease;
+        }
+        return { tokensUsed: 1 };
+      },
+    });
+    await runtime.start();
+    await actorStarted.promise;
+
+    let protocolStarted = false;
+    const protocol = runtime.runActorTask("did:a", async () => {
+      protocolStarted = true;
+    });
+    await Bun.sleep(5);
+    expect(protocolStarted).toBeFalse();
+    releaseActor();
+    await protocol;
+    expect(protocolStarted).toBeTrue();
+
+    await expect(
+      runtime.runActorTask("did:a", () => {
+        throw new Error("sync failure");
+      }),
+    ).rejects.toThrow("sync failure");
+    await expect(runtime.runActorTask("did:a", async () => "released")).resolves.toBe("released");
+    await runtime.stop();
+  });
 });

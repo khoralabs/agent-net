@@ -24,6 +24,7 @@ export {
   type CreateEconomyNegotiateRuntimeInput,
   createEconomyNbcEncounterRunner,
   createEconomyNegotiateRuntime,
+  createEconomyNegotiationOpener,
   type EconomyChainRecord,
   type EconomyNegotiateRuntime,
 } from "./encounter-registry.ts";
@@ -67,6 +68,12 @@ export {
 } from "./session-store.ts";
 export { setupEconomy, teardownEconomy } from "./setup.ts";
 export {
+  createSocietyChainStatusNotifier,
+  createSocietyNegotiations,
+  type OpenSocietyNegotiation,
+  serializeSocietyNbcTurns,
+} from "./society-negotiation.ts";
+export {
   type CreateSocietyRuntimeInput,
   createSocietyRuntime,
   type SocietyRuntime,
@@ -75,6 +82,7 @@ export {
   enqueueActorWake,
   listActorWakes,
   listDueActorWakes,
+  listNegotiationInvitations,
   loadSocietyState,
   type SocietyState,
 } from "./society-state.ts";
@@ -82,6 +90,8 @@ export type {
   ActorWake,
   ActorWakeReason,
   ActorWakeStatus,
+  NegotiationInvitation,
+  NegotiationInvitationStatus,
   SocietyActorTurn,
   SocietyConfig,
   SocietyRunResult,
