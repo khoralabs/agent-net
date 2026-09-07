@@ -1,0 +1,103 @@
+name: Release CLI
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Semver for @khoralabs/agent-net-cli (e.g. 0.1.0). Do not include a leading v."
+        required: true
+        type: string
+      dry_run:
+        description: "Run checks and version bump preview without publishing"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  release-cli:
+    runs-on: ubuntu-latest
+    env:
+      HUSKY: "0"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Resolve version
+        id: ver
+        run: |
+          V="${{ inputs.version }}"
+          V="${V#v}"
+          if ! [[ "$V" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid semver: $V"
+            exit 1
+          fi
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Test CLI
+        run: bun test packages/cli
+
+      - name: Bump CLI package version
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          bun -e '
+            const path = "packages/cli/package.json";
+            const pkg = await Bun.file(path).json();
+            const version = process.env.VERSION;
+            if (!version) throw new Error("VERSION env is required");
+            pkg.version = version;
+            await Bun.write(path, `${JSON.stringify(pkg, null, 2)}\n`);
+            console.log(`${pkg.name} → ${pkg.version}`);
+          '
+
+      - name: Commit version bump
+        if: ${{ !inputs.dry_run }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add packages/cli/package.json
+          if git diff --cached --quiet; then
+            echo "No version changes to commit"
+          else
+            git commit -m "chore(cli): release @khoralabs/agent-net-cli@${{ steps.ver.outputs.version }}"
+            git push origin HEAD:${{ github.ref_name }}
+          fi
+
+      - name: Publish package
+        if: ${{ !inputs.dry_run }}
+        working-directory: packages/cli
+        env:
+          NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN || secrets.NPM_CONFIG_TOKEN }}
+        run: |
+          if [ -z "$NPM_CONFIG_TOKEN" ]; then
+            echo "::error::Set repository secret NPM_TOKEN (or NPM_CONFIG_TOKEN)."
+            exit 1
+          fi
+          bun publish --access public
+
+      - name: Dry-run publish preview
+        if: ${{ inputs.dry_run }}
+        run: bun pm pack --quiet
+        working-directory: packages/cli
+
+      - name: Remind skills publish
+        if: ${{ !inputs.dry_run }}
+        run: |
+          echo "CLI published. To sync skills to khoralabs/skills, run workflow publish-agent-net-cli-skills with version=${{ steps.ver.outputs.version }}."

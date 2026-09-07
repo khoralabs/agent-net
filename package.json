@@ -14,8 +14,8 @@
       "@khoralabs/agent-capabilities-otel": "^0.2.0",
       "@khoralabs/chat": "^0.1.14",
       "@khoralabs/did-key-identity": "^0.2.0",
-      "@khoralabs/khora-client": "0.1.12",
-      "@khoralabs/khora-host": "0.1.12",
+      "@khoralabs/khora-client": "0.1.13",
+      "@khoralabs/khora-host": "0.1.13",
       "@khoralabs/memories-node": "^0.12.0",
       "@khoralabs/memories-service": "^0.12.0",
       "@khoralabs/memories-otel": "^0.12.0",
@@ -52,7 +52,8 @@
     "@libsql/client": "catalog:"
   },
   "scripts": {
-    "typecheck": "bun run --filter '@khoralabs/agent-net' typecheck && bun run --filter '@khoralabs/agent-net-reference' typecheck",
+    "typecheck": "bun run --filter '@khoralabs/agent-net' typecheck && bun run --filter '@khoralabs/agent-net-cli' typecheck && bun run --filter '@khoralabs/agent-net-reference' typecheck",
+    "cli": "bun run --filter @khoralabs/agent-net-cli start",
     "format": "biome check --write .",
     "format:check": "biome check --error-on-warnings .",
     "agent:setup": "bun run --filter @khoralabs/agent-net-reference agent:setup",

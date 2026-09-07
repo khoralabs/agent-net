@@ -1,0 +1,17 @@
+{
+  "dataDir": "~/.agent-net",
+  "khora": {
+    "baseUrl": "http://127.0.0.1:8788"
+  },
+  "relay": {
+    "baseUrl": "http://127.0.0.1:8790"
+  },
+  "memories": {
+    "baseUrl": "http://127.0.0.1:8791",
+    "adminToken": ""
+  },
+  "chat": {
+    "baseUrl": "http://127.0.0.1:8792",
+    "token": ""
+  }
+}
