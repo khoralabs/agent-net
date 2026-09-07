@@ -14,18 +14,19 @@ import {
 } from "@khoralabs/agent-net";
 import type { EconomyConfig } from "@khoralabs/agent-net/economy";
 import {
-  provideEconomyHarnessForSession,
-  provideEconomyOntologyForSession,
+  deferredEncounterRunner,
+  runEconomyUntilDone,
+  setupEconomy,
+  teardownEconomy,
 } from "@khoralabs/agent-net/economy";
 import { installMemoriesOntology } from "@khoralabs/agent-net/memories";
 import { createSqliteNetworkEventPersistencePlugin } from "@khoralabs/agent-net/network-events/sqlite";
-import { start } from "workflow/api";
 
+import { getEconomyScenario } from "./economy/scenario-registry.ts";
 import { registerSmokeEconomyScenario } from "./economy/smoke-scenario.ts";
 import { referenceMemoriesOntology } from "./memories/ontology.ts";
 import { installReferenceObservability } from "./observability/install.ts";
-import { economyOrchestrator } from "./workflows/economy.ts";
-import { configureLocalWorldEnv, startLocalWorldWorker } from "./world/local.ts";
+import { requireKhoraReachable, requireReferenceStackReachable } from "./services/stack-health.ts";
 import { resolveHarnessDataDir } from "./world/paths.ts";
 
 function parseArgs(argv: string[]): {
@@ -83,13 +84,16 @@ function parseArgs(argv: string[]): {
   };
 }
 
-/** Reference economy CLI: composition root for harness + scenario + Workflow. */
+/**
+ * Reference economy CLI.
+ * Runs setup → rounds → teardown via directive-free harness helpers.
+ * Durable Workflow wrappers remain in `workflows/economy.ts` for hosts that
+ * wire the Workflow SDK client transform; this CLI does not require that yet.
+ */
 async function main(): Promise<void> {
   registerSmokeEconomyScenario();
   const parsed = parseArgs(process.argv.slice(2));
   const { config, scenarioId } = parsed;
-  configureLocalWorldEnv({ dataDir: config.dataDir });
-  await startLocalWorldWorker({ dataDir: config.dataDir });
 
   const networkEvents = createSqliteNetworkEventPersistencePlugin({ dataDir: config.dataDir });
   bindNetworkSessionContext({ sessionId: config.sessionId });
@@ -102,21 +106,34 @@ async function main(): Promise<void> {
     source: "economy",
   });
 
+  const memoriesBaseUrl = requireMemoriesBaseUrl(parsed.memoriesBaseUrl);
+  const relayBaseUrl = requireRelayBaseUrl(parsed.relayBaseUrl);
+  const chatBaseUrl = requireChatBaseUrl(parsed.chatBaseUrl);
+  const chatToken = requireChatToken(parsed.chatToken);
+  const khoraBaseUrl = requireKhoraBaseUrl(parsed.khoraBaseUrl);
+
+  await requireKhoraReachable(khoraBaseUrl);
+  await requireReferenceStackReachable({
+    memoriesBaseUrl,
+    relayBaseUrl,
+    chatBaseUrl,
+  });
+
   const harness = await startNetworkHarness({
     dataDir: config.dataDir,
-    chatBaseUrl: requireChatBaseUrl(parsed.chatBaseUrl),
-    chatToken: requireChatToken(parsed.chatToken),
+    chatBaseUrl,
+    chatToken,
     networkEvents,
-    khoraBaseUrl: requireKhoraBaseUrl(parsed.khoraBaseUrl),
-    relayBaseUrl: requireRelayBaseUrl(parsed.relayBaseUrl),
-    memoriesBaseUrl: requireMemoriesBaseUrl(parsed.memoriesBaseUrl),
+    khoraBaseUrl,
+    relayBaseUrl,
+    memoriesBaseUrl,
     memoriesAdminToken: requireMemoriesAdminToken(undefined),
   });
   installMemoriesOntology(referenceMemoriesOntology);
-  provideEconomyHarnessForSession(config.sessionId, harness);
-  provideEconomyOntologyForSession(config.sessionId, referenceMemoriesOntology);
 
+  let toreDown = false;
   try {
+    const scenario = getEconomyScenario(scenarioId);
     logger.info(
       {
         sessionId: config.sessionId,
@@ -126,11 +143,29 @@ async function main(): Promise<void> {
       },
       "economy.starting",
     );
-    const run = await start(economyOrchestrator, [config, scenarioId]);
-    const result = await run.returnValue;
-    logger.info({ result }, "economy.completed");
+
+    const { sessionId } = await setupEconomy({
+      harness,
+      config,
+      ontology: referenceMemoriesOntology,
+      scenario,
+    });
+    try {
+      const result = await runEconomyUntilDone({
+        sessionId,
+        encounterRunner: deferredEncounterRunner,
+      });
+      logger.info({ result }, "economy.completed");
+    } finally {
+      // Clear bound session before teardown's harness.stop() so it does not
+      // fire-and-forget harness.stopped against a DB it immediately closes.
+      clearNetworkSessionContext();
+      await teardownEconomy(sessionId);
+      toreDown = true;
+    }
   } finally {
     clearNetworkSessionContext();
+    if (!toreDown) harness.stop();
   }
 }
 

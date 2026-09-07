@@ -13,18 +13,23 @@ This entrypoint does **not** export Workflow orchestrators. Hosts own durable di
 
 ```ts
 import {
-  provideEconomyHarnessForSession,
-  provideEconomyOntologyForSession,
+  deferredEncounterRunner,
+  runEconomyUntilDone,
+  setupEconomy,
+  teardownEconomy,
   type EconomyConfig,
   type EconomyScenario,
-} from "@khoralabs/agent-net/economy";
-import { start } from "workflow/api";
-import { economyOrchestrator } from "./workflows/economy.ts";
+} from "@khoralabs/agent-net/economy-run";
 
-provideEconomyHarnessForSession(sessionId, harness);
-provideEconomyOntologyForSession(sessionId, ontology);
-await start(economyOrchestrator, [config, "smoke-lifecycle"]);
+const { sessionId } = await setupEconomy({ harness, config, ontology, scenario });
+try {
+  await runEconomyUntilDone({ sessionId, encounterRunner: deferredEncounterRunner });
+} finally {
+  await teardownEconomy(sessionId);
+}
 ```
+
+Hosts that wire the Workflow SDK Bun client transform can instead `start(economyOrchestrator, …)` from `apps/reference/src/workflows/economy.ts`.
 
 ## Contracts
 
@@ -50,12 +55,13 @@ After each encounter, `indexEconomyExperience` writes immutable per-agent summar
 
 ## CLI (reference)
 
+Economy does not start Khora/memories/relay/chat. Start the reference stack in one terminal, then run economy in another (same pattern as marketplace/swarm):
+
 ```bash
 cd apps/reference
+bun run start          # khora :8788 + memories/relay/chat
+# other terminal:
 bun run economy -- \
-  --khora-url http://127.0.0.1:8788 \
-  --relay-url http://127.0.0.1:8790 \
-  --memories-url http://127.0.0.1:8791 \
   --actors 2 \
   --scenario smoke-lifecycle
 ```
