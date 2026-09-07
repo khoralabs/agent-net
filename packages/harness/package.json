@@ -66,6 +66,18 @@
       "import": "./dist/swarm/run.js",
       "default": "./dist/swarm/run.js"
     },
+    "./economy": {
+      "types": "./src/economy/index.ts",
+      "bun": "./src/economy/index.ts",
+      "import": "./dist/economy/index.js",
+      "default": "./dist/economy/index.js"
+    },
+    "./economy-run": {
+      "types": "./src/economy/run.ts",
+      "bun": "./src/economy/run.ts",
+      "import": "./dist/economy/run.js",
+      "default": "./dist/economy/run.js"
+    },
     "./ai-sdk": {
       "types": "./src/ai-sdk/index.ts",
       "bun": "./src/ai-sdk/index.ts",

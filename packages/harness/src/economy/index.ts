@@ -1,0 +1,31 @@
+export {
+  checkTokenBudgetRemaining,
+  createEconomyState,
+  findPriorPairEncounter,
+  incrementTokensUsed,
+  insertEconomyEncounter,
+  listEconomyEncounters,
+  loadEconomyEncounter,
+  loadEconomyRound,
+  loadEconomyState,
+  loadEconomyStateBySessionId,
+  resetEconomyStateClientForTests,
+  updateEconomyEncounter,
+  updateEconomySessionStatus,
+  upsertEconomyRound,
+} from "./economy-state.ts";
+export type {
+  EconomyActor,
+  EconomyConfig,
+  EconomyEncounter,
+  EconomyEncounterStatus,
+  EconomyPersistedState,
+  EconomyResult,
+  EconomyRound,
+  EconomyRoundStatus,
+  EconomyScenario,
+  EconomyScenarioContext,
+  EconomyScheduledEncounter,
+  EconomySessionStatus,
+} from "./types.ts";
+export { validateEconomyConfig } from "./validate.ts";
