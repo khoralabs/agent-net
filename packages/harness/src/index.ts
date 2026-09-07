@@ -55,7 +55,11 @@ export {
   resolveMemoriesStepContextFacets,
 } from "./agent/turn/step-context-sources.ts";
 export { HARNESS_TOOLKIT, type HarnessToolkitId } from "./agent/turn/tools/ids.ts";
-export type { HarnessMemorySearchExtensions, NbcToolkitContext } from "./agent/turn/tools/types.ts";
+export type {
+  HarnessMemorySearchExtensions,
+  NbcToolkitContext,
+  SocietyToolkitContext,
+} from "./agent/turn/tools/types.ts";
 export type {
   AgentStepContext,
   AgentStepNamespaceEntry,

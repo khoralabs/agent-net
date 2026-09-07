@@ -31,6 +31,7 @@ export async function createHarnessToolkitEnv(input: {
   integrateMemories?: HarnessToolkitEnv["integrateMemories"];
   memoriesContext?: HarnessToolkitEnv["memoriesContext"];
   nbc?: HarnessToolkitEnv["nbc"];
+  society?: HarnessToolkitEnv["society"];
 }): Promise<HarnessToolkitEnv> {
   const agentDid = input.agentDid?.trim() || input.agentChat?.did;
   const recentNamespaces = await resolveRecentNamespacesTracker({
@@ -45,6 +46,7 @@ export async function createHarnessToolkitEnv(input: {
     ...(input.khoraClient !== undefined ? { khoraClient: input.khoraClient } : {}),
     ...(input.agentChat !== undefined ? { agentChat: input.agentChat } : {}),
     ...(input.nbc !== undefined ? { nbc: input.nbc } : {}),
+    ...(input.society !== undefined ? { society: input.society } : {}),
   };
 
   const env: HarnessToolkitEnv = {
@@ -66,6 +68,7 @@ export async function createHarnessToolkitEnv(input: {
     ...(integrateMemories !== undefined ? { integrateMemories } : {}),
     ...(input.memoriesContext !== undefined ? { memoriesContext: input.memoriesContext } : {}),
     ...(input.nbc !== undefined ? { nbc: input.nbc } : {}),
+    ...(input.society !== undefined ? { society: input.society } : {}),
   };
 
   if (input.memoriesClient === undefined) return env;

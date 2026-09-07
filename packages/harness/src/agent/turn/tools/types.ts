@@ -20,6 +20,14 @@ export type NbcToolkitContext = {
   leave: (reason?: string) => Promise<void>;
 };
 
+export type SocietyToolkitContext = {
+  requestWake(input: { delayMs?: number; payload?: unknown }): Promise<unknown>;
+  inviteNegotiation(input: { peerDid: string; message?: string }): Promise<unknown>;
+  listInvitations(): Promise<unknown>;
+  respondInvitation(input: { invitationId: string; accept: boolean }): Promise<unknown>;
+  cancelInvitation(input: { invitationId: string }): Promise<unknown>;
+};
+
 /**
  * Host bag for co-located domain toolkits on the shared memory-search session env
  * (`MemorySearchEnv.memorySearchExtensions`).
@@ -28,6 +36,7 @@ export type HarnessMemorySearchExtensions = {
   khoraClient?: KhoraClient;
   agentChat?: AgentChatClient;
   nbc?: NbcToolkitContext;
+  society?: SocietyToolkitContext;
 };
 
 /** Optional `MemorySearchEnv` fields filled by `toMemorySearchEnv` when a DB is present. */
@@ -72,6 +81,8 @@ export type HarnessToolkitEnv = MemorySearchEnvSlice & {
   disabledTools: ReadonlySet<string>;
   /** NBC negotiation replica + submit hooks (negotiation agent only). */
   nbc?: NbcToolkitContext;
+  /** Actor-scoped society scheduler and negotiation invitation callbacks. */
+  society?: SocietyToolkitContext;
 };
 
 export function emptyDisabledToolSets(): {

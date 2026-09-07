@@ -35,6 +35,7 @@ export type PrepareHarnessStepInput = {
     disableToolkits?: readonly string[];
     disableTools?: readonly string[];
     nbc?: HarnessToolkitEnv["nbc"];
+    society?: HarnessToolkitEnv["society"];
     /** Capture harness tools for chat / tool-loop modes. */
     captureTools?: boolean;
     /** Full workflow params required when captureTools is true. */
@@ -86,6 +87,7 @@ export async function prepareHarnessStepRuntime(
     disableTools: runtime.disableTools,
     ...(stepContext?.database !== undefined ? { memoriesContext: stepContext.database } : {}),
     ...(runtime.nbc !== undefined ? { nbc: runtime.nbc } : {}),
+    ...(runtime.society !== undefined ? { society: runtime.society } : {}),
   });
 
   if (runtime.captureTools !== true || runtime.workflowParams === undefined) {

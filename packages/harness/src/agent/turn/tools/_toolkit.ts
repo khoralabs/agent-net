@@ -4,9 +4,10 @@ import { skillsToolkit } from "../../memories/skills/_toolkit.ts";
 import { memoriesToolkit } from "../../memories/tools/_toolkit.ts";
 import { chatToolkit } from "../../social/message/tools/_toolkit.ts";
 import { khoraToolkit } from "../../social/tools/_toolkit.ts";
+import { societyToolkit } from "./society.ts";
 
 export const harnessToolkit = toolkit(
-  [memorySearchToolkit, memoriesToolkit, skillsToolkit, khoraToolkit, chatToolkit],
+  [memorySearchToolkit, memoriesToolkit, skillsToolkit, khoraToolkit, chatToolkit, societyToolkit],
   {
     name: "network-harness",
   },

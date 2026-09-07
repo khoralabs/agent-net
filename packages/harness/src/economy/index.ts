@@ -1,3 +1,7 @@
+export {
+  createSocietyActorTools,
+  type SocietyInvitationActions,
+} from "./actor-tools.ts";
 export { ensureEconomyAgentRegistered } from "./agent-registry.ts";
 export {
   checkTokenBudgetRemaining,

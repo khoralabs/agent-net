@@ -5,6 +5,7 @@ export const HARNESS_TOOLKIT = {
   khora: "khora-network",
   chat: "harness-chat",
   nbc: "nbc-protocol",
+  society: "society-runtime",
 } as const;
 
 export type HarnessToolkitId = (typeof HARNESS_TOOLKIT)[keyof typeof HARNESS_TOOLKIT];

@@ -1,4 +1,8 @@
 export {
+  createSocietyActorTools,
+  type SocietyInvitationActions,
+} from "./actor-tools.ts";
+export {
   createEconomyNbcEncounterRunner,
   createEconomyNegotiateRuntime,
   type EconomyNegotiateRuntime,

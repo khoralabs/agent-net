@@ -217,6 +217,7 @@ export async function runAgentWorkflow(
       agentChat: deps.agentChat,
       disableToolkits: params.tools?.disableToolkits,
       disableTools: params.tools?.disableTools,
+      society: deps.society,
       captureTools: true,
       workflowParams: params,
     },
