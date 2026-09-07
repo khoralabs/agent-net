@@ -16,6 +16,14 @@ export {
   upsertEconomyRound,
 } from "./economy-state.ts";
 export {
+  attachEconomyNegotiateRuntime,
+  type CreateEconomyNegotiateRuntimeInput,
+  createEconomyNbcEncounterRunner,
+  createEconomyNegotiateRuntime,
+  type EconomyChainRecord,
+  type EconomyNegotiateRuntime,
+} from "./encounter-registry.ts";
+export {
   clearPendingEconomyHarnessForTests,
   provideEconomyHarnessForSession,
   takeEconomyHarnessForSession,

@@ -143,6 +143,7 @@ export async function teardownEconomy(sessionId: string): Promise<void> {
   if (session === undefined) return;
 
   session.harness.unbindNetworkSession(sessionId);
+  session.negotiate?.stop();
 
   await updateEconomySessionStatus(session.config.dataDir, session.economyStateId, "teardown");
 

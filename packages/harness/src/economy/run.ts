@@ -1,3 +1,8 @@
+export {
+  createEconomyNbcEncounterRunner,
+  createEconomyNegotiateRuntime,
+  type EconomyNegotiateRuntime,
+} from "./encounter-registry.ts";
 /**
  * Directive-free economy runtime helpers.
  * Hosts wrap durable Workflow steps; see `@khoralabs/agent-net/economy` for config/session APIs.

@@ -1,6 +1,7 @@
 import type { AgentChatClient, ChatServiceClient } from "../agent/social/message/chat.ts";
 import type { AgentHandle, HarnessAgentWorkflowDeps, NetworkHarnessHandle } from "../index.ts";
 
+import type { EconomyNegotiateRuntime } from "./encounter-registry.ts";
 import type { EconomyActor, EconomyConfig, EconomyScenario } from "./types.ts";
 
 export type EconomyRuntimeSession = {
@@ -14,6 +15,7 @@ export type EconomyRuntimeSession = {
   scenarioState: unknown;
   economyStateId: string;
   inboxUnsubscribes: Array<() => void>;
+  negotiate?: EconomyNegotiateRuntime;
 };
 
 const sessions = new Map<string, EconomyRuntimeSession>();
