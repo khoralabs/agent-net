@@ -63,6 +63,15 @@ export {
 } from "./session-store.ts";
 export { setupEconomy, teardownEconomy } from "./setup.ts";
 export type {
+  ActorWake,
+  ActorWakeReason,
+  ActorWakeStatus,
+  SocietyActorTurn,
+  SocietyConfig,
+  SocietyRunResult,
+  SocietyScenario,
+} from "./society-types.ts";
+export type {
   EconomyActor,
   EconomyConfig,
   EconomyEncounter,
