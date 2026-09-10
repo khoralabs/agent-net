@@ -4,9 +4,9 @@ Published import surfaces for `@khoralabs/agent-net`.
 
 | Import | Role |
 |--------|------|
-| `@khoralabs/agent-net` | Core control plane: `startNetworkHarness`, agents/pool/network events, turn helpers (no AI SDK / Workflow directives; no negotiate/chat/memories peels) |
+| `@khoralabs/agent-net` | Core control plane: `startNetworkHarness`, agents/pool/network events, turn helpers (no AI SDK / Workflow directives; no negotiate/chat/memories peels). Optional `harness.publicPostFeed` when a Khora admin token is configured. |
 | `@khoralabs/agent-net/agent` | Slim agent surface (`AgentHandle`, `AgentSocial`, …) |
-| `@khoralabs/agent-net/pool` | Pool / inbox / network / observability (`ManagedAgentPool.queryAgents`, `PoolAgentRegistry.query`, …) |
+| `@khoralabs/agent-net/pool` | Pool / inbox / network / observability (`ManagedAgentPool.queryAgents`, `PoolAgentRegistry.query`, `createKhoraPublicPostFeed`, …) |
 | `@khoralabs/agent-net/negotiate` | NBC / Vellum negotiate (`AgentSocialNegotiate`, sessions, loop, routes, prompts) |
 | `@khoralabs/agent-net/chat` | Signed chat backends and agent chat service helpers |
 | `@khoralabs/agent-net/memories` | Ontology install, deferred client, write-scope helpers |
