@@ -145,6 +145,7 @@ describe("createBoundAgentMemoriesClient", () => {
       ontology: { nodeLabels: { memory: {} }, edgeLabels: {} } as never,
       serviceClient: {} as never,
       client: {} as never,
+      readModel: { database: { kind: "account", ownerKey: "did:key:x" } } as never,
     });
     await expect(
       memories.integrate({
@@ -158,5 +159,19 @@ describe("createBoundAgentMemoriesClient", () => {
         instructions: "  ",
       }),
     ).rejects.toThrow(/lexical or instructions/);
+  });
+
+  test("exposes the same readModel instance passed in", () => {
+    const readModel = {
+      database: { kind: "account", ownerKey: "did:key:x" },
+    } as never;
+    const memories = createBoundAgentMemoriesClient({
+      database: { kind: "account", ownerKey: "did:key:x" },
+      ontology: { nodeLabels: { memory: {} }, edgeLabels: {} } as never,
+      serviceClient: {} as never,
+      client: {} as never,
+      readModel,
+    });
+    expect(memories.readModel).toBe(readModel);
   });
 });
