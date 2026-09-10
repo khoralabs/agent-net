@@ -172,3 +172,21 @@ export function createKhoraPublicPostFeed(
     },
   };
 }
+
+/**
+ * Build a harness feed facade when an admin token is available; otherwise omit it.
+ * Keeps the raw token out of the returned handle surface.
+ */
+export function resolveHarnessPublicPostFeed(opts: {
+  baseUrl: string;
+  adminToken?: string;
+  fetchFn?: CreateKhoraPublicPostFeedOptions["fetchFn"];
+}): KhoraPublicPostFeed | undefined {
+  const adminToken = opts.adminToken?.trim();
+  if (adminToken === undefined || adminToken.length === 0) return undefined;
+  return createKhoraPublicPostFeed({
+    baseUrl: opts.baseUrl,
+    adminToken,
+    ...(opts.fetchFn !== undefined ? { fetchFn: opts.fetchFn } : {}),
+  });
+}

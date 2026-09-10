@@ -1,6 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import { KHORA_HTTP_PATH } from "@khoralabs/khora-client";
-import { createKhoraPublicPostFeed, KhoraPublicPostFeedError } from "./khora-public-post-feed.ts";
+import {
+  createKhoraPublicPostFeed,
+  KhoraPublicPostFeedError,
+  resolveHarnessPublicPostFeed,
+} from "./khora-public-post-feed.ts";
 
 describe("createKhoraPublicPostFeed", () => {
   test("list encodes filters and Bearer auth", async () => {
@@ -109,5 +113,42 @@ describe("createKhoraPublicPostFeed", () => {
       name: "KhoraPublicPostFeedError",
       message: expect.stringContaining("unreachable"),
     });
+  });
+});
+
+describe("resolveHarnessPublicPostFeed", () => {
+  test("omits facade without admin token", () => {
+    expect(
+      resolveHarnessPublicPostFeed({
+        baseUrl: "http://khora.test",
+      }),
+    ).toBeUndefined();
+    expect(
+      resolveHarnessPublicPostFeed({
+        baseUrl: "http://khora.test",
+        adminToken: "   ",
+      }),
+    ).toBeUndefined();
+  });
+
+  test("returns working facade when token is set", async () => {
+    let seenAuth = "";
+    const feed = resolveHarnessPublicPostFeed({
+      baseUrl: "http://khora.test",
+      adminToken: "root-secret",
+      fetchFn: async (_input, init) => {
+        seenAuth = new Headers(init?.headers).get("Authorization") ?? "";
+        return Response.json({
+          items: [],
+          nextCursor: null,
+          hasMore: false,
+          watermarkMs: 1,
+        });
+      },
+    });
+    expect(feed).toBeDefined();
+    const page = await feed?.list({ limit: 1 });
+    expect(seenAuth).toBe("Bearer root-secret");
+    expect(page?.items).toEqual([]);
   });
 });

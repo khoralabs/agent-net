@@ -147,6 +147,7 @@ export {
   KhoraPublicPostFeedError,
   type KhoraPublicPostFeedListParams,
   type KhoraPublicPostFeedNewerCountParams,
+  resolveHarnessPublicPostFeed,
 } from "./pool/khora-public-post-feed.ts";
 export {
   emitNetworkEvent,

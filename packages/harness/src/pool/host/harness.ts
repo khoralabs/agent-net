@@ -41,6 +41,10 @@ import { loadHarnessIdentity, resolveIdentitySecretFromEnv } from "../identity-w
 import { HarnessPoolInbox, type PoolInboxEvent } from "../inbox/pool-inbox.ts";
 import { mintKhoraInviteTokens, resolveKhoraAdminTokenFromEnv } from "../khora-admin-invites.ts";
 import {
+  type KhoraPublicPostFeed,
+  resolveHarnessPublicPostFeed,
+} from "../khora-public-post-feed.ts";
+import {
   emitNetworkEvent,
   installNetworkEventsPlugin,
   type NetworkEventsPlugin,
@@ -116,6 +120,11 @@ export type NetworkHarnessCore = {
   readonly poolInbox: HarnessPoolInbox;
   readonly chat: HarnessChat;
   readonly signedChat: SignedChatBackend;
+  /**
+   * Admin-authenticated public post feed client when a Khora admin token is configured.
+   * Absent when the harness starts without admin credentials.
+   */
+  readonly publicPostFeed?: KhoraPublicPostFeed;
   /** DID of an optional host-supplied operator (human ↔ agent chat). */
   readonly uiUserDid: string | undefined;
   /** Decrypt and list registration-issued invites available for custodial viral growth. */
@@ -502,6 +511,11 @@ export async function startNetworkHarness(
     await poolInbox.add(handle.signer);
   }
 
+  const publicPostFeed = resolveHarnessPublicPostFeed({
+    baseUrl: khoraBaseUrl,
+    ...(khoraAdminToken !== undefined ? { adminToken: khoraAdminToken } : {}),
+  });
+
   const core: NetworkHarnessCore = {
     serverBaseUrl: khoraBaseUrl,
     relayBaseUrl,
@@ -518,6 +532,7 @@ export async function startNetworkHarness(
     poolInbox,
     chat,
     signedChat,
+    ...(publicPostFeed !== undefined ? { publicPostFeed } : {}),
     uiUserDid: operatorSigner?.did,
     async listInvitesForAgent(did: string) {
       const signer = await loadSigner(did);
