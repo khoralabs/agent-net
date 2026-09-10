@@ -37,6 +37,10 @@ export class AgentSocialMessage {
     return this.#chat.getThread(threadId);
   }
 
+  subscribeToThread(...args: Parameters<AgentChatClient["subscribeToThread"]>) {
+    return this.#chat.subscribeToThread(...args);
+  }
+
   grantAccess(...args: Parameters<AgentChatClient["grantAccess"]>) {
     return this.#chat.grantAccess(...args);
   }

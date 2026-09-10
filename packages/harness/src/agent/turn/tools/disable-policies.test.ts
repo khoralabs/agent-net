@@ -34,6 +34,7 @@ function mockChat(): AgentChatClient {
     listThreads: async () => ({ items: [], nextCursor: null }),
     getThread: async (threadId) => ({ id: threadId }) as never,
     listParticipants: async () => [],
+    subscribeToThread: async () => () => {},
   };
 }
 

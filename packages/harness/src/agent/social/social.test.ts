@@ -15,6 +15,7 @@ function fakeChat(did: string): AgentChatClient {
     listThreads: mock(async () => ({ threads: [], cursor: undefined }) as never),
     getThread: mock(async () => ({ id: "t1" }) as never),
     listParticipants: mock(async () => []),
+    subscribeToThread: mock(async () => () => {}),
   };
 }
 

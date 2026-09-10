@@ -1,5 +1,6 @@
 import type {
   AppendPostInput,
+  ChatEvent,
   ChatSigner,
   JsonObject,
   Post,
@@ -63,6 +64,7 @@ export type AgentChatClient = {
   listThreads(input?: { limit?: number; cursor?: string }): Promise<ThreadPage>;
   getThread(threadId: string): Promise<Thread>;
   listParticipants(threadId: string): Promise<ScopeRef[]>;
+  subscribeToThread(threadId: string, handler: (event: ChatEvent) => void): Promise<() => void>;
 };
 
 export type CreateHarnessChatBackendOptions = {
@@ -302,6 +304,12 @@ function createScopedChatClient(
     },
     listParticipants(threadId) {
       return whenReady(() => client.listThreadParticipants(threadId));
+    },
+    subscribeToThread(threadId, handler) {
+      return whenReady(async () => {
+        await requireParticipant(threadId);
+        return client.subscribeToThread(threadId, handler);
+      });
     },
   };
 }
