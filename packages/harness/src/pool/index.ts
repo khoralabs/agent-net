@@ -26,6 +26,14 @@ export {
   type WaitForPostInput,
 } from "./inbox/reactor.ts";
 export {
+  type CreateKhoraPublicPostFeedOptions,
+  createKhoraPublicPostFeed,
+  type KhoraPublicPostFeed,
+  KhoraPublicPostFeedError,
+  type KhoraPublicPostFeedListParams,
+  type KhoraPublicPostFeedNewerCountParams,
+} from "./khora-public-post-feed.ts";
+export {
   emitNetworkEvent,
   getInstalledNetworkEventsPlugin,
   getNetworkSession,

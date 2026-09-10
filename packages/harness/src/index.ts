@@ -141,6 +141,14 @@ export {
   resolveKhoraAdminTokenFromEnv,
 } from "./pool/khora-admin-invites.ts";
 export {
+  type CreateKhoraPublicPostFeedOptions,
+  createKhoraPublicPostFeed,
+  type KhoraPublicPostFeed,
+  KhoraPublicPostFeedError,
+  type KhoraPublicPostFeedListParams,
+  type KhoraPublicPostFeedNewerCountParams,
+} from "./pool/khora-public-post-feed.ts";
+export {
   emitNetworkEvent,
   installNetworkEventsPlugin,
   type ListNetworkEventsOptions,
