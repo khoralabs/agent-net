@@ -19,6 +19,14 @@ export {
   writeScopeNeighborSearchOptions,
 } from "./integrate/write-scope.ts";
 export {
+  type CreateMemoriesReadModelOptions,
+  createMemoriesReadModel,
+  type MemoriesGraphSearchInput,
+  type MemoriesGraphSearchResult,
+  type MemoriesReadModel,
+  MemoriesReadModelError,
+} from "./read-model.ts";
+export {
   getInstalledMemoriesOntology,
   installMemoriesOntology,
 } from "./tools/_helpers/memories-ontology-install.ts";
