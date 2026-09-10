@@ -3,6 +3,7 @@ import path from "node:path";
 /** Relative paths under `KHORA_DATA_DIR` (default layout). */
 export const KHORA_PERSISTENCE_REL = {
   hostDb: "khora-host.sqlite",
+  catalogDb: "khora-catalog.sqlite",
   authNoncesDb: "khora-auth-nonces.sqlite",
   percolatorDb: "khora-percolator.sqlite",
   cellsDir: "cells",
@@ -13,6 +14,7 @@ export const KHORA_PERSISTENCE_REL = {
 export type KhoraPersistencePaths = {
   dataDir: string;
   hostDbPath: string;
+  catalogDbPath: string;
   authNoncesDbPath: string;
   percolatorDbPath: string;
   cellsDir: string;
@@ -41,8 +43,8 @@ function joinUnderDataDir(
 /**
  * Resolve host persistence paths from env.
  * Primary: `KHORA_DATA_DIR` (required for the reference embed — set by orchestrator).
- * Per-component overrides: `KHORA_HOST_DB_PATH`, `KHORA_AUTH_NONCES_DB_PATH`,
- * `KHORA_PERCOLATOR_DB_PATH`, `KHORA_CELLS_DIR`.
+ * Per-component overrides: `KHORA_HOST_DB_PATH`, `KHORA_CATALOG_DB_PATH`,
+ * `KHORA_AUTH_NONCES_DB_PATH`, `KHORA_PERCOLATOR_DB_PATH`, `KHORA_CELLS_DIR`.
  */
 export function resolveKhoraPersistencePaths(
   env: NodeJS.ProcessEnv = process.env,
@@ -53,6 +55,7 @@ export function resolveKhoraPersistencePaths(
     throw new Error("KHORA_DATA_DIR is required to start the embedded Khora host");
   }
   const hostDbOverride = trimEnv(env, "KHORA_HOST_DB_PATH");
+  const catalogDbOverride = trimEnv(env, "KHORA_CATALOG_DB_PATH");
   const authNoncesOverride = trimEnv(env, "KHORA_AUTH_NONCES_DB_PATH");
   const percolatorOverride = trimEnv(env, "KHORA_PERCOLATOR_DB_PATH");
   const cellsOverride = trimEnv(env, "KHORA_CELLS_DIR");
@@ -61,6 +64,12 @@ export function resolveKhoraPersistencePaths(
   return {
     dataDir,
     hostDbPath: joinUnderDataDir(dataDir, cwd, hostDbOverride, KHORA_PERSISTENCE_REL.hostDb),
+    catalogDbPath: joinUnderDataDir(
+      dataDir,
+      cwd,
+      catalogDbOverride,
+      KHORA_PERSISTENCE_REL.catalogDb,
+    ),
     authNoncesDbPath: joinUnderDataDir(
       dataDir,
       cwd,

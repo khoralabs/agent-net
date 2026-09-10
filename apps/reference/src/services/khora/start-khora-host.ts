@@ -52,11 +52,13 @@ export async function startKhoraHost(
 
   process.env.KHORA_DATA_DIR = opts.dataDir;
   const persistencePaths = resolveKhoraPersistencePaths(process.env);
-  const { hostDbPath, authNoncesDbPath, percolatorDbPath, cellsDir, dataDir } = persistencePaths;
+  const { hostDbPath, catalogDbPath, authNoncesDbPath, percolatorDbPath, cellsDir, dataDir } =
+    persistencePaths;
   const memoriesConfig = envMemoriesBootstrapConfig(persistencePaths);
 
   mkdirSync(dataDir, { recursive: true });
   mkdirSync(path.dirname(hostDbPath), { recursive: true });
+  mkdirSync(path.dirname(catalogDbPath), { recursive: true });
   mkdirSync(path.dirname(authNoncesDbPath), { recursive: true });
   mkdirSync(path.dirname(percolatorDbPath), { recursive: true });
   mkdirSync(cellsDir, { recursive: true });
@@ -68,6 +70,7 @@ export async function startKhoraHost(
   const tenantKey = envTenantKey();
   const { ctx } = await bootstrapKhoraHost({
     hostDbPath,
+    catalogDbPath,
     authNoncesDbPath,
     percolatorDbPath,
     cellsDir,

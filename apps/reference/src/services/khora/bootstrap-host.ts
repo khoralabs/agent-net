@@ -28,6 +28,7 @@ import {
 
 export type BootstrapKhoraHostOpts = {
   hostDbPath: string;
+  catalogDbPath: string;
   authNoncesDbPath: string;
   percolatorDbPath: string;
   cellsDir: string;
@@ -55,6 +56,7 @@ export async function bootstrapKhoraHost(
 
   const foundation = await createSqliteKhoraHostFoundation({
     hostDbPath: opts.hostDbPath,
+    catalogDbPath: opts.catalogDbPath,
     authNoncesDbPath: opts.authNoncesDbPath,
     percolatorDbPath: opts.percolatorDbPath,
     cellsDir: opts.cellsDir,

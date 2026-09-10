@@ -14,6 +14,7 @@ describe("khora persistence paths", () => {
     const paths = resolveKhoraPersistencePaths({ KHORA_DATA_DIR: "/tmp/ref-khora" }, "/tmp");
     expect(paths.dataDir).toBe("/tmp/ref-khora");
     expect(paths.hostDbPath).toBe("/tmp/ref-khora/khora-host.sqlite");
+    expect(paths.catalogDbPath).toBe("/tmp/ref-khora/khora-catalog.sqlite");
     expect(paths.memoriesDataDir).toBe("/tmp/ref-khora/memories");
   });
 
@@ -22,11 +23,13 @@ describe("khora persistence paths", () => {
       {
         KHORA_DATA_DIR: "/tmp/ref-khora",
         KHORA_HOST_DB_PATH: "/tmp/custom-host.sqlite",
+        KHORA_CATALOG_DB_PATH: "/tmp/custom-catalog.sqlite",
         KHORA_CELLS_DIR: "/tmp/custom-cells",
       },
       "/tmp",
     );
     expect(paths.hostDbPath).toBe("/tmp/custom-host.sqlite");
+    expect(paths.catalogDbPath).toBe("/tmp/custom-catalog.sqlite");
     expect(paths.cellsDir).toBe("/tmp/custom-cells");
   });
 });
