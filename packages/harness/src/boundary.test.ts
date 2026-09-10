@@ -16,7 +16,15 @@ describe("root export graph peel", () => {
     expect(indexText.includes("memories/integrate")).toBe(false);
     expect(indexText.includes("memories-ontology-install")).toBe(false);
     expect(indexText.includes("memories-types")).toBe(false);
+    expect(indexText.includes("agent/memories/read-model")).toBe(false);
     expect(indexText.includes("ai-sdk")).toBe(false);
     expect(indexText.includes("swarm/")).toBe(false);
+  });
+
+  test("memories peel exports createMemoriesReadModel", () => {
+    const peel = path.join(srcRoot, "agent/memories/index.ts");
+    const text = readFileSync(peel, "utf8");
+    expect(text.includes("createMemoriesReadModel")).toBe(true);
+    expect(text.includes('./read-model.ts"')).toBe(true);
   });
 });

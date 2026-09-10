@@ -101,6 +101,10 @@ export {
   type SpawnWithMemoriesOptions,
   startNetworkHarness,
 } from "./pool/host/harness.ts";
+export type {
+  HarnessMemoriesAccess,
+  HarnessMemoriesReadOptions,
+} from "./pool/host/harness-memories.ts";
 export {
   type AgentMemoriesFraming,
   type AgentRecord,
