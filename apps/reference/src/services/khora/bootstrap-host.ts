@@ -1,9 +1,6 @@
-import type { Database } from "bun:sqlite";
 import {
   bootstrapHostSearch,
   createKhoraHost,
-  enqueuePendingEmbedding,
-  ensurePendingEmbeddingsTable,
   type KhoraHostContext,
   parseInviteSeedTokens,
   readInvitePepper,
@@ -25,6 +22,7 @@ import {
   assertKhoraMemoriesDbPathUnset,
   type KhoraMemoriesBootstrapConfig,
 } from "./memories-env.ts";
+import { migrateLegacyPendingEmbeddingsFromMemoriesDb } from "./migrate-legacy-pending-embeddings.ts";
 
 export type BootstrapKhoraHostOpts = {
   hostDbPath: string;
@@ -89,8 +87,6 @@ export async function bootstrapKhoraHost(
     invitesRepoValue = repo;
   }
 
-  let memoriesSqliteDb: Database | undefined;
-
   if (opts.memories !== undefined) {
     assertKhoraMemoriesDbPathUnset();
 
@@ -100,16 +96,20 @@ export async function bootstrapKhoraHost(
     });
 
     const handle = await stack.service.getHandle(opts.memories.databaseId);
+    const pendingEmbeddings = foundation.persistence.pendingEmbeddings;
     const syncPersistence = handle.sync?.syncPersistence;
-    if (syncPersistence === undefined) {
-      throw new Error("Host memories handle is missing sync SQLite persistence");
+    if (syncPersistence !== undefined) {
+      migrateLegacyPendingEmbeddingsFromMemoriesDb(
+        getMemoriesSqliteDatabase(syncPersistence),
+        pendingEmbeddings,
+      );
     }
-    memoriesSqliteDb = getMemoriesSqliteDatabase(syncPersistence);
-    ensurePendingEmbeddingsTable(memoriesSqliteDb);
+    let embeddingRetryWorker: ReturnType<typeof startEmbeddingRetryWorker> | undefined;
 
     memories = bootstrapHostSearch({
       persistence: handle.persistence,
       close: () => {
+        embeddingRetryWorker?.stop();
         void handle.close();
       },
       persistenceClient: foundation.persistenceClient,
@@ -117,12 +117,11 @@ export async function bootstrapKhoraHost(
       embeddingModel: opts.memories.embeddingModel,
       namespaceRoot: opts.memories.namespaceRoot,
       onEmbeddingFailure: ({ namespace, memoryKey, sourceKey, text }) => {
-        if (!memoriesSqliteDb) return;
-        enqueuePendingEmbedding(memoriesSqliteDb, { namespace, memoryKey, sourceKey, text });
+        pendingEmbeddings.enqueue({ namespace, memoryKey, sourceKey, text });
       },
     });
-    startEmbeddingRetryWorker({
-      db: memoriesSqliteDb,
+    embeddingRetryWorker = startEmbeddingRetryWorker({
+      queue: pendingEmbeddings,
       client: memories.client,
       embeddingModel: opts.memories.embeddingModel,
     });
