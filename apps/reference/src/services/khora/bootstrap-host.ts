@@ -1,5 +1,6 @@
 import {
   bootstrapHostSearch,
+  createCatalogPublicPostFeedReader,
   createKhoraHost,
   type KhoraHostContext,
   parseInviteSeedTokens,
@@ -127,6 +128,12 @@ export async function bootstrapKhoraHost(
     });
   }
 
+  const publicPostFeed = createCatalogPublicPostFeedReader({
+    catalog: foundation.cluster.catalog,
+    tenantKey: foundation.tenantKey,
+    postResolver: foundation.postResolver,
+  });
+
   // Published host entrypoints (`./sqlite` vs `.`) re-declare private classes in
   // separate .d.ts bundles; cast across that boundary.
   const ctx = createKhoraHost({
@@ -143,6 +150,7 @@ export async function bootstrapKhoraHost(
     hostSpec: foundation.hostSpec,
     outboxPayloadCodec: foundation.outboxPayloadCodec,
     subscriptions: foundation.subscriptions,
+    publicPostFeed,
     ...(invitesRepoValue !== undefined ? { invitesRepo: invitesRepoValue } : {}),
     ...(memories !== undefined ? { search: memories } : {}),
     ...(opts.startPrincipalTeardownWorker !== undefined
