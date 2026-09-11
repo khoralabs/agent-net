@@ -4,12 +4,12 @@ Published import surfaces for `@khoralabs/agent-net`.
 
 | Import | Role |
 |--------|------|
-| `@khoralabs/agent-net` | Core control plane: `startNetworkHarness`, agents/pool/network events, turn helpers (no AI SDK / Workflow directives; no negotiate/chat/memories peels). Optional `harness.publicPostFeed` when a Khora admin token is configured. |
+| `@khoralabs/agent-net` | Core control plane: `startNetworkHarness`, agents/pool/network events, turn helpers (no AI SDK / Workflow directives; no negotiate/chat/memories peels). Optional `harness.publicPostFeed` when a Khora admin token is configured. Always includes `harness.memories.forAgent` / `forDatabase` (typed via `HarnessMemoriesAccess`). |
 | `@khoralabs/agent-net/agent` | Slim agent surface (`AgentHandle`, `AgentSocial`, …) |
 | `@khoralabs/agent-net/pool` | Pool / inbox / network / observability (`ManagedAgentPool.queryAgents`, `PoolAgentRegistry.query`, `createKhoraPublicPostFeed`, …) |
 | `@khoralabs/agent-net/negotiate` | NBC / Vellum negotiate (`AgentSocialNegotiate`, sessions, loop, routes, prompts) |
 | `@khoralabs/agent-net/chat` | Signed chat backends and agent chat service helpers |
-| `@khoralabs/agent-net/memories` | Ontology install, deferred client, write-scope helpers |
+| `@khoralabs/agent-net/memories` | Ontology install, deferred client, write-scope helpers, `createMemoriesReadModel` / `MemoriesReadModel` |
 | `@khoralabs/agent-net/integrate/write-scope` | Write-scope only |
 | `@khoralabs/agent-net/integrate/memory-event` | Integrate memory-event helpers |
 | `@khoralabs/agent-net/ai-sdk` | LLM helpers: `generateStructured`, `runAgentWorkflow`, tool capture (optional peers: `ai`, `agent-capabilities-ai-sdk`) |
@@ -42,7 +42,7 @@ Contributor import-boundary rules: `packages/harness/AGENTS.md`. Peel rationale:
 |----------------------------------------|------------|
 | NBC / Vellum negotiate helpers (`disconnectVellum`, `registerNbcInternalNegotiationRoutes`, `createVellumChainSessionRegistry`, …) | `@khoralabs/agent-net/negotiate` |
 | Chat backends / `installAgentChat` / `AgentSocialMessage` | `@khoralabs/agent-net/chat` |
-| `installMemoriesOntology`, `createBoundAgentMemoriesClient`, write-scope helpers | `@khoralabs/agent-net/memories` (or `./integrate/write-scope`) |
+| `installMemoriesOntology`, `createBoundAgentMemoriesClient`, `createMemoriesReadModel`, write-scope helpers | `@khoralabs/agent-net/memories` (or `./integrate/write-scope`) |
 | `generateStructured`, `runHarnessAgentStep`, `prepareHarnessStepRuntime`, `captureHarnessCapabilities` | `@khoralabs/agent-net/ai-sdk` |
 | `AI_STEP_MAX_RETRIES` / `AI_STEP_TIMEOUT_MS` | `@khoralabs/agent-net/workflow-resilience` |
 | `agentResponse`, `executeAgentResponse`, `runAgentResponseStep` | Host wrappers (copy `apps/reference/src/workflows/agent-response*.ts`) + `./agent-response-run` |

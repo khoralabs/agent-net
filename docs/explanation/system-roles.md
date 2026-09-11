@@ -32,6 +32,8 @@ Within the memories monorepo, roles split:
 
 **What agent-net assumes:** a memories service base URL and admin token for remote DBs, plus node/agents helpers for tools and turn sources.
 
+**Read facade:** Memories owns HTTP contracts, graph/search ranking, provenance, and wire DTOs. Agent-net adds a credential-safe, read-only facade (`createMemoriesReadModel`, `harness.memories.forAgent` / `forDatabase`, `agent.memories.readModel`) that scopes databases and omits mutation methods/credentials. Hosts retain BFF/session auth and presentation transforms; do not put the Memories admin token in browsers.
+
 **Harness vs reference:** harness is a **service client** plus node/agents tooling. Reference **hosts** the local memories HTTP + SQLite stack (also shared with khora-host search).
 
 ## `chat`

@@ -12,6 +12,7 @@ import type {
   RemoteMemoriesClientAsync,
 } from "@khoralabs/memories-service/client";
 import type { IntegrateMemoryEvent } from "./memories/integrate/memory-event.ts";
+import type { MemoriesReadModel } from "./memories/read-model.ts";
 
 /** A bound memories client scoped to a single agent's database. */
 export type AgentMemoriesClient = {
@@ -28,6 +29,11 @@ export type AgentMemoriesClient = {
   readonly serviceClient: MemoriesServiceClient;
   /** Typed runtime client for search, merge, and delete — lazy-init on first use. */
   readonly client: RemoteMemoriesClientAsync;
+  /**
+   * Read-only Memories facade for this agent DB (same contract as
+   * `harness.memories.forAgent`). Does not expose credentials or mutation methods.
+   */
+  readonly readModel: MemoriesReadModel;
   /**
    * Hybrid memory search in this agent's DB (uses in-tree standard search helper).
    */
@@ -51,8 +57,9 @@ export function createBoundAgentMemoriesClient(input: {
   ontology: OntologyDefinition<LabelSchemaMap, LabelSchemaMap>;
   serviceClient: MemoriesServiceClient;
   client: RemoteMemoriesClientAsync;
+  readModel: MemoriesReadModel;
 }): AgentMemoriesClient {
-  const { database, ontology, serviceClient, client } = input;
+  const { database, ontology, serviceClient, client, readModel } = input;
   return {
     database,
     ontology,
@@ -63,6 +70,7 @@ export function createBoundAgentMemoriesClient(input: {
     delete: () => serviceClient.deleteDatabase(database),
     serviceClient,
     client,
+    readModel,
     search(searchInput) {
       const embeddingModel = searchInput.embeddingModel ?? resolveAgentEmbeddingModel();
       return runStandardHybridMemorySearch(client, {

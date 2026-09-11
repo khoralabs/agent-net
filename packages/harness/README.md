@@ -51,6 +51,8 @@ await agent.social.negotiate.start(peerHandle, vellumOptions);
 
 await agent.memories.search({ namespace: "notes", query: "…" });
 await agent.memories.integrate(integrateEvent);
+const namespaces = await agent.memories.readModel.listNamespaces();
+await agent.memories.readModel.getMemoryPreview({ namespace: "notes", key: "m1" });
 
 // Inbox: one multiplex WebSocket for the whole pool — demux by event.did
 const unsub = harness.subscribeInbox((event) => {
@@ -64,6 +66,29 @@ Registration invites and peer relationships are separate. `inviteFromDid` withdr
 registration token from the parent agent's encrypted bank so Khora records viral
 issuer→registrant lineage; the admin token remains the bootstrap faucet. `social.connect`
 creates a peer relationship, and `visibility: "network"` reaches accepted peers only.
+
+### Memories reads
+
+The harness exposes credential-capturing, read-only Memories facades. Returned models do **not** expose the admin token or mutation methods:
+
+```ts
+// Pool agent DB (rejects DIDs outside the managed pool)
+const reads = harness.memories.forAgent(agent.did);
+await reads.searchGraph({ namespace: "notes", query: "…" });
+
+// Explicit trusted-host path for arbitrary MemoriesDatabaseId (e.g. workflow account DBs)
+const workflowReads = harness.memories.forDatabase({
+  kind: "account",
+  ownerKey: "workflow-acct",
+});
+
+// Same contract as forAgent, bound on the agent handle
+await agent.memories.readModel.getGraphLayout({ namespace: "notes" });
+```
+
+Standalone factory (workflows / non-harness hosts): import `createMemoriesReadModel` from `@khoralabs/agent-net/memories`.
+
+Memories owns HTTP contracts, graph/search semantics, and wire DTOs. Agent-net owns database scoping, token-safe harness wiring, and this capability-limited read facade. Host BFFs keep session authorization and presentation transforms; Bloom-style browser adapters are out of scope here.
 
 ### Public post feed
 

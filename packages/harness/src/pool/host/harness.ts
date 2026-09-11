@@ -56,6 +56,7 @@ import { PerAgentInviteBank } from "../per-agent-invite-bank.ts";
 import { ManagedAgentPool } from "../pool.ts";
 import type { PoolAgentRegistry } from "../store.ts";
 import { AgentStore } from "../store.ts";
+import { createHarnessMemoriesAccess, type HarnessMemoriesAccess } from "./harness-memories.ts";
 
 export type { AgentMemoriesClient } from "../../agent/memories-types.ts";
 
@@ -116,6 +117,11 @@ export type NetworkHarnessCore = {
   readonly inviteBank: PerAgentInviteBank;
   readonly agentDids: readonly string[];
   readonly memoriesClient: MemoriesServiceClient;
+  /**
+   * Credential-capturing Memories read facades (`forAgent` / `forDatabase`).
+   * Returned models do not expose the admin token.
+   */
+  readonly memories: HarnessMemoriesAccess;
   readonly pool: ManagedAgentPool;
   readonly poolInbox: HarnessPoolInbox;
   readonly chat: HarnessChat;
@@ -212,6 +218,7 @@ function bindAgentServices(
   ontology: AgentMemoriesOntology,
 ): AgentHandle {
   const database: MemoriesDatabaseId = { kind: "account", ownerKey: agent.did };
+  const readModel = harness.memories.forAgent(agent.did, { ontology });
   const memories = createBoundAgentMemoriesClient({
     database,
     ontology,
@@ -222,6 +229,7 @@ function bindAgentServices(
       ontology,
       adminToken: harness.memoriesAdminToken,
     }),
+    readModel,
   });
   return agent.bindServices({
     memories,
@@ -516,6 +524,13 @@ export async function startNetworkHarness(
     ...(khoraAdminToken !== undefined ? { adminToken: khoraAdminToken } : {}),
   });
 
+  const memoriesAccess = createHarnessMemoriesAccess({
+    memoriesBaseUrl,
+    memoriesAdminToken,
+    isManagedAgent: (did) => pool.list().includes(did),
+    fetch: memoriesServiceFetch(),
+  });
+
   const core: NetworkHarnessCore = {
     serverBaseUrl: khoraBaseUrl,
     relayBaseUrl,
@@ -528,6 +543,7 @@ export async function startNetworkHarness(
       return pool.list();
     },
     memoriesClient,
+    memories: memoriesAccess,
     pool,
     poolInbox,
     chat,
