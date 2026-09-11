@@ -61,7 +61,7 @@
     },
     "packages/harness": {
       "name": "@khoralabs/agent-net",
-      "version": "0.6.0",
+      "version": "0.7.0",
       "dependencies": {
         "@khoralabs/agent-capabilities": "catalog:",
         "@khoralabs/chat": "catalog:",
@@ -122,8 +122,8 @@
     "@khoralabs/agent-capabilities-otel": "^0.2.0",
     "@khoralabs/chat": "^0.1.14",
     "@khoralabs/did-key-identity": "^0.2.0",
-    "@khoralabs/khora-client": "0.1.15",
-    "@khoralabs/khora-host": "0.1.15",
+    "@khoralabs/khora-client": "0.1.16",
+    "@khoralabs/khora-host": "0.1.16",
     "@khoralabs/memories-agents": "0.12.1",
     "@khoralabs/memories-node": "0.12.1",
     "@khoralabs/memories-otel": "0.12.1",
@@ -295,11 +295,11 @@
 
     "@khoralabs/did-key-identity": ["@khoralabs/did-key-identity@0.2.0", "", { "dependencies": { "@noble/ed25519": "^3.1.0", "@noble/hashes": "^2.2.0", "iso-base": "^4.2.1", "iso-signatures": "^0.5.1", "lru-cache": "^11.5.1" }, "peerDependencies": { "typescript": "^5" } }, "sha512-C0lEQIWnkhCRR22n4ew4J2c8iTsDPqwAsqOpasNZ+fGqQ9qR5ZRo7TRSzsd3jcPiXdi0P/pqx7/EUHo7UtZDcA=="],
 
-    "@khoralabs/khora-client": ["@khoralabs/khora-client@0.1.15", "", { "dependencies": { "@khoralabs/did-key-identity": "^0.2.0", "zod": "^4" }, "peerDependencies": { "typescript": "^5" } }, "sha512-LkF8HTUBbJvc8udN4TlaI564aseJuRvtyn9sEm73M8wxG+Y4svZdZClbae6AWgDAK3fmmHqi59u54I1tqYyLbg=="],
+    "@khoralabs/khora-client": ["@khoralabs/khora-client@0.1.16", "", { "dependencies": { "@khoralabs/did-key-identity": "^0.2.0", "zod": "^4" }, "peerDependencies": { "typescript": "^5" } }, "sha512-WPHlbmMTXcCh6Rmj1oXhgKK5NcJQmDXNuAjo+/l4alYv9EzNmcPMmYH/y+v7JvavDd1UfSxIHjLUgRKWOJvCqQ=="],
 
-    "@khoralabs/khora-host": ["@khoralabs/khora-host@0.1.15", "", { "dependencies": { "@khoralabs/khora-registry": "0.1.15", "@khoralabs/memories-node": "^0.12.0", "@khoralabs/memories-service": "^0.12.0", "@khoralabs/sourcemaps": "^0.1.0", "@khoralabs/sqlite-crypto": "^0.1.0", "zod": "^4" }, "peerDependencies": { "typescript": "^5" } }, "sha512-CwV55KZhSINcn/K+TMF0MKRo7L5kPfTaM1U8vpJHuJRoSC9a4B9q98euZ5YjrRhYh9lah2vBT05TBymgxlRU3g=="],
+    "@khoralabs/khora-host": ["@khoralabs/khora-host@0.1.16", "", { "dependencies": { "@khoralabs/khora-registry": "0.1.16", "@khoralabs/memories-node": "^0.12.1", "@khoralabs/memories-service": "^0.12.1", "@khoralabs/sourcemaps": "^0.1.0", "@khoralabs/sqlite-crypto": "^0.1.0", "zod": "^4" }, "peerDependencies": { "typescript": "^5" } }, "sha512-AivpsEoHE+WbgjooIpSRr2zFLoXgcC18WJziDkZA0coT3YWjtm2Hv/PwrZKqkkyelP8m+mWH9eeMAiXhcYMVAQ=="],
 
-    "@khoralabs/khora-registry": ["@khoralabs/khora-registry@0.1.15", "", { "dependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "@opentelemetry/api": "^1.9.0" }, "optionalDependencies": { "@tursodatabase/serverless": "^1.2.3" }, "peerDependencies": { "typescript": "^5" } }, "sha512-IC2usy/TvszZ5rpi8DRzY/w93jU0RL9nfRmkVOXL9ziIhUQvtxsY/1QBwsjaa0aRFkgahRTeNv6y/gqTzWX7bA=="],
+    "@khoralabs/khora-registry": ["@khoralabs/khora-registry@0.1.16", "", { "dependencies": { "@khoralabs/sqlite-crypto": "^0.1.0", "@opentelemetry/api": "^1.9.0" }, "optionalDependencies": { "@tursodatabase/serverless": "^1.2.3" }, "peerDependencies": { "typescript": "^5" } }, "sha512-WcItgmkfRN6zXdet3eicavxOCrzFdbpEOsasdJdgjvYVn5dWEPrdudvT1b2I5ASnVQQMypDrGA9HdG9LQBQnQw=="],
 
     "@khoralabs/memories-agents": ["@khoralabs/memories-agents@0.12.1", "", { "dependencies": { "@khoralabs/agent-capabilities": "^0.2.0", "@khoralabs/agent-capabilities-otel": "^0.2.0", "@khoralabs/memories-node": "0.12.1", "zod": "^4" }, "peerDependencies": { "@khoralabs/agent-capabilities-ai-sdk": "^0.2.0", "ai": "^7.0.77", "typescript": "^5" }, "optionalPeers": ["@khoralabs/agent-capabilities-ai-sdk", "ai"] }, "sha512-JzrAFGkkv1gdjmQP+XZFSvsc8VXo58BsGIVgJ0S32S1fdbeOU6VC3NeJT8Jt6f+aqb5Ll9rU6TnyzX6Xcvrj0Q=="],
 
