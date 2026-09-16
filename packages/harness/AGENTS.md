@@ -18,6 +18,7 @@ Consumer-facing architecture (control plane vs host, Workflow peel): [`docs/expl
 | `@khoralabs/agent-net` | `src/index.ts` |
 | `@khoralabs/agent-net/agent` | `src/agent/index.ts` |
 | `@khoralabs/agent-net/pool` | `src/pool/index.ts` |
+| `@khoralabs/agent-net/capabilities` | `src/capabilities/index.ts` |
 | `@khoralabs/agent-net/negotiate` | `src/agent/social/negotiate/index.ts` |
 | `@khoralabs/agent-net/chat` | `src/agent/social/message/index.ts` |
 | `@khoralabs/agent-net/memories` | `src/agent/memories/index.ts` |
@@ -25,7 +26,9 @@ Consumer-facing architecture (control plane vs host, Workflow peel): [`docs/expl
 | `@khoralabs/agent-net/swarm` | `src/swarm/index.ts` |
 | `@khoralabs/agent-net/swarm-run` | `src/swarm/run.ts` |
 
-**Do not** re-export swarm, ai-sdk, negotiate, chat, or memories peels from `src/index.ts`. Published export map: [`docs/reference/entrypoints.md`](../../docs/reference/entrypoints.md).
+**Do not** re-export swarm, ai-sdk, negotiate, chat, memories, or capabilities peels from `src/index.ts`. Published export map: [`docs/reference/entrypoints.md`](../../docs/reference/entrypoints.md).
+
+Host capability discovery (`./capabilities`) is orthogonal to `@khoralabs/agent-capabilities` tool hashes: the former describes host infrastructure; the latter fingerprints LLM tool graphs.
 
 ## Hosts own Workflow directives
 

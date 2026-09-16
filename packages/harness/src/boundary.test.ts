@@ -6,7 +6,7 @@ const packageRoot = path.resolve(import.meta.dir, "..");
 const srcRoot = path.join(packageRoot, "src");
 
 describe("root export graph peel", () => {
-  test("root does not re-export negotiate/chat/memories/ai-sdk/swarm peels", () => {
+  test("root does not re-export negotiate/chat/memories/ai-sdk/swarm/capabilities peels", () => {
     const entry = path.join(srcRoot, "index.ts");
     const indexText = readFileSync(entry, "utf8");
     expect(indexText.includes("social/negotiate")).toBe(false);
@@ -19,6 +19,15 @@ describe("root export graph peel", () => {
     expect(indexText.includes("agent/memories/read-model")).toBe(false);
     expect(indexText.includes("ai-sdk")).toBe(false);
     expect(indexText.includes("swarm/")).toBe(false);
+    expect(indexText.includes("capabilities/")).toBe(false);
+  });
+
+  test("capabilities peel exports registry and discovery", () => {
+    const peel = path.join(srcRoot, "capabilities/index.ts");
+    const text = readFileSync(peel, "utf8");
+    expect(text.includes("createHostCapabilityRegistry")).toBe(true);
+    expect(text.includes("buildAgentNetDiscovery")).toBe(true);
+    expect(text.includes("HOST_CAPABILITY")).toBe(true);
   });
 
   test("memories peel exports createMemoriesReadModel", () => {

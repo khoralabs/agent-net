@@ -36,6 +36,12 @@
       "import": "./dist/pool/index.js",
       "default": "./dist/pool/index.js"
     },
+    "./capabilities": {
+      "types": "./src/capabilities/index.ts",
+      "bun": "./src/capabilities/index.ts",
+      "import": "./dist/capabilities/index.js",
+      "default": "./dist/capabilities/index.js"
+    },
     "./negotiate": {
       "types": "./src/agent/social/negotiate/index.ts",
       "bun": "./src/agent/social/negotiate/index.ts",
