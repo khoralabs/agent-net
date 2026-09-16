@@ -35,6 +35,12 @@ import { createHarnessKhoraClientForAgent } from "../../agent/social/tools/_help
 import { getCapabilityRegistry } from "../../agent/turn/agent-runtime.ts";
 import { harnessToolkit } from "../../agent/turn/tools/index.ts";
 import type { RunAgentWorkflowDependencies } from "../../agent/turn/workflow-deps.ts";
+import {
+  type AgentEntitlementResolver,
+  createHostCapabilitiesFacade,
+  type HostCapabilitiesFacade,
+  type HostCapabilityRegistry,
+} from "../../capabilities/index.ts";
 import { requireChatBaseUrl, requireChatToken } from "../../lib/chat-base-url.ts";
 import { requireMemoriesAdminToken } from "../../lib/memories-base-url.ts";
 import { loadHarnessIdentity, resolveIdentitySecretFromEnv } from "../identity-wrap-key.ts";
@@ -133,6 +139,11 @@ export type NetworkHarnessCore = {
   readonly publicPostFeed?: KhoraPublicPostFeed;
   /** DID of an optional host-supplied operator (human ↔ agent chat). */
   readonly uiUserDid: string | undefined;
+  /**
+   * Host capability registry + entitlement facade.
+   * Always present; defaults to an empty registry with deny-all entitlements.
+   */
+  readonly capabilities: HostCapabilitiesFacade;
   /** Decrypt and list registration-issued invites available for custodial viral growth. */
   listInvitesForAgent(did: string): Promise<string[]>;
   /** Subscribe to harness multiplex inbox events (demux by `event.did`). */
@@ -208,6 +219,21 @@ export type NetworkHarnessOptions = {
    * When omitted, opens the legacy file-backed AgentStore under agentsDataDir.
    */
   agentRegistry?: PoolAgentRegistry;
+  /**
+   * Optional host capability registry. When omitted, creates an empty in-memory registry.
+   * Hosts should register the capabilities they provide after or during harness start.
+   */
+  capabilityRegistry?: HostCapabilityRegistry;
+  /**
+   * Host-owned per-agent entitlement resolver. Defaults to deny-all.
+   * Pass an allow-all helper explicitly when legacy open access is intended.
+   */
+  entitlementResolver?: AgentEntitlementResolver;
+  /**
+   * Public base URL for the capability discovery surface (`getManifest().baseUrl`).
+   * Defaults to `khoraBaseUrl` when omitted.
+   */
+  capabilitiesBaseUrl?: string;
 };
 
 export type NetworkHarnessHandle = NetworkHarnessCore & NetworkHarnessAgentApi;
@@ -531,6 +557,14 @@ export async function startNetworkHarness(
     fetch: memoriesServiceFetch(),
   });
 
+  const capabilities = createHostCapabilitiesFacade({
+    baseUrl: opts.capabilitiesBaseUrl?.trim() || khoraBaseUrl,
+    ...(opts.capabilityRegistry !== undefined ? { registry: opts.capabilityRegistry } : {}),
+    ...(opts.entitlementResolver !== undefined
+      ? { entitlementResolver: opts.entitlementResolver }
+      : {}),
+  });
+
   const core: NetworkHarnessCore = {
     serverBaseUrl: khoraBaseUrl,
     relayBaseUrl,
@@ -550,6 +584,7 @@ export async function startNetworkHarness(
     signedChat,
     ...(publicPostFeed !== undefined ? { publicPostFeed } : {}),
     uiUserDid: operatorSigner?.did,
+    capabilities,
     async listInvitesForAgent(did: string) {
       const signer = await loadSigner(did);
       if (signer === undefined) {
