@@ -22,7 +22,7 @@ describe("root export graph peel", () => {
     expect(indexText.includes("capabilities/")).toBe(false);
   });
 
-  test("capabilities peel exports registry, discovery, and entitlements", () => {
+  test("capabilities peel exports registry, discovery, entitlements, and HTTP", () => {
     const peel = path.join(srcRoot, "capabilities/index.ts");
     const text = readFileSync(peel, "utf8");
     expect(text.includes("createHostCapabilityRegistry")).toBe(true);
@@ -30,6 +30,8 @@ describe("root export graph peel", () => {
     expect(text.includes("HOST_CAPABILITY")).toBe(true);
     expect(text.includes("createHostCapabilitiesFacade")).toBe(true);
     expect(text.includes("computeAgentEffectiveCapabilities")).toBe(true);
+    expect(text.includes("dispatchAgentNetCapabilityRequest")).toBe(true);
+    expect(text.includes("discoverAgentNet")).toBe(true);
   });
 
   test("memories peel exports createMemoriesReadModel", () => {

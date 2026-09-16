@@ -1,9 +1,12 @@
+import { z } from "zod";
 import type { AgentEntitlement, AgentEntitlementSet } from "./entitlement.ts";
+import { zEntitlementDecision } from "./entitlement.ts";
 import type {
   AgentNetHostManifest,
   HostCapabilityAvailability,
   HostCapabilityEntry,
 } from "./manifest.ts";
+import { zHostCapabilityAvailability } from "./manifest.ts";
 
 export type EffectiveBlockedBy = "unsupported" | "unavailable" | "denied";
 
@@ -27,6 +30,28 @@ export type AgentEffectiveCapabilities = {
   computedAt: string;
   capabilities: EffectiveCapabilityEntry[];
 };
+
+export const zEffectiveBlockedBy = z.enum(["unsupported", "unavailable", "denied"]);
+
+export const zEffectiveCapabilityEntry = z.object({
+  capabilityId: z.string().min(1),
+  effective: z.boolean(),
+  supported: z.boolean(),
+  availability: z.union([zHostCapabilityAvailability, z.literal("unsupported")]),
+  entitlement: zEntitlementDecision,
+  blockedBy: zEffectiveBlockedBy.optional(),
+  scopes: z.array(z.string()).optional(),
+  reason: z.string().optional(),
+  statusDetail: z.string().optional(),
+});
+
+export const zAgentEffectiveCapabilities = z.object({
+  agentDid: z.string().min(1),
+  manifestRevision: z.string().min(1),
+  entitlementRevision: z.string().min(1),
+  computedAt: z.string().datetime(),
+  capabilities: z.array(zEffectiveCapabilityEntry),
+});
 
 function entitlementById(set: AgentEntitlementSet): Map<string, AgentEntitlement> {
   const map = new Map<string, AgentEntitlement>();

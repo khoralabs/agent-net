@@ -4,6 +4,9 @@ export {
   computeAgentEffectiveCapabilities,
   type EffectiveBlockedBy,
   type EffectiveCapabilityEntry,
+  zAgentEffectiveCapabilities,
+  zEffectiveBlockedBy,
+  zEffectiveCapabilityEntry,
 } from "./effective.ts";
 export {
   type AgentEntitlement,
@@ -21,7 +24,22 @@ export {
   createHostCapabilitiesFacade,
   type HostCapabilitiesFacade,
 } from "./facade.ts";
-export { AGENT_NET_HTTP_PATH, type AgentNetHttpPath } from "./http/routes.ts";
+export {
+  AGENT_NET_HTTP_PATH,
+  type AgentNetCapabilityHttpDeps,
+  type AgentNetFetch,
+  type AgentNetHttpPath,
+  type DiscoverAgentNetOptions,
+  discoverAgentNet,
+  dispatchAgentNetCapabilityRequest,
+  type FetchAgentCapabilitiesSelfOptions,
+  fetchAgentCapabilitiesSelf,
+  handleAgentNetCapabilitiesSelf,
+  handleAgentNetHealth,
+  handleAgentNetWellKnown,
+  type ResolveCapabilityPrincipal,
+  type ResolveCapabilityPrincipalResult,
+} from "./http/index.ts";
 export { type BuiltInHostCapabilityId, HOST_CAPABILITY, type HostCapabilityId } from "./ids.ts";
 export {
   AGENT_NET_DISCOVERY_PROTOCOL_VERSION,
