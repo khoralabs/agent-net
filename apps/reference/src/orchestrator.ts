@@ -3,6 +3,7 @@ import path from "node:path";
 import { getHarnessMemoriesTelemetry } from "@khoralabs/agent-net";
 
 import { installReferenceObservability } from "./observability/install.ts";
+import { startAgentNetCapabilitiesService } from "./services/agent-net-capabilities.ts";
 import { startChatHttpService } from "./services/chat.ts";
 import { startKhoraHost } from "./services/khora/index.ts";
 import { startMemoriesService } from "./services/memories.ts";
@@ -21,6 +22,7 @@ const DEFAULT_KHORA_PORT = 8788;
 const DEFAULT_RELAY_PORT = 8790;
 const DEFAULT_MEMORIES_PORT = 8791;
 const DEFAULT_CHAT_PORT = 8792;
+const DEFAULT_CAPABILITIES_PORT = 8793;
 
 function parseArgs(argv: string[]): {
   dataDir: string;
@@ -28,6 +30,7 @@ function parseArgs(argv: string[]): {
   memoriesPort?: number;
   relayPort?: number;
   chatPort?: number;
+  capabilitiesPort?: number;
   chatToken: string;
 } {
   const args = new Map<string, string>();
@@ -48,6 +51,7 @@ function parseArgs(argv: string[]): {
   const memoriesPortRaw = args.get("memories-port");
   const relayPortRaw = args.get("relay-port");
   const chatPortRaw = args.get("chat-port");
+  const capabilitiesPortRaw = args.get("capabilities-port");
   return {
     dataDir: resolveHarnessDataDir(args.get("data-dir")),
     chatToken:
@@ -59,6 +63,10 @@ function parseArgs(argv: string[]): {
       memoriesPortRaw !== undefined ? Number.parseInt(memoriesPortRaw, 10) : DEFAULT_MEMORIES_PORT,
     relayPort: relayPortRaw !== undefined ? Number.parseInt(relayPortRaw, 10) : DEFAULT_RELAY_PORT,
     chatPort: chatPortRaw !== undefined ? Number.parseInt(chatPortRaw, 10) : DEFAULT_CHAT_PORT,
+    capabilitiesPort:
+      capabilitiesPortRaw !== undefined
+        ? Number.parseInt(capabilitiesPortRaw, 10)
+        : DEFAULT_CAPABILITIES_PORT,
   };
 }
 
@@ -106,11 +114,21 @@ async function main(): Promise<void> {
     token: opts.chatToken,
     port: opts.chatPort,
   });
+  const capabilities = startAgentNetCapabilitiesService({
+    port: opts.capabilitiesPort,
+    services: {
+      khoraBaseUrl: khora.baseUrl,
+      memoriesBaseUrl: memories.baseUrl,
+      relayBaseUrl: relay.baseUrl,
+      chatBaseUrl: chat.baseUrl,
+    },
+  });
 
   process.env.KHORA_BASE_URL = khora.baseUrl;
   process.env.MEMORIES_BASE_URL = memories.baseUrl;
   process.env.RELAY_BASE_URL = relay.baseUrl;
   process.env.CHAT_BASE_URL = chat.baseUrl;
+  process.env.AGENT_NET_BASE_URL = capabilities.baseUrl;
   process.env.CHAT_INTERNAL_TOKEN = chat.token;
   process.env.MEMORIES_SERVICE_ADMIN_TOKEN =
     process.env.MEMORIES_SERVICE_ADMIN_TOKEN?.trim() || DEFAULT_MEMORIES_ADMIN_TOKEN;
@@ -124,6 +142,7 @@ async function main(): Promise<void> {
         memoriesBaseUrl: memories.baseUrl,
         relayBaseUrl: relay.baseUrl,
         chatBaseUrl: chat.baseUrl,
+        agentNetBaseUrl: capabilities.baseUrl,
         khoraAdminToken:
           process.env.KHORA_ADMIN_TOKEN?.trim() ||
           process.env.ADMIN_ROOT_TOKEN?.trim() ||
@@ -137,10 +156,11 @@ async function main(): Promise<void> {
     )}\n`,
   );
   process.stdout.write(
-    "Reference stack is running (khora + memories + relay + chat). Run marketplace/swarm in another terminal.\n",
+    "Reference stack is running (khora + memories + relay + chat + capabilities). Run marketplace/swarm in another terminal.\n",
   );
 
   const shutdown = () => {
+    capabilities.stop();
     chat.stop();
     memories.stop();
     relay.stop();

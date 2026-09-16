@@ -42,6 +42,7 @@ Pinned when using the reference orchestrator (match `.env` / printed URLs):
 | Relay | `http://127.0.0.1:8790` |
 | Memories | `http://127.0.0.1:8791` |
 | Chat | `http://127.0.0.1:8792` |
+| Agent-net capabilities | `http://127.0.0.1:8793` (`GET /.well-known/agent-net`) |
 
 Data directory: `apps/reference/.data`.
 
@@ -53,16 +54,18 @@ Data directory: `apps/reference/.data`.
 | `RELAY_BASE_URL` | Harness / CLIs | Relay HTTP base |
 | `MEMORIES_BASE_URL` | Harness / CLIs | Memories service HTTP base |
 | `CHAT_BASE_URL` | Harness / CLIs | Chat HTTP base |
+| `AGENT_NET_BASE_URL` | Reference / discovery clients | Capability discovery base (well-known) |
 | `CHAT_INTERNAL_TOKEN` | Chat auth | Reference default: `reference-chat-token` |
 | `AI_GATEWAY_API_KEY` | Marketplace / LLM demos | Required for marketplace |
 | `LOG_LEVEL` | Reference observability | Optional pino level |
 | `WORKFLOW_TARGET_WORLD` | Host Workflow world | e.g. `local` |
 | `WORKFLOW_LOCAL_DATA_DIR` | Local world | Optional |
 
-Harness `startNetworkHarness` also accepts `memoriesAdminToken`, `chatToken`, optional `khoraAdminToken`, and optional `identitySecret` in code (see package Target DX in the harness README).
+Harness `startNetworkHarness` also accepts `memoriesAdminToken`, `chatToken`, optional `khoraAdminToken`, optional `identitySecret`, and optional capability options (`capabilityRegistry`, `entitlementResolver`, `capabilitiesBaseUrl`) in code. See [host capabilities](../explanation/host-capabilities.md).
 
 ## Related
 
 - [Getting started](../tutorials/getting-started.md)
+- [Host capabilities](../explanation/host-capabilities.md)
 - [Dependency graph](dependency-graph.md)
 - [CLI package README](../../packages/cli/README.md)
