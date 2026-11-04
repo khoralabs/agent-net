@@ -4,9 +4,10 @@ Published import surfaces for `@khoralabs/agent-net`.
 
 | Import | Role |
 |--------|------|
-| `@khoralabs/agent-net` | Core control plane: `startNetworkHarness`, agents/pool/network events, turn helpers (no AI SDK / Workflow directives; no negotiate/chat/memories peels). Optional `harness.publicPostFeed` when a Khora admin token is configured. Always includes `harness.memories.forAgent` / `forDatabase` (typed via `HarnessMemoriesAccess`). |
+| `@khoralabs/agent-net` | Core control plane: `startNetworkHarness`, agents/pool/network events, turn helpers (no AI SDK / Workflow directives; no negotiate/chat/memories/capabilities peels). Optional `harness.publicPostFeed` when a Khora admin token is configured. Always includes `harness.memories.forAgent` / `forDatabase` (typed via `HarnessMemoriesAccess`). |
 | `@khoralabs/agent-net/agent` | Slim agent surface (`AgentHandle`, `AgentSocial`, …) |
 | `@khoralabs/agent-net/pool` | Pool / inbox / network / observability (`ManagedAgentPool.queryAgents`, `PoolAgentRegistry.query`, `createKhoraPublicPostFeed`, …) |
+| `@khoralabs/agent-net/capabilities` | Host capability registry, discovery manifest, entitlement resolver, effective-capability computation, and auth-agnostic HTTP handlers/client — orthogonal to `@khoralabs/agent-capabilities` tool hashes |
 | `@khoralabs/agent-net/negotiate` | NBC / Vellum negotiate (`AgentSocialNegotiate`, sessions, loop, routes, prompts) |
 | `@khoralabs/agent-net/chat` | Signed chat backends and agent chat service helpers |
 | `@khoralabs/agent-net/memories` | Ontology install, deferred client, write-scope helpers, `createMemoriesReadModel` / `MemoriesReadModel` |
@@ -30,7 +31,7 @@ Published import surfaces for `@khoralabs/agent-net`.
 | `@khoralabs/agent-net/swarm-run` | Directive-free swarm setup/assemble/state helpers |
 | `@khoralabs/agent-net/agent-workflow-types` | Lean workflow types |
 
-Swarm orchestrators and `"use workflow"` / `"use step"` wrappers are **host-owned** (see `apps/reference/src/workflows/`). Swarm, ai-sdk, negotiate, chat, and memories peels are **not** re-exported from the root entrypoint.
+Swarm orchestrators and `"use workflow"` / `"use step"` wrappers are **host-owned** (see `apps/reference/src/workflows/`). Swarm, ai-sdk, negotiate, chat, memories, and capabilities peels are **not** re-exported from the root entrypoint.
 
 Optional peers: `ai`, `workflow`, and `@khoralabs/agent-capabilities-ai-sdk`. Install them when using `./ai-sdk` or host Workflow wrappers.
 

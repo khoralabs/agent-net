@@ -8,7 +8,8 @@ For why each primary package exists, see [system roles](system-roles.md). For de
 
 ```text
 reference orchestrator
-  ├─ wires servers: khora-host, memories-service, relay/server, chat/http/server
+  ├─ wires servers: khora-host, memories-service, relay/server, chat/http/server,
+  │                 agent-net capabilities discovery (/.well-known/agent-net)
   ├─ configures Workflow world (local world in the reference app)
   └─ CLIs import harness → which calls clients:
         khora-client, chat HTTP client, memories-service client,
@@ -17,10 +18,10 @@ reference orchestrator
 
 | Layer | Package | Owns |
 |-------|---------|------|
-| **Client / control plane** | `@khoralabs/agent-net` | Identities, pool, inbox, social, memories tools, negotiate, directive-free run helpers |
-| **Host / process wiring** | `@khoralabs/agent-net-reference` (or any host) | Embedded or remote servers, Workflow durable wrappers, CLIs, demo domains |
+| **Client / control plane** | `@khoralabs/agent-net` | Identities, pool, inbox, social, memories tools, negotiate, directive-free run helpers, capability registry/entitlements |
+| **Host / process wiring** | `@khoralabs/agent-net-reference` (or any host) | Embedded or remote servers, Workflow durable wrappers, CLIs, demo domains, capability HTTP auth injection |
 
-The harness assumes base URLs and tokens; it does **not** embed relay, chat, memories, or khora. A host that already runs those services can point the harness at them. The reference app embeds them for zero-config local demos.
+The harness assumes base URLs and tokens; it does **not** embed relay, chat, memories, or khora. A host that already runs those services can point the harness at them. The reference app embeds them for zero-config local demos. Host capability discovery is documented in [host capabilities](host-capabilities.md).
 
 ## Khora registration and social graphs
 
